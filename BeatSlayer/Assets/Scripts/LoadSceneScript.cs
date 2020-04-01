@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 using ProjectManagement;
 
 public class LoadSceneScript : MonoBehaviour {
-
+    /*
     AsyncOperation ao;
     public Slider loadingSlider;
     public Text loadingText;
@@ -186,7 +186,7 @@ public class LoadSceneScript : MonoBehaviour {
         {
             switch (loadparams.type)
             {
-                case SceneloadParameters.LoadType.Standard: yield return InitProjectFile(); break;
+                case SceneloadParameters.LoadType.Author: yield return InitProjectFile(); break;
                 case SceneloadParameters.LoadType.AudioFile: yield return InitCustomFile(); break;
                 case SceneloadParameters.LoadType.ProjectFolder: yield return InitProjectFolder(loadparams); break;
             }
@@ -214,87 +214,12 @@ public class LoadSceneScript : MonoBehaviour {
 
         yield return new WaitForEndOfFrame();
     }
-
+    */
 }
 
 // Класс для временного (межстраничного) хранения данных
 public static class LCData
 {
-    public static string sceneLoading = "";
-    public enum LoadingType { Standard, AudioFile, ProjectFile, MapFolder };
-    public static LoadingType loadingType;
-
-    public static TrackClass track;
-    public static Project project;
-
-    public static AudioClip aclip;
-
     public static int[] hitsIds;
-
-    public static string newVersion,newVersionDescription;
-
-    public static bool isBossLevel = false;
-
-
-    /// <summary>
-    /// Путь до файла проекта (.bsz). Используется при loadingType = ProjectFile
-    /// </summary>
-    public static string projectFilePath;
-
-
-    public static SceneloadParameters loadparams;
-
-
-    public static string author
-    {
-        get
-        {
-            if (loadparams.type == SceneloadParameters.LoadType.ProjectFolder) return project.author;
-            else return track.group.author;
-        }
-    }
-    public static string name
-    {
-        get
-        {
-            if (loadparams.type == SceneloadParameters.LoadType.ProjectFolder) return project.name;
-            else return track.group.name;
-        }
-    }
 }
 
-public class SceneloadParameters
-{
-    /// <summary>
-    /// Project loading method
-    /// </summary>
-    public enum LoadType 
-    { 
-        /// <summary>
-        /// From Author list
-        /// </summary>
-        Standard,
-        /// <summary>
-        /// From Own music list (from .mp3 or .ogg file)
-        /// </summary>
-        AudioFile,
-        /// <summary>
-        /// From 'From file' list. Select folder with unzipped project (Folder contains bsu, mp3/ogg, png/jpg files)
-        /// </summary>
-        ProjectFolder
-    }
-
-    public LoadType type;
-    public string path;
-
-
-    public SceneloadParameters(LoadType type)
-    {
-        this.type = type;
-    }
-    public SceneloadParameters(LoadType type, string path)
-    {
-        this.type = type;
-        this.path = path;
-    }
-}

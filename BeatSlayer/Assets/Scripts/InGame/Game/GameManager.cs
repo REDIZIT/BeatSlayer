@@ -1,5 +1,6 @@
 ﻿using Assets.SimpleLocalization;
 using InGame.Game;
+using InGame.SceneManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -95,10 +96,6 @@ public class GameManager : MonoBehaviour
     float maxCombo = 1;
     int[] clipTime;
 
-    //PrefsManager prefsManager
-    //{
-    //    get { return GetComponent<PrefsManager>(); }
-    //}
     AdvancedSaveManager prefsManager
     {
         get { return GetComponent<AdvancedSaveManager>(); }
@@ -115,13 +112,13 @@ public class GameManager : MonoBehaviour
 
     public void InitProject()
     {
-        project = LCData.project;
+        project = LoadingData.project;
 
         beats.AddRange(project.beatCubeList.OrderBy(c => c.time).ToArray());
     }
     public void ProcessBeatTime()
     {
-        if (LCData.loadingType != LCData.LoadingType.AudioFile)
+        if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
             float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime / pitch;
             if (beats.ToArray().Length > 0 && asTime >= beats[0].time)
@@ -153,9 +150,9 @@ public class GameManager : MonoBehaviour
 
         #region Redirect to menu
 
-        if (LCData.sceneLoading == "" && this.enabled)
+        if (LoadingData.loadparams == null || (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Menu && this.enabled))
         {
-            SceneManager.LoadScene("LoadScene");
+            SceneManager.LoadScene("Menu");
             return;
         }
 
@@ -168,12 +165,12 @@ public class GameManager : MonoBehaviour
         try
         {
 
-            fullTrackName = LCData.project.author + "-" + LCData.project.name;
+            fullTrackName = LoadingData.project.author + "-" + LoadingData.project.name;
 
             GameObject sc = Instantiate(scenes[prefsManager.prefs.selectedMapId]);
             sc.transform.position = new Vector3(0, 0, 0);
 
-            if (LCData.loadingType != LCData.LoadingType.AudioFile)
+            if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
             {
                 InitProject();
             }
@@ -189,36 +186,35 @@ public class GameManager : MonoBehaviour
         try { InitGraphics(); }
         catch (System.Exception err) { trackText.text = "Error InitGraphics: " + err.Message; }
 
-        try { InitAudio(); }
-        catch (System.Exception err) { trackText.text = "Error InitAudio: " + err.Message; }
-
         try { StartForUI(); }
         catch (System.Exception err) { trackText.text = "Error StartForUI: " + err.Message; }
     }
     void InitAudio()
     {
-        audioManager.asource.clip = LCData.aclip;
+        audioManager.asource.clip = LoadingData.aclip;
+
+        Debug.Log("Audio Clip len is " + audioManager.asource.clip.length + "/" + LoadingData.aclip.length);
 
         pitch = SSytem.instance.GetFloat("MusicSpeed") / 10f;
         audioManager.asource.pitch = pitch;
-        if (LCData.loadingType == LCData.LoadingType.AudioFile) audioManager.spectrumAsource.pitch = pitch;
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = pitch;
         pitchSlider.value = (pitch - 1) * 10;
         OnPitchChanged();
 
 
 
 
-        if (LCData.loadingType == LCData.LoadingType.AudioFile)
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile)
         {
-            AudioClip sClip = CloneAudioClip(LCData.aclip, "SUKAAAAA");
+            AudioClip sClip = CloneAudioClip(LoadingData.aclip, "SUKAAAAA");
             audioManager.spectrumAsource.clip = sClip;
         }
 
 
-        clipTime = SplitTime(LCData.aclip.length);
+        clipTime = SplitTime(LoadingData.aclip.length);
 
-        Debug.Log("Audio Clip is null? " + (LCData.aclip == null));
-        Debug.Log("Audio Extension is " + (LCData.project.audioExtension == Project.AudioExtension.Mp3 ? "mp3" : "ogg"));
+        Debug.Log("Audio Clip is null? " + (LoadingData.aclip == null));
+        Debug.Log("Audio Extension is " + (LoadingData.project.audioExtension == Project.AudioExtension.Mp3 ? "mp3" : "ogg"));
     }
     void InitGraphics()
     {
@@ -241,9 +237,9 @@ public class GameManager : MonoBehaviour
         }
         fpsText.gameObject.SetActive(false);
 
-        likeBtnImg.gameObject.SetActive(LCData.loadingType != LCData.LoadingType.AudioFile);
+        likeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
         //likeBtnImg.gameObject.SetActive(true);
-        dislikeBtnImg.gameObject.SetActive(LCData.loadingType != LCData.LoadingType.AudioFile);
+        dislikeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
         //dislikeBtnImg.gameObject.SetActive(true);
 
         rightSaber.Init(SSytem.instance.rightColor, prefsManager.prefs.selectedSaber);
@@ -312,15 +308,18 @@ public class GameManager : MonoBehaviour
 
         AlignToSide();
 
+        try { InitAudio(); }
+        catch (System.Exception err) { trackText.text = "Error InitAudio: " + err.Message; }
+
         gameStarting = true;
         gameStarted = true;
-        if (LCData.loadingType == LCData.LoadingType.AudioFile) { audioManager.PlaySpectrumSource(); }
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) { audioManager.PlaySpectrumSource(); }
         yield return new WaitForSeconds(bitCubeEndTime / pitch / cubesspeed);
         audioManager.PlaySource();
         if (paused)
         {
             audioManager.asource.Pause();
-            if (LCData.loadingType == LCData.LoadingType.AudioFile) audioManager.spectrumAsource.Pause();
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
         }
         gameStarting = false;
     }
@@ -412,7 +411,7 @@ public class GameManager : MonoBehaviour
                     if (audioManager.asource.isPlaying)
                     {
                         audioManager.asource.Pause();
-                        if (LCData.loadingType == LCData.LoadingType.AudioFile) audioManager.spectrumAsource.Pause();
+                        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
                     }
                     return;
                 }
@@ -458,7 +457,6 @@ public class GameManager : MonoBehaviour
                         catch (Exception err) { Debug.LogError("Catched error::Time::Text: " + err.Message); }
                         
                     }
-                    else Debug.LogError("asource clip time is zero");
                 }
                 else Debug.LogError("asource clip is null");
             }
@@ -478,7 +476,7 @@ public class GameManager : MonoBehaviour
 
             //if (!gameStarting && !paused && !asource.isPlaying && (beats.ToArray().Length == 0 || (beats.ToArray().Length < 10 && asource.time == 0)))
             if (!gameStarting && audioManager.asource.time == 0 && beats.ToArray().Length == 0 && !audioManager.asource.isPlaying
-                /*&& (LCData.loadingType == LCData.LoadingType.AudioFile ? spectrumAsource.isPlaying : true)*/)
+                /*&& (LoadingData.loadparams.Type == LoadingData.loadparams.Type.AudioFile ? spectrumAsource.isPlaying : true)*/)
             {
                 if (!gameCompleted)
                 {
@@ -487,16 +485,16 @@ public class GameManager : MonoBehaviour
                     trackTimeSlider.value = 100;
                     trackTextSliderText.text = "100%";
 
-                    if (LCData.loadingType != LCData.LoadingType.ProjectFile)
+                    if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.ProjectFolder)
                     {
                         if (Application.internetReachability != NetworkReachability.NotReachable)
                         {
-                            AccountTrackRecord atRecord = accountManager.GetRecord(LCData.author, LCData.name, LCData.track.nick);
+                            AccountTrackRecord atRecord = accountManager.GetRecord(project.author, project.name, project.creatorNick);
                             AccountTrackRecord newRecord = new AccountTrackRecord()
                             {
-                                author = LCData.author,
-                                name = LCData.name,
-                                nick = LCData.track.nick,
+                                author = project.author,
+                                name = project.name,
+                                nick = project.creatorNick,
                                 score = float.Parse(scoreText.text),
                                 missed = int.Parse(missedText.text),
                                 percent = float.Parse(perText.text.Replace("%", ""))
@@ -518,8 +516,8 @@ public class GameManager : MonoBehaviour
                                 }
                             }
 
-                            accountManager.UpdateRecord(LCData.author, LCData.name, LCData.track.nick, newRecord);
-                            accountManager.UpdatePlayedMap(LCData.author, LCData.name, LCData.track.nick);
+                            accountManager.UpdateRecord(project.author, project.name, project.creatorNick, newRecord);
+                            accountManager.UpdatePlayedMap(project.author, project.name, project.creatorNick);
                             accountManager.UpdateSessionTime();
                         }
                     }
@@ -534,12 +532,12 @@ public class GameManager : MonoBehaviour
 
 
 
-                    string coverPath = TheGreat.GetCoverPath(Application.persistentDataPath + "/maps/" + LCData.track.group.author + "-" + LCData.track.group.name + "/" + LCData.track.nick, fullTrackName);
+                    string coverPath = TheGreat.GetCoverPath(Application.persistentDataPath + "/maps/" + project.author + "-" + project.name + "/" + project.creatorNick, fullTrackName);
                     endCoverImage.sprite = coverPath == "" ? defaultTrackSprite : TheGreat.LoadSprite(coverPath);
 
-                    endAuthorText.text = LCData.track.group.author;
-                    endNameText.text = LCData.track.group.name;
-                    endCreatorText.text = LocalizationManager.Localize("by") + " " + LCData.track.nick;
+                    endAuthorText.text = project.author;
+                    endNameText.text = project.name;
+                    endCreatorText.text = LocalizationManager.Localize("by") + " " + project.creatorNick;
 
                     endScoreText.text = $"<color=#fff>{scoreText.text}</color> <color=#f40>{perText.text}</color> <color=#f00>{missedText.text}</color>";
 
@@ -846,7 +844,7 @@ public class GameManager : MonoBehaviour
         paused = true;
         pausePanel.SetActive(true);
         audioManager.PauseSource();
-        if (LCData.loadingType == LCData.LoadingType.AudioFile) audioManager.spectrumAsource.Pause();
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
     }
     public void Unpause()
     {
@@ -857,7 +855,7 @@ public class GameManager : MonoBehaviour
     {
         paused = false;
         audioManager.PlaySource();
-        if (LCData.loadingType == LCData.LoadingType.AudioFile) audioManager.spectrumAsource.Play();
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Play();
 
         float timespeed = 0;
         float encrease = 0.02f;
@@ -870,7 +868,7 @@ public class GameManager : MonoBehaviour
                 timespeed = 1;
             }
             audioManager.asource.pitch = timespeed * pitch;
-            if (LCData.loadingType == LCData.LoadingType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * pitch;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * pitch;
             Time.timeScale = timespeed;
             yield return new WaitForEndOfFrame();
         }
@@ -883,14 +881,12 @@ public class GameManager : MonoBehaviour
     {
         accountManager.UpdateSessionTime();
 
-        LCData.sceneLoading = "Menu";
-        SceneManager.LoadScene("LoadScene");
+        SceneloadParameters parameters = SceneloadParameters.GoToMenuPreset();
+        SceneController.instance.LoadScene(parameters);
     }
     public void Restart()
     {
-        //LCData.sceneLoading = "ServerLevel";
-        LCData.sceneLoading = "Game";
-        SceneManager.LoadScene("LoadScene");
+        SceneController.instance.LoadScene(LoadingData.loadparams);
     }
     public void OnPitchChanged()
     {
@@ -1211,7 +1207,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("RateBtnSET: state is " + (liked ? 1 : -1));
 
             //File.AppendAllText(Application.persistentDataPath + "/order.ls", (liked ? "Liked:" : "Disliked:") + fullTrackName + "\n");
-            TheGreat.SendStatistics(fullTrackName, LCData.track.nick, liked ? "like" : "dislike");
+            TheGreat.SendStatistics(fullTrackName, project.creatorNick, liked ? "like" : "dislike");
 
             likeBtnImg.color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);
             likeBtnImg.transform.GetChild(0).GetComponent<Image>().color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);
@@ -1276,5 +1272,11 @@ public class GameManager : MonoBehaviour
         }
 
         coinsText.text = Mathf.RoundToInt(target) + "";
+    }
+
+    class SpawnPointClass
+    {
+        public int index;
+        public float cooldown;
     }
 }

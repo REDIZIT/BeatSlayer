@@ -30,6 +30,9 @@ public class TrackClass
     public Sprite cover;
 
     public bool hasUpdate;
+
+    public int difficulty;
+    public string difficultyName;
 }
 
 public class TrackRecordGroup

@@ -33,6 +33,9 @@ public class MapListItem : MonoBehaviour
 
     public GameObject updateBtn;
 
+    public Text difficultyText;
+    public Transform difficultyStarsContnet;
+
     public void Setup(MenuScript_v2 menu, TrackClass item, bool isPassed)
     {
         this.menu = menu;
@@ -60,10 +63,13 @@ public class MapListItem : MonoBehaviour
         {
             updateBtn.SetActive(item.hasUpdate);
         }
+
+        //difficultyStarsContnet implement
+        UpdateDifficulty();
+
     }
     public void SetupForLocalFile(MenuScript_v2 menu, TrackClass item)
     {
-        Debug.Log("[SETUP LOCAL]");
         this.menu = menu;
         this.item = item;
 
@@ -80,6 +86,34 @@ public class MapListItem : MonoBehaviour
         progressBar.gameObject.SetActive(false);
         deleteBtn.SetActive(false);
     }
+
+    public void UpdateDifficulty()
+    {
+        int difficulty = item.difficulty;
+        string diffName = item.difficultyName;
+
+        difficultyText.text = diffName;
+        float xOffset = difficultyText.preferredWidth + 20;
+
+
+        foreach (Transform child in difficultyStarsContnet) if (child.name != "Item") Destroy(child.gameObject);
+        GameObject prefab = difficultyStarsContnet.GetChild(0).gameObject;
+        prefab.SetActive(true);
+
+        for (int i = 1; i <= 10; i++)
+        {
+            Color clr = i <= difficulty ? Color.white : new Color(0.18f, 0.18f, 0.18f);
+
+            GameObject item = Instantiate(prefab, difficultyStarsContnet);
+            item.GetComponent<Image>().color = clr;
+        }
+
+        prefab.SetActive(false);
+
+        difficultyStarsContnet.GetComponent<RectTransform>().anchoredPosition = new Vector2(xOffset, 0);
+    }
+
+
 
 
     #region Downloading track
@@ -167,8 +201,8 @@ public class MapListItem : MonoBehaviour
 
     public void OnPlayClick()
     {
-        LCData.track = item;
-        LCData.loadingType = item.group.filepath != "" ? LCData.LoadingType.AudioFile : LCData.LoadingType.Standard;
+        //LCData.track = item;
+        
 
         //if (LCData.loadingType == LCData.LoadingType.Standard)
         //{
@@ -194,20 +228,23 @@ public class MapListItem : MonoBehaviour
         //        }
         //    }
 
-        //}
-        
-        Debug.Log("[LOADING] " + item.group.filepath);
 
-        Debug.Log("[LOADING] Is Custom(AudioFile) ? " + (LCData.loadingType == LCData.LoadingType.AudioFile));
 
-        if (LCData.loadingType == LCData.LoadingType.Standard)
+        SceneloadParameters load;
+        if (item.group.filepath == "")
         {
-            TheGreat.SendStatistics(LCData.track.group.author + "-" + LCData.track.group.name, LCData.track.nick, "play");
+            // Load author music
+            load = SceneloadParameters.AuthorMusicPreset(item.group.author + "-" + item.group.name, item.nick);
+
+            TheGreat.SendStatistics(item.group.author + "-" + item.group.name, item.nick, "play");
+        }
+        else
+        {
+            // Load own music
+            load = SceneloadParameters.OwnMusicPreset(item.group.filepath);
         }
 
-        //LCData.sceneLoading = "ServerLevel";
-        LCData.sceneLoading = "Game";
-        SceneManager.LoadScene("LoadScene");
+        InGame.SceneManagement.SceneController.instance.LoadScene(load);
     }
 
     public void OnDeleteClick()

@@ -19,7 +19,7 @@ using System.Xml.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using InGame.SceneManagement;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -85,6 +85,8 @@ public class MenuScript_v2 : MonoBehaviour
         m_currentOrientation = Screen.orientation;
         nextOrientationCheckTime = Time.realtimeSinceStartup + 1f;
 
+        GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
+
 
         if (!Directory.Exists(Application.persistentDataPath + "/maps")) Directory.CreateDirectory(Application.persistentDataPath + "/maps");
         if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
@@ -140,7 +142,6 @@ public class MenuScript_v2 : MonoBehaviour
         HandleDev();
         HandleSettings();
 
-        LoadHitSounds();
         //bool enableMenuMusic = SSytem.instance.GetBool("MenuMusic");
         //if (enableMenuMusic) musicSource.Play();
         //musicSource.volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
@@ -180,7 +181,7 @@ public class MenuScript_v2 : MonoBehaviour
         {
             StartLog("Server");
 
-            if (LCData.sceneLoading != "Menu" && !File.Exists(Application.persistentDataPath + "/DontUpdate.txt"))
+            if (!File.Exists(Application.persistentDataPath + "/DontUpdate.txt") && Time.realtimeSinceStartup <= 30)
             {
                 StartCoroutine(CheckForUpdatesAsync());
             }
@@ -397,24 +398,7 @@ public class MenuScript_v2 : MonoBehaviour
         }
     }
 
-    void LoadHitSounds()
-    {
-        // Loading Hits sound
-        if (LCData.sceneLoading == "Menu")
-        {
-            foreach (int id in LCData.hitsIds)
-            {
-                AndroidNativeAudio.unload(id);
-            }
-            AndroidNativeAudio.releasePool();
-        }
-        AndroidNativeAudio.makePool();
-        LCData.hitsIds = new int[10];
-        for (int i = 0; i < 10; i++)
-        {
-            LCData.hitsIds[i] = AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg");
-        }
-    }
+    
 
     #region Music lists
 
@@ -1076,7 +1060,7 @@ public class MenuScript_v2 : MonoBehaviour
     public string gpsId;
     void LoadGPSUser(bool auth)
     {
-        Debug.Log("PlayGames auth result is " + auth);
+        //Debug.Log("PlayGames auth result is " + auth);
         //return;
         //string username = PlayGamesPlatform.Instance.RealTime.GetSelf().Player.userName;
         string username = PlayGamesPlatform.Instance.GetUserDisplayName();
@@ -1100,13 +1084,14 @@ public class MenuScript_v2 : MonoBehaviour
         FileBrowser.ShowLoadDialog(OnCustomTrackSelected, delegate { }, false, Application.persistentDataPath);
 
     }
+    // 'From file' button
     void OnCustomTrackSelected(string path)
     {
         string bsuPath = path;
 
-        LCData.loadparams = new SceneloadParameters(SceneloadParameters.LoadType.ProjectFolder, bsuPath);
-        LCData.sceneLoading = "Game";
-        SceneManager.LoadScene("LoadScene");
+
+        SceneloadParameters parameters = SceneloadParameters.FromFilePreset(bsuPath);
+        SceneController.instance.LoadScene(parameters);
     }
 
     public void CloseEditorAvailableForever()

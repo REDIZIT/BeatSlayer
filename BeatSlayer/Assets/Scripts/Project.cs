@@ -9,6 +9,10 @@ public class Project
     public int mins, secs;
     public string source, creatorNick;
 
+    public string difficultName = "Standard";
+    public int difficultStars = 4;
+
+
     public bool hasImage;
     public enum ImageExtension { Jpeg, Png }
     public ImageExtension imageExtension;
@@ -19,12 +23,15 @@ public class Project
     public byte[] audioFile;
 
     public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
-    //public List<Bookmark> bookmarks = new List<Bookmark>();
+    public List<Bookmark> bookmarks = new List<Bookmark>();
+
+
+
 
     public void CheckDefaults()
     {
         if (beatCubeList == null) beatCubeList = new List<BeatCubeClass>();
-        //if (bookmarks == null) bookmarks = new List<Bookmark>();
+        if (bookmarks == null) bookmarks = new List<Bookmark>();
     }
 
     public static string ToString(ImageExtension value)

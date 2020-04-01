@@ -11,12 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ServerLevel.unity
     guid: e1f6ee71af6ac8d43931f6a7eafcf76b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LoadScene.unity
     guid: 52027675d5aceb74780d9180a6c3258e
   - enabled: 0
-    path: Assets/Scenes/NewVerAvailable.unity
-    guid: 8fee93244f775f74fa77eeed0f7245f6
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 0
     path: Assets/Scenes/Bossfight.unity
     guid: 4f796b5397e5a264f8627dc466b3c0a6

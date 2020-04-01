@@ -74,8 +74,6 @@ public class ListController : MonoBehaviour
 
     public async void RefreshAuthorAsync()
     {
-        TimeSpan t0 = DateTime.Now.TimeOfDay;
-
         foreach (Transform child in authorMusicList)
         {
             Destroy(child.gameObject);
@@ -91,7 +89,6 @@ public class ListController : MonoBehaviour
         bool doSaveInDisplayedList = displayedAuthorGroup == null;
         if (doSaveInDisplayedList) displayedAuthorGroup = new List<TrackGroupPair>();
 
-        TimeSpan t1 = DateTime.Now.TimeOfDay;
 
         bool isPortrait = Screen.height > Screen.width;
         for (int i = 0; i < groups.Count; i++)
@@ -107,34 +104,17 @@ public class ListController : MonoBehaviour
             if (doSaveInDisplayedList) displayedAuthorGroup.Add(new TrackGroupPair(group, item.gameObject));
         }
 
-        TimeSpan t2 = DateTime.Now.TimeOfDay;
-
-        //await Task.Factory.StartNew(() =>
-        //{
-
-        //});
-
 
 
         float flexCount = groups.Count % 2 == 0 ? groups.Count / 2f : groups.Count / 2f + 1f;
         float contentSize = authorMusicList.GetComponent<GridLayoutGroup>().cellSize.y * flexCount + authorMusicList.GetComponent<GridLayoutGroup>().spacing.y * (flexCount - 2);
         authorMusicList.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentSize + 15);
 
-        TimeSpan t3 = DateTime.Now.TimeOfDay;
-
 
         downloadHelper.LoadSmartQueue();
 
 
         OnSearch();
-
-
-        Debug.Log("[REFRESH AUTHOR] Time is " + (DateTime.Now.TimeOfDay - t0).TotalMilliseconds);
-        Debug.Log("[REFRESH AUTHOR] T0 is " + (t1 - t0).TotalMilliseconds);
-        Debug.Log("[REFRESH AUTHOR] T1 is " + (t2 - t1).TotalMilliseconds);
-        Debug.Log("[REFRESH AUTHOR] T3 is " + (DateTime.Now.TimeOfDay - t3).TotalMilliseconds);
-
-        //yield return new WaitForEndOfFrame();
     }
 
     public async void RefreshDownloadedAsync()
@@ -201,7 +181,7 @@ public class ListController : MonoBehaviour
         string[] drives = Environment.GetLogicalDrives();
         customMusicFolders.AddRange(drives);
 
-        Debug.Log("[RefreshCustomListInBackground]");
+        //Debug.Log("[RefreshCustomListInBackground]");
 
         string[] filters = new string[2] { "*.mp3", "*.ogg" };
 
@@ -209,7 +189,6 @@ public class ListController : MonoBehaviour
         List<string> files = new List<string>();
         for (int i = 0; i < customMusicFolders.Count; i++)
         {
-            Debug.Log("[CHECK] " + customMusicFolders[i] + " Exists? " + Directory.Exists(customMusicFolders[i]));
             for (int j = 0; j < 2; j++)
             {
                 if (!Directory.Exists(customMusicFolders[i])) continue;
@@ -230,7 +209,6 @@ public class ListController : MonoBehaviour
         {
             msg += filepath + " : " + Path.GetFullPath(filepath);
         }
-        Debug.Log("[LOAD] " + msg);
 
         Debug.Log("[LOAD] File time is " + (DateTime.Now.TimeOfDay - t1).TotalMilliseconds);
         Debug.Log("[LOAD] Files count " + files.Count);

@@ -220,8 +220,6 @@ UnityEngine.Debug:LogWarning(Object)
     public IEnumerator LoadDatabaseAsync(bool refresh = false)
     {
         System.Net.ServicePointManager.ServerCertificateValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
-
-        Debug.Log("[Database] Loading from: " + db_groupsUrl);
         GetComponent<MenuScript_v2>().musicLoadingText.color = Color.white;
         GetComponent<MenuScript_v2>().musicLoadingText.text = "Music is loading";
 
@@ -309,7 +307,9 @@ UnityEngine.Debug:LogWarning(Object)
                 likes = int.Parse(split[3]),
                 dislikes = int.Parse(split[4]),
                 group = groupCls,
-                hasUpdate = HasUpdateForMap(groupCls.author + "-" + groupCls.name, split[0])
+                hasUpdate = HasUpdateForMap(groupCls.author + "-" + groupCls.name, split[0]),
+                difficultyName = split[5],
+                difficulty = int.Parse(split[6])
             };
             cls.cover = GetComponent<DownloadHelper>().DownloadSprite(cls);
             arr[i] = cls;
