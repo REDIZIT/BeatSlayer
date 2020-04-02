@@ -23,7 +23,7 @@ public class Project
     public byte[] audioFile;
 
     public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
-    public List<Bookmark> bookmarks = new List<Bookmark>();
+    //public List<Bookmark> bookmarks = new List<Bookmark>();
 
 
 
@@ -31,7 +31,7 @@ public class Project
     public void CheckDefaults()
     {
         if (beatCubeList == null) beatCubeList = new List<BeatCubeClass>();
-        if (bookmarks == null) bookmarks = new List<Bookmark>();
+        //if (bookmarks == null) bookmarks = new List<Bookmark>();
     }
 
     public static string ToString(ImageExtension value)
@@ -88,22 +88,22 @@ public class BeatCubeClass
     }
 }
 
-[Serializable]
-public class Bookmark
-{
-    public float time;
-    public int type;
-    public SerializableColor color;
+//[Serializable]
+//public class Bookmark
+//{
+//    public float time;
+//    public int type;
+//    public SerializableColor color;
 
-    public Bookmark(float time, int type, SerializableColor color)
-    {
-        this.time = time;
-        this.type = type;
-        this.color = color;
-    }
+//    public Bookmark(float time, int type, SerializableColor color)
+//    {
+//        this.time = time;
+//        this.type = type;
+//        this.color = color;
+//    }
 
-    public Bookmark() { }
-}
+//    public Bookmark() { }
+//}
 
 [System.Serializable]
 public struct SerializableVector3

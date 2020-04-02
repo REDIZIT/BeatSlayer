@@ -74,7 +74,14 @@ namespace InGame.SceneManagement
                 }
                 AndroidNativeAudio.releasePool();
             }
-            AndroidNativeAudio.makePool(int.Parse(File.ReadAllText(Application.persistentDataPath + "/streamcount.txt")));
+
+            int streamsCount = 20;
+            if (File.Exists(Application.persistentDataPath + "/streamcount.txt"))
+            {
+                streamsCount = int.Parse(File.ReadAllText(Application.persistentDataPath + "/streamcount.txt"));
+            }
+
+            AndroidNativeAudio.makePool(streamsCount);
             LCData.hitsIds = new int[10];
             for (int i = 0; i < 10; i++)
             {

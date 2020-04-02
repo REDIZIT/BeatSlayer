@@ -360,7 +360,7 @@ public class MenuScript_v2 : MonoBehaviour
         LocalizationManager.Read("Translating");
         if(Application.isEditor)
         {
-            LocalizationManager.Language = "Russian";
+            LocalizationManager.Language = "English";
             return;
         }
         if (Application.systemLanguage == SystemLanguage.Russian || Application.systemLanguage == SystemLanguage.Ukrainian) LocalizationManager.Language = "Russian";
@@ -505,7 +505,7 @@ public class MenuScript_v2 : MonoBehaviour
             TrackRecord record = TheGreat.GetRecord(records, arr[i].group.author, arr[i].group.name, arr[i].nick);
             mapItem.recordText.text = record == null ? "" : LocalizationManager.Localize("Record") + ": " + record.score;
 
-            contentHeight += 140 + 10;
+            contentHeight += 191.3f + 10;
         }
         trackInfoMapContent.GetComponent<RectTransform>().sizeDelta = new Vector2(trackInfoMapContent.GetComponent<RectTransform>().sizeDelta.x, contentHeight);
     }

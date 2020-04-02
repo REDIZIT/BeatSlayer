@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -57,5 +58,18 @@ namespace ProjectManagement
             tex.LoadImage(bytes);
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
+    }
+
+    public class MapInfo
+    {
+        public string author, name;
+        public string nick;
+
+        public int likes, dislikes, playCount, downloads;
+
+        public string difficultyName;
+        public int difficultyStars;
+
+        public DateTime publishTime;
     }
 }

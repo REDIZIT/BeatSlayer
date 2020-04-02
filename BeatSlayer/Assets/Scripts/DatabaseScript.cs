@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using ProjectManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +35,8 @@ public class DatabaseScript : MonoBehaviour
     //string db_mapsUrl = "https://bsserver.tk/Database/GetMaps";
     string db_mapsUrl = "http://176.107.160.146/Database/GetMaps";
 
-    string db_mapStatUrl = "http://www.bsserver.tk/Database/GetShortStatistics?trackname={0}&nick={1}";
+    //string db_mapStatUrl = "http://www.bsserver.tk/Database/GetShortStatistics?trackname={0}&nick={1}";
+    string db_mapStatUrl = "http://www.bsserver.tk/Database/GetShortStatisticsJson?trackname={0}&nick={1}";
 
 
     public Sprite defaultTrackSprite;
@@ -190,7 +193,8 @@ UnityEngine.Debug:LogWarning(Object)
 MenuScript_v2:DownloadTrack() (at Assets/Scripts/MenuScript_v2.cs:1035)
 UnityEngine.EventSystems.EventSystem:Update()
 
-         Download url: http://drive.google.com/uc?id=1wVRhDTat3RVg6EXNcOn8iZs2EbYGEbba&export=download
+         Download url: http://drive.google.com/uc?id=1wVRhDTat3RVg6EXNcOn8iZs2EbYGEbba
+&export=download
 UnityEngine.Debug:LogWarning(Object)
          
          
@@ -308,8 +312,8 @@ UnityEngine.Debug:LogWarning(Object)
                 dislikes = int.Parse(split[4]),
                 group = groupCls,
                 hasUpdate = HasUpdateForMap(groupCls.author + "-" + groupCls.name, split[0]),
-                difficultyName = split[5],
-                difficulty = int.Parse(split[6])
+                //difficultyName = split[5],
+                //difficulty = int.Parse(split[6])
             };
             cls.cover = GetComponent<DownloadHelper>().DownloadSprite(cls);
             arr[i] = cls;
@@ -357,11 +361,12 @@ UnityEngine.Debug:LogWarning(Object)
             arr[i].cover = coverPath == "" ? defaultTrackSprite : TheGreat.LoadSprite(coverPath);
             arr[i].nick = new DirectoryInfo(mapsPathes[i]).Name;
 
-            int[] mapStat = GetMapStatistics(group.author + "-" + group.name, arr[i].nick);
-            arr[i].downloads = mapStat[0];
-            arr[i].plays = mapStat[1];
-            arr[i].likes = mapStat[2];
-            arr[i].dislikes = mapStat[3];
+            //int[] mapStat = GetMapStatistics(group.author + "-" + group.name, arr[i].nick);
+            MapInfo mapStat = GetMapInfo(group.author + "-" + group.name, arr[i].nick);
+            arr[i].downloads = mapStat.downloads;
+            arr[i].plays = mapStat.playCount;
+            arr[i].likes = mapStat.likes;
+            arr[i].dislikes = mapStat.dislikes;
 
 
             arr[i].hasUpdate = HasUpdateForMap(group.author + "-" + group.name, arr[i].nick);
@@ -406,24 +411,39 @@ UnityEngine.Debug:LogWarning(Object)
         return arr;
     }
 
-    public int[] GetMapStatistics(string trackname, string nick)
+    //public int[] GetMapStatistics(string trackname, string nick)
+    //{
+    //    try
+    //    {
+    //        WebClient c = new WebClient();
+    //        string response = c.DownloadString(string.Format(db_mapStatUrl, trackname, nick)).Replace("[", "").Replace("]", "");
+    //        return new int[4]
+    //        {
+    //        int.Parse(response.Split(',')[0]),
+    //        int.Parse(response.Split(',')[1]),
+    //        int.Parse(response.Split(',')[2]),
+    //        int.Parse(response.Split(',')[3])
+    //        };
+    //    }
+    //    catch (Exception err)
+    //    {
+    //        Debug.LogError("GetMapStatistics for " + trackname + "   " + nick + "\n" + err.Message);
+    //        return new int[4];
+    //    }
+    //}
+    public MapInfo GetMapInfo(string trackname, string nick)
     {
         try
         {
             WebClient c = new WebClient();
-            string response = c.DownloadString(string.Format(db_mapStatUrl, trackname, nick)).Replace("[", "").Replace("]", "");
-            return new int[4]
-            {
-            int.Parse(response.Split(',')[0]),
-            int.Parse(response.Split(',')[1]),
-            int.Parse(response.Split(',')[2]),
-            int.Parse(response.Split(',')[3])
-            };
+            string response = c.DownloadString(string.Format(db_mapStatUrl, trackname, nick));
+
+            return (MapInfo)JsonConvert.DeserializeObject(response);
         }
         catch (Exception err)
         {
             Debug.LogError("GetMapStatistics for " + trackname + "   " + nick + "\n" + err.Message);
-            return new int[4];
+            return new MapInfo();
         }
     }
 
