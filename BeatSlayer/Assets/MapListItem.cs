@@ -85,6 +85,9 @@ public class MapListItem : MonoBehaviour
         downloadBtn.SetActive(false);
         progressBar.gameObject.SetActive(false);
         deleteBtn.SetActive(false);
+
+        difficultyText.gameObject.SetActive(false);
+        difficultyStarsContnet.gameObject.SetActive(false);
     }
 
     public void UpdateDifficulty()

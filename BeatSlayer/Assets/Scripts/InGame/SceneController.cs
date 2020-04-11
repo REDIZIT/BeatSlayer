@@ -16,31 +16,22 @@ namespace InGame.SceneManagement
 
         public void Init(SceneControllerUI ui)
         {
+            Debug.Log("Is UI null? " + (ui == null));
             SceneController.ui = ui;
-            if (instance == null) instance = this;
+            instance = this;
         }
 
 
 
         public void LoadScene(SceneloadParameters loadpamars)
         {
-            Debug.Log("LoadScene " + loadpamars.Type);
-            if (loadpamars.Type == SceneloadParameters.LoadType.Menu)
-            {
-                Debug.Log("Load menu");
-                SceneManager.LoadScene("Menu");
-            }
-            else
-            {
-                Debug.Log("Load map");
-                StartCoroutine(IELoadScene(loadpamars));
-            }
+            StartCoroutine(IELoadScene(loadpamars));
         }
         IEnumerator IELoadScene(SceneloadParameters loadpamars)
         {
             LoadingData.loadparams = loadpamars;
 
-            IProjectLoader loader = null;
+            IProjectLoader loader = new ProjectLoaderMenu();
 
             switch (loadpamars.Type)
             {
@@ -57,10 +48,8 @@ namespace InGame.SceneManagement
 
             yield return loader.LoadProject(loadpamars);
 
-            Debug.Log("IELoadScene is aclip null? " + (LoadingData.aclip == null));
-            Debug.Log("IELoadScene aclip len is " + LoadingData.aclip.length);
-
             LoadHitSounds();
+
             ui.Load();
         }
 
@@ -242,9 +231,13 @@ public class ProjectLoaderAudioFile : IProjectLoader
         yield return ProjectManager.LoadAudioCoroutine(audioFilePath);
     }
 }
-
-
-
+public class ProjectLoaderMenu : IProjectLoader
+{
+    public IEnumerator LoadProject(SceneloadParameters parameters)
+    {
+        yield return new WaitForEndOfFrame();
+    }
+}
 
 
 

@@ -87,7 +87,14 @@ public class DownloadHelper : MonoBehaviour
                 Texture2D texture = new Texture2D(2, 2, TextureFormat.RGB24, false);
                 texture.LoadImage(args.Result);
 
-                if (filepath != "") File.WriteAllBytes(filepath, args.Result);
+                try
+                {
+                    if (filepath != "") File.WriteAllBytes(filepath, args.Result);
+                }
+                catch (Exception err)
+                {
+                    Debug.LogError($"On cover downloaded for {filepath} error: " + err.Message);
+                }
 
                 callback(texture);
                 //callback(Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f)));

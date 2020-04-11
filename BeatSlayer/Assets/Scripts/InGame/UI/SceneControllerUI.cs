@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Advertisements;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -22,18 +23,33 @@ public class SceneControllerUI : MonoBehaviour
 
         string sceneName = parameters.Type == SceneloadParameters.LoadType.Menu ? "Menu" : "Game";
 
-        AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName);
-        ao.allowSceneActivation = false;
+
+        float loadStartTime = Time.realtimeSinceStartup;
 
         window.gameObject.SetActive(true);
         window.Play("StartLoading");
 
-        float loadStartTime = Time.realtimeSinceStartup;
+
+        AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName);
+        ao.allowSceneActivation = false;
 
 
-
-        while (ao.progress < 0.9f)
+        if (!Advertisement.isInitialized)
         {
+            Advertisement.Initialize("3202418", false);
+        }
+        if (parameters.Type == SceneloadParameters.LoadType.Menu)
+        {
+            if (Advertisement.IsReady())
+            {
+                Advertisement.Show("video");
+            }
+        }
+
+
+
+        while (ao.progress < 0.9f /*&& (Time.realtimeSinceStartup - loadStartTime) < 2*/)
+        { 
             stateText.text = "Loading..";
             percentText.text = ao.progress + "%";
             progressBar.value = ao.progress;
@@ -41,7 +57,7 @@ public class SceneControllerUI : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-
+        
 
 
         stateText.text = "Loaded";

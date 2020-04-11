@@ -144,7 +144,6 @@ public class AccountManager : MonoBehaviour
             if (r.ContentLength != 0)
             {
                 string response = r.ReadAsString();
-                Debug.Log("[ACCOUNT:U REPONSE] " + response);
             }
             else Debug.Log("[ACCOUNT:U] Content size is zero");
         });

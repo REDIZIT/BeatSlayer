@@ -14,7 +14,7 @@ public class SaberController : MonoBehaviour
     public Transform rightHand;
     public int saberSkinId;
 
-    public AnimationCurve curve;
+    public Material[] swooshes;
 
     Camera cam;
 
@@ -43,10 +43,12 @@ public class SaberController : MonoBehaviour
         return Math.Atan2(yDiff, xDiff) * 180.0 / Math.PI;
     }
 
-    public void Init(Color clr, int skinId)
+    public void Init(Color clr, int skinId, int swooshEffectId)
     {
         saberSkinId = skinId;
         GetComponent<MeleeWeaponTrail>()._colors[0] = clr;
+        GetComponent<MeleeWeaponTrail>()._material = swooshes[swooshEffectId];
+
 
         foreach (Transform child in transform) child.gameObject.SetActive(false);
 

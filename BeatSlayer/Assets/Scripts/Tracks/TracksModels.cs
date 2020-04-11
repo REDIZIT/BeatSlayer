@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ProjectManagement;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 
@@ -19,6 +22,21 @@ public class TrackGroupClass
     // Sum of stats for all maps in this group
     public int downloads, plays, likes, dislikes;
     public bool novelty;
+
+    public TrackGroupClass() { }
+    public TrackGroupClass(GroupInfoExtended info)
+    {
+        author = info.author;
+        name = info.name;
+        mapsCount = info.mapsCount;
+        downloads = info.allDownloads;
+        plays = info.allPlays;
+        likes = info.allLikes;
+        dislikes = info.allDislikes;
+
+        TimeSpan timeDifference = DateTime.Now - info.updateTime;
+        novelty = timeDifference.TotalDays <= 3;
+    }
 }
 
 public class TrackClass

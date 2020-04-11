@@ -158,6 +158,8 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
+        GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
+
         scoreMultiplier = SettingsManager.GetScoreMultiplier();
 
         accountManager = GetComponent<AccountManager>();
@@ -242,8 +244,8 @@ public class GameManager : MonoBehaviour
         dislikeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
         //dislikeBtnImg.gameObject.SetActive(true);
 
-        rightSaber.Init(SSytem.instance.rightColor, prefsManager.prefs.selectedSaber);
-        leftSaber.Init(SSytem.instance.leftColor, prefsManager.prefs.selectedSaber);
+        rightSaber.Init(SSytem.instance.rightColor, prefsManager.prefs.selectedSaber, prefsManager.prefs.selectedSaberEffect);
+        leftSaber.Init(SSytem.instance.leftColor, prefsManager.prefs.selectedSaber, prefsManager.prefs.selectedSaberEffect);
 
         for (int i = 0; i < spawnPoints.Length; i++)
         {

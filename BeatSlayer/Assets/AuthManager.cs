@@ -80,8 +80,6 @@ public class AuthManager : MonoBehaviour
 
                 string filepath = Application.persistentDataPath + "/session.txt";
                 File.WriteAllText(filepath, AccountManager.account.nick + ":" + AccountManager.account.password);
-
-                GetComponent<FirstAprilScript>().Troll();
             }
         }
         else if(req == "SignUp")

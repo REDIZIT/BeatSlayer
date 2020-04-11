@@ -14,7 +14,6 @@ using UnityEngine;
 
 public class DatabaseScript : MonoBehaviour
 {
-    //public List<TrackDataBaseItem> TracksDataBase;
     public TrackDatabase db;
     public TrackDatabase cachedDb;
 
@@ -36,189 +35,10 @@ public class DatabaseScript : MonoBehaviour
     string db_mapsUrl = "http://176.107.160.146/Database/GetMaps";
 
     //string db_mapStatUrl = "http://www.bsserver.tk/Database/GetShortStatistics?trackname={0}&nick={1}";
-    string db_mapStatUrl = "http://www.bsserver.tk/Database/GetShortStatisticsJson?trackname={0}&nick={1}";
+    string db_mapUrl = "http://www.bsserver.tk/Database/GetMap?trackname={0}&nick={1}";
 
 
     public Sprite defaultTrackSprite;
-
-    public IEnumerator LoadTracksDataBaseAsyncLegacy(bool refresh = false)
-    {
-        System.Net.ServicePointManager.ServerCertificateValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
-
-        if (File.Exists(Application.persistentDataPath + "/DontCheckDatabase.txt") || Application.internetReachability == NetworkReachability.NotReachable)
-        {
-            LoadTracksDataBaseOffline();
-        }
-        else
-        {
-            if(isFirstCall) LoadTracksDataBaseOffline();
-
-            Debug.Log("Loading from: " + databaseUrl);
-            GetComponent<MenuScript_v2>().musicLoadingText.color = Color.white;
-            GetComponent<MenuScript_v2>().musicLoadingText.text = "Music is loading";
-
-            WebClient client = new WebClient();
-
-            bool isDone = false;
-            string response = "";
-
-            client.DownloadStringAsync(new Uri(databaseUrl));
-            client.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
-            {
-                isDone = true;
-                response = e.Result;
-            };
-
-            int commaInd = 0;
-            while (!isDone)
-            {
-                GetComponent<MenuScript_v2>().musicLoadingText.text = "Music is loading" + (commaInd == 0 ? "." : commaInd == 1 ? ".." : commaInd == 2 ? "..." : "");
-                commaInd++;
-                if (commaInd >= 3)
-                {
-                    commaInd = 0;
-                }
-                yield return new WaitForSeconds(0.3f);
-            }
-            
-
-            db.list = new List<TrackItemClass>();
-
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            if (File.Exists(Application.persistentDataPath + "/database.bin"))
-            {
-                using (var fileStream = File.Open(Application.persistentDataPath + "/database.bin", FileMode.Open))
-                {
-                    cachedDb = (TrackDatabase)binaryFormatter.Deserialize(fileStream);
-                }
-            }
-
-            try
-            {
-                foreach (string line in response.Split('\n'))
-                {
-                    if (line == "") continue;
-
-                    string[] split = line.Split('|');
-                    string trackname = split[0];
-                    int mins = int.Parse(split[1].Split(':')[0]);
-                    int secs = int.Parse(split[1].Split(':')[1]);
-                    string nick = split[2];
-
-                    db.list.Add(new TrackItemClass(trackname, mins, secs, -1, -1, -1, -1, TrackItemClass.Rated.NotSet, true, "", nick));
-                }
-
-                if (db.list.Count == 0)
-                {
-                    LoadTracksDataBaseOffline();
-                }
-                else
-                {
-                    using (var fileStream = File.Create(Application.persistentDataPath + "/database.bin"))
-                    {
-                        binaryFormatter.Serialize(fileStream, db);
-                    }
-                }
-
-                GetComponent<MenuScript_v2>().musicLoadingText.color = Color.white;
-                GetComponent<MenuScript_v2>().musicLoadingText.text = "";
-            }
-            catch (Exception err)
-            {
-                Debug.LogError("Something goes wrong: " + err);
-                GetComponent<MenuScript_v2>().musicLoadingText.text = "";
-                db.list = new List<TrackItemClass>();
-                LoadFromGoogleDrive();
-                GetComponent<ListController>().RefreshAuthorList();
-            }
-        }
-
-        if (refresh) GetComponent<ListController>().RefreshAuthorList();
-
-        isFirstCall = false;
-    }
-    public void LoadTracksDataBaseOffline()
-    {
-        Debug.Log("Loading DB from cache");
-
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        if (File.Exists(Application.persistentDataPath + "/database.bin"))
-        {
-            using (var fileStream = File.Open(Application.persistentDataPath + "/database.bin", FileMode.Open))
-            {
-                db = (TrackDatabase)binaryFormatter.Deserialize(fileStream);
-            }
-        }
-
-        GetComponent<MenuScript_v2>().musicLoadingText.color = Color.white;
-        GetComponent<MenuScript_v2>().musicLoadingText.text = "";
-        GetComponent<ListController>().RefreshAuthorList();
-    }
-
-
-    public void LoadFromGoogleDrive()
-    {
-        Debug.LogError("Loading from google drive");
-
-        useGoogleDrive = true;
-        googleDriveUsedMsg.SetActive(true);
-        if (googleDriveInfo.Length == 0) LoadGoogleDriveInfo();
-
-        for (int i = 0; i < googleDriveInfo.Length; i++)
-        {
-            db.list.Add(new TrackItemClass(googleDriveInfo[i].Split('>')[0], 0, 0, 0, 0, 0, 0, 0, false, "", ""));
-        }
-    }
-
-    public string GetGoogleDriveUrl(string track)
-    {
-        if (googleDriveInfo.Length == 0) LoadGoogleDriveInfo();
-        return googleDriveInfo.Where(c => c.Split('>')[0] == track).ToArray()[0].Split('>')[1];
-    }
-    public void LoadGoogleDriveInfo()
-    {
-        WebClient web = new WebClient();
-        string raw = web.DownloadString("http://drive.google.com/uc?id=10533FKOoyISkeWHfCUQO3uqRk8V8Fq82&export=download");
-        googleDriveInfo = raw.Replace(" > ", ">").Split('\n');
-        for (int i = 0; i < googleDriveInfo.Length; i++)
-        {
-            googleDriveInfo[i] = googleDriveInfo[i].Split('>')[0] + ">" + "http://drive.google.com/uc?id=" + googleDriveInfo[i].Split('>')[1].Trim() + "&export=download";
-            //Debug.Log(googleDriveInfo[i]);
-        }
-
-        /*
-        
-         Download url: http://drive.google.com/uc?id=1UeP4AQZ49YrX7_FdUWA2ezw6kChLqk2Q&export=download
-UnityEngine.Debug:LogWarning(Object)
-MenuScript_v2:DownloadTrack() (at Assets/Scripts/MenuScript_v2.cs:1035)
-UnityEngine.EventSystems.EventSystem:Update()
-
-         Download url: http://drive.google.com/uc?id=1wVRhDTat3RVg6EXNcOn8iZs2EbYGEbba
-&export=download
-UnityEngine.Debug:LogWarning(Object)
-         
-         
-         */
-    }
-
-    public void SaveDB()
-    {
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        using (var fileStream = File.Create(Application.persistentDataPath + "/database.bin"))
-        {
-            binaryFormatter.Serialize(fileStream, db);
-        }
-    }
-
-    public long CheckDatabaseSum()
-    {
-        WWW www = new WWW(databaseUrl + "?q=sum");
-
-        while (!www.isDone) { }
-
-        return long.Parse(www.text);
-    }
-
 
     // Get all tracks from db (maps groups)
     public IEnumerator LoadDatabaseAsync(bool refresh = false)
@@ -256,33 +76,22 @@ UnityEngine.Debug:LogWarning(Object)
         if (data.tracks == null) data.tracks = new List<TrackGroupClass>();
         else data.tracks.Clear();
 
-        string[] lines = response.Split('\n');
-        for (int i = 0; i < lines.Length; i++)
+        List<MapInfo> mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
+
+        foreach (MapInfo info in mapInfos)
         {
-            if (!lines[i].Contains('|')) continue;
-
-            string[] split = lines[i].Split('|');
-
-            // trackname|maps|downloads|plays|likes|dislikes
-
-            string trackname = split[0];
-            int mapsCount = int.Parse(split[1]);
-            int downloads = int.Parse(split[2]);
-            int plays = int.Parse(split[3]);
-            int likes = int.Parse(split[4]);
-            int dislikes = int.Parse(split[5]);
-            bool novelty = bool.Parse(split[6]);
+            bool isNew = (DateTime.Now - info.publishTime) <= new TimeSpan(3, 0, 0, 0);
 
             TrackGroupClass cls = new TrackGroupClass()
             {
-                author = trackname.Split('-')[0],
-                name = trackname.Split('-')[1],
-                mapsCount = mapsCount,
-                downloads = downloads,
-                plays = plays,
-                likes = likes,
-                dislikes = dislikes,
-                novelty = novelty
+                author = info.author,
+                name = info.name,
+                mapsCount = info.group.mapsCount,
+                downloads = info.downloads,
+                plays = info.playCount,
+                likes = info.likes,
+                dislikes = info.dislikes,
+                novelty = isNew
             };
             data.tracks.Add(cls);
         }
@@ -294,26 +103,25 @@ UnityEngine.Debug:LogWarning(Object)
     public TrackClass[] GetMapsByTrack(TrackGroupClass groupCls)
     {
         WebClient client = new WebClient();
-        string response = client.DownloadString(db_mapsUrl + "?trackname=" + groupCls.author.Replace("&", "%amp%") + "-" + groupCls.name.Replace("&", "%amp%"));
-        string[] lines = response.Split('\n');
+        string url = db_mapsUrl + "?trackname=" + groupCls.author.Replace("&", "%amp%") + "-" + groupCls.name.Replace("&", "%amp%");
+        string response = client.DownloadString(url);
 
-        TrackClass[] arr = new TrackClass[lines.Length - 1];
-        for (int i = 0; i < lines.Length; i++)
+        List<MapInfo> mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
+
+        TrackClass[] arr = new TrackClass[mapInfos.Count];
+        for (int i = 0; i < mapInfos.Count; i++)
         {
-            if (!lines[i].Contains("|")) continue;
-
-            string[] split = lines[i].Split('|');
             TrackClass cls = new TrackClass()
             {
-                nick = split[0],
-                downloads = int.Parse(split[1]),
-                plays = int.Parse(split[2]),
-                likes = int.Parse(split[3]),
-                dislikes = int.Parse(split[4]),
+                nick = mapInfos[i].nick,
+                downloads = mapInfos[i].downloads,
+                plays = mapInfos[i].playCount,
+                likes = mapInfos[i].likes,
+                dislikes = mapInfos[i].dislikes,
                 group = groupCls,
-                hasUpdate = HasUpdateForMap(groupCls.author + "-" + groupCls.name, split[0]),
-                //difficultyName = split[5],
-                //difficulty = int.Parse(split[6])
+                hasUpdate = HasUpdateForMap(mapInfos[i]),
+                difficulty = mapInfos[i].difficultyStars,
+                difficultyName = mapInfos[i].difficultyName
             };
             cls.cover = GetComponent<DownloadHelper>().DownloadSprite(cls);
             arr[i] = cls;
@@ -367,6 +175,8 @@ UnityEngine.Debug:LogWarning(Object)
             arr[i].plays = mapStat.playCount;
             arr[i].likes = mapStat.likes;
             arr[i].dislikes = mapStat.dislikes;
+            arr[i].difficultyName = mapStat.difficultyName;
+            arr[i].difficulty = mapStat.difficultyStars;
 
 
             arr[i].hasUpdate = HasUpdateForMap(group.author + "-" + group.name, arr[i].nick);
@@ -374,29 +184,6 @@ UnityEngine.Debug:LogWarning(Object)
         }
 
         return arr;
-    }
-
-    public List<TrackGroupClass> GetCustomMusic()
-    {
-        List<TrackGroupClass> ls = new List<TrackGroupClass>();
-
-        string mapsFolder = Application.persistentDataPath + "/maps";
-        string[] groups = Directory.GetDirectories(mapsFolder);
-        for (int i = 0; i < groups.Length; i++)
-        {
-            string trackname = new DirectoryInfo(groups[i]).Name;
-
-            TrackGroupClass groupcls = new TrackGroupClass()
-            {
-                author = trackname.Split('-')[0],
-                name = trackname.Split('-')[1],
-                mapsCount = Directory.GetDirectories(mapsFolder + "/" + trackname).Length
-            };
-
-            ls.Add(groupcls);
-        }
-
-        return ls;
     }
 
     public TrackClass[] GetCustomMaps(TrackGroupClass group)
@@ -411,34 +198,16 @@ UnityEngine.Debug:LogWarning(Object)
         return arr;
     }
 
-    //public int[] GetMapStatistics(string trackname, string nick)
-    //{
-    //    try
-    //    {
-    //        WebClient c = new WebClient();
-    //        string response = c.DownloadString(string.Format(db_mapStatUrl, trackname, nick)).Replace("[", "").Replace("]", "");
-    //        return new int[4]
-    //        {
-    //        int.Parse(response.Split(',')[0]),
-    //        int.Parse(response.Split(',')[1]),
-    //        int.Parse(response.Split(',')[2]),
-    //        int.Parse(response.Split(',')[3])
-    //        };
-    //    }
-    //    catch (Exception err)
-    //    {
-    //        Debug.LogError("GetMapStatistics for " + trackname + "   " + nick + "\n" + err.Message);
-    //        return new int[4];
-    //    }
-    //}
+
+
     public MapInfo GetMapInfo(string trackname, string nick)
     {
         try
         {
             WebClient c = new WebClient();
-            string response = c.DownloadString(string.Format(db_mapStatUrl, trackname, nick));
+            string response = c.DownloadString(string.Format(db_mapUrl, trackname, nick));
 
-            return (MapInfo)JsonConvert.DeserializeObject(response);
+            return (MapInfo)JsonConvert.DeserializeObject(response, typeof(MapInfo));
         }
         catch (Exception err)
         {
@@ -446,6 +215,9 @@ UnityEngine.Debug:LogWarning(Object)
             return new MapInfo();
         }
     }
+
+
+
 
     public bool HasUpdateForMap(string trackname, string nick)
     {
@@ -461,6 +233,17 @@ UnityEngine.Debug:LogWarning(Object)
         Debug.Log("Has Updates " + trackname + " with nick " + nick + "? " + response + "\n" + url);
 
         return bool.Parse(response);
+    }
+    public bool HasUpdateForMap(MapInfo info)
+    {
+        string trackname = info.author + "-" + info.name;
+        string nick = info.nick;
+
+        string path = Application.persistentDataPath + "/maps/" + trackname + "/" + nick + "/" + trackname + ".bsu";
+        if (!File.Exists(path)) return false;
+        long utcTicks = new FileInfo(path).LastWriteTimeUtc.Ticks;
+
+        return info.publishTime.Ticks > utcTicks;
     }
 }
 

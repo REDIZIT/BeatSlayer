@@ -93,11 +93,16 @@ public class Prefs
 
     // Sabers
     public int selectedSaber;
-    public bool[] boughtSabers = new bool[5] { true, false, false, false, false };
-    public int[] sabersCosts = new int[5] { 0, 2500, 8999, 12000, 15000 };
+    public bool[] boughtSabers = new bool[6] { true, false, false, false, false, false };
+    public int[] sabersCosts = new int[6] { 0, 2500, 8999, 12000, 15000, 180000 };
     //public SerializableColor leftColor = new SerializableColor(0, 0.5f, 1), rightColor = new SerializableColor(1, 0.5f, 0);
     //public SerializableColor leftDirColor = new SerializableColor(1, 1, 1), rightDirColor = new SerializableColor(1, 1, 1);
     public float colorPower = 2;
+
+    // Sabers effects
+    public int selectedSaberEffect;
+    public bool[] boughtSaberEffects = new bool[2] { true, false };
+    public int[] saberEffectsCosts = new int[2] { 0, 200000 };
 
     // Editor link
     public bool showedEditorAvailableWindow = false;

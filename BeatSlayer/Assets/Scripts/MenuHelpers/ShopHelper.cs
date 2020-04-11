@@ -11,7 +11,7 @@ public class ShopHelper : MonoBehaviour
     public GameObject tutorial;
     
 
-    public Transform skillsScrollView, sabersView;
+    public Transform skillsScrollView, sabersView, effectsContent;
     public GameObject sabersGroup;
     Transform content;
 
@@ -39,12 +39,14 @@ public class ShopHelper : MonoBehaviour
     public void OnWindowChange(int id)
     {
         selectedPage = id;
-        skillsScrollView.gameObject.SetActive(id != 2);
+        skillsScrollView.gameObject.SetActive(id != 2 && id != 3);
         sabersGroup.gameObject.SetActive(id == 2);
+        effectsContent.parent.gameObject.SetActive(id == 3);
 
         if (id == 0) UpdateSkillsView();
         else if (id == 1) UpdateBoostersView();
-        else UpdateSabersView();
+        else if (id == 2) UpdateSabersView();
+        else UpdateEffectsView();
     }
 
 
@@ -102,6 +104,32 @@ public class ShopHelper : MonoBehaviour
                 item.GetChild(3).GetComponent<Image>().color = btnColor;
                 Color32 textColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(34, 34, 34, 255) : new Color32(255,255,255,255);
                 string textStr = i != menuscript.prefsManager.prefs.selectedSaber ? LocalizationManager.Localize("Select") : LocalizationManager.Localize("Selected");
+                item.GetChild(3).GetChild(0).GetComponent<Text>().color = textColor;
+                item.GetChild(3).GetChild(0).GetComponent<Text>().text = textStr;
+            }
+        }
+
+        UpdateColors();
+    }
+    void UpdateEffectsView()
+    {
+        Transform eContent = effectsContent.GetChild(0);
+        for (int i = 0; i < eContent.childCount; i++)
+        {
+            Transform item = eContent.GetChild(i).GetChild(0);
+            item.GetChild(4).gameObject.SetActive(!menuscript.prefsManager.prefs.boughtSaberEffects[i]);
+            if (!menuscript.prefsManager.prefs.boughtSaberEffects[i])
+            {
+                item.GetChild(4).GetChild(1).GetComponent<Text>().text = LocalizationManager.Localize("Cost") + ": " + menuscript.prefsManager.prefs.saberEffectsCosts[i];
+            }
+            else
+            {
+                Color32 imageColor = i != menuscript.prefsManager.prefs.selectedSaberEffect ? new Color32(12, 12, 12, 232) : new Color32(255, 128, 0, 232);
+                item.GetComponent<Image>().color = imageColor;
+                Color32 btnColor = i != menuscript.prefsManager.prefs.selectedSaberEffect ? new Color32(255, 128, 0, 255) : new Color32(34, 34, 34, 255);
+                item.GetChild(3).GetComponent<Image>().color = btnColor;
+                Color32 textColor = i != menuscript.prefsManager.prefs.selectedSaberEffect ? new Color32(34, 34, 34, 255) : new Color32(255, 255, 255, 255);
+                string textStr = i != menuscript.prefsManager.prefs.selectedSaberEffect ? LocalizationManager.Localize("Select") : LocalizationManager.Localize("Selected");
                 item.GetChild(3).GetChild(0).GetComponent<Text>().color = textColor;
                 item.GetChild(3).GetChild(0).GetComponent<Text>().text = textStr;
             }
@@ -211,6 +239,40 @@ public class ShopHelper : MonoBehaviour
         menuscript.prefsManager.Save();
         UpdateSabersView();
     }
+
+    public void BuySaberEffectClick(int id)
+    {
+        if (!menuscript.prefsManager.prefs.boughtSaberEffects[id])
+        {
+            if (menuscript.prefsManager.prefs.coins >= menuscript.prefsManager.prefs.saberEffectsCosts[id])
+            {
+                menuscript.prefsManager.prefs.boughtSaberEffects[id] = true;
+                menuscript.prefsManager.prefs.coins -= menuscript.prefsManager.prefs.saberEffectsCosts[id];
+
+                menuscript.prefsManager.Save();
+                UpdateEffectsView();
+
+                menuscript.CheckAchievement();
+
+                menuscript.coinsTexts[0].text = menuscript.prefsManager.prefs.coins.ToString();
+            }
+        }
+    }
+
+    public void SelectSaberEffectClick(int id)
+    {
+        menuscript.prefsManager.prefs.selectedSaberEffect = id;
+        menuscript.prefsManager.Save();
+        UpdateEffectsView();
+    }
+
+
+
+
+
+
+
+
 
     public void OnShopOpen()
     {

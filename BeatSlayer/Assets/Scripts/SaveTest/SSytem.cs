@@ -41,7 +41,7 @@ GlowQuality|2
 TrackTextSide|0
 GlowPower|2
 SliceSound|True
-SliceVolume|10
+SliceVolume|4
 MenuMusic|True
 MenuMusicVolume|1
 FingerPause|0

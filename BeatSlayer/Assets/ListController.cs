@@ -39,6 +39,12 @@ public class ListController : MonoBehaviour
         RefreshDownloadedAsync();
     }
 
+    public void RefreshApprovedList()
+    {
+
+    }
+
+
     public delegate void CallbackDelegate(List<string> files);
 
     public void RefreshCustomList()
@@ -66,11 +72,10 @@ public class ListController : MonoBehaviour
 
     #region Refreshing
 
-    //[HideInInspector] public Dictionary<TrackGroupClass, GameObject> displayedAuthorGroup;
     [HideInInspector] public List<TrackGroupPair> displayedAuthorGroup;
     [HideInInspector] public List<TrackGroupPair> displayedCustomGroup;
     [HideInInspector] public List<TrackGroupPair> displayedDownloadedGroup;
-    //[HideInInspector] public List<TrackGroupClass> displayedAuthorGroup = new List<TrackGroupClass>();
+    [HideInInspector] public List<TrackGroupPair> displayedApprovedGroup;
 
     public async void RefreshAuthorAsync()
     {
@@ -164,6 +169,9 @@ public class ListController : MonoBehaviour
 
         downloadMusicList.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentSize + 15);
     }
+
+
+
 
     List<string> customMusicFiles;
     List<string> customMusicFolders = new List<string>()

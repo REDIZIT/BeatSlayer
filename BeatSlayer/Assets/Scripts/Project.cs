@@ -23,15 +23,10 @@ public class Project
     public byte[] audioFile;
 
     public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
-    //public List<Bookmark> bookmarks = new List<Bookmark>();
-
-
-
 
     public void CheckDefaults()
     {
         if (beatCubeList == null) beatCubeList = new List<BeatCubeClass>();
-        //if (bookmarks == null) bookmarks = new List<Bookmark>();
     }
 
     public static string ToString(ImageExtension value)
@@ -47,28 +42,26 @@ public class Project
 [Serializable]
 public class BeatCubeClass
 {
-    public float time;
+    public float time; // Time in seconds where cube placed
 
-    public int road; // 0-3 include
-    public int level; // 0-1 include
+    public int road; // 0,1,2,3
+    public int level; // 0,1 - cube height level (0-Bottom, 1-Top)
 
     public enum Type { Point, Dir, Line }
-    public Type type;
+    public Type type; // Type of cube: Point (Any direction), Dir (arrow), Line
 
-    //public enum SubType { Up, Down, Left, Right, Random }
+    // Direction you need to cut
     public enum SubType { Down, DownRight, Right, UpRight, Up, UpLeft, Left, DownLeft, Random }
     public SubType subType;
 
+    // For which saber (left: -1 or right: 1 or any: 0)
     public int saberType;
 
-    //public List<float> x, y, z;
+    // Used only for Line (position of start and end of line)
     public List<SerializableVector3> linePoints;
 
-    public BeatCubeClass()
-    {
-
-    }
-
+    // Parameterless ctor
+    public BeatCubeClass() { }
     public BeatCubeClass(float time, int road, Type type)
     {
         this.time = time;
@@ -155,23 +148,55 @@ public struct SerializableVector3
     }
 }
 
-//[Serializable]
-//public struct SerializableColor
-//{
-//    public float r, g, b;
-//    public SerializableColor(float r, float g, float b)
-//    {
-//        this.r = r;
-//        this.g = g;
-//        this.b = b;
-//    }
-//    //public static implicit operator Color(SerializableColor color)
-//    //{
-//    //    return new Color(color.r, color.g, color.b);
-//    //}
 
-//    //public static implicit operator SerializableColor(Color color)
-//    //{
-//    //    return new SerializableColor(color.r, color.g, color.b);
-//    //}
-//}
+
+
+
+
+[Serializable]
+public class ProjectV2
+{
+    public string author, name;
+    public int mins, secs;
+    public string source, creatorNick;
+
+    public bool hasImage;
+    public enum ImageExtension { Jpeg, Png }
+    public ImageExtension imageExtension;
+    public byte[] image; // has bytes only in zipped file (.bsz)
+
+    public enum AudioExtension { Ogg, Mp3 }
+    public AudioExtension audioExtension;
+    public byte[] audioFile; // has bytes only in .bsz
+
+    public List<Difficulty> difficulties;
+}
+[Serializable]
+public class Difficulty
+{
+    public string name; // Selected by user
+    public int stars; // Selected by user
+
+    public float realStars; // Calculated by alg
+
+    public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
+
+
+    public void CalculateRealStars()
+    {
+        float minDelayBeforeNextCube = 9999;
+        for (int i = 1; i < beatCubeList.Count - 1; i++)
+        {
+            BeatCubeClass prevCube = beatCubeList[i - 1];
+            BeatCubeClass currentCube = beatCubeList[i];
+
+            if(currentCube.time - prevCube.time < minDelayBeforeNextCube)
+            {
+                minDelayBeforeNextCube = currentCube.time - prevCube.time;
+            }
+        }
+
+        // Based on min delay before next cube spawn calculate real difficulty of this Difficulty (Haha difficulty of difficulty :D)
+        realStars = float.MaxValue; // XD
+    }
+}

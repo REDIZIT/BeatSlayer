@@ -20,6 +20,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Runtime.Serialization.Formatters.Binary;
 using InGame.SceneManagement;
+using SaveManagement;
+using DatabaseManagement;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -87,6 +89,8 @@ public class MenuScript_v2 : MonoBehaviour
 
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
 
+        Database.Init();
+
 
         if (!Directory.Exists(Application.persistentDataPath + "/maps")) Directory.CreateDirectory(Application.persistentDataPath + "/maps");
         if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
@@ -94,6 +98,10 @@ public class MenuScript_v2 : MonoBehaviour
 
         if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
         if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
+
+        //Debug.LogError(SaveManager.Data.SaberEffects.Count);
+        //SaveManager.Data.SaberEffects.Add(new SaberEffectData(2, "123", "234", 90000, false));
+        //SaveManager.SaveData();
     }
 
     string logname;
@@ -146,13 +154,13 @@ public class MenuScript_v2 : MonoBehaviour
         //if (enableMenuMusic) musicSource.Play();
         //musicSource.volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
 
-        StartLog("Init own music");
+        //StartLog("Init own music");
 
-        //listController.InitOwnMusic();
+        ////listController.InitOwnMusic();
 
-        listController.RefreshCustomList();
+        //listController.RefreshCustomList();
 
-        EndLog();
+        //EndLog();
 
         listController.RefreshDownloadList();
 

@@ -24,7 +24,7 @@ public class MeleeWeaponTrail : MonoBehaviour
 	float _emitTime = 0.0f;
 
 	[SerializeField]
-	Material _material;
+	public Material _material;
 
 	[SerializeField]
 	float _lifeTime = 1.0f;
