@@ -40,7 +40,6 @@ public class PageController : MonoBehaviour
     public void RefreshPageButtons(int itemsCount)
     {
         int pagesCount = Mathf.FloorToInt(itemsCount / (float)itemsPerPage);
-        Debug.Log("pagesCount: " + pagesCount);
 
         int currentPage = GetCurrentPage(ui.showedListType);
         int nextPage = currentPage + 1 <= pagesCount ? currentPage + 1 : -1;
@@ -107,5 +106,14 @@ public class PageController : MonoBehaviour
         approvedScrollView.SetActive(false);
         authorScrollView.SetActive(true);
         downloadedScrollView.SetActive(false);
+    }
+    public void ShowScrollViewDownloaded()
+    {
+        refreshListCallback = ui.RefreshDownloadedList;
+        refreshListCallback(-1);
+
+        approvedScrollView.SetActive(false);
+        authorScrollView.SetActive(false);
+        downloadedScrollView.SetActive(true);
     }
 }

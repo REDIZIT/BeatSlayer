@@ -1,6 +1,7 @@
 ﻿using CoversManagement;
 using DatabaseManagement;
 using ProjectManagement;
+using Searching;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,18 +12,18 @@ using UnityEngine.UI;
 public class TrackListUI : MonoBehaviour
 {
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
-    public ListController listController { get { return GetComponent<ListController>(); } }
+    //public ListController listController { get { return GetComponent<ListController>(); } }
     public MenuScript_v2 menu { get { return GetComponent<MenuScript_v2>(); } }
-
     public PageController pageController { get { return GetComponent<PageController>(); } }
+    public SearchUI SearchUI { get { return GetComponent<SearchUI>(); } }
+
+
 
 
     public GameObject trackItemPrefab;
 
     public static Texture2D defaultIcon;
     public Texture2D _defaultIcon;
-
-
 
 
     public Transform content
@@ -58,49 +59,94 @@ public class TrackListUI : MonoBehaviour
     {
         showedListType = ListType.Approved;
         pageController.SetCurrentPage(showedListType, page == -1 ? pageController.GetCurrentPage(showedListType) : page);
-        StartCoroutine(IRefreshApprovedList());
+        StartCoroutine(ILoadAndRefresh());
     }
     public void RefreshAllMusicList(int page = -1)
     {
         showedListType = ListType.AllMusic;
         pageController.SetCurrentPage(showedListType, page == -1 ? pageController.GetCurrentPage(showedListType) : page);
-        StartCoroutine(IRefreshApprovedList());
+        StartCoroutine(ILoadAndRefresh());
+    }
+    public void RefreshDownloadedList(int page = -1)
+    {
+        showedListType = ListType.Downloaded;
+        pageController.SetCurrentPage(showedListType, page == -1 ? pageController.GetCurrentPage(showedListType) : page);
+        StartCoroutine(ILoadAndRefresh());
+    }
+    public void Refresh()
+    {
+        StartCoroutine(ILoadAndRefresh());
     }
 
 
 
+    IEnumerator ILoadAndRefresh()
+    {
+        stateText.text = "";
 
-    IEnumerator IRefreshApprovedList()
+        // If approved maps not loaded
+        if (GetData().Count == 0)
+        {
+            if(Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                stateText.text = "No internet connection >﹏<";
+            }
+            else
+            {
+                bool isApprovedLoaded = false;
+                stateText.text = "Loading..";
+                try
+                {
+                    LoadData(() => { isApprovedLoaded = true; });
+                }
+                catch(Exception err)
+                {
+                    isApprovedLoaded = false;
+                    stateText.text = $"Sorry, I can't load maps ╯︿╰\n<color=#333>{err.Message}</color>";
+                }
+                
+                while (!isApprovedLoaded)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                stateText.text = "";
+            }
+        }
+
+        List<GroupInfoExtended> sortedList = SearchUI.OnSearch(GetData()).ToList();
+
+        DateTime d1 = DateTime.Now;
+
+        RefreshList(sortedList);
+
+        Debug.Log("Refresh time is " + (DateTime.Now - d1).TotalMilliseconds);
+    }
+    void RefreshList(List<GroupInfoExtended> ls)
     {
         // Clear cover downloading queue and content
-        CoversManager.ClearPackages(content.GetComponentsInChildren<RawImage>());
+        //CoversManager.ClearPackages(content.GetComponentsInChildren<RawImage>());
+        Debug.Log("packages count " + CoversManager.requests.Count);
+        CoversManager.ClearAll();
+        Debug.Log("packages count " + CoversManager.requests.Count);
         foreach (Transform child in content)
         {
             Destroy(child.gameObject);
         }
 
 
-        // If approved maps not loaded
-        if (GetData().Count == 0)
-        {
-            bool isApprovedLoaded = false;
-            stateText.text = "Loading..";
-            LoadData(() => { isApprovedLoaded = true; });
-            while (!isApprovedLoaded)
-            {
-                yield return new WaitForEndOfFrame();
-            }
-            stateText.text = "";
-        }
+        List<GroupInfoExtended> data = new List<GroupInfoExtended>();
+        data.AddRange(ls);
+
+
 
         // Get item paging
         int pagingItemStart = pageController.GetStartItemIndex(pageController.GetCurrentPage(showedListType));
-        int pagingItemCount = pageController.GetPageItemsCount(pageController.GetCurrentPage(showedListType), GetData().Count);
+        int pagingItemCount = pageController.GetPageItemsCount(pageController.GetCurrentPage(showedListType), data.Count);
 
 
         // Creating TrackGroupClass for items from Database container
         List<TrackGroupClass> groups = new List<TrackGroupClass>();
-        foreach (var item in GetData().GetRange(pagingItemStart, pagingItemCount))
+        foreach (var item in data.GetRange(pagingItemStart, pagingItemCount))
         {
             groups.Add(new TrackGroupClass(item));
         }
@@ -108,7 +154,7 @@ public class TrackListUI : MonoBehaviour
 
 
         // Creating items and cover requests
-        listController.displayedApprovedGroup = new List<TrackGroupPair>();
+        //listController.displayedApprovedGroup = new List<TrackGroupPair>();
         List<CoverRequestPackage> coverPackages = new List<CoverRequestPackage>();
 
         for (int i = 0; i < groups.Count; i++)
@@ -118,11 +164,9 @@ public class TrackListUI : MonoBehaviour
             TrackListItem item = Instantiate(trackItemPrefab, content).GetComponent<TrackListItem>();
             item.Setup(group, menu);
 
-            Debug.Log(group.author + "-" + group.name);
-
             coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), group.author + "-" + group.name));
 
-            listController.displayedApprovedGroup.Add(new TrackGroupPair(group, item.gameObject));
+            //listController.displayedApprovedGroup.Add(new TrackGroupPair(group, item.gameObject));
         }
 
 
@@ -134,8 +178,9 @@ public class TrackListUI : MonoBehaviour
 
         CoversManager.AddPackages(coverPackages);
 
-        pageController.RefreshPageButtons(GetData().Count);
+        pageController.RefreshPageButtons(data.Count);
     }
+
 
 
     void LoadData(Action callback)
@@ -150,10 +195,10 @@ public class TrackListUI : MonoBehaviour
         }
         else
         {
-            //Database.LoadAllGroups(callback);
+            Database.LoadDownloadedGroups(callback);
         }
     }
-    List<GroupInfoExtended> GetData()
+    public List<GroupInfoExtended> GetData()
     {
         List<GroupInfoExtended> ls = new List<GroupInfoExtended>();
         if (showedListType == ListType.Approved)
@@ -164,8 +209,10 @@ public class TrackListUI : MonoBehaviour
         {
             ls.AddRange(Database.container.allGroups);
         }
-
-        ls = ls.OrderByDescending(c => c.allLikes).ToList();
+        else
+        {
+            ls.AddRange(Database.container.downloadedGroups);
+        }
 
         return ls;
     }

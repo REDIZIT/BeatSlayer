@@ -22,13 +22,15 @@ using System.Runtime.Serialization.Formatters.Binary;
 using InGame.SceneManagement;
 using SaveManagement;
 using DatabaseManagement;
+using ProjectManagement;
 
 public class MenuScript_v2 : MonoBehaviour
 {
     public DatabaseScript database;
     public DailyRewarder dailyRewarder;
     public DownloadHelper downloadHelper { get { return GetComponent<DownloadHelper>(); } }
-    public ListController listController { get { return GetComponent<ListController>(); } }
+    //public ListController listController { get { return GetComponent<ListController>(); } }
+    public TrackListUI TrackListUI { get { return GetComponent<TrackListUI>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
 
@@ -67,6 +69,7 @@ public class MenuScript_v2 : MonoBehaviour
 
 
     public Transform tutorialLocker;
+    public AudioSource aSource;
 
 
 
@@ -82,6 +85,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     private void Awake()
     {
+        Application.targetFrameRate = 60;
         debugConsole.SetActive(true);
 
         m_currentOrientation = Screen.orientation;
@@ -98,43 +102,10 @@ public class MenuScript_v2 : MonoBehaviour
 
         if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
         if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
-
-        //Debug.LogError(SaveManager.Data.SaberEffects.Count);
-        //SaveManager.Data.SaberEffects.Add(new SaberEffectData(2, "123", "234", 90000, false));
-        //SaveManager.SaveData();
     }
 
-    string logname;
-    TimeSpan logTime;
-    void StartLog(string msg)
-    {
-        logname = msg;
-        logTime = DateTime.Now.TimeOfDay;
-    }
-    void EndLog()
-    {
-        Debug.LogWarning(logname + ": " + (DateTime.Now.TimeOfDay - logTime).TotalMilliseconds + "ms");
-    }
     private void Start()
     {
-        //foreach (var filepath in Directory.GetFiles(Application.persistentDataPath + "/up"))
-        //{
-        //    BinaryFormatter bin = new BinaryFormatter();
-        //    Project proj = null;
-        //    using (var stream = File.OpenRead(filepath))
-        //    {
-        //        proj = (Project)bin.Deserialize(stream);
-        //    }
-
-        //    XmlSerializer xml = new XmlSerializer(typeof(Project));
-        //    using (var stream = File.Create(filepath + ".bsz"))
-        //    {
-        //        xml.Serialize(stream, proj);
-        //    }
-        //}
-
-
-        Application.targetFrameRate = 60;
         versionText.text = Application.version.ToString() + " by " + Application.installerName + " in " + Application.installMode.ToString() + " mode";
 
         // Google Play Services Auth
@@ -150,19 +121,7 @@ public class MenuScript_v2 : MonoBehaviour
         HandleDev();
         HandleSettings();
 
-        //bool enableMenuMusic = SSytem.instance.GetBool("MenuMusic");
-        //if (enableMenuMusic) musicSource.Play();
-        //musicSource.volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
-
-        //StartLog("Init own music");
-
-        ////listController.InitOwnMusic();
-
-        //listController.RefreshCustomList();
-
-        //EndLog();
-
-        listController.RefreshDownloadList();
+        TrackListUI.RefreshDownloadedList();
 
         #region Loading prefs
 
@@ -187,40 +146,25 @@ public class MenuScript_v2 : MonoBehaviour
         // Actions with server
         if (Application.internetReachability != NetworkReachability.NotReachable)
         {
-            StartLog("Server");
-
             if (!File.Exists(Application.persistentDataPath + "/DontUpdate.txt") && Time.realtimeSinceStartup <= 30)
             {
                 StartCoroutine(CheckForUpdatesAsync());
             }
 
             CheckServerMessage();
-            StartCoroutine(database.LoadDatabaseAsync(true));
-
-            EndLog();
-        }
-        else
-        {
-            noInternetAuthors.SetActive(true);
         }
 
         dailyRewarder.Calculate();
-
         CheckAchievement();
+
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += delegate { videoPlayer.Play(); };
-
         canvasRect = GameObject.Find("Canvas").GetComponent<RectTransform>().rect.size;
         if (Screen.height > Screen.width) canvasRect = new Vector2(canvasRect.y, canvasRect.x);
         UpdateOrientationHanlder(true);
     }
 
-
-
-
-
-    Vector2 startPos;
-    public AudioSource aSource;
+    
     private void Update()
     {
 
@@ -312,7 +256,7 @@ public class MenuScript_v2 : MonoBehaviour
         if (!onChange && !force) return;
 
         SettingsRescale(isVertical);
-        ListRescale(isVertical);
+        //ListRescale(isVertical);
 
 
         // Background video
@@ -372,6 +316,7 @@ public class MenuScript_v2 : MonoBehaviour
             return;
         }
         if (Application.systemLanguage == SystemLanguage.Russian || Application.systemLanguage == SystemLanguage.Ukrainian) LocalizationManager.Language = "Russian";
+        else if (Application.systemLanguage == SystemLanguage.French) LocalizationManager.Language = "French";
         else LocalizationManager.Language = "English";
     }
 
@@ -423,24 +368,24 @@ public class MenuScript_v2 : MonoBehaviour
 
     
 
-    public void OnSearchOwnMusic(InputField field)
-    {
-        string search = field.text.ToLower();
+    //public void OnSearchOwnMusic(InputField field)
+    //{
+    //    string search = field.text.ToLower();
 
-        //foreach (Transform child in listController.ownMusicList) child.gameObject.SetActive(false);
+    //    //foreach (Transform child in listController.ownMusicList) child.gameObject.SetActive(false);
 
-        List<UserTrackClass> sorted = listController.ownMusicArray.Where(c => (c.author + "-" + c.name).ToLower().Contains(search)).ToList();
+    //    List<UserTrackClass> sorted = listController.ownMusicArray.Where(c => (c.author + "-" + c.name).ToLower().Contains(search)).ToList();
 
-        float contentSize = 0;
-        for (int i = 0; i < listController.ownMusicList.childCount; i++)
-        {
-            GameObject item = listController.ownMusicList.GetChild(i).gameObject;
-            TrackListItem track = item.GetComponent<TrackListItem>();
-            //item.SetActive(sorted.Exists(c => c.author == track.group.author && c.name == track.group.name));
-        }
+    //    float contentSize = 0;
+    //    for (int i = 0; i < listController.ownMusicList.childCount; i++)
+    //    {
+    //        GameObject item = listController.ownMusicList.GetChild(i).gameObject;
+    //        TrackListItem track = item.GetComponent<TrackListItem>();
+    //        //item.SetActive(sorted.Exists(c => c.author == track.group.author && c.name == track.group.name));
+    //    }
         
-        listController.authorMusicList.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentSize + 15);
-    }
+    //    listController.authorMusicList.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentSize + 15);
+    //}
 
 
     public State configScreen;
@@ -490,27 +435,27 @@ public class MenuScript_v2 : MonoBehaviour
         foreach (Transform child in trackInfoMapContent) Destroy(child.gameObject);
 
         // Refresh list of player's maps
-        TrackClass[] arr;
+        List<MapInfo> mapInfos;
         TrackRecordGroup records = TheGreat.GetRecords();
 
-        if (listItem.isCustomMusic) arr = database.GetCustomMaps(listItem.group);
-        else if (listItem.isLocalItem) arr = database.GetDownloadedMaps(listItem.group);
-        else arr = database.GetMapsByTrack(listItem.group);
+        if (listItem.isCustomMusic) mapInfos = database.GetCustomMaps(listItem.groupInfo);
+        else if (listItem.isLocalItem) mapInfos = database.GetDownloadedMaps(listItem.groupInfo);
+        else mapInfos = database.GetMapsByTrack(listItem.group);
 
         float contentHeight = -10;
-        for (int i = 0; i < arr.Length; i++)
+        for (int i = 0; i < mapInfos.Count; i++)
         {
             MapListItem mapItem = Instantiate(trackInfoMapPrefab, trackInfoMapContent).GetComponent<MapListItem>();
 
-            bool isPassed = accountManager.IsPassed(arr[i].group.author, arr[i].group.name, arr[i].nick);
+            bool isPassed = accountManager.IsPassed(mapInfos[i].group.author, mapInfos[i].group.name, mapInfos[i].nick);
 
             if (listItem.isCustomMusic)
             {
-                mapItem.SetupForLocalFile(this, arr[i]);
+                mapItem.SetupForLocalFile(this, mapInfos[i]);
             }
-            else mapItem.Setup(this, arr[i], isPassed);
+            else mapItem.Setup(this, isPassed, mapInfos[i]);
 
-            TrackRecord record = TheGreat.GetRecord(records, arr[i].group.author, arr[i].group.name, arr[i].nick);
+            TrackRecord record = TheGreat.GetRecord(records, mapInfos[i].group.author, mapInfos[i].group.name, mapInfos[i].nick);
             mapItem.recordText.text = record == null ? "" : LocalizationManager.Localize("Record") + ": " + record.score;
 
             contentHeight += 191.3f + 10;
@@ -603,70 +548,70 @@ public class MenuScript_v2 : MonoBehaviour
     public StateMachine Main_UI;
     public RectTransform selectMapRect;
     public GameObject achievementBtn, leaderboardBtn;
-    public void ListRescale(bool isPortrait)
-    {
-        if (isPortrait)
-        {
-            if (!isPortraitHandled)
-            {
-                isPortraitHandled = true;
-                foreach (Transform child in listController.authorMusicList)
-                {
-                    if (child.name == "MusicLoadingText") continue;
-                    else if (child.GetComponent<MenuTrackButton>() != null) child.GetComponent<MenuTrackButton>().Rescale(true);
+    //public void ListRescale(bool isPortrait)
+    //{
+    //    if (isPortrait)
+    //    {
+    //        if (!isPortraitHandled)
+    //        {
+    //            isPortraitHandled = true;
+    //            foreach (Transform child in listController.authorMusicList)
+    //            {
+    //                if (child.name == "MusicLoadingText") continue;
+    //                else if (child.GetComponent<MenuTrackButton>() != null) child.GetComponent<MenuTrackButton>().Rescale(true);
 
-                }
-                foreach (Transform child in listController.ownMusicList)
-                {
-                    //child.GetComponent<MenuTrackButton>().Rescale(true);
-                }
+    //            }
+    //            foreach (Transform child in listController.ownMusicList)
+    //            {
+    //                //child.GetComponent<MenuTrackButton>().Rescale(true);
+    //            }
 
-                selectMapRect.offsetMin = new Vector2(0, selectMapRect.offsetMin.y);
-                selectMapRect.offsetMax = new Vector2(0, selectMapRect.offsetMax.y);
+    //            selectMapRect.offsetMin = new Vector2(0, selectMapRect.offsetMin.y);
+    //            selectMapRect.offsetMax = new Vector2(0, selectMapRect.offsetMax.y);
 
-                RectTransform mapScreen = selectMapRect.GetChild(0).GetChild(0).GetComponent<RectTransform>();
-                mapScreen.offsetMin = new Vector2(0, mapScreen.offsetMin.y);
-                mapScreen.offsetMax = new Vector2(0, mapScreen.offsetMax.y);
+    //            RectTransform mapScreen = selectMapRect.GetChild(0).GetChild(0).GetComponent<RectTransform>();
+    //            mapScreen.offsetMin = new Vector2(0, mapScreen.offsetMin.y);
+    //            mapScreen.offsetMax = new Vector2(0, mapScreen.offsetMax.y);
 
-                achievementBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(-300, -35);
-                leaderboardBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(300, -35);
+    //            achievementBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(-300, -35);
+    //            leaderboardBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(300, -35);
 
-                // Refresh Main_UI. IMPORTANT! Allow Reentry must be TRUE!!
-                selectMapRect.GetComponent<StateMachine>().ChangeState(0);
-                Main_UI.ChangeState(Main_UI.currentState);
-            }
-        }
-        else
-        {
-            if (isPortraitHandled)
-            {
-                isPortraitHandled = false;
-                foreach (Transform child in listController.ownMusicList)
-                {
-                    //child.GetComponent<MenuTrackButton>().Rescale(false);
-                }
-                foreach (Transform child in listController.authorMusicList)
-                {
-                    if (child.GetComponent<MenuTrackButton>() != null) child.GetComponent<MenuTrackButton>().Rescale(false);
-                }
+    //            // Refresh Main_UI. IMPORTANT! Allow Reentry must be TRUE!!
+    //            selectMapRect.GetComponent<StateMachine>().ChangeState(0);
+    //            Main_UI.ChangeState(Main_UI.currentState);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if (isPortraitHandled)
+    //        {
+    //            isPortraitHandled = false;
+    //            foreach (Transform child in listController.ownMusicList)
+    //            {
+    //                //child.GetComponent<MenuTrackButton>().Rescale(false);
+    //            }
+    //            foreach (Transform child in listController.authorMusicList)
+    //            {
+    //                if (child.GetComponent<MenuTrackButton>() != null) child.GetComponent<MenuTrackButton>().Rescale(false);
+    //            }
 
-                selectMapRect.offsetMin = new Vector2(250, selectMapRect.offsetMin.y);
-                selectMapRect.offsetMax = new Vector2(-250, selectMapRect.offsetMax.y);
-                //Debug.Log("Landscape");
+    //            selectMapRect.offsetMin = new Vector2(250, selectMapRect.offsetMin.y);
+    //            selectMapRect.offsetMax = new Vector2(-250, selectMapRect.offsetMax.y);
+    //            //Debug.Log("Landscape");
 
-                RectTransform mapScreen = selectMapRect.GetChild(0).GetChild(0).GetComponent<RectTransform>();
-                mapScreen.offsetMin = new Vector2(162.8f, mapScreen.offsetMin.y);
-                mapScreen.offsetMax = new Vector2(-162.8f, mapScreen.offsetMax.y);
+    //            RectTransform mapScreen = selectMapRect.GetChild(0).GetChild(0).GetComponent<RectTransform>();
+    //            mapScreen.offsetMin = new Vector2(162.8f, mapScreen.offsetMin.y);
+    //            mapScreen.offsetMax = new Vector2(-162.8f, mapScreen.offsetMax.y);
 
-                achievementBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600, 150);
-                leaderboardBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(600, 150);
+    //            achievementBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600, 150);
+    //            leaderboardBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(600, 150);
 
-                // Refresh Main_UI. IMPORTANT! Allow Reentry must be TRUE!!
-                selectMapRect.GetComponent<StateMachine>().ChangeState(selectMapRect.GetComponent<StateMachine>().currentState);
-                Main_UI.ChangeState(Main_UI.currentState);
-            }
-        }
-    }
+    //            // Refresh Main_UI. IMPORTANT! Allow Reentry must be TRUE!!
+    //            selectMapRect.GetComponent<StateMachine>().ChangeState(selectMapRect.GetComponent<StateMachine>().currentState);
+    //            Main_UI.ChangeState(Main_UI.currentState);
+    //        }
+    //    }
+    //}
 
 
     public HorizontalScrollSnap mapHss;
@@ -847,7 +792,8 @@ public class MenuScript_v2 : MonoBehaviour
                 trackImg.sprite = selectedTrack.img.sprite;
             }
 
-            listController.RefreshAuthorList();
+            //listController.RefreshAuthorList();
+            TrackListUI.RefreshAllMusicList();
         }
         catch (Exception err)
         {
@@ -1189,7 +1135,6 @@ public class MenuScript_v2 : MonoBehaviour
             string result = args.Result;
             if(result.Contains("|"))
             {
-                Debug.Log(result);
                 serverMsgAnim.SetActive(true);
 
                 string type = result.Split('|')[0];

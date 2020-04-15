@@ -3,28 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
 
 public class LeaderboardUIItem : MonoBehaviour
 {
-    public LeaderboardRecord record;
+    //public LeaderboardRecord record;
 
-    public Text placeText, nickText, accuracyText, playedTimesText, RPText, totalRPText;
+    public Text placeText, nickText, accuracyText, missedText, playedTimesText, RPText, totalRPText;
+    public Text scoreText;
+    public Replay replay;
+
+    [Header("Colors")]
+    public Color32 defaultBodyColor;
+    public Color32 defaultBorderColor;
+    public Color32 defaultTextColor;
+
+    public Color32 selectedBodyColor, selectedBorderColor;
+    public Color32 selectedTextColor;
 
 
-    public void Refresh()
+
+    public void Refresh(int place, bool isCurrentPlayer)
     {
-        placeText.text = "#" + record.place;
-        nickText.text = record.nick;
+        placeText.text = "#" + place;
+        nickText.text = replay.player;
 
-        float roundedAccuray = Mathf.FloorToInt(record.accuracy * 100f) / 100f;
+        float roundedAccuray = Mathf.FloorToInt(replay.Accuracy * 1000f) / 10f;
         accuracyText.text = roundedAccuray + "%";
+        accuracyText.color = isCurrentPlayer ? selectedTextColor : defaultTextColor;
 
-        playedTimesText.text = record.playedTimes.ToString();
+        missedText.text = replay.missed.ToString();
+        missedText.color = isCurrentPlayer ? selectedTextColor : defaultTextColor;
 
-        int RP = Mathf.FloorToInt(record.RP);
+        float RP = Mathf.FloorToInt((float)replay.RP * 10f) / 10f;
         RPText.text = RP.ToString();
 
-        int totalRP = Mathf.FloorToInt(record.totalRP);
-        totalRPText.text = totalRP.ToString();
+        scoreText.text = Mathf.FloorToInt(replay.score).ToString();
+
+        GetComponent<UICornerCut>().color = isCurrentPlayer ? selectedBodyColor : defaultBodyColor;
+        GetComponent<UICornerCut>().ColorDown = isCurrentPlayer ? selectedBorderColor : defaultBorderColor;
     }
 }

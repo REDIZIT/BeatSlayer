@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 
 namespace LeaderboardManagement
@@ -20,6 +18,7 @@ namespace LeaderboardManagement
     {
         public int place;
         public string nick;
+        public int sliced, missed;
         public float accuracy, playedTimes, RP, totalRP;
     }
 }

@@ -17,7 +17,7 @@ namespace Assets.SimpleLocalization
         public static event Action LocalizationChanged = () => { }; 
 
         private static readonly Dictionary<string, Dictionary<string, string>> Dictionary = new Dictionary<string, Dictionary<string, string>>();
-        private static string _language = "English";
+        private static string _language = "French";
 
 		/// <summary>
 		/// Get or set language.
@@ -33,7 +33,7 @@ namespace Assets.SimpleLocalization
 		/// </summary>
         public static void AutoLanguage()
         {
-            Language = "English";
+            Language = "French";
         }
 
 		/// <summary>
@@ -80,7 +80,14 @@ namespace Assets.SimpleLocalization
                     {
                         if(key.Contains("//") || key == "" || key == "\n" || key == @"
 " || key == " ") continue;
-                        Dictionary[languages[j]].Add(key, columns[j]);
+                        try
+                        {
+                            Dictionary[languages[j]].Add(key, columns[j]);
+                        }
+                        catch (Exception err)
+                        {
+                            Debug.LogError("Line " + key + " => " + err.Message);
+                        }
                     }
                 }
             }

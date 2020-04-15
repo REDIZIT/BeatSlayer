@@ -100,7 +100,7 @@ public class DatabaseScript : MonoBehaviour
         GetComponent<ListController>().RefreshAuthorList();
     }
     
-    public TrackClass[] GetMapsByTrack(TrackGroupClass groupCls)
+    public List<MapInfo> GetMapsByTrack(TrackGroupClass groupCls)
     {
         WebClient client = new WebClient();
         string url = db_mapsUrl + "?trackname=" + groupCls.author.Replace("&", "%amp%") + "-" + groupCls.name.Replace("&", "%amp%");
@@ -108,26 +108,7 @@ public class DatabaseScript : MonoBehaviour
 
         List<MapInfo> mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
 
-        TrackClass[] arr = new TrackClass[mapInfos.Count];
-        for (int i = 0; i < mapInfos.Count; i++)
-        {
-            TrackClass cls = new TrackClass()
-            {
-                nick = mapInfos[i].nick,
-                downloads = mapInfos[i].downloads,
-                plays = mapInfos[i].playCount,
-                likes = mapInfos[i].likes,
-                dislikes = mapInfos[i].dislikes,
-                group = groupCls,
-                hasUpdate = HasUpdateForMap(mapInfos[i]),
-                difficulty = mapInfos[i].difficultyStars,
-                difficultyName = mapInfos[i].difficultyName
-            };
-            cls.cover = GetComponent<DownloadHelper>().DownloadSprite(cls);
-            arr[i] = cls;
-        }
-
-        return arr;
+        return mapInfos;
     }
 
     public Task<List<TrackGroupClass>> GetDownloadedMusic()
@@ -156,46 +137,32 @@ public class DatabaseScript : MonoBehaviour
         });
     }
     
-    public TrackClass[] GetDownloadedMaps(TrackGroupClass group)
+    public List<MapInfo> GetDownloadedMaps(GroupInfo group)
     {
         string trackFolder = Application.persistentDataPath + "/maps/" + group.author + "-" + group.name;
         string[] mapsPathes = Directory.GetDirectories(trackFolder);
 
-        TrackClass[] arr = new TrackClass[mapsPathes.Length];
+        List<MapInfo> mapInfos = new List<MapInfo>();
         for (int i = 0; i < mapsPathes.Length; i++)
         {
-            arr[i] = new TrackClass() { group = group };
-            string coverPath = TheGreat.GetCoverPath(mapsPathes[i], group.author + "-" + group.name);
-            arr[i].cover = coverPath == "" ? defaultTrackSprite : TheGreat.LoadSprite(coverPath);
-            arr[i].nick = new DirectoryInfo(mapsPathes[i]).Name;
+            string nick = new DirectoryInfo(mapsPathes[i]).Name;
+            MapInfo info = GetMapInfo(group.author + "-" + group.name, new DirectoryInfo(mapsPathes[i]).Name);
+            mapInfos.Add(info);
 
-            //int[] mapStat = GetMapStatistics(group.author + "-" + group.name, arr[i].nick);
-            MapInfo mapStat = GetMapInfo(group.author + "-" + group.name, arr[i].nick);
-            arr[i].downloads = mapStat.downloads;
-            arr[i].plays = mapStat.playCount;
-            arr[i].likes = mapStat.likes;
-            arr[i].dislikes = mapStat.dislikes;
-            arr[i].difficultyName = mapStat.difficultyName;
-            arr[i].difficulty = mapStat.difficultyStars;
-
-
-            arr[i].hasUpdate = HasUpdateForMap(group.author + "-" + group.name, arr[i].nick);
-            //db.list.Where(c => c.author == group.author && c.name == group.name && c.)
+            //arr[i].hasUpdate = HasUpdateForMap(group.author + "-" + group.name, arr[i].nick);
         }
 
-        return arr;
+        return mapInfos;
     }
 
-    public TrackClass[] GetCustomMaps(TrackGroupClass group)
+    public List<MapInfo> GetCustomMaps(GroupInfo group)
     {
-        TrackClass[] arr = new TrackClass[1];
-        arr[0] = new TrackClass()
+        List<MapInfo> ls = new List<MapInfo>();
+        ls.Add(new MapInfo(group)
         {
-            nick = "[LOCAL STORAGE]",
-            cover = defaultTrackSprite,
-            group = group
-        };
-        return arr;
+            nick = "[LOCAL STORAGE]"
+        });
+        return ls;
     }
 
 
@@ -390,6 +357,39 @@ public static class TheGreat
         else if (File.Exists(pngPath)) return pngPath;
 
         return "";
+    }
+    public static string GetCoverPathFromName(string trackname, string nick)
+    {
+        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+        if (!Directory.Exists(groupFolder)) return "";
+
+        string mapFolder = groupFolder + "/" + nick;
+        if (nick == "")
+        {
+            mapFolder = Directory.GetDirectories(groupFolder)[0];
+        }
+
+        Debug.Log("mapFolder " + mapFolder);
+
+        string jpgPath = mapFolder + "/" + trackname + ".jpg";
+        string pngPath = mapFolder + "/" + trackname + ".png";
+        if (File.Exists(jpgPath)) return jpgPath;
+        else if (File.Exists(pngPath)) return pngPath;
+
+        return "";
+    }
+    public static Texture2D GetCover(string trackname, string nick)
+    {
+        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+        if (!Directory.Exists(groupFolder)) return null;
+
+        string mapFolder = groupFolder + "/" + nick;
+        if (!Directory.Exists(mapFolder)) return null;
+
+        string path = GetCoverPathFromName(trackname, nick);
+        if (path == "") return null;
+
+        return LoadTexure(path);
     }
 
     public static string UrlEncode(string url)

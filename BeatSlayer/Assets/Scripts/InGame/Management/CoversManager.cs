@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Policy;
-using System.Text;
-using UnityEditor;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +12,7 @@ namespace CoversManagement
     public static class CoversManager
     {
         public static List<CoverRequestPackage> requests = new List<CoverRequestPackage>();
+
         static bool isInited;
         static bool isDownloading;
 
@@ -35,16 +33,14 @@ namespace CoversManagement
         static void OnDataDownloaded(object sender, DownloadDataCompletedEventArgs e)
         {
             isDownloading = false;
-            if (e.Cancelled)
-            {
-                Debug.Log("Downloading canceled");
-            }
-            else if (e.Error != null)
+            if (e.Cancelled) return;
+
+            if (e.Error != null)
             {
                 Debug.LogError(e.Error);
                 requests.RemoveAt(0);
 
-                OnRequestsListUpdate(); 
+                OnRequestsListUpdate();
             }
             else
             {
@@ -59,7 +55,6 @@ namespace CoversManagement
                     requests[0].image.texture = tex;
                 }
 
-                Debug.Log("Completed " + requests[0].trackname);
                 requests.RemoveAt(0);
 
                 OnRequestsListUpdate();
@@ -72,11 +67,24 @@ namespace CoversManagement
 
             if (!isInited) Init();
 
+            requests = requests.OrderByDescending(c => c.priority).ToList();
+
             string url = string.Format(url_cover, requests[0].trackname, requests[0].nick);
 
-            Uri uri = new Uri(url);
-            client.DownloadDataAsync(uri);
-            isDownloading = true;
+            // file path for downloaded map cover
+            Texture2D tex = TheGreat.GetCover(requests[0].trackname, requests[0].nick);
+            if (tex != null)
+            {
+                requests[0].image.texture = tex;
+                requests.RemoveAt(0);
+                OnRequestsListUpdate();
+            }
+            else
+            {
+                Uri uri = new Uri(url);
+                client.DownloadDataAsync(uri);
+                isDownloading = true;
+            }
         }
 
         public static void AddPackages(List<CoverRequestPackage> ls)
@@ -95,21 +103,22 @@ namespace CoversManagement
                 {
                     client.CancelAsync();
                     toRemove.Add(requests[0]);
-                    Debug.Log("Removed zero index");
                     continue;
                 }
 
                 CoverRequestPackage package = requests.Find(c => c.image == img);
                 if(package != null)
                 {
-                    Debug.Log("Removed " + package.trackname);
                     toRemove.Add(package);
                 }
             }
-
-            Debug.Log("Removed " + toRemove.Count + "/" + requests.Count);
             requests = requests.Except(toRemove).ToList();
-            Debug.Log(".. Requests count " + requests.Count);
+        }
+        public static void ClearAll()
+        {
+            Debug.Log("ClearAll");
+            if(requests.Count > 0) client.CancelAsync();
+            requests.Clear();
         }
     }
     
@@ -118,12 +127,14 @@ namespace CoversManagement
         public RawImage image;
 
         public string trackname, nick;
+        public bool priority;
 
-        public CoverRequestPackage(RawImage image, string trackname, string nick = "")
+        public CoverRequestPackage(RawImage image, string trackname, string nick = "", bool priority = false)
         {
             this.image = image;
             this.trackname = trackname;
             this.nick = nick;
+            this.priority = priority;
         }
     }
 }

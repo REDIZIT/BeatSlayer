@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CoversManagement;
+using ProjectManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,12 +18,13 @@ public class MapListItem : MonoBehaviour
         get { return menu.transform.GetComponent<AdvancedSaveManager>(); }
     }
 
-    public TrackClass item;
+    public MapInfo mapInfo;
 
     public Text nickText;
 
     public Text likesText, dislikesText, downloadsText, playsText;
-    public Image coverImage;
+    //public Image coverImage;
+    public RawImage coverImage;
 
     public GameObject downloadIndicator;
     public GameObject downloadBtn, playBtn, deleteBtn;
@@ -36,19 +39,22 @@ public class MapListItem : MonoBehaviour
     public Text difficultyText;
     public Transform difficultyStarsContnet;
 
-    public void Setup(MenuScript_v2 menu, TrackClass item, bool isPassed)
+    public void Setup(MenuScript_v2 menu, bool isPassed, MapInfo mapInfo)
     {
         this.menu = menu;
-        this.item = item;
+        this.mapInfo = mapInfo;
 
-        nickText.text = item.nick;
-        likesText.text = item.likes.ToString();
-        dislikesText.text = item.dislikes.ToString();
-        downloadsText.text = item.downloads.ToString();
-        playsText.text = item.plays.ToString();
-        coverImage.sprite = item.cover;
+        nickText.text = mapInfo.nick;
+        likesText.text = mapInfo.likes.ToString();
+        dislikesText.text = mapInfo.dislikes.ToString();
+        downloadsText.text = mapInfo.downloads.ToString();
+        CoversManager.AddPackages(new List<CoverRequestPackage>()
+        {
+            new CoverRequestPackage(coverImage, mapInfo.author + "-" + mapInfo.name, mapInfo.nick, true)
+        });
 
-        string filepath = Application.persistentDataPath + "/maps/" + item.group.author + "-" + item.group.name + "/" + item.nick + "/" + item.group.author + "-" + item.group.name + ".bsu";
+
+        string filepath = Application.persistentDataPath + "/maps/" + mapInfo.group.author + "-" + mapInfo.group.name + "/" + mapInfo.nick + "/" + mapInfo.group.author + "-" + mapInfo.group.name + ".bsu";
         bool exists = File.Exists(filepath);
 
         downloadIndicator.SetActive(exists);
@@ -61,24 +67,25 @@ public class MapListItem : MonoBehaviour
 
         if (exists)
         {
-            updateBtn.SetActive(item.hasUpdate);
+            
+            //updateBtn.SetActive(mapInfo.HasUpdates());
         }
 
         //difficultyStarsContnet implement
         UpdateDifficulty();
 
     }
-    public void SetupForLocalFile(MenuScript_v2 menu, TrackClass item)
+    public void SetupForLocalFile(MenuScript_v2 menu, MapInfo mapInfo)
     {
         this.menu = menu;
-        this.item = item;
+        this.mapInfo = mapInfo;
 
-        nickText.text = item.nick;
+        nickText.text = mapInfo.nick;
         likesText.transform.parent.gameObject.SetActive(false);
         dislikesText.transform.parent.gameObject.SetActive(false);
         downloadsText.transform.parent.gameObject.SetActive(false);
         playsText.transform.parent.gameObject.SetActive(false);
-        coverImage.sprite = item.cover;
+        //coverImage.sprite = mapInfo.cover;
 
         downloadIndicator.SetActive(true);
         playBtn.SetActive(true);
@@ -92,8 +99,8 @@ public class MapListItem : MonoBehaviour
 
     public void UpdateDifficulty()
     {
-        int difficulty = item.difficulty;
-        string diffName = item.difficultyName;
+        int difficulty = mapInfo.difficultyStars;
+        string diffName = mapInfo.difficultyName;
 
         difficultyText.text = diffName;
         float xOffset = difficultyText.preferredWidth + 20;
@@ -131,13 +138,13 @@ public class MapListItem : MonoBehaviour
 
         downloadClient = new WebClient();
 
-        string downloadUrl = "http://176.107.160.146/Home/DownloadProject?trackname=" + (item.group.author + "-" + item.group.name).Replace("&", "%amp%") + "&nickname=" + item.nick.Replace("&", "%amp%");
+        string downloadUrl = "http://176.107.160.146/Home/DownloadProject?trackname=" + (mapInfo.group.author + "-" + mapInfo.group.name).Replace("&", "%amp%") + "&nickname=" + mapInfo.nick.Replace("&", "%amp%");
         Debug.LogWarning("Download url: " + downloadUrl);
         Uri uri = new Uri(downloadUrl);
 
         if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
 
-        string tempPath = Application.persistentDataPath + "/temp/" + (item.group.author.Trim() + "-" + item.group.name.Trim()) + ".bsz";
+        string tempPath = Application.persistentDataPath + "/temp/" + (mapInfo.group.author.Trim() + "-" + mapInfo.group.name.Trim()) + ".bsz";
         //downloadClient.DownloadFileCompleted += new AsyncCompletedEventHandler(OnDownloadComplete);
         //downloadClient.DownloadFileAsync(uri, tempPath);
 
@@ -158,7 +165,7 @@ public class MapListItem : MonoBehaviour
     public void OnDownloadComplete(object sender, DownloadDataCompletedEventArgs e)
     {
         TimeSpan t2 = DateTime.Now.TimeOfDay;
-        string tempPath = Application.persistentDataPath + "/temp/" + (item.group.author.Trim() + "-" + item.group.name.Trim()) + ".bsz";
+        string tempPath = Application.persistentDataPath + "/temp/" + (mapInfo.group.author.Trim() + "-" + mapInfo.group.name.Trim()) + ".bsz";
         File.WriteAllBytes(tempPath, e.Result);
         Debug.Log("WriteAllBytes time is " + (DateTime.Now.TimeOfDay - t2).TotalMilliseconds);
 
@@ -175,14 +182,14 @@ public class MapListItem : MonoBehaviour
             downloadIndicator.SetActive(true);
             deleteBtn.SetActive(true);
 
-            tempPath = Application.persistentDataPath + "/temp/" + (item.group.author.Trim() + "-" + item.group.name.Trim()) + ".bsz";
+            tempPath = Application.persistentDataPath + "/temp/" + (mapInfo.group.author.Trim() + "-" + mapInfo.group.name.Trim()) + ".bsz";
 
             TimeSpan t1 = DateTime.Now.TimeOfDay;
             Debug.Log("Unpacking... " + t1);
             menu.UnpackBspFile(tempPath);
             Debug.Log("Unpacked in " + (DateTime.Now.TimeOfDay - t1).TotalMilliseconds);
 
-            TheGreat.SendStatistics(item.group.author + "-" + item.group.name, item.nick, "download");
+            TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "download");
         }
         else
         {
@@ -204,47 +211,18 @@ public class MapListItem : MonoBehaviour
 
     public void OnPlayClick()
     {
-        //LCData.track = item;
-        
-
-        //if (LCData.loadingType == LCData.LoadingType.Standard)
-        //{
-        //    if (!prefsManager.prefs.hasAchiv_ThatsMy)
-        //    {
-        //        Social.ReportProgress(GPGamesManager.achievement_ThatsMy, 100, (bool success) =>
-        //        {
-        //            if (!success) Debug.LogError("Achiv error");
-        //            if (success)
-        //            {
-        //                prefsManager.prefs.hasAchiv_ThatsMy = true;
-        //                prefsManager.Save();
-        //            }
-        //        });
-        //    }
-        //    if (item.nick != "")
-        //    {
-        //        if (!prefsManager.prefs.hasAchiv_MadeInChina)
-        //        {
-        //            Social.ReportProgress(GPGamesManager.achiv_madeInChina, 100, (bool success) => { if (!success) Debug.LogError("Achiv error: madeInChina"); });
-        //            prefsManager.prefs.hasAchiv_MadeInChina = true;
-        //            prefsManager.Save();
-        //        }
-        //    }
-
-
-
         SceneloadParameters load;
-        if (item.group.filepath == "")
+        if (mapInfo.filepath == "")
         {
             // Load author music
-            load = SceneloadParameters.AuthorMusicPreset(item.group.author + "-" + item.group.name, item.nick);
+            load = SceneloadParameters.AuthorMusicPreset(mapInfo);
 
-            TheGreat.SendStatistics(item.group.author + "-" + item.group.name, item.nick, "play");
+            TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "play");
         }
         else
         {
             // Load own music
-            load = SceneloadParameters.OwnMusicPreset(item.group.filepath);
+            load = SceneloadParameters.OwnMusicPreset(mapInfo.filepath);
         }
 
         InGame.SceneManagement.SceneController.instance.LoadScene(load);
@@ -252,8 +230,8 @@ public class MapListItem : MonoBehaviour
 
     public void OnDeleteClick()
     {
-        string trackPath = Application.persistentDataPath + "/maps/" + item.group.author + "-" + item.group.name;
-        string mapPath = trackPath + "/" + item.nick;
+        string trackPath = Application.persistentDataPath + "/maps/" + mapInfo.group.author + "-" + mapInfo.group.name;
+        string mapPath = trackPath + "/" + mapInfo.nick;
 
         Directory.Delete(mapPath, true);
 

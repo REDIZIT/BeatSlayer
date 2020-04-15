@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,7 @@ public class TrackListItem : MonoBehaviour
 {
     MenuScript_v2 menu;
     public TrackGroupClass group;
+    public GroupInfo groupInfo;
 
     public Text nameText, authorText, mapsCountText;
     public RawImage coverImage;
@@ -22,9 +24,10 @@ public class TrackListItem : MonoBehaviour
 
 
     //TimeSpan t1;
-    public void Setup(TrackGroupClass group, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
+    public void Setup(TrackGroupClass group, GroupInfo groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
     {
         this.group = group;
+        this.groupInfo = groupInfo;
         authorText.text = group.author;
         nameText.text = group.name;
         this.menu = menu;

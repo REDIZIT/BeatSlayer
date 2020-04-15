@@ -16,7 +16,6 @@ namespace InGame.SceneManagement
 
         public void Init(SceneControllerUI ui)
         {
-            Debug.Log("Is UI null? " + (ui == null));
             SceneController.ui = ui;
             instance = this;
         }
@@ -123,21 +122,20 @@ public class SceneloadParameters
 
     public LoadType Type { get; private set; }
 
-    public string Trackname { get; private set; }
-    public string Nick { get; private set; }
+    public MapInfo Map { get; private set; } = new MapInfo();
+    public string Trackname { get { return Map.author + "-" + Map.name; } }
 
     public string AudioFilePath { get; private set; }
     public string ProjectFolderPath { get; private set; }
 
     private SceneloadParameters() { }
 
-    public static SceneloadParameters AuthorMusicPreset(string trackname, string nick)
+    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
-            Trackname = trackname,
-            Nick = nick,
+            Map = mapInfo
         };
         return parameters;
     }
@@ -153,11 +151,22 @@ public class SceneloadParameters
     public static SceneloadParameters FromFilePreset(string bsuPath)
     {
         string trackname = Path.GetFileNameWithoutExtension(bsuPath);
+        GroupInfo groupInfo = new GroupInfo()
+        {
+            author = trackname.Split('-')[0],
+            name = trackname.Split('-')[1],
+            mapsCount = 1
+        };
+        MapInfo info = new MapInfo()
+        {
+            group = groupInfo,
+            nick = "[LOCAL STORAGE *]",
+        };
+
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.ProjectFolder,
-            Trackname = trackname,
-            Nick = "[LOCAL STORAGE *]",
+            Map = info,
             ProjectFolderPath = new FileInfo(bsuPath).DirectoryName
         };
         return parameters;
@@ -171,6 +180,10 @@ public class SceneloadParameters
         return parameters;
     }
 }
+
+
+
+
 
 
 
@@ -189,7 +202,7 @@ public class ProjectLoaderMap : IProjectLoader
 
         if(parameters.Type == SceneloadParameters.LoadType.Author)
         {
-            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Nick;
+            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.nick;
         }
         else
         {
@@ -238,55 +251,3 @@ public class ProjectLoaderMenu : IProjectLoader
         yield return new WaitForEndOfFrame();
     }
 }
-
-
-
-
-
-
-//public class OurClass
-//{
-
-//    public LoadTypeEnum LoadType { get; private set; }
-
-//    public string ProjectPath { get; private set; }
-//    public string AudioFilePath { get; private set; }
-
-
-//    // Используется, когда нужно загрузить проект (.bsz файл (тот самый 'архив' с музыкой, кубами и т.д.))
-//    public OurClass(string projectPath, LoadTypeEnum loadType = LoadTypeEnum.Project)
-//    {
-//        LoadType = loadType;
-//        ProjectPath = projectPath;
-//    }
-
-//    // Используется, когда нужно загрузить только музыку (в игре алгоритм будет сам спавнить кубы в ритм музыки)
-//    public OurClass(string audioFilePath, LoadTypeEnum loadType = LoadTypeEnum.AudioFile)
-//    {
-//        LoadType = loadType;
-//        AudioFilePath = audioFilePath;
-//    }
-//}
-
-
-//public class Lenin
-//{
-//    public void OnBirth()
-//    {
-//        //OurClass cls = new OurClass(LoadTypeEnum.AudioFile, )
-
-//        SceneloadParameters parameters = SceneloadParameters.
-//    }
-//}
-
-
-
-//namespace USSR.Сommunism.Enums
-//{
-//    public enum LoadTypeEnum
-//    {
-//        Menu,
-//        Project,
-//        AudioFile
-//    };
-//}

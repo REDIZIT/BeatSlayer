@@ -18,8 +18,14 @@ using UnityEditor;
 public class GameManager : MonoBehaviour
 {
     public SettingsManager settingsManager { get { return GetComponent<SettingsManager>(); } }
-    AccountManager accountManager;
+    public AccountManager accountManager;
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
+    public FinishHandler finishHandler { get { return GetComponent<FinishHandler>(); } }
+    public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
+    public GameUIManager UIManager { get { return GetComponent<GameUIManager>(); } }
+
+
+    public Replay replay;
 
 
 
@@ -31,8 +37,6 @@ public class GameManager : MonoBehaviour
 
     public GameObject[] scenes;
 
-    public Text DEBUG_TEXT;
-
     [Header("Text Mesh Pro")]
     public Text missedTextMsg;
     public TextMeshPro scoreText, missedText, perText, comboText, comboMultiplierText;
@@ -43,21 +47,20 @@ public class GameManager : MonoBehaviour
     [Header("Beat cubes stuff")]
     public bool displayColor;
     public SpawnPointScript[] spawnPoints;
-    List<BeatCubeClass> beats = new List<BeatCubeClass>();
+    [HideInInspector] public List<BeatCubeClass> beats = new List<BeatCubeClass>();
 
-    float comboValue = 0, comboValueMax = 16, comboMultiplierAnimValue;
-    float comboMultiplier = 1, score;
+    [HideInInspector] public float comboValue = 0, comboValueMax = 16, comboMultiplierAnimValue;
+    [HideInInspector] public float comboMultiplier = 1;
     [HideInInspector] public float earnedScore;
+    [HideInInspector] public float scoreMultiplier;
 
     List<SpawnPointClass> spawnPointClasses = new List<SpawnPointClass>();
     public GameObject BeatCubePrefab, BeatLinePrefab;
-    Project project;
-    int cubesMissed, cubesSliced, cubesSpawned;
+    [HideInInspector] public Project project;
 
     public SaberController rightSaber, leftSaber;
     public Material orangeMaterial, blueMaterial;
 
-    float scoreMultiplier;
 
     [Header("Skills")]
     public GameObject timeTravelPanel;
@@ -73,12 +76,8 @@ public class GameManager : MonoBehaviour
     public Slider trackTimeSlider;
     public Text trackTextSliderText, timeInSecondsText;
     public GameObject finishRecordPanel;
-    public Slider pitchSlider;
     public Image comboValueImg;
 
-    [Header("Game end")]
-    public Image endCoverImage;
-    public Text endNameText, endAuthorText, endCreatorText, endScoreText, endRecordText, endDifficultText;
     public Sprite defaultTrackSprite;
 
     [Header("Statistics UI")]
@@ -91,15 +90,9 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float cubesspeed = 1;
     [HideInInspector] public bool noarrows;
     [HideInInspector] public bool nolines;
-    string fullTrackName;
-    bool gameCompleted, gameStarted, gameStarting;
-    float maxCombo = 1;
-    int[] clipTime;
-
-    AdvancedSaveManager prefsManager
-    {
-        get { return GetComponent<AdvancedSaveManager>(); }
-    }
+    [HideInInspector] public bool gameCompleted, gameStarted, gameStarting;
+    [HideInInspector] public string fullTrackName;
+    [HideInInspector] public float maxCombo = 1;
 
     // Settings
     float sliceeffectVolume = 0.8f;
@@ -164,23 +157,22 @@ public class GameManager : MonoBehaviour
 
         accountManager = GetComponent<AccountManager>();
 
-        try
+        fullTrackName = LoadingData.project.author + "-" + LoadingData.project.name;
+
+        GameObject sc = Instantiate(scenes[prefsManager.prefs.selectedMapId]);
+        sc.transform.position = new Vector3(0, 0, 0);
+
+        if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
-
-            fullTrackName = LoadingData.project.author + "-" + LoadingData.project.name;
-
-            GameObject sc = Instantiate(scenes[prefsManager.prefs.selectedMapId]);
-            sc.transform.position = new Vector3(0, 0, 0);
-
-            if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
-            {
-                InitProject();
-            }
+            InitProject();
         }
-        catch (System.Exception err)
-        {
-            trackText.text = "Error Setup: " + err.Message;
-        }
+
+        replay = new Replay();
+        replay.author = project.author;
+        replay.name = project.name;
+        replay.nick = project.creatorNick;
+        replay.difficulty = project.difficultStars;
+
 
         try { InitSettings(); }
         catch (System.Exception err) { trackText.text = "Error InitSettings: " + err.Message; }
@@ -195,28 +187,14 @@ public class GameManager : MonoBehaviour
     {
         audioManager.asource.clip = LoadingData.aclip;
 
-        Debug.Log("Audio Clip len is " + audioManager.asource.clip.length + "/" + LoadingData.aclip.length);
-
-        pitch = SSytem.instance.GetFloat("MusicSpeed") / 10f;
         audioManager.asource.pitch = pitch;
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = pitch;
-        pitchSlider.value = (pitch - 1) * 10;
-        OnPitchChanged();
-
-
-
 
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile)
         {
             AudioClip sClip = CloneAudioClip(LoadingData.aclip, "SUKAAAAA");
             audioManager.spectrumAsource.clip = sClip;
         }
-
-
-        clipTime = SplitTime(LoadingData.aclip.length);
-
-        Debug.Log("Audio Clip is null? " + (LoadingData.aclip == null));
-        Debug.Log("Audio Extension is " + (LoadingData.project.audioExtension == Project.AudioExtension.Mp3 ? "mp3" : "ogg"));
     }
     void InitGraphics()
     {
@@ -255,10 +233,15 @@ public class GameManager : MonoBehaviour
     void InitSettings()
     {
         sliceeffectVolume = SSytem.instance.GetFloat("SliceVolume") * 0.3f;
-        cubesspeed = SSytem.instance.GetFloat("CubesSpeed") / 10f;
-        pitch = SSytem.instance.GetFloat("MusicSpeed") / 10f;
-        noarrows = SSytem.instance.GetBool("NoArrows");
-        nolines = SSytem.instance.GetBool("NoLines");
+        cubesspeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);
+        pitch = Mathf.Clamp(SSytem.instance.GetFloat("MusicSpeed") / 10f, 0.5f, 1.5f);
+
+
+        if (!LoadingData.loadparams.Map.approved)
+        {
+            noarrows = SSytem.instance.GetBool("NoArrows");
+            nolines = SSytem.instance.GetBool("NoLines");
+        }
 
 
         float distanceToSpawn = spawnPoints[0].transform.position.z;
@@ -305,13 +288,12 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator Start()
     {
-        DEBUG_TEXT.gameObject.SetActive(File.Exists(Application.persistentDataPath + "/Dev.txt"));
         trackText.text = fullTrackName + (pitch == 1 ? "" : " x" + pitch);
 
         AlignToSide();
 
         try { InitAudio(); }
-        catch (System.Exception err) { trackText.text = "Error InitAudio: " + err.Message; }
+        catch (System.Exception err) { trackText.text = "Error InitAudio: " + err.Message; Debug.LogError(err); }
 
         gameStarting = true;
         gameStarted = true;
@@ -370,10 +352,10 @@ public class GameManager : MonoBehaviour
                 bool isPortrait = Screen.orientation == ScreenOrientation.Portrait;
                 if (Application.isEditor) isPortrait = Screen.width < Screen.height;
 
-                CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
-                // Инвентируем исходное разрешение (как будто переворачиваем)
-                scaler.referenceResolution = isPortrait ? new Vector2(600, 800) : new Vector2(800, 600);
-                scaler.matchWidthOrHeight = isPortrait ? 1 : 0;
+                //CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
+                //// Инвентируем исходное разрешение (как будто переворачиваем)
+                //scaler.referenceResolution = isPortrait ? new Vector2(600, 800) : new Vector2(800, 600);
+                //scaler.matchWidthOrHeight = isPortrait ? 1 : 0;
 
                 GetComponent<Camera>().fieldOfView = isPortrait ? 90 : 60;
 
@@ -399,7 +381,7 @@ public class GameManager : MonoBehaviour
             {
                 float rounded = Mathf.FloorToInt(earnedScore) * scoreMultiplier;
                 earnedScore -= rounded;
-                score += rounded;
+                replay.score += rounded;
             }
 
             if (!paused && gameStarted)
@@ -442,22 +424,7 @@ public class GameManager : MonoBehaviour
                 {
                     if (audioManager.asource.time != 0)
                     {
-                        int[] curTime = new int[2];
-                        try
-                        {
-                            curTime = SplitTime(audioManager.asource.time);
-                        }
-                        catch (Exception err) { Debug.LogError("Catched error::Time::Split: " + err.Message); }
-                        
-                        try
-                        {
-                            if (timeInSecondsText == null) Debug.LogError("TimeInSecondsText is null");
-                            timeInSecondsText.text =
-                            curTime[0] + ":" + (curTime[1] < 10 ? "0" + curTime[1] : curTime[1] + "") + " / " +
-                            clipTime[0] + ":" + (clipTime[1] < 10 ? "0" + clipTime[1] : clipTime[1] + "");
-                        }
-                        catch (Exception err) { Debug.LogError("Catched error::Time::Text: " + err.Message); }
-                        
+                        timeInSecondsText.text = SecondsToString(audioManager.asource.time) + " / " + SecondsToString(audioManager.asource.clip.length);
                     }
                 }
                 else Debug.LogError("asource clip is null");
@@ -472,141 +439,13 @@ public class GameManager : MonoBehaviour
         //  Игровые процессы
         if (!gameStarted) return;
 
+        finishHandler.CheckLevelFinish();
+
         try
         {
             #region Level Finished
 
-            //if (!gameStarting && !paused && !asource.isPlaying && (beats.ToArray().Length == 0 || (beats.ToArray().Length < 10 && asource.time == 0)))
-            if (!gameStarting && audioManager.asource.time == 0 && beats.ToArray().Length == 0 && !audioManager.asource.isPlaying
-                /*&& (LoadingData.loadparams.Type == LoadingData.loadparams.Type.AudioFile ? spectrumAsource.isPlaying : true)*/)
-            {
-                if (!gameCompleted)
-                {
-                    gameCompleted = true;
-                    lvlfinishPanel.SetActive(true);
-                    trackTimeSlider.value = 100;
-                    trackTextSliderText.text = "100%";
-
-                    if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.ProjectFolder)
-                    {
-                        if (Application.internetReachability != NetworkReachability.NotReachable)
-                        {
-                            AccountTrackRecord atRecord = accountManager.GetRecord(project.author, project.name, project.creatorNick);
-                            AccountTrackRecord newRecord = new AccountTrackRecord()
-                            {
-                                author = project.author,
-                                name = project.name,
-                                nick = project.creatorNick,
-                                score = float.Parse(scoreText.text),
-                                missed = int.Parse(missedText.text),
-                                percent = float.Parse(perText.text.Replace("%", ""))
-                            };
-
-                            if (atRecord == null)
-                            {
-                                endRecordText.text = "";
-                            }
-                            else
-                            {
-                                if (newRecord.score > atRecord.score)
-                                {
-                                    endRecordText.text = "Новый рекорд!";
-                                }
-                                else
-                                {
-                                    endRecordText.text = $"Рекорд: <color=#fff>{atRecord.score}</color> <color=#f40>{atRecord.percent}%</color> <color=#f00>{atRecord.missed}</color>";
-                                }
-                            }
-
-                            accountManager.UpdateRecord(project.author, project.name, project.creatorNick, newRecord);
-                            accountManager.UpdatePlayedMap(project.author, project.name, project.creatorNick);
-                            accountManager.UpdateSessionTime();
-                        }
-                    }
-
-                    int coins = prefsManager.prefs.coins;
-                    int addCoins = Mathf.RoundToInt(score / 16f * maxCombo / 2f * scoreMultiplier);
-
-
-                    StartCoroutine(coinsAnimator(coins, addCoins));
-                    prefsManager.prefs.coins = coins + addCoins;
-                    prefsManager.Save();
-
-
-
-                    string coverPath = TheGreat.GetCoverPath(Application.persistentDataPath + "/maps/" + project.author + "-" + project.name + "/" + project.creatorNick, fullTrackName);
-                    endCoverImage.sprite = coverPath == "" ? defaultTrackSprite : TheGreat.LoadSprite(coverPath);
-
-                    endAuthorText.text = project.author;
-                    endNameText.text = project.name;
-                    endCreatorText.text = LocalizationManager.Localize("by") + " " + project.creatorNick;
-
-                    endScoreText.text = $"<color=#fff>{scoreText.text}</color> <color=#f40>{perText.text}</color> <color=#f00>{missedText.text}</color>";
-
-                    string cubeSpeed = LocalizationManager.Localize("CubesSpeed") + ": " + (cubesspeed == 1 ? "1.0x" : cubesspeed + "x");
-                    string musicSpeed = LocalizationManager.Localize("MusicSpeed") + ": " + (pitch == 1 ? "1.0x" : pitch + "x");
-                    string noLines = LocalizationManager.Localize("NoLines") + "? " + (nolines ? LocalizationManager.Localize("Yes") : LocalizationManager.Localize("No"));
-                    string noArrows = LocalizationManager.Localize("NoArrows") + "? " + (noarrows ? LocalizationManager.Localize("Yes") : LocalizationManager.Localize("No"));
-                    endDifficultText.text = "<size=18>" + LocalizationManager.Localize("Difficult") + @"</size>
-" + cubeSpeed + @"
-" + musicSpeed + @"
-" + noLines + @"
-" + noArrows;
-
-
-                    RateBtnUpdate();
-
-                    trackText.gameObject.SetActive(false);
-
-                    if (!prefsManager.prefs.hasAchiv_Uff)
-                    {
-                        Social.ReportProgress(GPGamesManager.achievement_UffEnded, 100, (bool success) =>
-                        {
-                            if (!success) Debug.LogError("Achiv error");
-                            if (success)
-                            {
-                                prefsManager.prefs.hasAchiv_Uff = true;
-                                prefsManager.Save();
-                            }
-                        });
-                    }
-
-                    if (cubesMissed == 0 && score >= 4000 && cubesspeed == 1.5f && !nolines && !noarrows)
-                    {
-                        if (!prefsManager.prefs.hasAchiv_Hardcore)
-                        {
-                            Social.ReportProgress(GPGamesManager.achievement_Hardcore, 100, (bool success) =>
-                            {
-                                if (!success) Debug.LogError("Achiv error");
-                                if (success)
-                                {
-                                    prefsManager.prefs.hasAchiv_ThatsMy = true;
-                                    prefsManager.Save();
-                                }
-                            });
-                        }
-                    }
-
-                    (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.youArePlayer, 1, (bool s) => { });
-                    (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.dj, 1, (bool s) => { });
-                    (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.musicKing, 1, (bool s) => { });
-
-                    if (cubesMissed == cubesSpawned && cubesSpawned >= 10 && !prefsManager.prefs.hasAchiv_Terrible) // 10 is random value :D
-                    {
-                        Social.ReportProgress(GPGamesManager.terrible, 100, (bool success) => { if (!success) Debug.LogError("Achiv error: terrible"); });
-                        prefsManager.prefs.hasAchiv_Terrible = true;
-                        prefsManager.Save();
-                    }
-                }
-            }
-            else
-            {
-                float trackPer = (audioManager.asource.time < audioManager.asource.clip.length ?
-                    audioManager.asource.time / audioManager.asource.clip.length : 1) * 100;
-                trackPer = Mathf.Round(trackPer * 10) / 10;
-                trackTimeSlider.value = trackPer;
-                trackTextSliderText.text = trackPer + "%";
-            }
+            
 
             #endregion
         }
@@ -618,11 +457,9 @@ public class GameManager : MonoBehaviour
 
             if (!gameCompleted)
             {
-                scoreText.text = score.ToString();
-                missedText.text = cubesMissed.ToString();
-                float per = cubesSpawned > 0 ? ((float)cubesMissed / (float)cubesSliced) : 1;
-                float perRounded = (Mathf.RoundToInt((100 - per * 100f) * 100f) / 100f);
-                perText.text = (perRounded < 0 ? 0 : perRounded) + "%";
+                scoreText.text = Mathf.RoundToInt(replay.score * 10f) / 10f + "";
+                missedText.text = replay.missed.ToString();
+                perText.text = Mathf.RoundToInt(replay.Accuracy * 1000f) / 10f + "%";
                 if (comboValue >= comboValueMax && comboMultiplier < 16)
                 {
                     comboValue = 2;
@@ -846,11 +683,13 @@ public class GameManager : MonoBehaviour
         paused = true;
         pausePanel.SetActive(true);
         audioManager.PauseSource();
+        UIManager.OnPause();
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
     }
     public void Unpause()
     {
         pausePanel.SetActive(false);
+        UIManager.OnResume();
         StartCoroutine(Unpauing());
     }
     public IEnumerator Unpauing()
@@ -889,14 +728,6 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         SceneController.instance.LoadScene(LoadingData.loadparams);
-    }
-    public void OnPitchChanged()
-    {
-        Text sliderText = pitchSlider.transform.GetChild(2).GetChild(0).GetChild(0).GetComponent<Text>();
-        float pitch = 1 + pitchSlider.value / 10f;
-        sliderText.text = "x" + (pitch == 1 ? "1.0" : pitch.ToString());
-        //prefsManager.prefs.musicSpeed = pitch;
-        prefsManager.Save();
     }
     #endregion
 
@@ -955,7 +786,6 @@ public class GameManager : MonoBehaviour
         c.transform.position = new Vector3(selectedSpawnPoint.position.x, beat.level == 0 ? 1 : 5f, selectedSpawnPoint.position.z);
         spawnPoints[road].Spawn(beat.type);
         c.transform.name = "BeatCube";
-        cubesSpawned++;
 
         c.GetComponent<Bit>().Start();
     }
@@ -987,9 +817,9 @@ public class GameManager : MonoBehaviour
 
         missedTextMsg.transform.GetComponent<Animator>().Play(0);
         comboValue -= 10;
-        score -= 5 * scoreMultiplier;
-        if (score < 0) score = 0;
-        cubesMissed++;
+        replay.score -= 5 * scoreMultiplier;
+        if (replay.score < 0) replay.score = 0;
+        replay.missed++;
 
         if (!prefsManager.prefs.hasAchiv_Blinked)
         {
@@ -1022,21 +852,14 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Slice sound err: " + err);
         }
 
-        try
-        {
-            score += comboMultiplier * scoreMultiplier;
-            cubesSliced++;
-            comboValue += 1;
-        }
-        catch (System.Exception err)
-        {
-            Debug.LogWarning("Slice sound err #2: " + err);
-        }
+        replay.score += comboMultiplier * scoreMultiplier;
+        replay.sliced++;
+        comboValue += 1;
     }
     public void BeatLineSliced()
     {
-        score += comboMultiplier * scoreMultiplier;
-        cubesSliced++;
+        replay.score += comboMultiplier * scoreMultiplier;
+        replay.sliced++;
         comboValue += 1;
     }
 
@@ -1178,11 +1001,21 @@ public class GameManager : MonoBehaviour
     #endregion
 
 
+    #region High quality code (cringe but okay)
 
-    void RateBtnUpdate()
+    #region Finishing
+    
+    #endregion
+
+    #endregion
+
+
+
+
+
+    public void RateBtnUpdate()
     {
         int state = prefsManager.prefs.GetRateState(fullTrackName);
-        Debug.Log("RateBtnUpdate: state is " + state);
 
         if (state != 0)
         {
@@ -1206,8 +1039,6 @@ public class GameManager : MonoBehaviour
         {
             prefsManager.prefs.SetRateState(fullTrackName, liked ? 1 : -1);
 
-            Debug.Log("RateBtnSET: state is " + (liked ? 1 : -1));
-
             //File.AppendAllText(Application.persistentDataPath + "/order.ls", (liked ? "Liked:" : "Disliked:") + fullTrackName + "\n");
             TheGreat.SendStatistics(fullTrackName, project.creatorNick, liked ? "like" : "dislike");
 
@@ -1223,7 +1054,14 @@ public class GameManager : MonoBehaviour
 
 
 
-    // Просто для удобства и красоты кода
+    // Просто для удобства и красоты (какая нахуй красота дебил?! в каком месте он красивый???) кода
+    public string SecondsToString(float allTimeInSeconds)
+    {
+        int mins = Mathf.FloorToInt(allTimeInSeconds / 60f);
+        int secs = Mathf.FloorToInt(allTimeInSeconds - mins * 60);
+
+        return mins + ":" + (secs < 10 ? "0" + secs : secs.ToString());
+    }
     public int[] SplitTime(float allTime)
     {
         int mins = Mathf.FloorToInt(allTime / 60f);
@@ -1231,50 +1069,6 @@ public class GameManager : MonoBehaviour
         return new int[2] { mins, secs };
     }
 
-    public string dbgStr;
-    public void Log(string str)
-    {
-        dbgStr += str + @"
-";
-    }
-
-    IEnumerator coinsAnimator(float _coins, int toadd)
-    {
-        float boosting = 1;
-        if (prefsManager.prefs.selectedBooster != -1)
-        {
-            Booster booster = prefsManager.prefs.boosters[prefsManager.prefs.selectedBooster];
-            if (booster.count > 0)
-            {
-                boosting = booster.name.Contains("x2") ? 2 : 0.5f;
-                toadd = Mathf.RoundToInt(toadd * boosting);
-                booster.count--;
-            }
-        }
-
-        prefsManager.Save();
-
-
-        float coins = _coins;
-        float target = coins + toadd;
-
-
-        coinsText.text = coins + "<color=white>+" + toadd + (boosting == 1 ? "" : " <b>x" + boosting + "</b>") + "</color>";
-
-
-        yield return new WaitForSeconds(0.6f);
-        while (coins < target)
-        {
-            coins += 0.1f + (target - coins) / 50f;
-
-            if (coins >= target) coins = target;
-
-            coinsText.text = Mathf.RoundToInt(coins) + "<color=white>+" + Mathf.RoundToInt(target - coins) + "</color>";
-            yield return new WaitForEndOfFrame();
-        }
-
-        coinsText.text = Mathf.RoundToInt(target) + "";
-    }
 
     class SpawnPointClass
     {

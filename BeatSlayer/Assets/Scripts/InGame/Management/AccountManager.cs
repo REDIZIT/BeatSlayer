@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Assets.SimpleLocalization;
 using Newtonsoft.Json;
+using GooglePlayGames.BasicApi.Multiplayer;
 
 public class AccountManager : MonoBehaviour
 {
@@ -40,6 +41,9 @@ public class AccountManager : MonoBehaviour
     [Header("Action buttons")]
     public GameObject actionLocker;
     public Transform actionContnet;
+
+    public const string url_sendReplay = "http://www.bsserver.tk/Account/AddReplay?nick={0}&json={1}";
+    public const string url_getBestReplay = "http://www.bsserver.tk/Account/GetBestReplay?player={0}&trackname={1}&nick={2}";
 
 
 
@@ -353,19 +357,16 @@ public class AccountManager : MonoBehaviour
 
         if(account.records.Exists(c => c.author == author && c.name == name && c.nick == nick))
         {
-            Debug.Log("[RECORD] Exists");
             AccountTrackRecord record = account.records.Find(c => c.author == author && c.name == name && c.nick == nick);
             if(newRecord.score > record.score)
             {
                 record.score = newRecord.score;
                 record.missed = newRecord.missed;
-                record.percent = newRecord.percent;
-                Debug.Log("[RECORD] New score uploaded");
+                record.accuracy = newRecord.accuracy;
             }
         }
         else
         {
-            Debug.Log("[RECORD] Does not exists");
             AccountTrackRecord record = new AccountTrackRecord()
             {
                 author = author,
@@ -373,10 +374,9 @@ public class AccountManager : MonoBehaviour
                 nick = nick,
                 score = newRecord.score,
                 missed = newRecord.missed,
-                percent = newRecord.percent
+                accuracy = newRecord.accuracy
             };
             account.records.Add(record);
-            Debug.Log("[RECORD] New record uploaded");
         }
     }
     public AccountTrackRecord GetRecord(string author, string name, string nick)
@@ -394,8 +394,6 @@ public class AccountManager : MonoBehaviour
     public void UpdatePlayedMap(string author, string name, string nick)
     {
         if (account == null) return;
-
-        Debug.Log("[MAP] " + author + "-" + name + " by " + nick);
 
         if (account.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick))
         {
@@ -618,6 +616,39 @@ public class AccountManager : MonoBehaviour
         bigLeaderboardContent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -contentY);
     }
 
+    public static void SendReplay(Replay replay, Action<double> callback)
+    {
+        replay.player = account.nick;
+
+        WebClient c = new WebClient();
+        c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
+        {
+            Debug.Log("SendReplay response is " + e.Result);
+            //if (!e.Cancelled && e.Error != null) Debug.LogError("SendReplay\n" + e.Error);
+
+            callback(double.Parse(e.Result, System.Globalization.CultureInfo.InvariantCulture));
+        };
+
+        string url = string.Format(url_sendReplay, account.nick, JsonConvert.SerializeObject(replay));
+        Debug.Log("SendReplay url " + url);
+        c.DownloadStringAsync(new Uri(url));
+    }
+    public static void GetBestReplay(string player, string trackname, string nick, Action<Replay> callback)
+    {
+        WebClient c = new WebClient();
+        string url = string.Format(url_getBestReplay, player, trackname, nick);
+
+        c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
+        {
+            if (!e.Cancelled && e.Error != null) { Debug.LogError("GetBestReplay\n" + e.Error); callback(null); return; }
+            else Debug.Log("GetBestReplay response is " + e.Result);
+
+            Replay replay = JsonConvert.DeserializeObject<Replay>(e.Result);
+            callback(replay);
+        };
+    }
+
+
     #endregion
 }
 
@@ -648,9 +679,9 @@ public class Account
 public class AccountTrackRecord
 {
     public string author, name, nick;
-    public float score;
-    public int missed;
-    public float percent;
+
+    public float score = 0, accuracy = 0; // Accuracy in 1.0
+    public int missed = 0, sliced = 0;
 }
 
 public class AccountMapInfo

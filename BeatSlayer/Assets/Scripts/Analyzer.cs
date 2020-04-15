@@ -129,8 +129,6 @@ public class Analyzer : MonoBehaviour
             item.diff = diff;
 
             float roundedVol = Mathf.RoundToInt(volume * 100) / 100f;
-            gs.DEBUG_TEXT.text = @"[First Alg]
-Volume: " + roundedVol;
 
             float startPointVal = 0.15f; // 75% of 0.2f
             float addPointVal = volume * 0.1f; // 25% of 0.2f
@@ -143,10 +141,6 @@ Volume: " + roundedVol;
 
             //float pointVal = 0.2f;
             float pointVal = startPointVal + addPointVal;
-            gs.DEBUG_TEXT.text += @"
-PointVal: " + Mathf.RoundToInt(pointVal * 100f) / 100f + @"
-HighTier: " + Mathf.RoundToInt(highTierVal * 100f) / 100f;
-
 
 
             if (volume > highTierVal) { highTier = 0.1f; }
@@ -215,8 +209,6 @@ HighTier: " + Mathf.RoundToInt(highTierVal * 100f) / 100f;
             item.diff = diff;
 
             float roundedVol = Mathf.RoundToInt(volume * 100) / 100f;
-            gs.DEBUG_TEXT.text = @"[Second Alg]
-Volume: " + roundedVol;
 
             float startPointVal = 0.15f; // 75% of 0.2f
             float addPointVal = volume * 0.06f; // 25% of 0.2f
@@ -229,10 +221,6 @@ Volume: " + roundedVol;
 
             //float pointVal = 0.2f;
             float pointVal = startPointVal + addPointVal;
-            gs.DEBUG_TEXT.text += @"
-PointVal: " + Mathf.RoundToInt(pointVal * 100f) / 100f + @"
-HighTier: " + Mathf.RoundToInt(highTierVal * 100f) / 100f;
-
 
 
             if (volume > highTierVal) { highTier = 0.3f; }

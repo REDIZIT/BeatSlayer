@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -71,7 +72,17 @@ namespace ProjectManagement
         public int mapsCount;
 
         public int allDownloads, allPlays, allLikes, allDislikes;
+
         public DateTime updateTime;
+        public bool IsNew
+        {
+            get
+            {
+                return (DateTime.Now - updateTime).TotalDays <= 3;
+            }
+        }
+
+        public List<string> nicks;
     }
     public class MapInfo
     {
@@ -88,6 +99,21 @@ namespace ProjectManagement
         public int difficultyStars;
 
         public DateTime publishTime;
+
+        public bool approved;
+        public DateTime grantedTime;
+
+        // If map isn't on server
+        [JsonIgnore] public string filepath;
+
+        public bool IsGrantedNow
+        {
+            get
+            {
+                if (!approved) return false;
+                else return grantedTime > publishTime;
+            }
+        }
 
         public MapInfo() { }
         public MapInfo(GroupInfo group)
