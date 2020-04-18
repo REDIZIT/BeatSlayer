@@ -1,24 +1,36 @@
-﻿using System.Collections.Generic;
-
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Threading;
 
 namespace LeaderboardManagement
 {
     public static class LeaderboardManager
     {
-        public static List<LeaderboardRecord> GetLeaderboard()
+        public const string url_leaderboard = "http://www.bsserver.tk/Account/GetGlobalLeaderboard";
+
+        public static void GetLeaderboard(Action<List<LeaderboardItem>> callback)
         {
-            return new List<LeaderboardRecord>()
+            WebClient c = new WebClient();
+            c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
             {
-                new LeaderboardRecord() { nick = "Tester", accuracy = 50, place = 1, playedTimes = 20, RP = 270, totalRP = 570}
+                if (!e.Cancelled && e.Error != null) throw e.Error;
+                callback(JsonConvert.DeserializeObject<List<LeaderboardItem>>(e.Result));
             };
+
+            c.DownloadStringAsync(new Uri(url_leaderboard));
         }
     }
 
-    public class LeaderboardRecord
+    public class LeaderboardItem
     {
-        public int place;
         public string nick;
-        public int sliced, missed;
-        public float accuracy, playedTimes, RP, totalRP;
+        public int place;
+        public int playCount;
+        public int slicedCount, missedCount;
+        public float Accuracy { get { return slicedCount / (float)(slicedCount + missedCount); } }
+        public double RP, score;
     }
 }

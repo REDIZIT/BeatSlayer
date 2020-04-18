@@ -12,6 +12,10 @@ Search,Search,Поиск,Chercher
 Later,Later,Позже,Plus tard
 Reset,Reset,Сброс,Réinitialiser
 Score,Score,Очки,But
+Missed,Missed,Промах,Manqué
+Accuracy,Accuracy,Точность,Précision
+Difficulties,Difficulties,Сложности,Des difficultés
+PlayCount,Play count,Кол-во игр,Nombre de parties
 Back,Back,Назад,Retour
 Yes,Yes,Да,Oui
 No,No,Нет,Non
@@ -159,7 +163,12 @@ Saber-4,Katana,Катана,Katana
 Saber-4-Descript,The thinnest blade of the strongest metal allows you to cut the sausage into a sandwich with the thinnest pieces,Самое тонкое лезвие из самого крепкого металла позволяет нарезать колбасу на бутерброт самыми тонкими кусочками,La lame la plus fine du métal le plus solide vous permet de couper la saucisse en sandwich avec les morceaux les plus fins
 Saber-5,Middleage sword,Средневековый меч,Épée intermédiaire
 Saber-5-Descript,This medieval sword was stolen from the museum by a pizza delivery man,Этот средневековый меч был украден из музея доставщиком пиццы,Cette épée médiévale a été volée au musée par un livreur de pizza
-
+Saber-6,Sword for boyars,Меч для бояр,Épée pour boyards
+Saber-6-Descript,This sword has a little bit HUGE cost that's why only boyars can buy it,У этого меча немного ОГРОМНЫЙ ценник[comma] так что только бояры могут купить его,Cette épée a un prix énorme[comma] donc seuls les boyards peuvent l'acheter
+Swoosh-1,The most common,Самый обычный,le plus ordinaire
+Swoosh-1-Descript,The most common effect. Worth the whole nothing,Самый обычный эффект. Стоит целое ничего,L'effet le plus courant. Ne vaut rien
+Swoosh-2,Soul,Душа,Âme
+Swoosh-2-Descript,The soul of the sword follows the movement of your finger[comma] making the game delightful.[N]But be so kind as to lay a kidney.,Душа меча следует за движением твоего пальца[comma] делая игру восхитительной.[N]Но будь добр заложить почку.,L'âme de l'épée suit le mouvement de votre doigt[comma] ce qui rend le jeu délicieux.[N]Mais ayez la gentillesse de pondre un rein.
 
 // Color selection
 //
@@ -253,3 +262,9 @@ Pause,Pause,Пауза,Break
 Resume,Resume,Играть,Summary
 Restart,Restart,Рестарт,Redémarrer
 Menu,Menu,Меню,Menu
+
+
+MapLeaderboard,Map leaderboard,Таблица лидеров карты,Classement de la carte
+Leaderboard(RP),Leaderboard (RP),Рейтинг (RP),Classement (RP)
+ShowAll,Show all,Показать,Montrer
+ShowRP,Show RP,Показать RP,Montrer RP

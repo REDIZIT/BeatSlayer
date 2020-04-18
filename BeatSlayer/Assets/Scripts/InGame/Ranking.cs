@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using UnityEngine;
 
 public class Replay
 {
@@ -18,7 +19,9 @@ public class Replay
     /// </summary>
     [JsonIgnore] public float Accuracy { get { return AllCubes == 0 ? 0 : sliced / AllCubes; } }
 
-    public Replay(string author, string name, string nick, int difficulty, float score, int sliced, int missed)
+    public float cubesSpeed = 1, musicSpeed = 1;
+
+    public Replay(string author, string name, string nick, int difficulty, float score, int sliced, int missed, float cubesSpeed, float musicSpeed)
     {
         this.author = author;
         this.name = name;
@@ -27,6 +30,8 @@ public class Replay
         this.score = score;
         this.sliced = sliced;
         this.missed = missed;
+        this.cubesSpeed = Mathf.Clamp(cubesSpeed, 0.5f, 1.5f);
+        this.musicSpeed = Mathf.Clamp(musicSpeed, 0.5f, 1.5f);
     }
     public Replay(AccountTrackRecord record)
     {

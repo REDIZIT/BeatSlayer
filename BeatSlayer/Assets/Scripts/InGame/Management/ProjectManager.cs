@@ -33,7 +33,6 @@ namespace ProjectManagement
         public static IEnumerator LoadAudioCoroutine(string path)
         {
             Debug.Log($"LoadAudioCoroutine({path})");
-            Debug.Log($"AudioFiles exists? " + (File.Exists(path)));
             // Must work in sync mode!
             using (WWW www = new WWW("file:///" + path))
             {
@@ -66,11 +65,8 @@ namespace ProjectManagement
         public string author, name;
         public int mapsCount;
     }
-    public class GroupInfoExtended
+    public class GroupInfoExtended : GroupInfo
     {
-        public string author, name;
-        public int mapsCount;
-
         public int allDownloads, allPlays, allLikes, allDislikes;
 
         public DateTime updateTime;
@@ -83,6 +79,7 @@ namespace ProjectManagement
         }
 
         public List<string> nicks;
+        public string filepath; // Path to file on phone. Used only for Own music
     }
     public class MapInfo
     {
@@ -104,7 +101,7 @@ namespace ProjectManagement
         public DateTime grantedTime;
 
         // If map isn't on server
-        [JsonIgnore] public string filepath;
+        [JsonIgnore] public string filepath = "";
 
         public bool IsGrantedNow
         {

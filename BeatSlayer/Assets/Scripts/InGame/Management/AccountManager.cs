@@ -44,6 +44,7 @@ public class AccountManager : MonoBehaviour
 
     public const string url_sendReplay = "http://www.bsserver.tk/Account/AddReplay?nick={0}&json={1}";
     public const string url_getBestReplay = "http://www.bsserver.tk/Account/GetBestReplay?player={0}&trackname={1}&nick={2}";
+    public const string url_playTime = "http://www.bsserver.tk/Account/UpdateInGameTime?nick={0}&seconds={1}";
 
 
 
@@ -74,7 +75,7 @@ public class AccountManager : MonoBehaviour
             string secs = account.playTime.ToString("ss") + LocalizationManager.Localize("ss");
             accountPlayTime.text = LocalizationManager.Localize("PlayTime") + " " + days + " " + hours + " " + minutes + " " + secs;
 
-            if (lastUploadedPlayTime >= 60)
+            if (lastUploadedPlayTime >= 30)
             {
                 lastUploadedPlayTime = 0;
                 AccountUpload();
@@ -330,8 +331,12 @@ public class AccountManager : MonoBehaviour
             texts[1].text = acc.playedMaps[i].author + " <color=#07f>" + LocalizationManager.Localize("by") + " " + acc.playedMaps[i].nick + "</color>";
 
             AccountTrackRecord accountRecord = acc.records.Find(c => c.author == acc.playedMaps[i].author && c.name == acc.playedMaps[i].name && c.nick == acc.playedMaps[i].nick);
-            string record = LocalizationManager.Localize("record") + " " + accountRecord.score;
-            texts[2].text = LocalizationManager.Localize("played") + " " + acc.playedMaps[i].playTimes + " " + LocalizationManager.Localize("times") + " <color=#f90>" + record + "</color>";
+            if(accountRecord != null)
+            {
+                string record = LocalizationManager.Localize("record") + " " + accountRecord.score;
+                texts[2].text = LocalizationManager.Localize("played") + " " + acc.playedMaps[i].playTimes + " " + LocalizationManager.Localize("times") + " <color=#f90>" + record + "</color>";
+            }
+            
 
             contentHeight += 82.62f + 2;
         }
@@ -430,8 +435,11 @@ public class AccountManager : MonoBehaviour
 
     public void UpdateSessionTime()
     {
+        if (account == null) return;
+        float secondsToAdd = lastUploadedPlayTime;
         lastUploadedPlayTime = 0;
-        AccountUpload();
+        //AccountUpload();
+        SendRequestAstync((string response) => { }, url_playTime, account.nick, secondsToAdd);
     }
     //public float lastUpdatedSession;
     //public void UpdateSessionTime()
@@ -621,17 +629,20 @@ public class AccountManager : MonoBehaviour
         replay.player = account.nick;
 
         WebClient c = new WebClient();
-        c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
-        {
-            Debug.Log("SendReplay response is " + e.Result);
-            //if (!e.Cancelled && e.Error != null) Debug.LogError("SendReplay\n" + e.Error);
+        //c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
+        //{
+        //    if(e.Error != null) Debug.LogError("SendReplay error: " + e.Error);
+        //    Debug.Log("SendReplay response is " + e.Result);
+        //    //if (!e.Cancelled && e.Error != null) Debug.LogError("SendReplay\n" + e.Error);
 
-            callback(double.Parse(e.Result, System.Globalization.CultureInfo.InvariantCulture));
-        };
+        //    callback(double.Parse(e.Result, System.Globalization.CultureInfo.InvariantCulture));
+        //};
 
         string url = string.Format(url_sendReplay, account.nick, JsonConvert.SerializeObject(replay));
-        Debug.Log("SendReplay url " + url);
-        c.DownloadStringAsync(new Uri(url));
+        //c.DownloadStringAsync(new Uri(url));
+        string RPstr = c.DownloadString(url);
+        Debug.Log(url + "\n" + RPstr);
+        callback(double.Parse(RPstr, System.Globalization.CultureInfo.InvariantCulture));
     }
     public static void GetBestReplay(string player, string trackname, string nick, Action<Replay> callback)
     {
@@ -650,6 +661,16 @@ public class AccountManager : MonoBehaviour
 
 
     #endregion
+
+    public void SendRequestAstync(Action<string> callback, string url, params object[] strings)
+    {
+        WebClient c = new WebClient();
+        c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
+        {
+            callback(e.Result);
+        };
+        c.DownloadStringAsync(new Uri(string.Format(url, strings)));
+    }
 }
 
 
@@ -659,14 +680,19 @@ public class Account
     public string nick;
     public string email;
     public string password;
-
-    public int id;
-
-    public string avatarName;
+    public string role;
+    public AccountRole Role
+    {
+        get
+        {
+            return role == null || role == "" ? AccountRole.Player : (AccountRole)Enum.Parse(typeof(AccountRole), role);
+        }
+    }
 
     public TimeSpan playTime;
 
     public DateTime regTime;
+    public DateTime activeTime;
 
 
     public int ratingPlace;
@@ -674,8 +700,23 @@ public class Account
 
     public List<AccountMapInfo> playedMaps = new List<AccountMapInfo>();
     public List<AccountTrackRecord> records = new List<AccountTrackRecord>();
-}
 
+    public double RP
+    {
+        get
+        {
+            return replays.OrderByDescending(c => c.score).GroupBy(c => c.author + "-" + c.name).Select(c => c.First()).Sum(c => c.RP);
+        }
+    }
+    public double TotalRP { get { return replays.Sum(c => c.RP); } }
+    public List<Replay> replays = new List<Replay>();
+}
+public enum AccountRole
+{
+    Player = 0,
+    Developer = 1,
+    Moderator = 2
+}
 public class AccountTrackRecord
 {
     public string author, name, nick;

@@ -25,12 +25,12 @@ public class SSytem : MonoBehaviour
 
 
     string defaultSave =
-@"bloomQuality|2
+$@"bloomQuality|2
 fileLoad|false
 console|false
 showfps|false
-leftCubeColor|0;0.9;1
-rightCubeColor|1;0.5;0
+leftCubeColor|0;{0.9f};1
+rightCubeColor|1;{0.5f};0
 leftDirColor|1;1;1
 rightDirColor|1;1;1
 NoArrows|False
@@ -41,7 +41,7 @@ GlowQuality|2
 TrackTextSide|0
 GlowPower|2
 SliceSound|True
-SliceVolume|4
+SliceVolume|{0.3f}
 MenuMusic|True
 MenuMusicVolume|1
 FingerPause|0
@@ -186,7 +186,7 @@ EnableFps|0";
 
     public float GetFloat(string key)
     {
-        return float.Parse(GetString(key));
+        return float.Parse(GetString(key), System.Globalization.NumberStyles.AllowDecimalPoint);
     }
     public void SetFloat(string key, float value)
     {
@@ -286,9 +286,9 @@ EnableFps|0";
     public Color GetColor(string key)
     {
         string[] split = GetString(key).Split(';');
-        float r = float.Parse(split[0]);
-        float g = float.Parse(split[1]);
-        float b = float.Parse(split[2]);
+        float r = float.Parse(split[0], System.Globalization.NumberStyles.AllowDecimalPoint);
+        float g = float.Parse(split[1], System.Globalization.NumberStyles.AllowDecimalPoint);
+        float b = float.Parse(split[2], System.Globalization.NumberStyles.AllowDecimalPoint);
         //float a = float.Parse(split[3]);
         return new Color(r, g, b/*, a*/);
     }

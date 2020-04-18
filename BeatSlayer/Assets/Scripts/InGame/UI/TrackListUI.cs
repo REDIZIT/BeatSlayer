@@ -77,6 +77,13 @@ public class TrackListUI : MonoBehaviour
     {
         StartCoroutine(ILoadAndRefresh());
     }
+    // Recheck downloaded maps and refresh list
+    public void ReloadDownloadedList()
+    {
+        showedListType = ListType.Downloaded;
+        Database.container.downloadedGroups.Clear();
+        Refresh();
+    }
 
 
 
@@ -84,7 +91,7 @@ public class TrackListUI : MonoBehaviour
     {
         stateText.text = "";
 
-        // If approved maps not loaded
+        // If maps aren't loaded
         if (GetData().Count == 0)
         {
             if(Application.internetReachability == NetworkReachability.NotReachable)
@@ -109,7 +116,14 @@ public class TrackListUI : MonoBehaviour
                 {
                     yield return new WaitForEndOfFrame();
                 }
-                stateText.text = "";
+                if(GetData().Count == 0)
+                {
+                    stateText.text = "There no music yet";
+                }
+                else
+                {
+                    stateText.text = "";
+                }
             }
         }
 
@@ -125,9 +139,7 @@ public class TrackListUI : MonoBehaviour
     {
         // Clear cover downloading queue and content
         //CoversManager.ClearPackages(content.GetComponentsInChildren<RawImage>());
-        Debug.Log("packages count " + CoversManager.requests.Count);
         CoversManager.ClearAll();
-        Debug.Log("packages count " + CoversManager.requests.Count);
         foreach (Transform child in content)
         {
             Destroy(child.gameObject);
@@ -145,12 +157,7 @@ public class TrackListUI : MonoBehaviour
 
 
         // Creating TrackGroupClass for items from Database container
-        List<TrackGroupClass> groups = new List<TrackGroupClass>();
-        foreach (var item in data.GetRange(pagingItemStart, pagingItemCount))
-        {
-            groups.Add(new TrackGroupClass(item));
-        }
-
+        List<GroupInfoExtended> groups = data.GetRange(pagingItemStart, pagingItemCount);
 
 
         // Creating items and cover requests
@@ -159,12 +166,10 @@ public class TrackListUI : MonoBehaviour
 
         for (int i = 0; i < groups.Count; i++)
         {
-            TrackGroupClass group = groups[i];
-
             TrackListItem item = Instantiate(trackItemPrefab, content).GetComponent<TrackListItem>();
-            item.Setup(group, menu);
+            item.Setup(groups[i], menu);
 
-            coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), group.author + "-" + group.name));
+            coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), groups[i].author + "-" + groups[i].name));
 
             //listController.displayedApprovedGroup.Add(new TrackGroupPair(group, item.gameObject));
         }

@@ -96,14 +96,14 @@ public class DatabaseScript : MonoBehaviour
             data.tracks.Add(cls);
         }
 
-        TheGreat.SyncRecords(this);
-        GetComponent<ListController>().RefreshAuthorList();
+        //TheGreat.SyncRecords(this);
+        //GetComponent<ListController>().RefreshAuthorList();
     }
     
-    public List<MapInfo> GetMapsByTrack(TrackGroupClass groupCls)
+    public List<MapInfo> GetMapsByTrack(GroupInfoExtended groupInfo)
     {
         WebClient client = new WebClient();
-        string url = db_mapsUrl + "?trackname=" + groupCls.author.Replace("&", "%amp%") + "-" + groupCls.name.Replace("&", "%amp%");
+        string url = db_mapsUrl + "?trackname=" + groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
         string response = client.DownloadString(url);
 
         List<MapInfo> mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
@@ -155,12 +155,13 @@ public class DatabaseScript : MonoBehaviour
         return mapInfos;
     }
 
-    public List<MapInfo> GetCustomMaps(GroupInfo group)
+    public List<MapInfo> GetCustomMaps(GroupInfoExtended group)
     {
         List<MapInfo> ls = new List<MapInfo>();
         ls.Add(new MapInfo(group)
         {
-            nick = "[LOCAL STORAGE]"
+            nick = "[LOCAL STORAGE]",
+            filepath = group.filepath
         });
         return ls;
     }
@@ -369,8 +370,6 @@ public static class TheGreat
             mapFolder = Directory.GetDirectories(groupFolder)[0];
         }
 
-        Debug.Log("mapFolder " + mapFolder);
-
         string jpgPath = mapFolder + "/" + trackname + ".jpg";
         string pngPath = mapFolder + "/" + trackname + ".png";
         if (File.Exists(jpgPath)) return jpgPath;
@@ -401,7 +400,7 @@ public static class TheGreat
         return url.Replace("%amp%", "$");
     }
 
-
+    /*
     public static TrackRecordGroup GetRecords()
     {
         XmlSerializer xml = new XmlSerializer(typeof(TrackRecordGroup));
@@ -443,8 +442,8 @@ public static class TheGreat
         }
 
         SaveRecords(group);
-    }
-
+    }*/
+    /*
     public static TrackRecord GetRecord(TrackRecordGroup group, string author, string name, string nick)
     {
         TrackRecord record = group.ls.Find(c => c.author == author && c.name == name && c.nick == nick);
@@ -469,5 +468,5 @@ public static class TheGreat
         }
 
         Social.ReportScore(Mathf.RoundToInt(sum), GPGamesManager.leaderboard, (bool result) => { Debug.Log("ChangedBoard result: " + result); });
-    }
+    }*/
 }

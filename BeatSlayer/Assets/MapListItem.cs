@@ -48,6 +48,7 @@ public class MapListItem : MonoBehaviour
         likesText.text = mapInfo.likes.ToString();
         dislikesText.text = mapInfo.dislikes.ToString();
         downloadsText.text = mapInfo.downloads.ToString();
+        playsText.text = mapInfo.playCount.ToString();
         CoversManager.AddPackages(new List<CoverRequestPackage>()
         {
             new CoverRequestPackage(coverImage, mapInfo.author + "-" + mapInfo.name, mapInfo.nick, true)
@@ -167,9 +168,7 @@ public class MapListItem : MonoBehaviour
         TimeSpan t2 = DateTime.Now.TimeOfDay;
         string tempPath = Application.persistentDataPath + "/temp/" + (mapInfo.group.author.Trim() + "-" + mapInfo.group.name.Trim()) + ".bsz";
         File.WriteAllBytes(tempPath, e.Result);
-        Debug.Log("WriteAllBytes time is " + (DateTime.Now.TimeOfDay - t2).TotalMilliseconds);
 
-        Debug.Log("Download is completed. Error? " + e.Error);
         downloadClient.Dispose();
         if (e.Error == null)
         {
@@ -185,15 +184,14 @@ public class MapListItem : MonoBehaviour
             tempPath = Application.persistentDataPath + "/temp/" + (mapInfo.group.author.Trim() + "-" + mapInfo.group.name.Trim()) + ".bsz";
 
             TimeSpan t1 = DateTime.Now.TimeOfDay;
-            Debug.Log("Unpacking... " + t1);
             menu.UnpackBspFile(tempPath);
-            Debug.Log("Unpacked in " + (DateTime.Now.TimeOfDay - t1).TotalMilliseconds);
 
             TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "download");
+
+            menu.GetComponent<TrackListUI>().ReloadDownloadedList();
         }
         else
         {
-            Debug.Log("Something went wrong " + e.Error);
             progressBar.gameObject.SetActive(false);
             progressBar.value = 0;
             downloadBtn.SetActive(true);
@@ -211,9 +209,11 @@ public class MapListItem : MonoBehaviour
 
     public void OnPlayClick()
     {
+        
         SceneloadParameters load;
         if (mapInfo.filepath == "")
         {
+            Debug.Log("OnPlayClick() author music");
             // Load author music
             load = SceneloadParameters.AuthorMusicPreset(mapInfo);
 
@@ -221,8 +221,9 @@ public class MapListItem : MonoBehaviour
         }
         else
         {
+            Debug.Log("OnPlayClick() own music");
             // Load own music
-            load = SceneloadParameters.OwnMusicPreset(mapInfo.filepath);
+            load = SceneloadParameters.OwnMusicPreset(mapInfo.filepath, mapInfo);
         }
 
         InGame.SceneManagement.SceneController.instance.LoadScene(load);
@@ -240,13 +241,15 @@ public class MapListItem : MonoBehaviour
             Directory.Delete(trackPath);
         }
 
-        menu.GetComponent<ListController>().RefreshDownloadList();
+        //menu.GetComponent<ListController>().RefreshDownloadList();
 
         downloadIndicator.SetActive(false);
         playBtn.SetActive(false);
         downloadBtn.SetActive(true);
         progressBar.gameObject.SetActive(false);
         deleteBtn.SetActive(false);
+
+        menu.GetComponent<TrackListUI>().ReloadDownloadedList();
     }
 
 

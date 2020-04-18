@@ -21,7 +21,7 @@ namespace MusicFilesManagement
         {
             if (File.Exists(CacheFilePath))
             {
-                Debug.LogError("Loading from file");
+                Debug.Log("MusicFilesManager.LoadData Loading from file");
                 XmlSerializer xml = new XmlSerializer(typeof(MusicFilesData));
                 using(var stream = File.OpenRead(CacheFilePath))
                 {
@@ -31,16 +31,15 @@ namespace MusicFilesManagement
             }
             else
             {
-                Debug.LogError("Loading from new");
+                Debug.LogError("MusicFilesManager.LoadData Loading from new");
                 data = new MusicFilesData();
 
                 data.folders = new List<string>()
                 {
-                    "/storage/emulated/0/Music", "/storage/emulated/0/Download", "/storage/emulated/0/VK", "/storage/emulated/0/Telegram", Application.persistentDataPath
+                    "/storage/emulated/0/Music", "/storage/emulated/0/Download", "/storage/emulated/0/VK", "/storage/emulated/0/Telegram", GetSDPath(), Application.persistentDataPath
                 };
 
                 SaveData();
-                //CheckFolders();
                 Search(callback);
             }
         }
@@ -104,6 +103,23 @@ namespace MusicFilesManagement
             {
                 data.folders.Remove(foldersToRemove[i]);
             }
+        }
+        static string GetSDPath()
+        {
+            var removableDives = System.IO.DriveInfo.GetDrives()
+                //Take only removable drives into consideration as a SD card candidates
+                .Where(drive => drive.DriveType == DriveType.Removable)
+                .Where(drive => drive.IsReady)
+                //If volume label of SD card is always the same, you can identify
+                //SD card by uncommenting following line
+                //.Where(drive => drive.VolumeLabel == "MySdCardVolumeLabel")
+                .ToList();
+
+            if (removableDives.Count == 0)
+                return "";
+
+            string sdCardRootDirectory;
+            return sdCardRootDirectory = removableDives[0].RootDirectory.FullName;
         }
     }
 

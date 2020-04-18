@@ -197,7 +197,7 @@ public class Bit : MonoBehaviour
         spawnLinePoints = new List<Vector3>();
         foreach (Vector3 point in points)
         {
-            spawnLinePoints.Add(new Vector3(point.x, point.y, point.z * 100 * (1f / gs.pitch)));
+            spawnLinePoints.Add(new Vector3(point.x, point.y, point.z * 100 * (1f / gs.replay.musicSpeed)));
         }
         //Debug.Log(points.Length);
         linePoints.Add(spawnLinePoints[0]);
@@ -310,7 +310,7 @@ public class Bit : MonoBehaviour
         // Начисление очков 
         float distPerFrame = linePoints[0].z - prevDistPerFrame;
         prevDistPerFrame = distPerFrame;
-        gs.earnedScore += prevDistPerFrame * 2 * Time.deltaTime * gs.pitch; // 2 - множитель очков за кадр
+        gs.earnedScore += prevDistPerFrame * Time.deltaTime * gs.replay.musicSpeed; // 2 - множитель очков за кадр
     }
     public void SpecDieAnim()
     {
@@ -576,7 +576,7 @@ public class Bit : MonoBehaviour
     [HideInInspector] public int currentTouchId;
     public void SendBitSliced(Vector2 direction)
     {
-        if (useSoundEffect)
+        if (useSoundEffect && cubeSlicePs != null)
         {
             cubeSlicePs.SetActive(true);
             cubeSlicePs.transform.parent = null;

@@ -43,6 +43,9 @@ namespace InGame.SceneManagement
                 case SceneloadParameters.LoadType.ProjectFolder:
                     loader = new ProjectLoaderMap();
                     break;
+                case SceneloadParameters.LoadType.Moderation:
+                    loader = new ProjectLoaderModeration();
+                    break;
             }
 
             yield return loader.LoadProject(loadpamars);
@@ -117,7 +120,11 @@ public class SceneloadParameters
         /// <summary>
         /// From 'From file' list. Select folder with unzipped project (Folder contains bsu, mp3/ogg, png/jpg files)
         /// </summary>
-        ProjectFolder = 3
+        ProjectFolder = 3,
+        /// <summary>
+        /// Moderate map (no awards, no anything, just add GoToEditor button at the end)
+        /// </summary>
+        Moderation = 4
     }
 
     public LoadType Type { get; private set; }
@@ -139,12 +146,13 @@ public class SceneloadParameters
         };
         return parameters;
     }
-    public static SceneloadParameters OwnMusicPreset(string audioFilePath)
+    public static SceneloadParameters OwnMusicPreset(string audioFilePath, MapInfo mapInfo)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.AudioFile,
-            AudioFilePath = audioFilePath
+            AudioFilePath = audioFilePath,
+            Map = mapInfo
         };
         return parameters;
     }
@@ -168,6 +176,29 @@ public class SceneloadParameters
             Type = LoadType.ProjectFolder,
             Map = info,
             ProjectFolderPath = new FileInfo(bsuPath).DirectoryName
+        };
+        return parameters;
+    }
+    public static SceneloadParameters ModerationPreset(string bszPath)
+    {
+        string trackname = Path.GetFileNameWithoutExtension(bszPath);
+        GroupInfo groupInfo = new GroupInfo()
+        {
+            author = trackname.Split('-')[0],
+            name = trackname.Split('-')[1],
+            mapsCount = 1
+        };
+        MapInfo info = new MapInfo()
+        {
+            group = groupInfo,
+            nick = "[MODERATION *]",
+        };
+
+        var parameters = new SceneloadParameters()
+        {
+            Type = LoadType.Moderation,
+            Map = info,
+            AudioFilePath = bszPath
         };
         return parameters;
     }
@@ -196,8 +227,6 @@ public class ProjectLoaderMap : IProjectLoader
 {
     public IEnumerator LoadProject(SceneloadParameters parameters)
     {
-        Debug.Log("[LOADER] Loading from Map");
-
         string projectFolderPath;
 
         if(parameters.Type == SceneloadParameters.LoadType.Author)
@@ -249,5 +278,22 @@ public class ProjectLoaderMenu : IProjectLoader
     public IEnumerator LoadProject(SceneloadParameters parameters)
     {
         yield return new WaitForEndOfFrame();
+    }
+}
+public class ProjectLoaderModeration : IProjectLoader
+{
+    public IEnumerator LoadProject(SceneloadParameters parameters)
+    {
+        string bszPath = parameters.AudioFilePath;
+
+        Project proj = ProjectManager.LoadProject(bszPath);
+        LoadingData.project = proj;
+
+        string tempAudioFilePath = bszPath.Replace(".bsz", Project.ToString(proj.audioExtension));
+        File.WriteAllBytes(tempAudioFilePath, proj.audioFile);
+
+        yield return ProjectManager.LoadAudioCoroutine(tempAudioFilePath);
+
+        File.Delete(tempAudioFilePath);
     }
 }

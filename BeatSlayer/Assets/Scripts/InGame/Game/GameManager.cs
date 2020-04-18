@@ -86,8 +86,6 @@ public class GameManager : MonoBehaviour
 
 
     [HideInInspector] public bool paused;
-    [HideInInspector] public float pitch = 1;
-    [HideInInspector] public float cubesspeed = 1;
     [HideInInspector] public bool noarrows;
     [HideInInspector] public bool nolines;
     [HideInInspector] public bool gameCompleted, gameStarted, gameStarting;
@@ -113,7 +111,7 @@ public class GameManager : MonoBehaviour
     {
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
-            float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime / pitch;
+            float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime /replay.musicSpeed;
             if (beats.ToArray().Length > 0 && asTime >= beats[0].time)
             {
                 SpawnBeatCube(beats[0]);
@@ -145,6 +143,7 @@ public class GameManager : MonoBehaviour
 
         if (LoadingData.loadparams == null || (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Menu && this.enabled))
         {
+            Debug.Log("Redirect to menu");
             SceneManager.LoadScene("Menu");
             return;
         }
@@ -172,6 +171,8 @@ public class GameManager : MonoBehaviour
         replay.name = project.name;
         replay.nick = project.creatorNick;
         replay.difficulty = project.difficultStars;
+        replay.cubesSpeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);
+        replay.musicSpeed = Mathf.Clamp(SSytem.instance.GetFloat("MusicSpeed") / 10f, 0.5f, 1.5f);
 
 
         try { InitSettings(); }
@@ -187,8 +188,8 @@ public class GameManager : MonoBehaviour
     {
         audioManager.asource.clip = LoadingData.aclip;
 
-        audioManager.asource.pitch = pitch;
-        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = pitch;
+        audioManager.asource.pitch = replay.musicSpeed;
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch =replay.musicSpeed;
 
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile)
         {
@@ -233,8 +234,6 @@ public class GameManager : MonoBehaviour
     void InitSettings()
     {
         sliceeffectVolume = SSytem.instance.GetFloat("SliceVolume") * 0.3f;
-        cubesspeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);
-        pitch = Mathf.Clamp(SSytem.instance.GetFloat("MusicSpeed") / 10f, 0.5f, 1.5f);
 
 
         if (!LoadingData.loadparams.Map.approved)
@@ -246,7 +245,7 @@ public class GameManager : MonoBehaviour
 
         float distanceToSpawn = spawnPoints[0].transform.position.z;
         float localOffset = 10;
-        bitCubeEndTime = (distanceToSpawn + localOffset) / (cubesspeed * 60) * pitch;
+        bitCubeEndTime = (distanceToSpawn + localOffset) / (replay.cubesSpeed * 60) *replay.musicSpeed;
     }
 
 
@@ -288,7 +287,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator Start()
     {
-        trackText.text = fullTrackName + (pitch == 1 ? "" : " x" + pitch);
+        trackText.text = fullTrackName + (replay.musicSpeed == 1 ? "" : " x" +replay.musicSpeed);
 
         AlignToSide();
 
@@ -298,7 +297,7 @@ public class GameManager : MonoBehaviour
         gameStarting = true;
         gameStarted = true;
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) { audioManager.PlaySpectrumSource(); }
-        yield return new WaitForSeconds(bitCubeEndTime / pitch / cubesspeed);
+        yield return new WaitForSeconds(bitCubeEndTime /replay.musicSpeed / replay.cubesSpeed);
         audioManager.PlaySource();
         if (paused)
         {
@@ -708,8 +707,8 @@ public class GameManager : MonoBehaviour
             {
                 timespeed = 1;
             }
-            audioManager.asource.pitch = timespeed * pitch;
-            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * pitch;
+            audioManager.asource.pitch = timespeed *replay.musicSpeed;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed *replay.musicSpeed;
             Time.timeScale = timespeed;
             yield return new WaitForEndOfFrame();
         }
@@ -750,7 +749,7 @@ public class GameManager : MonoBehaviour
         activeCubes.Add(c);
 
         c.GetComponent<Bit>().gs = this;
-        c.GetComponent<Bit>().speed *= cubesspeed;
+        c.GetComponent<Bit>().speed *= replay.cubesSpeed;
         c.GetComponent<Bit>().useSoundEffect = SSytem.instance.GetBool("SliceSound");
 
         c.GetComponent<Bit>().type = type;
@@ -788,6 +787,8 @@ public class GameManager : MonoBehaviour
         c.transform.name = "BeatCube";
 
         c.GetComponent<Bit>().Start();
+
+        GetComponent<CheatEngine>().AddCube(c.GetComponent<Bit>());
     }
     string missedBeatCubeMsg = "";
     public void MissedBeatCube()
@@ -1003,9 +1004,37 @@ public class GameManager : MonoBehaviour
 
     #region High quality code (cringe but okay)
 
-    #region Finishing
-    
-    #endregion
+    public void GoToEditor()
+    {
+        bool fail = false;
+        string bundleId = "com.REDIZIT.BeatSlayerEditor"; // your target bundle id
+        AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
+
+        AndroidJavaObject launchIntent = null;
+        try
+        {
+            launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
+        }
+        catch (System.Exception e)
+        {
+            fail = true;
+        }
+
+        if (fail)
+        { //open app in store
+            Debug.LogError("OpenEditor() failed");
+            //Application.OpenURL("https://google.com");
+        }
+        else //open the app
+            ca.Call("startActivity", launchIntent);
+
+        up.Dispose();
+        ca.Dispose();
+        packageManager.Dispose();
+        launchIntent.Dispose();
+    }
 
     #endregion
 

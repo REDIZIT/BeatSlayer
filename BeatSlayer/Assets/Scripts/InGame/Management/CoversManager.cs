@@ -116,7 +116,6 @@ namespace CoversManagement
         }
         public static void ClearAll()
         {
-            Debug.Log("ClearAll");
             if(requests.Count > 0) client.CancelAsync();
             requests.Clear();
         }

@@ -1,5 +1,6 @@
 ﻿using MusicFilesManagement;
 using Pixelplacement;
+using ProjectManagement;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -50,7 +51,7 @@ public class MusicFilesUI : MonoBehaviour
             string author = trackname.Contains("-") ? trackname.Split('-')[0] : "";
             string name = trackname.Contains("-") ? trackname.Split('-')[1] : trackname.Split('-')[0];
 
-            TrackGroupClass group = new TrackGroupClass()
+            GroupInfoExtended groupInfo = new GroupInfoExtended()
             {
                 author = author,
                 name = name,
@@ -59,7 +60,7 @@ public class MusicFilesUI : MonoBehaviour
             };
 
             TrackListItem item = Instantiate(trackItemPrefab, ownMusicList).GetComponent<TrackListItem>();
-            item.Setup(group, menu, false, true);
+            item.Setup(groupInfo, menu, false, true);
 
             item.coverImage.texture = downloadHelper.defaultIcon;
         }

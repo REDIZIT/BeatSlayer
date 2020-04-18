@@ -97,8 +97,8 @@ public class MenuScript_v2 : MonoBehaviour
 
 
         if (!Directory.Exists(Application.persistentDataPath + "/maps")) Directory.CreateDirectory(Application.persistentDataPath + "/maps");
-        if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
-        if (!File.Exists(Application.persistentDataPath + "/rsave.bsf")) TheGreat.SaveRecords(new TrackRecordGroup());
+        //if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
+        //if (!File.Exists(Application.persistentDataPath + "/rsave.bsf")) TheGreat.SaveRecords(new TrackRecordGroup());
 
         if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
         if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
@@ -427,20 +427,20 @@ public class MenuScript_v2 : MonoBehaviour
     public void OnTrackItemClicked(TrackListItem listItem)
     {
         trackInfoLocker.GetComponent<Animator>().Play("TrackWindow-Open");
-        trackInfoAuthorText.text = listItem.group.author;
-        trackInfoNameText.text = listItem.group.name;
-        trackInfoMapsCountText.text = LocalizationManager.Localize("MapsCount") + ": " + listItem.group.mapsCount;
+        trackInfoAuthorText.text = listItem.groupInfo.author;
+        trackInfoNameText.text = listItem.groupInfo.name;
+        trackInfoMapsCountText.text = LocalizationManager.Localize("MapsCount") + ": " + listItem.groupInfo.mapsCount;
         trackInfoCoverImage.texture = listItem.coverImage.texture;
 
         foreach (Transform child in trackInfoMapContent) Destroy(child.gameObject);
 
         // Refresh list of player's maps
         List<MapInfo> mapInfos;
-        TrackRecordGroup records = TheGreat.GetRecords();
+//        TrackRecordGroup records = TheGreat.GetRecords();
 
         if (listItem.isCustomMusic) mapInfos = database.GetCustomMaps(listItem.groupInfo);
         else if (listItem.isLocalItem) mapInfos = database.GetDownloadedMaps(listItem.groupInfo);
-        else mapInfos = database.GetMapsByTrack(listItem.group);
+        else mapInfos = database.GetMapsByTrack(listItem.groupInfo);
 
         float contentHeight = -10;
         for (int i = 0; i < mapInfos.Count; i++)
@@ -455,8 +455,8 @@ public class MenuScript_v2 : MonoBehaviour
             }
             else mapItem.Setup(this, isPassed, mapInfos[i]);
 
-            TrackRecord record = TheGreat.GetRecord(records, mapInfos[i].group.author, mapInfos[i].group.name, mapInfos[i].nick);
-            mapItem.recordText.text = record == null ? "" : LocalizationManager.Localize("Record") + ": " + record.score;
+            //TrackRecord record = TheGreat.GetRecord(records, mapInfos[i].group.author, mapInfos[i].group.name, mapInfos[i].nick);
+            //mapItem.recordText.text = record == null ? "" : LocalizationManager.Localize("Record") + ": " + record.score;
 
             contentHeight += 191.3f + 10;
         }
@@ -892,11 +892,11 @@ public class MenuScript_v2 : MonoBehaviour
     {
         string[] strChars = str.Split('.');
         int[] strInts = new int[strChars.Length];
-        for (int i = 0; i < strChars.Length; i++) strInts[i] = int.Parse(strChars[i]);
+        for (int i = 0; i < strChars.Length; i++) strInts[i] = int.Parse(strChars[i], System.Globalization.NumberStyles.AllowDecimalPoint);
 
         strChars = str2.Split('.');
         int[] strInts2 = new int[strChars.Length];
-        for (int i = 0; i < strChars.Length; i++) strInts2[i] = int.Parse(strChars[i]);
+        for (int i = 0; i < strChars.Length; i++) strInts2[i] = int.Parse(strChars[i], System.Globalization.NumberStyles.AllowDecimalPoint);
 
         if (strInts.Length != strInts.Length) return true;
         for (int i = 0; i < strInts.Length; i++)
@@ -1055,7 +1055,8 @@ public class MenuScript_v2 : MonoBehaviour
     }
     public void OpenWebsite()
     {
-        Application.OpenURL("https://really-big-server.herokuapp.com/download.php");
+        //Application.OpenURL("https://really-big-server.herokuapp.com/download.php");
+        Application.OpenURL("https://beat-slayer.glitch.me/editor");
     }
     public void OpenUrl(string url)
     {

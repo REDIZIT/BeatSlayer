@@ -1,4 +1,5 @@
 ﻿using LeaderboardManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class LeaderboardUIItem : MonoBehaviour
     public Text placeText, nickText, accuracyText, missedText, playedTimesText, RPText, totalRPText;
     public Text scoreText;
     public Replay replay;
+    public LeaderboardItem leaderboardItem;
 
     [Header("Colors")]
     public Color32 defaultBodyColor;
@@ -42,5 +44,15 @@ public class LeaderboardUIItem : MonoBehaviour
 
         GetComponent<UICornerCut>().color = isCurrentPlayer ? selectedBodyColor : defaultBodyColor;
         GetComponent<UICornerCut>().ColorDown = isCurrentPlayer ? selectedBorderColor : defaultBorderColor;
+    }
+    public void RefreshLeaderboardItem()
+    {
+        nickText.text = leaderboardItem.nick;
+        placeText.text = "#" + leaderboardItem.place;
+
+        accuracyText.text = Mathf.FloorToInt(leaderboardItem.Accuracy * 1000f) / 10f + "%";
+        playedTimesText.text = leaderboardItem.playCount + "";
+        RPText.text = Math.Floor(leaderboardItem.RP * 10) / 10f + "";
+        scoreText.text = Math.Floor(leaderboardItem.score * 10) / 10f + "";
     }
 }

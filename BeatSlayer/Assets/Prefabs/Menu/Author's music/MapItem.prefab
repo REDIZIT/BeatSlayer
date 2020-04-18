@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1664536639}
   - component: {fileID: 1664536641}
-  - component: {fileID: 1664536640}
+  - component: {fileID: 651351570122381130}
   m_Layer: 5
   m_Name: CoverImage
   m_TagString: Untagged
@@ -46,7 +46,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1664536638}
   m_CullTransparentMesh: 0
---- !u!114 &1664536640
+--- !u!114 &651351570122381130
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,7 +55,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1664536638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: -98529514, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -64,15 +64,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cbbb9405340beae4284191890f74b63b, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 1
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
+  m_Texture: {fileID: 2800000, guid: cbbb9405340beae4284191890f74b63b, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!1 &2749418203826515103
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,7 +360,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Record: 15000'
+  m_Text: 
 --- !u!1 &4969582364965102036
 GameObject:
   m_ObjectHideFlags: 0
@@ -1791,7 +1789,7 @@ MonoBehaviour:
   dislikesText: {fileID: 6542158674036636462}
   downloadsText: {fileID: 6542158672433218579}
   playsText: {fileID: 6542158673341285674}
-  coverImage: {fileID: 1664536640}
+  coverImage: {fileID: 651351570122381130}
   downloadIndicator: {fileID: 6542158674107967528}
   downloadBtn: {fileID: 6542158673683447247}
   playBtn: {fileID: 6542158673960223391}
