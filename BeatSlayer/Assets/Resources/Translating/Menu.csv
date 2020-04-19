@@ -52,7 +52,7 @@ WeHaveEditor,We have editor and you can download here.[N]<color=#333>(click to d
 // Main_UI -> TracksScreen
 //
 SelectList,Select music list,Выберите тип музыки,Sélectionnez la liste de musique
-OwnList,Own,Своя,Posséder
+OwnList,Own,Своя,Musique locale
 AuthorList,Author's,Авторская,Auteurs
 SortBy,Sort by,Сортировка по,Trier par
 popularity,Popularity,Популярности,Popularité
@@ -64,7 +64,7 @@ OnTop,Top,Вверху,Haut
 OnBottom,Bottom,Внизу,Bas
 DontMove,Don't move,Не двигать,Ne bouge pas
 
-AllMusic,All music,Вся музыка,Toute la musique
+AllMusic,All music,Вся музыка,Toutes les musiques
 DownloadedMusic,Downloaded,Скачанная,Téléchargé
 
 NewTracks,New tracks,Новые треки,De nouvelles pistes
@@ -74,7 +74,7 @@ PlayersMaps,Players maps,Карты игроков,Cartes des joueurs
 DevMaps,Developer maps,Карты разраба,Cartes des développeurs
 Display,Display,Показать,Afficher
 Filters,Filters,Фильтры,Filtres
-MapsCount,Maps count,Количество карт,Les cartes comptent
+MapsCount,Maps count,Количество карт,Nombre de cartes
 SelectLocation,Select Location,Выбрать локацию,Sélectionnez l'emplacement
 Search..,Search..,Поиск..,Chercher..
 MapsByPlayers,Maps by players,Карты от игроков,Cartes par joueurs
@@ -136,6 +136,7 @@ ShopTutorial,This is shop[comma] here you can buy skills and boosters.[N]You can
 Skills,Skills,Навыки,Compétences
 Boosters,Boosters,Ускорители,Boosters
 Sabers,Sabers,Мечи,Sabres
+Effects,Effects,Эффекты,Effets
 YouHave,You have,В наличии,Tu as
 Cost,Cost,Цена,Coût
 Buy,Buy,Купить,Acheter

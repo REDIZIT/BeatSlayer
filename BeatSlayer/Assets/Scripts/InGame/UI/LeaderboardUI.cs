@@ -30,8 +30,11 @@ public class LeaderboardUI : MonoBehaviour
         GameObject prefab = ClearLeaderboard();
         stateText.text = "";
 
+        int place = 0;
         foreach (LeaderboardItem item in items)
         {
+            place++;
+            item.place = place;
             CreateItem(item, prefab);
         }
 

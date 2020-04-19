@@ -20,7 +20,10 @@ public class CheatEngine : MonoBehaviour
     {
         if (!Application.isEditor) return;
 
-        asource.pitch = pitch;
+        if(asource.pitch != pitch)
+        {
+            asource.pitch = pitch;
+        }
 
         if(cubes.Count > 0)
         {

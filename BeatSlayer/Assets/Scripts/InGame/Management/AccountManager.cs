@@ -77,8 +77,7 @@ public class AccountManager : MonoBehaviour
 
             if (lastUploadedPlayTime >= 30)
             {
-                lastUploadedPlayTime = 0;
-                AccountUpload();
+                UpdateSessionTime();
             }
         }
     }
@@ -436,10 +435,13 @@ public class AccountManager : MonoBehaviour
     public void UpdateSessionTime()
     {
         if (account == null) return;
-        float secondsToAdd = lastUploadedPlayTime;
+
+        Debug.Log("UpdateSessionTime add " + lastUploadedPlayTime + " seconds");
+
+        int secondsToAdd = Mathf.RoundToInt(lastUploadedPlayTime);
         lastUploadedPlayTime = 0;
-        //AccountUpload();
-        SendRequestAstync((string response) => { }, url_playTime, account.nick, secondsToAdd);
+
+        SendRequestAsync((string response) => { }, url_playTime, account.nick, secondsToAdd);
     }
     //public float lastUpdatedSession;
     //public void UpdateSessionTime()
@@ -662,14 +664,16 @@ public class AccountManager : MonoBehaviour
 
     #endregion
 
-    public void SendRequestAstync(Action<string> callback, string url, params object[] strings)
+    public void SendRequestAsync(Action<string> callback, string url, params object[] strings)
     {
         WebClient c = new WebClient();
         c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
         {
             callback(e.Result);
         };
-        c.DownloadStringAsync(new Uri(string.Format(url, strings)));
+        string _url = string.Format(url, strings);
+        Debug.Log("Send async request : " + _url);
+        c.DownloadStringAsync(new Uri(_url));
     }
 }
 

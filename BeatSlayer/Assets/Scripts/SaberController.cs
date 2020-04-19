@@ -151,7 +151,7 @@ public class SaberController : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.transform.GetComponent<SaberController>() == null) return;
+        /*if (collision.transform.GetComponent<SaberController>() == null) return;
         if (!collision.transform.GetComponent<SaberController>().enabled) return;
 
         transform.GetChild(transform.childCount - 1).gameObject.SetActive(true);
@@ -165,11 +165,11 @@ public class SaberController : MonoBehaviour
         mid = new Vector3(mid.x / collision.contactCount, mid.y / collision.contactCount, mid.z / collision.contactCount);
         transform.GetChild(transform.childCount - 1).transform.position = mid;
 
-        if(!Application.isEditor) VibratorWrapper.Vibrate((long)Time.deltaTime);
+        if(!Application.isEditor) VibratorWrapper.Vibrate((long)Time.deltaTime);*/
     }
     private void OnCollisionExit(Collision collision)
     {
         //transform.GetChild(transform.childCount - 1).gameObject.SetActive(false);
-        transform.GetChild(transform.childCount - 1).GetComponent<ParticleSystem>().Stop();
+        //transform.GetChild(transform.childCount - 1).GetComponent<ParticleSystem>().Stop();
     }
 }

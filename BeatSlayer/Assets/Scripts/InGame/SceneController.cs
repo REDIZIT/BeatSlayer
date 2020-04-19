@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http.Headers;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -45,6 +46,9 @@ namespace InGame.SceneManagement
                     break;
                 case SceneloadParameters.LoadType.Moderation:
                     loader = new ProjectLoaderModeration();
+                    break;
+                case SceneloadParameters.LoadType.EditorTest:
+                    loader = new ProjectLoaderEditorTest();
                     break;
             }
 
@@ -124,7 +128,11 @@ public class SceneloadParameters
         /// <summary>
         /// Moderate map (no awards, no anything, just add GoToEditor button at the end)
         /// </summary>
-        Moderation = 4
+        Moderation = 4,
+        /// <summary>
+        /// Executed from editor when player want to test map in game
+        /// </summary>
+        EditorTest = 5
     }
 
     public LoadType Type { get; private set; }
@@ -199,6 +207,29 @@ public class SceneloadParameters
             Type = LoadType.Moderation,
             Map = info,
             AudioFilePath = bszPath
+        };
+        return parameters;
+    }
+    public static SceneloadParameters EditorTestPreset(string bsuPath)
+    {
+        string trackname = Path.GetFileNameWithoutExtension(bsuPath);
+        GroupInfo groupInfo = new GroupInfo()
+        {
+            author = trackname.Split('-')[0],
+            name = trackname.Split('-')[1],
+            mapsCount = 1
+        };
+        MapInfo info = new MapInfo()
+        {
+            group = groupInfo,
+            nick = "[EDITOR TEST *]",
+        };
+
+        var parameters = new SceneloadParameters()
+        {
+            Type = LoadType.ProjectFolder,
+            Map = info,
+            ProjectFolderPath = new FileInfo(bsuPath).DirectoryName
         };
         return parameters;
     }
@@ -294,6 +325,23 @@ public class ProjectLoaderModeration : IProjectLoader
 
         yield return ProjectManager.LoadAudioCoroutine(tempAudioFilePath);
 
+        File.Delete(bszPath); // DELETION FILE SO THAT THERE IS NO REPEATING LOADING MAP
         File.Delete(tempAudioFilePath);
+    }
+}
+public class ProjectLoaderEditorTest : IProjectLoader
+{
+    public IEnumerator LoadProject(SceneloadParameters parameters)
+    {
+        string folderPath = parameters.ProjectFolderPath;
+        string trackname = parameters.Trackname;
+        string bsuPath = folderPath + "/" + trackname + ".bsu";
+
+        Project proj = ProjectManager.LoadProject(bsuPath);
+        LoadingData.project = proj;
+
+        string audioPath = folderPath + "/" + trackname + Project.ToString(proj.audioExtension);
+
+        yield return ProjectManager.LoadAudioCoroutine(audioPath);
     }
 }

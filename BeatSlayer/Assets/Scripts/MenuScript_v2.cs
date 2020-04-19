@@ -23,6 +23,7 @@ using InGame.SceneManagement;
 using SaveManagement;
 using DatabaseManagement;
 using ProjectManagement;
+using Testing;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -175,6 +176,8 @@ public class MenuScript_v2 : MonoBehaviour
         UpdateOrientationHanlder();
 
         if (Input.GetKeyDown(KeyCode.Escape)) OnExitSwipe();
+
+        TestManager.CheckUpdates();
     }
 
 
@@ -312,7 +315,7 @@ public class MenuScript_v2 : MonoBehaviour
         LocalizationManager.Read("Translating");
         if(Application.isEditor)
         {
-            LocalizationManager.Language = "English";
+            LocalizationManager.Language = "French";
             return;
         }
         if (Application.systemLanguage == SystemLanguage.Russian || Application.systemLanguage == SystemLanguage.Ukrainian) LocalizationManager.Language = "Russian";

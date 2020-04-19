@@ -1,0 +1,165 @@
+fileFormatVersion: 2
+guid: a31e31dc02585ac45b688cf31ab4ca82
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Agarradera
+    100002: Argolla
+    100004: Base
+    100006: Boton
+    100008: Boton1
+    100010: Boton2
+    100012: Emisor
+    100014: Interrumptor
+    100016: Mango
+    100018: //RootNode
+    100020: Palanca
+    100022: Sable
+    100024: Switch2
+    400000: Agarradera
+    400002: Argolla
+    400004: Base
+    400006: Boton
+    400008: Boton1
+    400010: Boton2
+    400012: Emisor
+    400014: Interrumptor
+    400016: Mango
+    400018: //RootNode
+    400020: Palanca
+    400022: Sable
+    400024: Switch2
+    2100000: Emisor1
+    2100002: BaseAlta
+    2100004: Tornillo
+    2100006: Argolla1
+    2100008: Tornillo1
+    2100010: Boton3
+    2100012: Sable1
+    2100014: BaseMedia
+    2100016: Interruptor
+    2100018: Palanca1
+    2100020: Agarraderas
+    2100022: BaseBaja
+    2300000: Agarradera
+    2300002: Argolla
+    2300004: Base
+    2300006: Boton
+    2300008: Boton1
+    2300010: Boton2
+    2300012: Emisor
+    2300014: Interrumptor
+    2300016: Mango
+    2300018: Palanca
+    2300020: Sable
+    2300022: Switch2
+    3300000: Agarradera
+    3300002: Argolla
+    3300004: Base
+    3300006: Boton
+    3300008: Boton1
+    3300010: Boton2
+    3300012: Emisor
+    3300014: Interrumptor
+    3300016: Mango
+    3300018: Palanca
+    3300020: Sable
+    3300022: Switch2
+    4300000: Emisor
+    4300002: Base
+    4300004: Boton2
+    4300006: Argolla
+    4300008: Boton1
+    4300010: Boton
+    4300012: Sable
+    4300014: Interrumptor
+    4300016: Switch2
+    4300018: Palanca
+    4300020: Agarradera
+    4300022: Mango
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

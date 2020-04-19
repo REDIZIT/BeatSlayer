@@ -1,6 +1,7 @@
 ﻿using InGame.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.SceneManagement;
@@ -34,17 +35,21 @@ public class SceneControllerUI : MonoBehaviour
         ao.allowSceneActivation = false;
 
 
-        if (!Advertisement.isInitialized)
+        if(!File.Exists(Application.persistentDataPath + "/noads.txt"))
         {
-            Advertisement.Initialize("3202418", false);
-        }
-        if (parameters.Type == SceneloadParameters.LoadType.Menu)
-        {
-            if (Advertisement.IsReady())
+            if (!Advertisement.isInitialized)
             {
-                Advertisement.Show("video");
+                Advertisement.Initialize("3202418", false);
+            }
+            if (parameters.Type == SceneloadParameters.LoadType.Menu)
+            {
+                if (Advertisement.IsReady())
+                {
+                    Advertisement.Show("video");
+                }
             }
         }
+        
 
 
 
