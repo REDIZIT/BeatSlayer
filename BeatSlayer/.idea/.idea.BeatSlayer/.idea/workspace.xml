@@ -88,10 +88,8 @@
         <option value="$PROJECT_DIR$/Assets/MapListItem.cs" />
         <option value="$PROJECT_DIR$/Assets/MeleeWeaponTrail/Scripts/MeleeWeaponTrail.cs" />
         <option value="$USER_HOME$/AppData/LocalLow/REDIZIT/Beat Slayer/data/moderation/request.json" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/ProjectManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/MusicFilesUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Analyzer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
@@ -100,12 +98,9 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/SearchUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/DatabaseManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/Translating/BeatmapUI.csv" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
         <option value="$APPLICATION_CONFIG_DIR$/consoles/.datagrid/cell" />
         <option value="$PROJECT_DIR$/Assets/Resources/Translating/SceneController.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/SceneControllerUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" />
         <option value="$PROJECT_DIR$/Assets/TrackListItem.cs" />
@@ -115,8 +110,13 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Project.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/Translating/Menu.csv" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
       </list>
     </option>
   </component>
@@ -133,7 +133,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="database.data.extractors.current.id" value="Comma-separated (CSV)_id" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="database.main" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
@@ -175,7 +175,7 @@
       <workItem from="1588587882835" duration="3950000" />
       <workItem from="1588592038397" duration="318000" />
       <workItem from="1588594356197" duration="2384000" />
-      <workItem from="1588597748988" duration="5510000" />
+      <workItem from="1588597748988" duration="9202000" />
     </task>
     <servers />
   </component>
@@ -197,6 +197,9 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/Assets/Resources/Localization" />
+    </ignored-roots>
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
   <component name="WindowStateProjectService">
@@ -212,10 +215,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="779" y="193" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588501495891" />
-    <state x="411" y="130" key="SettingsEditor" timestamp="1588600067952">
+    <state x="411" y="130" key="SettingsEditor" timestamp="1588620296928">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="411" y="130" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1588600067952" />
+    <state x="411" y="130" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1588620296928" />
     <state x="429" y="175" width="1053" height="691" key="editAsTableFormatDialogDimension" timestamp="1588600099246">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -224,9 +227,9 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588489478444" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1588602619475">
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1588619742486">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588602619475" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588619742486" />
   </component>
 </project>

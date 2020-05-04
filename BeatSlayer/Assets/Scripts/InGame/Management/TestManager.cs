@@ -66,6 +66,12 @@ namespace Testing
                 request.filepath = filepath;
 
                 Project proj = ProjectManager.LoadProject(filepath);
+
+                if (proj.difficulties == null || proj.difficulties.Count == 0)
+                {
+                    proj = ProjectUpgrader.UpgradeToDifficulty(proj);
+                }
+                
                 menu.beatmapUI.OpenModeration(request, proj);
             }
         }

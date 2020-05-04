@@ -18,6 +18,7 @@ namespace Assets.SimpleLocalization
 
         private static readonly Dictionary<string, Dictionary<string, string>> Dictionary = new Dictionary<string, Dictionary<string, string>>();
         private static string _language = "Unknown";
+        public static string folderPath = "GameLocalization/Master";
 
 		/// <summary>
 		/// Get or set language.
@@ -31,13 +32,13 @@ namespace Assets.SimpleLocalization
 		/// <summary>
 		/// Read localization spreadsheets.
 		/// </summary>
-		public static void Read(string path = "Translating")
+		public static void Read()
         {
             Debug.Log("Read with " + Language);
 
             if (Dictionary.Count > 0) return;
 
-            var textAssets = Resources.LoadAll<TextAsset>(path);
+            var textAssets = Resources.LoadAll<TextAsset>(folderPath);
 
             foreach (var textAsset in textAssets)
             {
@@ -88,11 +89,11 @@ namespace Assets.SimpleLocalization
         {
             if (Dictionary.Count == 0)
             {
-                Read("Translating");
+                Read();
             }
 
-            if (!Dictionary.ContainsKey(Language)) { Debug.LogError("Language not found: " + Language); return "[ERR L]"; }
-            if (!Dictionary[Language].ContainsKey(localizationKey)) { Debug.LogError("Translation not found: " + localizationKey); return "[ERR T]"; }
+            if (!Dictionary.ContainsKey(Language)) { Debug.LogError("Language not found: " + Language); return "[ERR Lang]"; }
+            if (!Dictionary[Language].ContainsKey(localizationKey)) { Debug.LogError("Translation not found: " + localizationKey); return "[ERR Tkey]"; }
 
             return Dictionary[Language][localizationKey];
         }

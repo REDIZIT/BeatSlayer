@@ -243,6 +243,7 @@ public class BeatmapUI : MonoBehaviour
         BeatmapUIItem item = toggleGroup.ActiveToggles().First().GetComponent<BeatmapUIItem>();
 
         currentDifficultyInfo = item.difficulty;
+        Debug.Log("Clicked id " + item.difficulty.id);
         string trackname = currentMapInfo.author + "-" + currentMapInfo.name;
 
 
@@ -251,6 +252,7 @@ public class BeatmapUI : MonoBehaviour
             ProjectManager.IsMapDownloaded(currentMapInfo.author, currentMapInfo.name, currentMapInfo.nick) ||
             currentMapInfo.group.groupType == GroupInfo.GroupType.Own;
         bool hasUpdate = DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.nick);
+        bool isTest = testRequest != null;
 
         if (testRequest != null)
         {
@@ -258,17 +260,31 @@ public class BeatmapUI : MonoBehaviour
             testRequest.difficultyId = currentDifficultyInfo.id;
         }
 
-        downloadPan.SetActive(hasUpdate || (!isDownloaded && !isGroupDeleted));
-        downloadBtn.SetActive(!hasUpdate || (!isDownloaded && !isGroupDeleted));
-        updateBtn.SetActive(isDownloaded && hasUpdate);
+        if (isTest)
+        {
+            downloadPan.SetActive(false);
+            recordPan.SetActive(false);
+            footer.SetActive(true);
+            
+            playBtn.SetActive(true);
+            deleteBtn.SetActive(true);
+        }
+        else
+        {
+            downloadPan.SetActive(hasUpdate || (!isDownloaded && !isGroupDeleted));
+            downloadBtn.SetActive(!hasUpdate || (!isDownloaded && !isGroupDeleted));
+            updateBtn.SetActive(isDownloaded && hasUpdate);
         
-        recordPan.SetActive(!isGroupDeleted);
-        modsPan.SetActive(false);
+            recordPan.SetActive(!isGroupDeleted);
+            modsPan.SetActive(false);
 
-        footer.SetActive(isDownloaded);
-        playBtn.SetActive(!isGroupDeleted && !hasUpdate);
-        locationBtn.SetActive(!isGroupDeleted);
-        deleteBtn.SetActive(true);
+            footer.SetActive(isDownloaded);
+            playBtn.SetActive(!isGroupDeleted && !hasUpdate);
+            locationBtn.SetActive(!isGroupDeleted);
+            deleteBtn.SetActive(true);
+
+        }
+
         
         
 
@@ -312,7 +328,7 @@ public class BeatmapUI : MonoBehaviour
         }
         
     }
-    
+
     #endregion
     
     #region Game section buttons events
@@ -327,7 +343,8 @@ public class BeatmapUI : MonoBehaviour
         
         if (testRequest != null)
         {
-            parameters = SceneloadParameters.ModerationPreset(testRequest);
+            Debug.Log("Moderate with id: " + currentDifficultyInfo.id);
+            parameters = SceneloadParameters.ModerationPreset(testRequest, currentDifficultyInfo);
         }
         else if (currentMapInfo.group.groupType == GroupInfo.GroupType.Own)
         {
@@ -335,7 +352,6 @@ public class BeatmapUI : MonoBehaviour
         }
         else if (currentMapInfo.group.groupType == GroupInfo.GroupType.Author)
         {
-            Debug.Log("Play with id: " + currentDifficultyInfo.id);
             parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo);
         }
 
@@ -414,6 +430,16 @@ public class BeatmapUI : MonoBehaviour
         
         // Download update
         OnDownloadBtnClicked();
+    }
+    
+    public void OnCloseBtnClicked()
+    {
+        if (testRequest != null)
+        {
+            TestManager.DeleteRequest();
+        }
+        
+        overlay.SetActive(false);
     }
     
     

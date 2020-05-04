@@ -338,7 +338,7 @@ public class MenuScript_v2 : MonoBehaviour
         else if (Application.systemLanguage == SystemLanguage.French) LocalizationManager.Language = "French";
         else LocalizationManager.Language = "English";
         
-        LocalizationManager.Read("Translating");
+        LocalizationManager.Read();
     }
 
     public void ShowAchivements()

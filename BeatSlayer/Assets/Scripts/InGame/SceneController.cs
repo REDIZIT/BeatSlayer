@@ -195,7 +195,7 @@ public class SceneloadParameters
         };
         return parameters;
     }
-    public static SceneloadParameters ModerationPreset(TestRequest request)
+    public static SceneloadParameters ModerationPreset(TestRequest request, DifficultyInfo difficultyInfo)
     {
         string mapFolder = Application.persistentDataPath + "/data/moderation/map";
 
@@ -216,10 +216,7 @@ public class SceneloadParameters
             Type = LoadType.Moderation,
             Map = info, 
             ProjectFolderPath = mapFolder,
-            difficultyInfo = new DifficultyInfo()
-            {
-                id = request.difficultyId
-            }
+            difficultyInfo = difficultyInfo
         };
         return parameters;
     }

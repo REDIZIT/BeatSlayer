@@ -126,6 +126,11 @@ public class GameManager : MonoBehaviour
         
         difficulty = project.difficulties.Find(c => c.id == difficultyInfo.id);
         Debug.Log("Id: " + difficultyInfo.id + "\nIs DIFF null? " + (difficulty == null) + "\nCount is: " + project.difficulties.Count);
+        foreach (var d in project.difficulties)
+        {
+            Debug.Log(d.name + " with id " + d.id);
+        }
+        
         var ls = difficulty.beatCubeList.OrderBy(c => c.time);
 
         beats.AddRange(ls);
