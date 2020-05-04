@@ -43,16 +43,11 @@ namespace Assets.SimpleLocalization
             {
                 var text = ReplaceMarkers(textAsset.text);
                 var matches = Regex.Matches(text, "\"[\\s\\S]+?\"");
-
-
-                foreach (Match match in matches)
-                {
-					text = text.Replace(match.Value, match.Value.Replace("\"", null).Replace(",", "[comma]").Replace("\n", "[newline]"));
-                }
+                
 
 
                 var lines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-				var languages = lines[0].Split(',').Select(i => i.Trim()).ToList();
+				var languages = lines[0].Split('|').Select(i => i.Trim()).ToList();
 
 
                 for (var i = 1; i < languages.Count; i++)
@@ -65,7 +60,7 @@ namespace Assets.SimpleLocalization
 
                 for (var i = 1; i < lines.Length; i++)
                 {
-					var columns = lines[i].Split(',').Select(j => j.Trim()).Select(j => j.Replace("[comma]", ",").Replace("[newline]", "\n").Replace("[N]","\n")).ToList();
+					var columns = lines[i].Split('|').Select(j => j.Trim()).Select(j => j.Replace("[N]","\n")).ToList();
 					var key = columns[0];
 
                     for (var j = 1; j < languages.Count; j++)
@@ -78,13 +73,12 @@ namespace Assets.SimpleLocalization
                         }
                         catch (Exception err)
                         {
-                            Debug.LogError("Line " + key + " => " + err.Message);
+                            Debug.LogWarning("Line " + key + " => " + err.Message);
+                            Dictionary[languages[j]][key] = columns[j];
                         }
                     }
                 }
             }
-
-            //AutoLanguage();
         }
 
         /// <summary>

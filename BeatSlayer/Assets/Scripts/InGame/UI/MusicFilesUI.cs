@@ -56,7 +56,8 @@ public class MusicFilesUI : MonoBehaviour
                 author = author,
                 name = name,
                 mapsCount = 1,
-                filepath = filepath
+                filepath = filepath,
+                groupType = GroupInfo.GroupType.Own
             };
 
             TrackListItem item = Instantiate(trackItemPrefab, ownMusicList).GetComponent<TrackListItem>();

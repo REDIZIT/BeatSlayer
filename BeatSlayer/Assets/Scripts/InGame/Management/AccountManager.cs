@@ -12,6 +12,7 @@ using System.Threading;
 using Assets.SimpleLocalization;
 using Newtonsoft.Json;
 using GooglePlayGames.BasicApi.Multiplayer;
+using ProjectManagement;
 
 public class AccountManager : MonoBehaviour
 {
@@ -42,22 +43,23 @@ public class AccountManager : MonoBehaviour
     public GameObject actionLocker;
     public Transform actionContnet;
 
+    #region urls
     public const string url_sendReplay = "http://www.bsserver.tk/Account/AddReplay?nick={0}&json={1}";
     public const string url_getBestReplay = "http://www.bsserver.tk/Account/GetBestReplay?player={0}&trackname={1}&nick={2}";
     public const string url_playTime = "http://www.bsserver.tk/Account/UpdateInGameTime?nick={0}&seconds={1}";
+    public const string url_getMapLeaderboardPlace = "http://www.bsserver.tk/Account/GetMapLeaderboardPlace?player={0}&trackname={1}&nick={2}";
+    public const string url_leaderboard = "http://www.bsserver.tk/Account/GetMapGlobalLeaderboard?trackname={0}&nick={1}";
+    public const string url_login = "http://176.107.160.146/Account/Login?";
+    public const string url_signup = "http://176.107.160.146/Account/Register?";
+    public const string url_upload = "http://176.107.160.146/Account/Update";
+    public const string url_viewAccount = "http://176.107.160.146/Account/ViewAccount?nick=";
+    public const string url_getshortleaderboard = "http://176.107.160.146/Account/getshortleaderboard?";
+    public const string url_getLeaderboard = "http://176.107.160.146/Account/GetLeaderboard";
+    public const string url_setAvatar = "http://176.107.160.146/Account/SetAvatar";
+    public const string url_getAvatar = "http://176.107.160.146/Account/GetAvatar?nick=";
+    #endregion
 
-
-
-    private void Awake()
-    {
-        //if (instance != null)
-        //{
-        //    Destroy(gameObject);
-        //    return;
-        //}
-        //DontDestroyOnLoad(gameObject);
-        //instance = this;
-    }
+    
     private void Update()
     {
         //if (instance != null) return;
@@ -89,10 +91,8 @@ public class AccountManager : MonoBehaviour
     {
         return Task.Factory.StartNew(() =>
         {
-            string authUrl = "http://176.107.160.146/Account/Login?";
-
             WebClient c = new WebClient();
-            string authResult = c.DownloadString(authUrl + "nick=" + login + "&password=" + password);
+            string authResult = c.DownloadString(url_login + "nick=" + login + "&password=" + password);
 
             if (authResult.Contains("[ERR]")) Debug.LogError("Auth error: " + authResult);
             else
@@ -110,10 +110,8 @@ public class AccountManager : MonoBehaviour
 
         await Task.Factory.StartNew(() =>
         {
-            string authUrl = "http://176.107.160.146/Account/Login?";
-
             WebClient c = new WebClient();
-            string authResult = c.DownloadString(authUrl + "nick=" + login + "&password=" + password);
+            string authResult = c.DownloadString(url_login + "nick=" + login + "&password=" + password);
 
             if (authResult.Contains("[ERR]")) Debug.LogError("Auth error: " + authResult);
             else
@@ -129,7 +127,6 @@ public class AccountManager : MonoBehaviour
     {
         if (!(Application.internetReachability != NetworkReachability.NotReachable)) return;
 
-        string uploadUrl = "http://176.107.160.146/Account/Update";
 
         WebClient c = new WebClient();
 
@@ -143,7 +140,7 @@ public class AccountManager : MonoBehaviour
         httpContent.Add(new CI.HttpClient.StringContent(json), "accountJson");
 
 
-        client.Post(new System.Uri(uploadUrl), httpContent, CI.HttpClient.HttpCompletionOption.AllResponseContent, (r) =>
+        client.Post(new System.Uri(url_upload), httpContent, CI.HttpClient.HttpCompletionOption.AllResponseContent, (r) =>
         {
             if (r.ContentLength != 0)
             {
@@ -157,11 +154,9 @@ public class AccountManager : MonoBehaviour
     public async void SignUp(string login, string password, AuthManager manager)
     {
         await Task.Factory.StartNew(() =>
-        {
-            string authUrl = "http://176.107.160.146/Account/Register?";
-
+        { 
             WebClient c = new WebClient();
-            string result = c.DownloadString(authUrl + "nick=" + login + "&password=" + password);
+            string result = c.DownloadString(url_signup + "nick=" + login + "&password=" + password);
 
             if (result.Contains("[ERR]"))
             {
@@ -266,7 +261,7 @@ public class AccountManager : MonoBehaviour
     {
         return Task.Factory.StartNew(() =>
         {
-            string url = "http://176.107.160.146/Account/ViewAccount?nick=" + nick;
+            string url = url_viewAccount + nick;
             WebClient c = new WebClient();
             return c.DownloadString(url);
         });
@@ -304,10 +299,8 @@ public class AccountManager : MonoBehaviour
     {
         return Task<string>.Factory.StartNew(() =>
         {
-            string url = "http://176.107.160.146/Account/getshortleaderboard?";
-
             WebClient c = new WebClient();
-            string result = c.DownloadString(url + "nick=" + nick);
+            string result = c.DownloadString(url_getshortleaderboard + "nick=" + nick);
 
             return result;
         });
@@ -421,7 +414,7 @@ public class AccountManager : MonoBehaviour
 
         return account.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick);
     }
-    public bool IsPassed(string author, string name)
+    public static bool IsPassed(string author, string name)
     {
         if (account == null) return false;
 
@@ -435,8 +428,6 @@ public class AccountManager : MonoBehaviour
     public void UpdateSessionTime()
     {
         if (account == null) return;
-
-        Debug.Log("UpdateSessionTime add " + lastUploadedPlayTime + " seconds");
 
         int secondsToAdd = Mathf.RoundToInt(lastUploadedPlayTime);
         lastUploadedPlayTime = 0;
@@ -479,9 +470,7 @@ public class AccountManager : MonoBehaviour
 
     public void OnAvatarSelected(string filepath)
     {
-        Debug.Log("[SPRITE] " + filepath);
-
-        Sprite sprite = TheGreat.LoadSprite(filepath);
+        Sprite sprite = ProjectManager.LoadSprite(filepath);
         avatar.sprite = sprite;
 
         SendAvatarFile(filepath);
@@ -490,9 +479,7 @@ public class AccountManager : MonoBehaviour
     public async void SendAvatarFile(string filepath)
     {
         if (account == null) return;
-
-
-        string url_publish = "http://176.107.160.146/Account/SetAvatar";
+        
 
         CI.HttpClient.HttpClient client = new CI.HttpClient.HttpClient();
 
@@ -509,7 +496,7 @@ public class AccountManager : MonoBehaviour
 
         await Task.Factory.StartNew(() =>
         {
-            client.Post(new System.Uri(url_publish), httpContent, CI.HttpClient.HttpCompletionOption.AllResponseContent, (r) =>
+            client.Post(new System.Uri(url_setAvatar), httpContent, CI.HttpClient.HttpCompletionOption.AllResponseContent, (r) =>
             {
                 string response = r.ReadAsString();
                 Debug.LogWarning("[SET AVATAR REPONSE] " + response);
@@ -539,13 +526,13 @@ public class AccountManager : MonoBehaviour
             await Task.Factory.StartNew(() =>
             {
                 WebClient c = new WebClient();
-                bytes = c.DownloadData("http://176.107.160.146/Account/GetAvatar?nick=" + nick);
+                bytes = c.DownloadData(url_getAvatar + nick);
                 if(account.nick == nick) File.WriteAllBytes(imgPath, bytes);
             });
 
         }
 
-        sprite = TheGreat.LoadSprite(bytes);
+        sprite = ProjectManager.LoadSprite(bytes);
         avatar.sprite = sprite;
     }
 
@@ -567,7 +554,7 @@ public class AccountManager : MonoBehaviour
         await Task.Factory.StartNew(() =>
         {
             WebClient c = new WebClient();
-            string response = c.DownloadString("http://176.107.160.146/Account/GetLeaderboard");
+            string response = c.DownloadString(url_getLeaderboard);
 
             if (response.Contains("[ERR]")) { Debug.LogError("[OPEN LEADERBOARD] " + response); return; }
             else
@@ -653,18 +640,42 @@ public class AccountManager : MonoBehaviour
 
         c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
         {
-            if (!e.Cancelled && e.Error != null) { Debug.LogError("GetBestReplay\n" + e.Error); callback(null); return; }
-            else Debug.Log("GetBestReplay response is " + e.Result);
-
-            Replay replay = JsonConvert.DeserializeObject<Replay>(e.Result);
-            callback(replay);
+            if (!e.Cancelled && e.Error != null)
+            {
+                Debug.Log("GetBestReplay\n" + e.Error); callback(null);
+                callback(null);
+            }
+            else 
+            {
+                if (e.Result == "")
+                {
+                    callback(null);
+                }
+                else
+                {
+                    Replay replay = JsonConvert.DeserializeObject<Replay>(e.Result);
+                    callback(replay);   
+                }
+            }
         };
+        
+        c.DownloadStringAsync(new Uri(url));
     }
 
+    public static void GetMapLeaderboardPlace(string player, string trackname, string nick, Action<int> callback)
+    {
+        string url = string.Format(url_getMapLeaderboardPlace, player, trackname, nick);
+        
+        SendRequestAsync(args =>
+        {
+            if (args.Cancelled || args.Error != null) callback(-1);
+            else callback(int.Parse(args.Result));
+        }, url);
+    }
 
     #endregion
 
-    public void SendRequestAsync(Action<string> callback, string url, params object[] strings)
+    public static void SendRequestAsync(Action<string> callback, string url, params object[] strings)
     {
         WebClient c = new WebClient();
         c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
@@ -672,8 +683,16 @@ public class AccountManager : MonoBehaviour
             callback(e.Result);
         };
         string _url = string.Format(url, strings);
-        Debug.Log("Send async request : " + _url);
         c.DownloadStringAsync(new Uri(_url));
+    }
+    public static void SendRequestAsync(Action<DownloadStringCompletedEventArgs> callback, string url)
+    {
+        WebClient c = new WebClient();
+        c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
+        {
+            callback(e);
+        };
+        c.DownloadStringAsync(new Uri(url));
     }
 }
 

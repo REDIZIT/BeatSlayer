@@ -36,7 +36,7 @@ namespace MusicFilesManagement
 
                 data.folders = new List<string>()
                 {
-                    "/storage/emulated/0/Music", "/storage/emulated/0/Download", "/storage/emulated/0/VK", "/storage/emulated/0/Telegram", GetSDPath(), Application.persistentDataPath
+                    "/storage/emulated/0/Music", "/storage/emulated/0/Download", "/storage/emulated/0/VK", "/storage/emulated/0/Telegram", Application.persistentDataPath
                 };
 
                 SaveData();

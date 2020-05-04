@@ -13,7 +13,6 @@ public class TextExtenderEditor : Editor
         DrawDefaultInspector();
 
         TextExtender script = (TextExtender)target;
-        Debug.Log("1");
         script.UpdateThis();
     }
 
@@ -64,7 +63,7 @@ public class TextExtender : MonoBehaviour
 
         RectTransform rect = GetComponent<RectTransform>();
 
-        rect.sizeDelta = new Vector2(text.preferredWidth + margin.x, text.preferredHeight + margin.y);
+        rect.sizeDelta = new Vector2(text.preferredWidth + margin.x * 2, text.preferredHeight + margin.y * 2);
         text.Rebuild(CanvasUpdate.MaxUpdateValue);
     }
 

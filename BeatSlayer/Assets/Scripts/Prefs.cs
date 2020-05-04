@@ -107,26 +107,3 @@ public class Prefs
     // Editor link
     public bool showedEditorAvailableWindow = false;
 }
-
-[Serializable]
-public class SerializableColor
-{
-    float r, g, b;
-    public SerializableColor(float r, float g, float b)
-    {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-    }
-
-    public Color GetColor()
-    {
-        return new Color(r, g, b);
-    }
-    public void SetColor(Color clr)
-    {
-        r = clr.r;
-        g = clr.g;
-        b = clr.b;
-    }
-}

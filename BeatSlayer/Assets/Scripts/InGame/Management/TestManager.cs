@@ -3,12 +3,16 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
+using ProjectManagement;
 using UnityEngine;
 
 namespace Testing
 {
     public static class TestManager
     {
+        public static MenuScript_v2 menu;
+        
         public static string EditorFolderPath
         {
             get
@@ -18,6 +22,10 @@ namespace Testing
             }
         }
 
+        public static void Setup(MenuScript_v2 m)
+        {
+            menu = m;
+        }
 
         public static void CheckUpdates()
         {
@@ -25,21 +33,43 @@ namespace Testing
             if (!File.Exists(Application.persistentDataPath + "/data/moderation/request.json")) return;
 
             TestRequest request = LoadRequest();
-            File.Delete(Application.persistentDataPath + "/data/moderation/request.json");
 
             string filepath = "";
-            if(request.type == TestType.ModerationMap) filepath = Application.persistentDataPath + "/data/moderation/" + request.trackname + ".bsz";
-            else
+            if(request.type == TestType.OwnMap)
             {
+                File.Delete(Application.persistentDataPath + "/data/moderation/request.json");
+                
                 filepath = EditorFolderPath + "/Maps/" + request.trackname + "/" + request.trackname + ".bsu";
+                request.filepath = filepath;
+
+                SceneloadParameters parameters = SceneloadParameters.EditorTestPreset(request);
+
+                SceneController.instance.LoadScene(parameters);
             }
-
-            SceneloadParameters parameters;
-            if (request.type == TestType.ModerationMap) parameters = SceneloadParameters.ModerationPreset(filepath);
-            else parameters  = SceneloadParameters.EditorTestPreset(filepath);
-
-            SceneController.instance.LoadScene(parameters);
         }
+
+        public static void CheckModerationUpdates()
+        {
+            if (!Directory.Exists(Application.persistentDataPath + "/data/moderation")) return;
+            if (!Directory.Exists(Application.persistentDataPath + "/data/moderation/map")) return;
+            if (!File.Exists(Application.persistentDataPath + "/data/moderation/request.json")) return;
+
+            if (menu.beatmapUI.overlay.activeSelf) return;
+            
+            TestRequest request = LoadRequest();
+
+            string filepath = "";
+            if (request.type == TestType.ModerationMap)
+            {
+                filepath = Application.persistentDataPath + "/data/moderation/map/" + request.trackname + ".bsu";
+                
+                request.filepath = filepath;
+
+                Project proj = ProjectManager.LoadProject(filepath);
+                menu.beatmapUI.OpenModeration(request, proj);
+            }
+        }
+
         public static TestRequest LoadRequest()
         {
             string filepath = Application.persistentDataPath + "/data/moderation/request.json";
@@ -47,12 +77,24 @@ namespace Testing
             return request;
         }
 
+        public static void DeleteRequest()
+        {
+            string requestPath = Application.persistentDataPath + "/data/moderation/request.json";
+            string mapFolder = Application.persistentDataPath + "/data/moderation/map";
+            
+            File.Delete(requestPath);
+            foreach (var filepath in Directory.GetFiles(mapFolder))
+            {
+                File.Delete(filepath);
+            }
+        }
+
         public static void OpenEditor()
         {
             if (Application.isEditor) { Debug.Log("Open BS"); return; }
 
             bool fail = false;
-            string bundleId = "com.REDIZIT.BeatSlayerEditor"; // your target bundle id
+            string bundleId = "com.REDIZIT.BeatSlayerEditor";
             AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
@@ -68,11 +110,10 @@ namespace Testing
             }
 
             if (fail)
-            { //open app in store
+            {
                 Debug.LogError("OpenEditor() failed");
-                //Application.OpenURL("https://google.com");
             }
-            else //open the app
+            else 
                 ca.Call("startActivity", launchIntent);
 
             up.Dispose();
@@ -87,15 +128,14 @@ namespace Testing
     {
         public TestType type;
         public string trackname;
-
-        public TestRequest(TestType type)
-        {
-            this.type = type;
-        }
-        public TestRequest(TestType type, string trackname)
+        public string filepath;
+        public int difficultyId;
+        
+        public TestRequest(TestType type, string trackname, int difficultyId)
         {
             this.type = type;
             this.trackname = trackname;
+            this.difficultyId = difficultyId;
         }
 
         public TestRequest() { }

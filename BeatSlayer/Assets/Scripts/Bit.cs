@@ -646,7 +646,7 @@ public static class VibratorWrapper
 
     }
     public static void Vibrate(long time)
-    {
+    {/*
         if (!Application.isEditor)
         {
             vibrator.Call("vibrate", time);
@@ -654,6 +654,6 @@ public static class VibratorWrapper
         else
         {
             Handheld.Vibrate();
-        }
+        }*/
     }
 }

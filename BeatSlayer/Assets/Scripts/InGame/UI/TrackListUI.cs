@@ -94,11 +94,12 @@ public class TrackListUI : MonoBehaviour
         // If maps aren't loaded
         if (GetData().Count == 0)
         {
-            if(Application.internetReachability == NetworkReachability.NotReachable)
+            bool reachable = Application.internetReachability != NetworkReachability.NotReachable;
+            if (!reachable && showedListType != ListType.Downloaded)
             {
                 stateText.text = "No internet connection >﹏<";
             }
-            else
+            else if (reachable || showedListType == ListType.Downloaded)
             {
                 bool isApprovedLoaded = false;
                 stateText.text = "Loading..";

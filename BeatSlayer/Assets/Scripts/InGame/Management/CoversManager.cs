@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,7 @@ namespace CoversManagement
         static bool isInited;
         static bool isDownloading;
 
-        static string url_cover = "http://176.107.160.146/Database/GetCover?trackname={0}&nick={1}";
+        public const string url_cover = "http://176.107.160.146/Database/GetCover?trackname={0}&nick={1}";
         static WebClient client = new WebClient();
 
         static Texture2D DefaultTexture { get { return TrackListUI.defaultIcon; } }
@@ -51,7 +52,7 @@ namespace CoversManagement
                 }
                 else
                 {
-                    Texture2D tex = TheGreat.LoadTexure(bytes);
+                    Texture2D tex = ProjectManager.LoadTexture(bytes);
                     requests[0].image.texture = tex;
                 }
 
@@ -72,7 +73,7 @@ namespace CoversManagement
             string url = string.Format(url_cover, requests[0].trackname, requests[0].nick);
 
             // file path for downloaded map cover
-            Texture2D tex = TheGreat.GetCover(requests[0].trackname, requests[0].nick);
+            Texture2D tex = ProjectManager.LoadCover(requests[0].trackname, requests[0].nick);
             if (tex != null)
             {
                 requests[0].image.texture = tex;
@@ -81,9 +82,18 @@ namespace CoversManagement
             }
             else
             {
-                Uri uri = new Uri(url);
-                client.DownloadDataAsync(uri);
-                isDownloading = true;
+                if(Application.internetReachability != NetworkReachability.NotReachable)
+                {
+                    Uri uri = new Uri(url);
+                    client.DownloadDataAsync(uri);
+                    isDownloading = true;
+                }
+                else
+                {
+                    requests[0].image.texture = DefaultTexture;
+                    requests.RemoveAt(0);
+                    OnRequestsListUpdate();
+                }
             }
         }
 

@@ -162,10 +162,12 @@ public class Analyzer : MonoBehaviour
                     BeatCubeClass cl = new BeatCubeClass(-1, -1, t);
                     if(t == BeatCubeClass.Type.Dir)
                     {
-                        cl.subType = BeatCubeClass.SubType.Random;
+                        int random = Random.Range(0, 8);
+                        
+                        cl.subType = (BeatCubeClass.SubType)random;
                     }
 
-                    gs.SpawnBeatCube(cl/*, c*/);
+                    gs.beatManager.SpawnBeatCube(cl);
                     timeLeftAfterSpawn = 0;
                 }
             }
@@ -234,7 +236,7 @@ public class Analyzer : MonoBehaviour
                     m_cubeCooldown = highTier > 0 ? cubeCooldown * 0.4f : cubeCooldown;
                     //Color c = Color.white;
                     //if (highTier > 0) c = Color.magenta;
-                    gs.SpawnBeatCube(new BeatCubeClass(0, -1, BeatCubeClass.Type.Point)/*, c*/);
+                    gs.beatManager.SpawnBeatCube(new BeatCubeClass(0, -1, BeatCubeClass.Type.Point)/*, c*/);
                 }
             }
             else
@@ -285,9 +287,14 @@ public class Analyzer : MonoBehaviour
 
                 BeatCubeClass cl = new BeatCubeClass(-1, road, t);
                 cl.saberType = saberType;
-                cl.subType = BeatCubeClass.SubType.Random;
+                if (t == BeatCubeClass.Type.Dir)
+                {
+                    int random = Random.Range(0, 8);
+                        
+                    cl.subType = (BeatCubeClass.SubType)random;
+                }
 
-                gs.SpawnBeatCube(cl/*, c*/);
+                gs.beatManager.SpawnBeatCube(cl);
                 ta_timeFromLastSpawn = 0;
             }
         }

@@ -62,15 +62,19 @@ namespace Searching
             ls = ls.Where(t => 
                 searchingForType == SearchingForType.Map ?
                     (t.author + "-" + t.name).ToLower().Contains(searchText.ToLower()) :
-                    t.nicks.Any(c => c.ToLower().Contains(searchText.ToLower())));
+                    (t.nicks == null ? true : t.nicks.Any(c => c != null && c.ToLower().Contains(searchText.ToLower()))));
+            /*ls = ls.Where(t => 
+                searchingForType == SearchingForType.Map ?
+                    (t.author + "-" + t.name).ToLower().Contains(searchText.ToLower()) :
+                    (t.nicks == null ? false : true));*/
 
 
             // Selecting ShowType
             if (showType != ShowType.All)
             {
-                ls = ls.Where(t => showType == ShowType.OnlyNew ?
-                    t.IsNew : showType == ShowType.Played ?
-                    AccountManager.account.playedMaps.Any(m => m.author + "-" + m.name == t.author + "-" + t.name) :
+                ls = ls.Where(t =>
+                    showType == ShowType.OnlyNew ? t.IsNew : 
+                    showType == ShowType.Played ? AccountManager.account.playedMaps.Any(m => m.author + "-" + m.name == t.author + "-" + t.name) : 
                     AccountManager.account.playedMaps.Any(m => m.author + "-" + m.name != t.author + "-" + t.name));
             }
 
@@ -85,8 +89,8 @@ namespace Searching
 
             ls = listSortDirection == ListSortDirection.Descending ? ls.OrderByDescending(keySelector) : ls.OrderBy(keySelector);
 
-            Debug.Log("Search time is " + (DateTime.Now - d1).TotalMilliseconds);
-
+            if (showType == ShowType.All) ls = ls.OrderByDescending(c => c.IsNew);
+            
             return ls;
         }
 

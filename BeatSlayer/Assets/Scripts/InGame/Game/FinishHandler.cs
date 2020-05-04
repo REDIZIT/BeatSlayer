@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,12 +15,10 @@ public class FinishHandler : MonoBehaviour
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
 
-    public const string url_leaderboard = "http://www.bsserver.tk/Account/GetMapGlobalLeaderboard?trackname={0}&nick={1}";
-
 
     [Header("UI")]
     public GameObject finishOverlay;
-    public Image coverImage;
+    public RawImage coverImage;
     public Text authorText, nameText, creatorText;
     public Text scoreText, missedText, accuracyText, RPText;
     public GameObject uploadingText, recordText;
@@ -41,7 +40,7 @@ public class FinishHandler : MonoBehaviour
 
     public void CheckLevelFinish()
     {
-        if (!gm.gameStarting && audioManager.asource.time == 0 && gm.beats.ToArray().Length == 0 && !audioManager.asource.isPlaying)
+        if (!gm.gameStarting && gm.gameStarted && audioManager.asource.time == 0 && gm.beats.ToArray().Length == 0 && !audioManager.asource.isPlaying)
         {
             OnLevelFinished();
         }
@@ -65,8 +64,7 @@ public class FinishHandler : MonoBehaviour
 
             int coins = prefsManager.prefs.coins;
             int addCoins = Mathf.RoundToInt(gm.replay.score / 16f * gm.maxCombo / 2f * gm.scoreMultiplier);
-
-;
+            
             prefsManager.prefs.coins = coins + addCoins;
             prefsManager.Save();
 
@@ -94,8 +92,8 @@ public class FinishHandler : MonoBehaviour
         gm.trackTimeSlider.value = 100;
         gm.trackTextSliderText.text = "100%";
 
-        string coverPath = TheGreat.GetCoverPath(Application.persistentDataPath + "/maps/" + gm.project.author + "-" + gm.project.name + "/" + gm.project.creatorNick, gm.fullTrackName);
-        coverImage.sprite = coverPath == "" ? gm.defaultTrackSprite : TheGreat.LoadSprite(coverPath);
+        string coverPath = ProjectManager.GetCoverPath(gm.project.author + "-" + gm.project.name, gm.project.creatorNick);
+        coverImage.texture = coverPath == "" ? gm.defaultTrackTexture : ProjectManager.LoadTexture(coverPath);
 
         authorText.text = LoadingData.loadparams.Map.author;
         nameText.text = LoadingData.loadparams.Map.name;
@@ -105,8 +103,8 @@ public class FinishHandler : MonoBehaviour
         missedText.text = gm.replay.missed.ToString();
         accuracyText.text = Mathf.RoundToInt(gm.replay.Accuracy * 1000) / 10f + "%";
 
-        cubesSpeedText.text = LocalizationManager.Localize("CubesSpeed") + ": " + (gm.replay.cubesSpeed == 1 ? "1.0x" : gm.replay.cubesSpeed + "x");
-        musicSpeedText.text = LocalizationManager.Localize("MusicSpeed") + ": " + (gm.replay.musicSpeed == 1 ? "1.0x" : gm.replay.musicSpeed + "x");
+        cubesSpeedText.text = (gm.replay.cubesSpeed == 1 ? "1.0x" : gm.replay.cubesSpeed.ToString().Replace(",", ".") + "x");
+        musicSpeedText.text = (gm.replay.musicSpeed == 1 ? "1.0x" : gm.replay.musicSpeed.ToString().Replace(",", ".") + "x");
         noLinesToggle.isOn = gm.nolines;
         noArrowsToggle.isOn = gm.noarrows;
 
@@ -144,10 +142,10 @@ public class FinishHandler : MonoBehaviour
     }
 
     void FinishAchievements()
-    {
+    {/*
         (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.youArePlayer, 1, (bool s) => { });
         (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.dj, 1, (bool s) => { });
-        (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.musicKing, 1, (bool s) => { });
+        (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.musicKing, 1, (bool s) => { });*/
 
         if (!prefsManager.prefs.hasAchiv_Uff)
         {
@@ -191,6 +189,8 @@ public class FinishHandler : MonoBehaviour
     }
     IEnumerator IEFinishServerActions()
     {
+        string trackname = gm.project.author + "-" + gm.project.name;
+        
         if (!LoadingData.loadparams.Map.approved)
         {
             leaderboardLoadingText.text = "Not approved map";
@@ -199,6 +199,14 @@ public class FinishHandler : MonoBehaviour
 
         if (Application.internetReachability == NetworkReachability.NotReachable) yield break;
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.Author) yield break;
+
+        if (!DatabaseScript.DoesMapExist(trackname, gm.project.creatorNick))
+        {
+            leaderboardLoadingText.text = "Map has been deleted";
+            yield break;
+        }
+        
+        DatabaseScript.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, DatabaseScript.StatisticsKeyType.Play);
 
         RPText.text = ".";
 
@@ -209,7 +217,7 @@ public class FinishHandler : MonoBehaviour
         RPText.text = "..";
 
         Replay bestReplay = null;
-        AccountManager.GetBestReplay(AccountManager.account.nick, gm.project.author + "-" + gm.project.name, gm.project.creatorNick, (Replay replay) =>
+        AccountManager.GetBestReplay(AccountManager.account.nick, trackname, gm.project.creatorNick, (Replay replay) =>
         {
             bestReplay = replay;
         });
@@ -237,12 +245,10 @@ public class FinishHandler : MonoBehaviour
     {
         leaderboardLoadingText.text = "Loading..";
         WebClient c = new WebClient();
-        //c.DownloadStringCompleted += OnLeaderboardLoaded;
-        string url = string.Format(url_leaderboard, gm.project.author + "-" + gm.project.name, gm.project.creatorNick);
-        
-        //c.DownloadStringAsync(new System.Uri(url));
+
+        string url = string.Format(AccountManager.url_leaderboard, gm.project.author + "-" + gm.project.name, gm.project.creatorNick);
+
         string response = c.DownloadString(url);
-        Debug.Log(url + "\n" + response);
         OnLeaderboardLoaded(response);
     }
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -18,28 +19,21 @@ public class DatabaseScript : MonoBehaviour
     public TrackDatabase cachedDb;
 
     public TracksDatabase data;
+    
+    #region urls
+    public const string url_database = "http://176.107.160.146/Home/Database";
+    public const string url_getGroups = "http://176.107.160.146/Database/GetGroups";
+    public const string url_getMaps = "http://176.107.160.146/Database/GetMaps";
+    public const string url_getMapsWithResult = "http://176.107.160.146/Database/GetMapsWithResult?trackname={0}";
+    public const string url_getMap = "http://176.107.160.146/Database/GetMap?trackname={0}&nick={1}";
+    public const string url_doesMapExist = "http://176.107.160.146/Database/DoesMapExist?trackname={0}&nick={1}";
+    public const string url_hasMapUpdate = "http://176.107.160.146/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
+    public const string url_setStatistics = "http://176.107.160.146/Database/SetStatistics?trackname={0}&nick={1}&key={2}&value=1";
+    public const string url_setDifficultyStatistics = "http://176.107.160.146/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
+    #endregion
+    
 
-    public bool useGoogleDrive = false;
-
-    public string[] googleDriveInfo;
-
-    public GameObject googleDriveUsedMsg;
-    bool isFirstCall = true;
-
-    //string databaseUrl = "https://bsserver.tk/Home/Database";
-    string databaseUrl = "http://176.107.160.146/Home/Database";
-
-    //string db_groupsUrl = "https://bsserver.tk/Database/GetGroups";
-    string db_groupsUrl = "http://176.107.160.146/Database/GetGroups";
-    //string db_mapsUrl = "https://bsserver.tk/Database/GetMaps";
-    string db_mapsUrl = "http://176.107.160.146/Database/GetMaps";
-
-    //string db_mapStatUrl = "http://www.bsserver.tk/Database/GetShortStatistics?trackname={0}&nick={1}";
-    string db_mapUrl = "http://www.bsserver.tk/Database/GetMap?trackname={0}&nick={1}";
-
-
-    public Sprite defaultTrackSprite;
-
+    #region Groups and maps (Server loading)
     // Get all tracks from db (maps groups)
     public IEnumerator LoadDatabaseAsync(bool refresh = false)
     {
@@ -52,7 +46,7 @@ public class DatabaseScript : MonoBehaviour
         bool isDone = false;
         string response = "";
 
-        client.DownloadStringAsync(new Uri(db_groupsUrl));
+        client.DownloadStringAsync(new Uri(url_getGroups));
         client.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
         {
             isDone = true;
@@ -100,16 +94,112 @@ public class DatabaseScript : MonoBehaviour
         //GetComponent<ListController>().RefreshAuthorList();
     }
     
+    
+    
     public List<MapInfo> GetMapsByTrack(GroupInfoExtended groupInfo)
-    {
-        WebClient client = new WebClient();
-        string url = db_mapsUrl + "?trackname=" + groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
-        string response = client.DownloadString(url);
+    { 
+        List<MapInfo> mapInfos;
 
-        List<MapInfo> mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
+        if(Application.internetReachability != NetworkReachability.NotReachable)
+        {
+            WebClient client = new WebClient();
+            
+            string trackname = groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
+            string url = string.Format(url_getMapsWithResult, trackname);
+            string response = client.DownloadString(url);
+
+            mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
+        }
+        else
+        {
+            mapInfos = new List<MapInfo>();
+            string trackname = groupInfo.author + "-" + groupInfo.name;
+            string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+            foreach(string mapFolder in Directory.GetDirectories(groupFolder))
+            {
+                MapInfo info = new MapInfo()
+                {
+                    group = groupInfo,
+                    nick = new DirectoryInfo(mapFolder).Name
+                };
+                mapInfos.Add(info);
+            }
+        }
+        
 
         return mapInfos;
     }
+    public void GetMapsByTrackAsync(GroupInfoExtended groupInfo, Action<List<MapInfo>> callback, Action<string> error)
+    {
+        List<MapInfo> mapInfos = null;
+
+        if(Application.internetReachability != NetworkReachability.NotReachable)
+        {
+            WebClient client = new WebClient();
+            client.DownloadStringCompleted += (s, a) =>
+            {
+                if (!a.Cancelled && a.Error == null)
+                {
+                    if (a.Result.StartsWith("[ERR]"))
+                    {
+                        string err = a.Result.Replace("[ERR] ", "");
+                        error(err);
+                        if (err == "Group has been deleted")
+                        {
+                            List<MapInfo> ls = LoadMapInfosFromLocal(groupInfo);
+                            ls.ForEach((info) =>
+                            {
+                                info.isMapDeleted = true;
+                            });
+                            callback(ls);   
+                        }
+                    }
+                    else
+                    {
+                        mapInfos = (List<MapInfo>) (JsonConvert.DeserializeObject(a.Result, typeof(List<MapInfo>)));
+                        callback(mapInfos);   
+                    }
+                }
+                else if(!a.Cancelled)
+                {
+                    error(a.Error.Message);
+                }
+            };
+
+            string trackname = groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
+            string url = string.Format(url_getMapsWithResult, trackname);
+            client.DownloadStringAsync(new Uri(url));
+        }
+        else
+        {
+            error("No internet connection");
+            callback(LoadMapInfosFromLocal(groupInfo));
+        }
+    }
+
+    
+    
+    List<MapInfo> LoadMapInfosFromLocal(GroupInfo groupInfo)
+    {
+        List<MapInfo> mapInfos = new List<MapInfo>();
+        string trackname = groupInfo.author + "-" + groupInfo.name;
+        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+        foreach(string mapFolder in Directory.GetDirectories(groupFolder))
+        {
+            MapInfo info = new MapInfo()
+            {
+                group = groupInfo,
+                nick = new DirectoryInfo(mapFolder).Name,
+                difficulties = new List<DifficultyInfo>()
+            };
+            mapInfos.Add(info);
+        }
+
+        return mapInfos;
+    }
+    
+    
+    
 
     public Task<List<TrackGroupClass>> GetDownloadedMusic()
     {
@@ -136,7 +226,6 @@ public class DatabaseScript : MonoBehaviour
             return ls;
         });
     }
-    
     public List<MapInfo> GetDownloadedMaps(GroupInfo group)
     {
         string trackFolder = Application.persistentDataPath + "/maps/" + group.author + "-" + group.name;
@@ -154,26 +243,45 @@ public class DatabaseScript : MonoBehaviour
 
         return mapInfos;
     }
-
     public List<MapInfo> GetCustomMaps(GroupInfoExtended group)
     {
         List<MapInfo> ls = new List<MapInfo>();
         ls.Add(new MapInfo(group)
         {
             nick = "[LOCAL STORAGE]",
-            filepath = group.filepath
+            filepath = group.filepath,
+            difficultyName = "Standard",
+            difficultyStars = 4,
+            difficulties = new List<DifficultyInfo>()
+            {
+                new DifficultyInfo()
+                {
+                    name = "Standard",
+                    stars = 4
+                }
+            }
         });
         return ls;
     }
 
 
+    public static bool DoesMapExist(string trackname, string nick)
+    {
+        string url = string.Format(url_doesMapExist, trackname, nick);
+        WebClient c = new WebClient();
+        string response = c.DownloadString(url);
+        return bool.Parse(response);
+    }
+    
+
+    #endregion
 
     public MapInfo GetMapInfo(string trackname, string nick)
     {
         try
         {
             WebClient c = new WebClient();
-            string response = c.DownloadString(string.Format(db_mapUrl, trackname, nick));
+            string response = c.DownloadString(string.Format(url_getMap, trackname, nick));
 
             return (MapInfo)JsonConvert.DeserializeObject(response, typeof(MapInfo));
         }
@@ -183,11 +291,9 @@ public class DatabaseScript : MonoBehaviour
             return new MapInfo();
         }
     }
+    
 
-
-
-
-    public bool HasUpdateForMap(string trackname, string nick)
+    public static bool HasUpdateForMap(string trackname, string nick)
     {
         trackname = trackname.Replace("&", "%amp%");
         nick = nick.Replace("&", "%amp%");
@@ -195,10 +301,8 @@ public class DatabaseScript : MonoBehaviour
         string path = Application.persistentDataPath + "/maps/" + trackname + "/" + nick + "/" + trackname + ".bsu";
         long utcTicks = new FileInfo(path).LastWriteTimeUtc.Ticks;
 
-        string url = "http://176.107.160.146/Database/HasUpdateForMap?trackname=" + trackname + "&nick=" + nick + "&utcTicks=" + utcTicks;
+        string url = string.Format(url_hasMapUpdate, trackname, nick, utcTicks);
         string response = new WebClient().DownloadString(url);
-
-        Debug.Log("Has Updates " + trackname + " with nick " + nick + "? " + response + "\n" + url);
 
         return bool.Parse(response);
     }
@@ -212,6 +316,20 @@ public class DatabaseScript : MonoBehaviour
         long utcTicks = new FileInfo(path).LastWriteTimeUtc.Ticks;
 
         return info.publishTime.Ticks > utcTicks;
+    }
+
+
+    public enum StatisticsKeyType
+    {
+        Download, Play, Like, Dislike
+    }
+    public static void SendStatistics(string trackname, string nick, int difficultyId, StatisticsKeyType key)
+    {
+        string keyStr = key.ToString().ToLower();
+        string url = string.Format(url_setDifficultyStatistics, trackname, nick, difficultyId, keyStr);
+        
+        WebClient c = new WebClient();
+        c.DownloadStringAsync(new Uri(url));
     }
 }
 
@@ -311,86 +429,9 @@ public class TrackInfoPacket
 
 
 
-// Выбрал такое название потому что он великий и он первый в выдаче по поиску "The"
+// Выбрал такое название потому что он великий ( этого в нем немного :D ) и он первый в выдаче по поиску "The"
 public static class TheGreat
 {
-    public static void SendStatistics(string trackname, string nick, string key)
-    {
-        WebClient client = new WebClient();
-
-        string url = "http://176.107.160.146/Database/SetStatistics?trackname=" + UrlEncode(trackname) + "&nick=" + UrlEncode(nick) + "&key=" + UrlEncode(key) + "&value=1";
-
-        client.DownloadStringAsync(new Uri(url));
-    }
-
-    public static Texture2D LoadTexure(byte[] bytes)
-    {
-        Texture2D tex = new Texture2D(0, 0);
-        tex.LoadImage(bytes);
-        return tex;
-    }
-    public static Texture2D LoadTexure(string path)
-    {
-        byte[] bytes = File.ReadAllBytes(path);
-        Texture2D tex = new Texture2D(0, 0);
-        tex.LoadImage(bytes);
-        return tex;
-    }
-    public static Sprite LoadSprite(string path)
-    {
-        byte[] bytes = File.ReadAllBytes(path);
-        Texture2D tex = new Texture2D(0, 0);
-        tex.LoadImage(bytes);
-        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-    }
-    public static Sprite LoadSprite(byte[] bytes)
-    {
-        Texture2D tex = new Texture2D(0, 0);
-        tex.LoadImage(bytes);
-        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-    }
-
-    public static string GetCoverPath(string mapPath, string trackname)
-    {
-        string jpgPath = mapPath + "/" + trackname + ".jpg";
-        string pngPath = mapPath + "/" + trackname + ".png";
-        if (File.Exists(jpgPath)) return jpgPath;
-        else if (File.Exists(pngPath)) return pngPath;
-
-        return "";
-    }
-    public static string GetCoverPathFromName(string trackname, string nick)
-    {
-        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
-        if (!Directory.Exists(groupFolder)) return "";
-
-        string mapFolder = groupFolder + "/" + nick;
-        if (nick == "")
-        {
-            mapFolder = Directory.GetDirectories(groupFolder)[0];
-        }
-
-        string jpgPath = mapFolder + "/" + trackname + ".jpg";
-        string pngPath = mapFolder + "/" + trackname + ".png";
-        if (File.Exists(jpgPath)) return jpgPath;
-        else if (File.Exists(pngPath)) return pngPath;
-
-        return "";
-    }
-    public static Texture2D GetCover(string trackname, string nick)
-    {
-        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
-        if (!Directory.Exists(groupFolder)) return null;
-
-        string mapFolder = groupFolder + "/" + nick;
-        if (!Directory.Exists(mapFolder)) return null;
-
-        string path = GetCoverPathFromName(trackname, nick);
-        if (path == "") return null;
-
-        return LoadTexure(path);
-    }
-
     public static string UrlEncode(string url)
     {
         return url.Replace("&", "%amp%");
@@ -399,74 +440,4 @@ public static class TheGreat
     {
         return url.Replace("%amp%", "$");
     }
-
-    /*
-    public static TrackRecordGroup GetRecords()
-    {
-        XmlSerializer xml = new XmlSerializer(typeof(TrackRecordGroup));
-        var stream = File.OpenRead(Application.persistentDataPath + "/rsave.bsf");
-        var group = xml.Deserialize(stream);
-        stream.Close();
-        return (TrackRecordGroup)group;
-    }
-
-    public static void SaveRecords(TrackRecordGroup group)
-    {
-        XmlSerializer xml = new XmlSerializer(typeof(TrackRecordGroup));
-        var stream = File.Create(Application.persistentDataPath + "/rsave.bsf");
-        xml.Serialize(stream, group);
-        stream.Close();
-    }
-
-    public static void UpdateRecord(TrackRecordGroup group, string author, string name, string nick, string score, string multiplier)
-    {
-        TrackRecord existsRecord = group.ls.Find(c => c.author == author && c.name == name && c.nick == nick);
-        if (existsRecord != null)
-        {
-            if(int.Parse(score) > int.Parse(existsRecord.score))
-            {
-                existsRecord.score = SSytem.instance.Encrypt(score);
-            }
-        }
-        else
-        {
-            TrackRecord record = new TrackRecord()
-            {
-                author = author,
-                name = name,
-                nick = nick,
-                score = SSytem.instance.Encrypt(score),
-                multiplier = SSytem.instance.Encrypt(multiplier)
-            };
-            group.ls.Add(record);
-        }
-
-        SaveRecords(group);
-    }*/
-    /*
-    public static TrackRecord GetRecord(TrackRecordGroup group, string author, string name, string nick)
-    {
-        TrackRecord record = group.ls.Find(c => c.author == author && c.name == name && c.nick == nick);
-        if (record == null) return null;
-        else
-        {
-            record.score = SSytem.instance.Decrypt(record.score);
-            return record;
-        }
-    }
-
-    public static void SyncRecords(DatabaseScript db)
-    {
-        if (!Social.localUser.authenticated) return;
-
-        TrackRecordGroup group = GetRecords();
-        float sum = 0;
-        IEnumerable<TrackRecord> records = group.ls.Where(c => c.nick != "[LOCAL STORAGE]");
-        foreach (var record in records)
-        {
-            sum += float.Parse(SSytem.instance.Decrypt(record.score));
-        }
-
-        Social.ReportScore(Mathf.RoundToInt(sum), GPGamesManager.leaderboard, (bool result) => { Debug.Log("ChangedBoard result: " + result); });
-    }*/
 }

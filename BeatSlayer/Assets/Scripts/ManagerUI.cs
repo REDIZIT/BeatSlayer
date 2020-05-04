@@ -67,17 +67,17 @@ public class ManagerUI : Singleton<ManagerUI>
 
         }
 
-        Tween.AnchoredPosition(titleTxt.GetComponent<RectTransform>(),
-           new Vector2(0, mainUI.sizeDelta.y)
-           , Vector2.zero, 0.25f, 0, Tween.EaseLinear,
-           completeCallback: () =>
-           {
-               int num = 1;
-               foreach (Transform tf in titleBtns)
-               {
-                   Tween.LocalScale(tf, Vector3.one, 0.4f, num++ / 8.0f, Tween.EaseInOut);
-               }
-           });
+        //Tween.AnchoredPosition(titleTxt.GetComponent<RectTransform>(),
+        //   new Vector2(0, mainUI.sizeDelta.y)
+        //   , Vector2.zero, 0.25f, 0, Tween.EaseLinear,
+        //   completeCallback: () =>
+        //   {
+        //       int num = 1;
+        //       foreach (Transform tf in titleBtns)
+        //       {
+        //           Tween.LocalScale(tf, Vector3.one, 0.4f, num++ / 8.0f, Tween.EaseInOut);
+        //       }
+        //   });
 
     }
 

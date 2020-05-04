@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="aef6e214-78ca-4cf8-8ac5-6a6f45073d73" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/ModerationUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/SearchUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MeleeWeaponTrail/Scripts/MeleeWeaponTrail.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/DownloadHelper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Prefs.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameUIManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Scripts/Controls/ComboBox/AutoCompleteComboBox.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/CheatEngine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ManagerUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/DatabaseManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/MusicFilesManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MapListItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Localization/Downloader.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Misc/LoadingCircle.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/GooglePlayGames/Editor/GPGSUpgrader.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/ProjectManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Examples/MenuExample/Scripts/Menus/GameMenu.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Analyzer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/SettingsManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/TrackListUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/UrlsChecker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Project.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/MusicFilesUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/SceneControllerUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/TrackListItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/PageController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUI.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/MusicFilesManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Prefs.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Misc/LoadingCircle.cs" />
+        <option value="$PROJECT_DIR$/Assets/DownloadHelper.cs" />
+        <option value="$PROJECT_DIR$/../../Localization/Game/Menu.csv" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/MapListItem.cs" />
+        <option value="$PROJECT_DIR$/Assets/MeleeWeaponTrail/Scripts/MeleeWeaponTrail.cs" />
+        <option value="$USER_HOME$/AppData/LocalLow/REDIZIT/Beat Slayer/data/moderation/request.json" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/ProjectManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/MusicFilesUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Analyzer.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/TrackListUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/SearchUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/DatabaseManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Resources/Translating/BeatmapUI.csv" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/.datagrid/cell" />
+        <option value="$PROJECT_DIR$/Assets/Resources/Translating/SceneController.csv" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/SceneControllerUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" />
+        <option value="$PROJECT_DIR$/Assets/TrackListItem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/CheatEngine.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/UrlsChecker.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Project.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Resources/Translating/Menu.csv" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1b8F4GvFfshbsnNaQoJBnxKI2RH" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Discover.Launch.Via.Unity" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="database.data.extractors.current.id" value="Comma-separated (CSV)_id" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="database.main" />
+  </component>
+  <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+    <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="aef6e214-78ca-4cf8-8ac5-6a6f45073d73" name="Default Changelist" comment="" />
+      <created>1588005621685</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1588005621685</updated>
+      <workItem from="1588005639665" duration="5272000" />
+      <workItem from="1588060644757" duration="3933000" />
+      <workItem from="1588077345491" duration="2348000" />
+      <workItem from="1588088403451" duration="2179000" />
+      <workItem from="1588142866616" duration="4433000" />
+      <workItem from="1588168741671" duration="2784000" />
+      <workItem from="1588178527054" duration="3034000" />
+      <workItem from="1588248840608" duration="629000" />
+      <workItem from="1588263866889" duration="2976000" />
+      <workItem from="1588358261027" duration="11909000" />
+      <workItem from="1588407460048" duration="8646000" />
+      <workItem from="1588432933232" duration="21330000" />
+      <workItem from="1588500018115" duration="19158000" />
+      <workItem from="1588587882835" duration="3950000" />
+      <workItem from="1588592038397" duration="318000" />
+      <workItem from="1588594356197" duration="2384000" />
+      <workItem from="1588597748988" duration="5510000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="92" y="92" width="1736" height="856" key="DiffContextDialog" timestamp="1588439332761">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588439332761" />
+    <state x="552" y="251" key="Rider.ProjectTemplateDialog.Size" timestamp="1588597918816">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="251" key="Rider.ProjectTemplateDialog.Size/0.0.1920.1040@0.0.1920.1040" timestamp="1588597918816" />
+    <state x="779" y="193" key="RiderGenerateDialog" timestamp="1588501495891">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="779" y="193" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588501495891" />
+    <state x="411" y="130" key="SettingsEditor" timestamp="1588600067952">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="411" y="130" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1588600067952" />
+    <state x="429" y="175" width="1053" height="691" key="editAsTableFormatDialogDimension" timestamp="1588600099246">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="429" y="175" width="1053" height="691" key="editAsTableFormatDialogDimension/0.0.1920.1040@0.0.1920.1040" timestamp="1588600099246" />
+    <state x="616" y="240" key="run.anything.popup" timestamp="1588489478444">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588489478444" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1588602619475">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588602619475" />
+  </component>
+</project>

@@ -1,253 +1,254 @@
-Key,English,Russian,French
+Key|English|Russian|French
 
-// Общие
+// Common
 //
-Subtitle,New Horizons,Новые горизонты,Nouveaux horizons
-NewVer,The new version is now available in the Play Market[comma] you need to update to the new version.[N][N]<size=16>Your version is <color=#F00>{0}</color>[comma] new is <color=#0DF>{1}</color></size>,Доступна новая версия игры теперь доступна в Play Market[comma] необходимо обновиться до новой версии.[N][N]<size=16>Твоя версия <color=#F00>{0}</color>[comma] а новая <color=#0DF>{1}</color></size>,La nouvelle version est maintenant disponible sur le Play Market[comma] vous devez mettre à jour vers la nouvelle version.[N][N]<size=16>Votre version est <color=#F00>{0}</color>[comma] nouveau est <color=#0DF>{1}</color></size>
-Loading,Loading,Загрузка,Chargement
-Loaded,Loaded,Загружено,Chargé
-Okay,Okay,Понял,j'ai compris
-Source,Source,Исходник,La source
-Search,Search,Поиск,Chercher
-Later,Later,Позже,Plus tard
-Reset,Reset,Сброс,Réinitialiser
-Score,Score,Очки,But
-Missed,Missed,Промах,Manqué
-Accuracy,Accuracy,Точность,Précision
-Difficulties,Difficulties,Сложности,Des difficultés
-PlayCount,Play count,Кол-во игр,Nombre de parties
-Back,Back,Назад,Retour
-Yes,Yes,Да,Oui
-No,No,Нет,Non
+Subtitle|I don't know why|Я не знаю почему|Je ne sais pas
+NewVer|The new version is now available in the Play Market, you need to update to the new version.[N][N]<size=16>Your version is <color=#F00>{0}</color>, new is <color=#0DF>{1}</color></size>|Доступна новая версия игры теперь доступна в Play Market, необходимо обновиться до новой версии.[N][N]<size=16>Твоя версия <color=#F00>{0}</color>, а новая <color=#0DF>{1}</color></size>|La nouvelle version est maintenant disponible sur le Play Market, vous devez mettre à jour vers la nouvelle version.[N][N]<size=16>Votre version est <color=#F00>{0}</color>, nouveau est <color=#0DF>{1}</color></size>
+Loading|Loading|Загрузка|Chargement
+Loaded|Loaded|Загружено|Chargé
+Okay|Okay|Понял|j'ai compris
+Source|Source|Исходник|La source
+Search|Search|Поиск|Chercher
+Later|Later|Позже|Plus tard
+Reset|Reset|Сброс|Réinitialiser
+Score|Score|Очки|But
+Missed|Missed|Промах|Manqué
+Accuracy|Accuracy|Точность|Précision
+Difficulties|Difficulties|Сложности|Des difficultés
+PlayCount|Play count|Кол-во игр|Nombre de parties
+Back|Back|Назад|Retour
+Yes|Yes|Да|Oui
+No|No|Нет|Non
 
 
 // Hints
-Hint_FingerPause,Finger pause,Пауза пальцем,Pause doigt
-Hint_FingerPauseText,Pause game if 3rd finger detected on screen[N](Left thumb[comma] right thumb and index finger),Ставить на паузу если на экране будет 3 пальца[N](Правый и левый большой палец и указательный),Mettre le jeu en pause si le 3ème doigt est détecté à l'écran[N](Pouce gauche[comma] pouce droit et index)
+Hint_FingerPause|Finger pause|Пауза пальцем|Pause doigt
+Hint_FingerPauseText|Pause game if 3rd finger detected on screen[N](Left thumb, right thumb and index finger)|Ставить на паузу если на экране будет 3 пальца[N](Правый и левый большой палец и указательный)|Mettre le jeu en pause si le 3ème doigt est détecté à l'écran[N](Pouce gauche, pouce droit et index)
 
 
 
 // Main_UI -> MainScreen
 //
-SliceSound,Slice sound volume,Громкость разрубания,Couper le volume sonore
-Glow,Bloom,Свечение,Floraison
-GlowPower,Glow power,Сила свечения,Puissance lumineuse
-Off,Off,Выкл,De
-On,On,Вкл,Sur
-Low,Low,Низкий,Faible
-Middle,Middle,Сред.,Milieu
-High,High,Высокий,Haute
-Short,Short,Короткая,Court
-Long,Long,Длинная,Longue
-Top,Top,Вверху,Haut
-Bottom,Bottom,Внизу,Bas
-BottomRev,Bottom Rev,Внизу реверс,Rev bas
-TimeTextSide,Time text side,Позиция текста,Côté texte de l'heure
-Info,If you find a bug or want to suggest a change then write to me in the mail,Если вы нашли баг или хотите предложить изменение то пишите мне на почту,Si vous trouvez un bug ou souhaitez suggérer un changement, écrivez-moi par mail
-ContactInfo,Contact Info,Контактная инфа,Informations de contact
-PrivacyPolicy,Open Privacy Policy,Открыть Политику Конфиденциальности,Politique de confidentialité ouverte
-WeHaveEditor,We have editor and you can download here.[N]<color=#333>(click to download)</color>,У нас есть редактор и ты можешь скачать его тут.[N]<color=#333>(нажми чтобы скачать)</color>,Nous avons un éditeur et vous pouvez le télécharger ici. <color=#333>(cliquez pour télécharger)</color>
+SliceSound|Slice sound volume|Громкость разрубания|Couper le volume sonore
+Glow|Bloom|Свечение|Floraison
+GlowPower|Glow power|Сила свечения|Puissance lumineuse
+Off|Off|Выкл|De
+On|On|Вкл|Sur
+Low|Low|Низкий|Faible
+Middle|Middle|Сред.|Milieu
+High|High|Высокий|Haute
+Short|Short|Короткая|Court
+Long|Long|Длинная|Longue
+Top|Top|Вверху|Haut
+Bottom|Bottom|Внизу|Bas
+BottomRev|Bottom Rev|Внизу реверс|Rev bas
+TimeTextSide|Time text side|Позиция текста|Côté texte de l'heure
+Info|If you find a bug or want to suggest a change then write to me in the mail|Если вы нашли баг или хотите предложить изменение то пишите мне на почту|Si vous trouvez un bug ou souhaitez suggérer un changement| écrivez-moi par mail
+ContactInfo|Contact Info|Контактная инфа|Informations de contact
+PrivacyPolicy|Open Privacy Policy|Открыть Политику Конфиденциальности|Politique de confidentialité ouverte
+WeHaveEditor|We have editor and you can download here.[N]<color=#333>(click to download)</color>|У нас есть редактор и ты можешь скачать его тут.[N]<color=#333>(нажми чтобы скачать)</color>|Nous avons un éditeur et vous pouvez le télécharger ici. <color=#333>(cliquez pour télécharger)</color>
 
 
 // Main_UI -> TracksScreen
 //
-SelectList,Select music list,Выберите тип музыки,Sélectionnez la liste de musique
-OwnList,Own,Своя,Musique locale
-AuthorList,Author's,Авторская,Auteurs
-SortBy,Sort by,Сортировка по,Trier par
-popularity,Popularity,Популярности,Popularité
-likes,Likes,Лайкам,Aime
-plays,Plays count,Количеству игр,Le nombre de jeux
-date,Date,Дате,Date
-NewTracksPos,New tracks position,Позиция новых треков,Nouvelle position des pistes
-OnTop,Top,Вверху,Haut
-OnBottom,Bottom,Внизу,Bas
-DontMove,Don't move,Не двигать,Ne bouge pas
+SelectList|Select music list|Выберите тип музыки|Sélectionnez la liste de musique
+OwnList|Own|Своя|Musique locale
+AuthorList|Author's|Авторская|Auteurs
+SortBy|Sort by|Сортировка по|Trier par
+popularity|Popularity|Популярности|Popularité
+likes|Likes|Лайкам|Aime
+plays|Plays count|Количеству игр|Le nombre de jeux
+date|Date|Дате|Date
+NewTracksPos|New tracks position|Позиция новых треков|Nouvelle position des pistes
+OnTop|Top|Вверху|Haut
+OnBottom|Bottom|Внизу|Bas
+DontMove|Don't move|Не двигать|Ne bouge pas
 
-AllMusic,All music,Вся музыка,Toutes les musiques
-DownloadedMusic,Downloaded,Скачанная,Téléchargé
+AllMusic|All music|Вся музыка|Toutes les musiques
+DownloadedMusic|Downloaded|Скачанная|Téléchargé
+Approved|Approved|Одобренная|Approuvé
 
-NewTracks,New tracks,Новые треки,De nouvelles pistes
-AllTracks,All tracks,Все треки,Toutes les pistes
-All,All,Всё,Tout
-PlayersMaps,Players maps,Карты игроков,Cartes des joueurs
-DevMaps,Developer maps,Карты разраба,Cartes des développeurs
-Display,Display,Показать,Afficher
-Filters,Filters,Фильтры,Filtres
-MapsCount,Maps count,Количество карт,Nombre de cartes
-SelectLocation,Select Location,Выбрать локацию,Sélectionnez l'emplacement
-Search..,Search..,Поиск..,Chercher..
-MapsByPlayers,Maps by players,Карты от игроков,Cartes par joueurs
+NewTracks|New tracks|Новые треки|De nouvelles pistes
+AllTracks|All tracks|Все треки|Toutes les pistes
+All|All|Всё|Tout
+PlayersMaps|Players maps|Карты игроков|Cartes des joueurs
+DevMaps|Developer maps|Карты разраба|Cartes des développeurs
+Display|Display|Показать|Afficher
+Filters|Filters|Фильтры|Filtres
+MapsCount|Maps count|Количество карт|Nombre de cartes
+SelectLocation|Select Location|Выбрать локацию|Sélectionnez l'emplacement
+Search..|Search..|Поиск..|Chercher..
+MapsByPlayers|Maps by players|Карты от игроков|Cartes par joueurs
 
 
 // Main_UI -> ConfigScreen
 //
-ChangeMap,Change map,Смена карты,Changer de carte
-Delete,Delete,Удалить,Effacer
-Download,Download,Скачать,Télécharger
-Difficult,Difficult,Сложность,Difficile
-MusicSpeed,Music speed,Скорость музыки,Vitesse de la musique
-CubesSpeed,Cubes speed,Скорость кубов,Vitesse des cubes
-NoArrows,No arrows,Без стрелок,Pas de flèches
-NoLines,No lines,Без линий,Pas de lignes
-Your record is,Your record is,Ваш рекорд,Votre dossier est
-Record,Record,Рекорд,Record
-NotSetYet,not set yet,ещё не установлен,pas encore installé
-Cancel,Cancel,Отменить,Annuler
-Play,Play,Играть,Jouer
-WaitingForDownload,Waiting for download..,Ожидание загрузки..,En attente de téléchargement ..
-Vibration,Vibration,Вибрация,Vibration
-MapCreator,Map creator,Создатель карты,Créateur de carte
+ChangeMap|Change map|Смена карты|Changer de carte
+Delete|Delete|Удалить|Effacer
+Download|Download|Скачать|Télécharger
+Difficult|Difficult|Сложность|Difficile
+MusicSpeed|Music speed|Скорость музыки|Vitesse de la musique
+CubesSpeed|Cubes speed|Скорость кубов|Vitesse des cubes
+NoArrows|No arrows|Без стрелок|Pas de flèches
+NoLines|No lines|Без линий|Pas de lignes
+Your record is|Your record is|Ваш рекорд|Votre dossier est
+Record|Record|Рекорд|Record
+NotSetYet|not set yet|ещё не установлен|pas encore installé
+Cancel|Cancel|Отменить|Annuler
+Play|Play|Играть|Jouer
+WaitingForDownload|Waiting for download..|Ожидание загрузки..|En attente de téléchargement ..
+Vibration|Vibration|Вибрация|Vibration
+MapCreator|Map creator|Создатель карты|Créateur de carte
 
 // SelectMap
 //
-Maps,Maps,Карты,Les cartes
-UnlockFor,Unlock for,Разблокировать за,Déverrouiller pour
-SelectMap,Select map,Выбрать карту,Choisissez une carte
-Coins,coins,монет,pièces de monnaie
-Unlocked,Unlocked,Разблокировано,Déverrouillé
+Maps|Maps|Карты|Les cartes
+UnlockFor|Unlock for|Разблокировать за|Déverrouiller pour
+SelectMap|Select map|Выбрать карту|Choisissez une carte
+Coins|coins|монет|pièces de monnaie
+Unlocked|Unlocked|Разблокировано|Déverrouillé
 
 
 // Tutorial
 //
-Tutorial,Tutorial,Туториал,Didacticiel
-Intro,<size=56><color=#FF5E00FF><b>Hi guy!</b></color></size>[N][N]I think it's your first time playing this game.[N]I'll tell you how to play[N][N]If you are ready click this button,<size=56><color=#FF5E00FF><b>Привет!</b></color></size>[N][N]Думаю ты впервые играешь в эту игру.[N]Я расскажу как играть[N][N]Если ты готов[comma] нажми кнопку,<size=56><color=#FF5E00FF><b>Salut le gars!</b></color></size>[N][N]Je pense que c'est votre première fois à jouer à ce jeu.[N]I ' Je vais vous dire comment jouer[N][N]Si vous êtes prêt cliquez sur ce bouton
-IntroBtn,Start,Начать,Début
-Next,Next,Далее,Prochain
-Page1,In the game you need to cut the bits (cubes) that will appear in time with the music.[N]This is <b><color=#FF5E00FF>cube with point</color></b>. Slice it by <b><color=#FF5E00FF>swiping it in any direction</color></b>,В игре вам нужно разрезать биты (кубики)[comma] которые будут появляться в такт музыке.[N]Это <b><color=#FF5E00FF>куб с точкой</color></b>. Разруби его [comma] <b><color=#FF5E00FF>проводя по нему пальцем в любом направлении</color></b>,Dans le jeu, vous devez couper les morceaux (cubes) qui apparaîtront au rythme de la musique.[N]Il s'agit du<b><color=#FF5E00FF>cube avec point</color></b>. Tranchez-le en<b><color=#FF5E00FF>en le faisant glisser dans n'importe quelle direction</color></b>
-Page2,This is <b><color=#FF5E00FF>cube with arrow</color></b>[N][N]In order to cut it you need to swipe it in the same direction as the arrow shows.[N]<b><color=#FF5E00FF>(In this case[comma] up)</color></b>,Это <b><color=#FF5E00FF>куб со стрелкой</color></b>[N][N]Для того чтобы разрубить его тебе нужно свайпнуть в том же направлении куда показывает стрелка.[N]<b><color=#FF5E00FF>(В этом случае[comma] вверх)</color></b>,Il s'agit du<b><color=#FF5E00FF>cube avec flèche</color></b>[N][N]Pour le couper vous devez le faire glisser dans le même sens que le montre la flèche.[N]<b><color=#FF5E00FF>(Dans ce cas [comma] vers le haut)</color></b>
-Page3,<b><color=#FF5E00FF>In this case[comma] down</color></b>.You will also see cubes with left and right directions,<b><color=#FF5E00FF>В этом случае[comma] вниз</color></b>.Ты также увидишь кубы со стрелками влево и вправо,<b><color=#FF5E00FF>Dans ce cas[comma] vers le bas</color></b>. Vous verrez également des cubes avec des directions gauche et droite
-Page4,<b><color=#FF5E00FF>This is Line</color></b> (blue color).[N]To slice[comma] you must <b><color=#FF5E00FF>hold</color></b> your finger on the line throughout the entire time[comma] from the beginning of the line to the end,<b><color=#FF5E00FF>Это линия</color></b> (синий цвет).[N]Для разрубания тебе нужно <b><color=#FF5E00FF>удерживать</color></b> палец на линии все время[comma] от начала и до конца линии,<b><color=#FF5E00FF>Ceci est la ligne</color></b>(couleur bleue).[N]Pour couper[comma] vous devez<b><color=#FF5E00FF>maintenir</color></b>votre doigt sur la ligne pendant tout le temps[comma] du début à la fin
-Page5,If you see this plasma sphere[comma] then you are doing everything right[comma] it remains only to <b><color=#FF5E00FF>hold</color></b> your finger to the end of the line,Если ты видишь плазменный шар[comma] тогда ты делаешь всё правльно[comma] осталось только <b><color=#FF5E00FF>удерживать</color></b> палец до конца,Si vous voyez cette sphère de plasma [comma] alors vous faites tout correctement [comma] il ne reste plus qu'à<b><color=#FF5E00FF>maintenir</couleur></b>votre doigt à la fin de la ligne
-PageSabers,You also will see <color=#F30><b>orange</b></color> and <color=#0CF><b>blue</b></color> cubes. And you will have <color=#F30><b>orange</b></color> and <color=#0CF><b>blue</b></color> saber for each finger. So[comma] to dematerialize orange cube you need orange saber[comma] for blue cube blue saber.[N][N]For <b>right finger</b> used <color=#F30><b>orange</b></color> saber.[N]For <b>left finger</b> <color=#0CF><b>blue</b></color> saber.,Ты также увидишь <color=#F30><b>оранжевые</b></color> и <color=#0CF><b>синие</b></color> кубы. Также у тебя будет <color=#F30><b>оранжевый</b></color> и <color=#0CF><b>синий</b></color> меч для каждого пальца. Итак[comma] для дематериализации оранжевого куба тебе понадобится оранжевый меч[comma] а для голубого - голубой меч.[N][N]Для <b>правого пальца</b> используется <color=#F30><b>оранжевый</b></color> меч.[N]Для <b>левого пальца</b><color=#0CF> <b>синий</b></color> меч.,Vous verrez également des cubes<color=#F30><b>orange</b></color>et<color=#0CF><b>blue</b></color>. Et vous aurez un sabre<color=#F30><b>orange</b></color>et<color=#0CF><b>bleu</b></color>pour chaque doigt. Donc[comma] pour dématérialiser le cube orange vous avez besoin d'un sabre orange[comma] pour un sabre bleu cube bleu.[N][N]Pour<b>le doigt droit</b>utilisez<color=#F30><b>orange</b></color>sabre.[N]Pour<b>doigt gauche</b><color=#0CF><b>blue</b></color>sabre.
-Page6,Now the hardest part.[N]You need to choose music. You can choose the music that we have <b><color=#FF5E00FF>prepared</color></b> for you in advance or choose your <b><color=#FF5E00FF>own</color></b>.[N][N]After selecting track you can <b><color=#0091FFFF>change map</color></b> and <b><color=#0091FFFF>difficulty</color></b>,А теперь самая сложна часть.[N]Тебе нужно выбрать музыку. Ты можешь выбрать ту[comma] которую мы для тебя <b><color=#FF5E00FF>подготовили</color></b> или выбрать <b><color=#FF5E00FF>свою</color></b>.[N][N]После выбора трека ты сможешь <b><color=#0091FFFF>поменять карту</color></b> и <b><color=#0091FFFF>сложность</color></b>,Maintenant la partie la plus difficile.[N]Vous devez choisir la musique. Vous pouvez choisir la musique que nous avons<b><color=#FF5E00FF>préparée</color></b>pour vous à l'avance ou choisir votre<b><color=#FF5E00FF>propre</color></b>.[N][N]Après avoir sélectionné la piste vous pouvez<b><color=#0091FFFF>changer de carte</color></b>et<b><color=#0091FFFF>difficulté</color></b>
-Outro,So[comma] <b><color=#FF5E00FF>that's all</color></b>[N][N]Enjoy playing ;),<b><color=#FF5E00FF>Это всё</color></b>[N][N]Наслаждайся игрой ;),Alors[comma] <b><color=#FF5E00FF>c'est tout</color></b>[N][N]Profitez de jouer;)
-Sure,Sure,Конечно,Sûr
+Tutorial|Tutorial|Туториал|Didacticiel
+Intro|<size=56><color=#FF5E00FF><b>Hi guy!</b></color></size>[N][N]I think it's your first time playing this game.[N]I'll tell you how to play[N][N]If you are ready click this button|<size=56><color=#FF5E00FF><b>Привет!</b></color></size>[N][N]Думаю ты впервые играешь в эту игру.[N]Я расскажу как играть[N][N]Если ты готов, нажми кнопку|<size=56><color=#FF5E00FF><b>Salut le gars!</b></color></size>[N][N]Je pense que c'est votre première fois à jouer à ce jeu.[N]I ' Je vais vous dire comment jouer[N][N]Si vous êtes prêt cliquez sur ce bouton
+IntroBtn|Start|Начать|Début
+Next|Next|Далее|Prochain
+Page1|In the game you need to cut the bits (cubes) that will appear in time with the music.[N]This is <b><color=#FF5E00FF>cube with point</color></b>. Slice it by <b><color=#FF5E00FF>swiping it in any direction</color></b>|В игре вам нужно разрезать биты (кубики), которые будут появляться в такт музыке.[N]Это <b><color=#FF5E00FF>куб с точкой</color></b>. Разруби его , <b><color=#FF5E00FF>проводя по нему пальцем в любом направлении</color></b>|Dans le jeu| vous devez couper les morceaux (cubes) qui apparaîtront au rythme de la musique.[N]Il s'agit du<b><color=#FF5E00FF>cube avec point</color></b>. Tranchez-le en<b><color=#FF5E00FF>en le faisant glisser dans n'importe quelle direction</color></b>
+Page2|This is <b><color=#FF5E00FF>cube with arrow</color></b>[N][N]In order to cut it you need to swipe it in the same direction as the arrow shows.[N]<b><color=#FF5E00FF>(In this case, up)</color></b>|Это <b><color=#FF5E00FF>куб со стрелкой</color></b>[N][N]Для того чтобы разрубить его тебе нужно свайпнуть в том же направлении куда показывает стрелка.[N]<b><color=#FF5E00FF>(В этом случае, вверх)</color></b>|Il s'agit du<b><color=#FF5E00FF>cube avec flèche</color></b>[N][N]Pour le couper vous devez le faire glisser dans le même sens que le montre la flèche.[N]<b><color=#FF5E00FF>(Dans ce cas , vers le haut)</color></b>
+Page3|<b><color=#FF5E00FF>In this case, down</color></b>.You will also see cubes with left and right directions|<b><color=#FF5E00FF>В этом случае, вниз</color></b>.Ты также увидишь кубы со стрелками влево и вправо|<b><color=#FF5E00FF>Dans ce cas, vers le bas</color></b>. Vous verrez également des cubes avec des directions gauche et droite
+Page4|<b><color=#FF5E00FF>This is Line</color></b> (blue color).[N]To slice, you must <b><color=#FF5E00FF>hold</color></b> your finger on the line throughout the entire time, from the beginning of the line to the end|<b><color=#FF5E00FF>Это линия</color></b> (синий цвет).[N]Для разрубания тебе нужно <b><color=#FF5E00FF>удерживать</color></b> палец на линии все время, от начала и до конца линии|<b><color=#FF5E00FF>Ceci est la ligne</color></b>(couleur bleue).[N]Pour couper, vous devez<b><color=#FF5E00FF>maintenir</color></b>votre doigt sur la ligne pendant tout le temps, du début à la fin
+Page5|If you see this plasma sphere, then you are doing everything right, it remains only to <b><color=#FF5E00FF>hold</color></b> your finger to the end of the line|Если ты видишь плазменный шар, тогда ты делаешь всё правльно, осталось только <b><color=#FF5E00FF>удерживать</color></b> палец до конца|Si vous voyez cette sphère de plasma , alors vous faites tout correctement , il ne reste plus qu'à<b><color=#FF5E00FF>maintenir</couleur></b>votre doigt à la fin de la ligne
+PageSabers|You also will see <color=#F30><b>orange</b></color> and <color=#0CF><b>blue</b></color> cubes. And you will have <color=#F30><b>orange</b></color> and <color=#0CF><b>blue</b></color> saber for each finger. So, to dematerialize orange cube you need orange saber, for blue cube blue saber.[N][N]For <b>right finger</b> used <color=#F30><b>orange</b></color> saber.[N]For <b>left finger</b> <color=#0CF><b>blue</b></color> saber.|Ты также увидишь <color=#F30><b>оранжевые</b></color> и <color=#0CF><b>синие</b></color> кубы. Также у тебя будет <color=#F30><b>оранжевый</b></color> и <color=#0CF><b>синий</b></color> меч для каждого пальца. Итак, для дематериализации оранжевого куба тебе понадобится оранжевый меч, а для голубого - голубой меч.[N][N]Для <b>правого пальца</b> используется <color=#F30><b>оранжевый</b></color> меч.[N]Для <b>левого пальца</b><color=#0CF> <b>синий</b></color> меч.|Vous verrez également des cubes<color=#F30><b>orange</b></color>et<color=#0CF><b>blue</b></color>. Et vous aurez un sabre<color=#F30><b>orange</b></color>et<color=#0CF><b>bleu</b></color>pour chaque doigt. Donc, pour dématérialiser le cube orange vous avez besoin d'un sabre orange, pour un sabre bleu cube bleu.[N][N]Pour<b>le doigt droit</b>utilisez<color=#F30><b>orange</b></color>sabre.[N]Pour<b>doigt gauche</b><color=#0CF><b>blue</b></color>sabre.
+Page6|Now the hardest part.[N]You need to choose music. You can choose the music that we have <b><color=#FF5E00FF>prepared</color></b> for you in advance or choose your <b><color=#FF5E00FF>own</color></b>.[N][N]After selecting track you can <b><color=#0091FFFF>change map</color></b> and <b><color=#0091FFFF>difficulty</color></b>|А теперь самая сложна часть.[N]Тебе нужно выбрать музыку. Ты можешь выбрать ту, которую мы для тебя <b><color=#FF5E00FF>подготовили</color></b> или выбрать <b><color=#FF5E00FF>свою</color></b>.[N][N]После выбора трека ты сможешь <b><color=#0091FFFF>поменять карту</color></b> и <b><color=#0091FFFF>сложность</color></b>|Maintenant la partie la plus difficile.[N]Vous devez choisir la musique. Vous pouvez choisir la musique que nous avons<b><color=#FF5E00FF>préparée</color></b>pour vous à l'avance ou choisir votre<b><color=#FF5E00FF>propre</color></b>.[N][N]Après avoir sélectionné la piste vous pouvez<b><color=#0091FFFF>changer de carte</color></b>et<b><color=#0091FFFF>difficulté</color></b>
+Outro|So, <b><color=#FF5E00FF>that's all</color></b>[N][N]Enjoy playing ;)|<b><color=#FF5E00FF>Это всё</color></b>[N][N]Наслаждайся игрой ;)|Alors, <b><color=#FF5E00FF>c'est tout</color></b>[N][N]Profitez de jouer;)
+Sure|Sure|Конечно|Sûr
 
 // Tutorial -> Shop
 //
-Shop,Shop,Магазин,Boutique
-ShopTutorial,This is shop[comma] here you can buy skills and boosters.[N]You can select only one skill and one booster.[N]Selected skill and booster highlighted by orange color.,Это магазин[comma] здесь можно купить навыки и бустеры.[N]Вы можете выбрать только один навык и один усилитель.[N]Выбранный навык и бустер выделены оранжевым цветом.,C'est la boutique[comma]ici vous pouvez acheter des compétences et des boosters.[N]Vous ne pouvez sélectionner qu'une seule compétence et un booster.[N]La compétence et le booster sélectionnés sont surlignés en orange.
+Shop|Shop|Магазин|Boutique
+ShopTutorial|This is shop, here you can buy skills and boosters.[N]You can select only one skill and one booster.[N]Selected skill and booster highlighted by orange color.|Это магазин, здесь можно купить навыки и бустеры.[N]Вы можете выбрать только один навык и один усилитель.[N]Выбранный навык и бустер выделены оранжевым цветом.|C'est la boutique,ici vous pouvez acheter des compétences et des boosters.[N]Vous ne pouvez sélectionner qu'une seule compétence et un booster.[N]La compétence et le booster sélectionnés sont surlignés en orange.
 
 
 
 // Shop
 //
-Skills,Skills,Навыки,Compétences
-Boosters,Boosters,Ускорители,Boosters
-Sabers,Sabers,Мечи,Sabres
-Effects,Effects,Эффекты,Effets
-YouHave,You have,В наличии,Tu as
-Cost,Cost,Цена,Coût
-Buy,Buy,Купить,Acheter
-Select,Select,Выбрать,Sélectionner
-Selected,Selected,Выбран,Choisi
-Deselect,Deselect,Убрать,Désélectionner
-Time travel,Time travel,Перемотка времени,Voyage dans le temps
-TimeTravelDescription,When you miss a cube[comma] this skill will stop time and return you 2 seconds back.,Когда ты пропускаешь куб[comma] этот навык остановит время и перемотает его на 2 секунды назад.,Lorsque vous manquez un cube[comma] cette compétence arrête le temps et vous renvoie 2 secondes en arrière.
-Explosion,Explosion,Взрыв,Explosion
-ExplosionDescription,When you miss a cube[comma] this skill will destroy all cubes on field,Когда ты пропустишь куб[comma] этот скилл уничтожит все кубы в зоне видимости,Lorsque vous manquez un cube[comma] cette compétence détruira tous les cubes sur le terrain
-Coins booster (x2),Coins booster (x2),Бустер монет (x2),Booster de pièces (x2)
-DoubleCoins,Double increase in earned coins,Увеличивает вдвое количетсво зарабатываемых монет,Double augmentation des pièces gagnées
-Coins decelerator (/2),Coins decelerator (/2),Замедлитель монет (/2),Décélérateur de pièces (/ 2)
-DivideCoins,Double decrease in earned coins. Idk why you need that,Вдвое уменьшает количество зарабатываемых монет. Я хз зачем тебе это нужно,Double diminution des pièces gagnées. Idk pourquoi vous en avez besoin
+Skills|Skills|Навыки|Compétences
+Boosters|Boosters|Ускорители|Boosters
+Sabers|Sabers|Мечи|Sabres
+Effects|Effects|Эффекты|Effets
+YouHave|You have|В наличии|Tu as
+Cost|Cost|Цена|Coût
+Buy|Buy|Купить|Acheter
+Select|Select|Выбрать|Sélectionner
+Selected|Selected|Выбран|Choisi
+Deselect|Deselect|Убрать|Désélectionner
+Time travel|Time travel|Перемотка времени|Voyage dans le temps
+TimeTravelDescription|When you miss a cube, this skill will stop time and return you 2 seconds back.|Когда ты пропускаешь куб, этот навык остановит время и перемотает его на 2 секунды назад.|Lorsque vous manquez un cube, cette compétence arrête le temps et vous renvoie 2 secondes en arrière.
+Explosion|Explosion|Взрыв|Explosion
+ExplosionDescription|When you miss a cube, this skill will destroy all cubes on field|Когда ты пропустишь куб, этот скилл уничтожит все кубы в зоне видимости|Lorsque vous manquez un cube, cette compétence détruira tous les cubes sur le terrain
+Coins booster (x2)|Coins booster (x2)|Бустер монет (x2)|Booster de pièces (x2)
+DoubleCoins|Double increase in earned coins|Увеличивает вдвое количетсво зарабатываемых монет|Double augmentation des pièces gagnées
+Coins decelerator (/2)|Coins decelerator (/2)|Замедлитель монет (/2)|Décélérateur de pièces (/2)
+DivideCoins|Double decrease in earned coins. Idk why you need that|Вдвое уменьшает количество зарабатываемых монет. Я хз зачем тебе это нужно|Double diminution des pièces gagnées. Idk pourquoi vous en avez besoin
 
 // Sabers
 //
-Saber-1,Stick-Digger,Палка-Копалка,Stick-Digger
-Saber-1-Descript,Initially[comma] it was an ordinary stick with which players were digging potatoes[comma] but then the developer forced they to chop flying cubes.,Изначально это была обычная палка[comma] которой игроки копали картошку[comma] но потом разработчик заставил ей рубить летающие кубы.,Au départ[comma] c'était un bâton ordinaire avec lequel les joueurs creusaient des pommes de terre[comma] mais ensuite le développeur les a forcés à couper des cubes volants.
-Saber-2,Used Jedi sword,Меч джедая б/у,Épée Jedi d'occasion
-Saber-2-Descript,Good condition. Almost never used.[N]Reason for sale - did not fit in size.[N]No bargaining.,Состояние хорошое. Почти не использовался.[N]Причина продажи - не подошёл по размеру.[N]Без торга.,Bonne condition. Presque jamais utilisé [N]Raison de la vente-ne correspondait pas à la taille.[N]Pas de négociation.
-Saber-3,Elite Ear Stick,Элитная ковырялка в ушах,Stick d'oreille Elite
-Saber-3-Descript,It is very convenient to use.[N]It is long and narrow[comma] which allows it to reach the most inaccessible places.,Очень удобен в использовании.[N]Он длинный и узкий[comma] что позволяет ему добераться до самых труднодоступных мест,Il est très pratique à utiliser.[N]Il est long et étroit[comma] ce qui lui permet d'atteindre les endroits les plus inaccessibles.
-Saber-4,Katana,Катана,Katana
-Saber-4-Descript,The thinnest blade of the strongest metal allows you to cut the sausage into a sandwich with the thinnest pieces,Самое тонкое лезвие из самого крепкого металла позволяет нарезать колбасу на бутерброт самыми тонкими кусочками,La lame la plus fine du métal le plus solide vous permet de couper la saucisse en sandwich avec les morceaux les plus fins
-Saber-5,Middleage sword,Средневековый меч,Épée intermédiaire
-Saber-5-Descript,This medieval sword was stolen from the museum by a pizza delivery man,Этот средневековый меч был украден из музея доставщиком пиццы,Cette épée médiévale a été volée au musée par un livreur de pizza
-Saber-6,Sword for boyars,Меч для бояр,Épée pour boyards
-Saber-6-Descript,This sword has a little bit HUGE cost that's why only boyars can buy it,У этого меча немного ОГРОМНЫЙ ценник[comma] так что только бояры могут купить его,Cette épée a un prix énorme[comma] donc seuls les boyards peuvent l'acheter
-Swoosh-1,The most common,Самый обычный,le plus ordinaire
-Swoosh-1-Descript,The most common effect. Worth the whole nothing,Самый обычный эффект. Стоит целое ничего,L'effet le plus courant. Ne vaut rien
-Swoosh-2,Soul,Душа,Âme
-Swoosh-2-Descript,The soul of the sword follows the movement of your finger[comma] making the game delightful.[N]But be so kind as to lay a kidney.,Душа меча следует за движением твоего пальца[comma] делая игру восхитительной.[N]Но будь добр заложить почку.,L'âme de l'épée suit le mouvement de votre doigt[comma] ce qui rend le jeu délicieux.[N]Mais ayez la gentillesse de pondre un rein.
+Saber-1|Stick-Digger|Палка-Копалка|Stick-Digger
+Saber-1-Descript|Initially, it was an ordinary stick with which players were digging potatoes, but then the developer forced they to chop flying cubes.|Изначально это была обычная палка, которой игроки копали картошку, но потом разработчик заставил ей рубить летающие кубы.|Au départ, c'était un bâton ordinaire avec lequel les joueurs creusaient des pommes de terre, mais ensuite le développeur les a forcés à couper des cubes volants.
+Saber-2|Used Jedi sword|Меч джедая б/у|Épée Jedi d'occasion
+Saber-2-Descript|Good condition. Almost never used.[N]Reason for sale - did not fit in size.[N]No bargaining.|Состояние хорошое. Почти не использовался.[N]Причина продажи - не подошёл по размеру.[N]Без торга.|Bonne condition. Presque jamais utilisé [N]Raison de la vente-ne correspondait pas à la taille.[N]Pas de négociation.
+Saber-3|Elite Ear Stick|Элитная ковырялка в ушах|Stick d'oreille Elite
+Saber-3-Descript|It is very convenient to use.[N]It is long and narrow, which allows it to reach the most inaccessible places.|Очень удобен в использовании.[N]Он длинный и узкий, что позволяет ему добераться до самых труднодоступных мест|Il est très pratique à utiliser.[N]Il est long et étroit, ce qui lui permet d'atteindre les endroits les plus inaccessibles.
+Saber-4|Katana|Катана|Katana
+Saber-4-Descript|The thinnest blade of the strongest metal allows you to cut the sausage into a sandwich with the thinnest pieces|Самое тонкое лезвие из самого крепкого металла позволяет нарезать колбасу на бутерброт самыми тонкими кусочками|La lame la plus fine du métal le plus solide vous permet de couper la saucisse en sandwich avec les morceaux les plus fins
+Saber-5|Middleage sword|Средневековый меч|Épée intermédiaire
+Saber-5-Descript|This medieval sword was stolen from the museum by a pizza delivery man|Этот средневековый меч был украден из музея доставщиком пиццы|Cette épée médiévale a été volée au musée par un livreur de pizza
+Saber-6|Sword for boyars|Меч для бояр|Épée pour boyards
+Saber-6-Descript|This sword has a little bit HUGE cost that's why only boyars can buy it|У этого меча немного ОГРОМНЫЙ ценник, так что только бояры могут купить его|Cette épée a un prix énorme, donc seuls les boyards peuvent l'acheter
+Swoosh-1|The most common|Самый обычный|le plus ordinaire
+Swoosh-1-Descript|The most common effect. Worth the whole nothing|Самый обычный эффект. Стоит целое ничего|L'effet le plus courant. Ne vaut rien
+Swoosh-2|Soul|Душа|Âme
+Swoosh-2-Descript|The soul of the sword follows the movement of your finger, making the game delightful.[N]But be so kind as to lay a kidney.|Душа меча следует за движением твоего пальца, делая игру восхитительной.[N]Но будь добр заложить почку.|L'âme de l'épée suit le mouvement de votre doigt, ce qui rend le jeu délicieux.[N]Mais ayez la gentillesse de pondre un rein.
 
 // Color selection
 //
-PayColor,Pay 690.99$ to select your own color[N]<size=24><color=#777>(no refund)</color></size>,Заплатите 690.99 $[comma] чтобы выбрать свой цвет,Payez 690.99$ pour sélectionner votre propre couleur[N]<size=24><color=#777>(pas de remboursement)</color></size>
-ColorHeader,Color selecting,Выбор цвета,Sélection de couleur
-Colors,Saber colors,Цвета мечей,Couleurs de sabre
-Left,Left,Левый,La gauche
-Right,Right,Правый,Droite
+PayColor|Pay 690.99$ to select your own color[N]<size=24><color=#777>(no refund)</color></size>|Заплатите 690.99 $, чтобы выбрать свой цвет|Payez 690.99$ pour sélectionner votre propre couleur[N]<size=24><color=#777>(pas de remboursement)</color></size>
+ColorHeader|Color selecting|Выбор цвета|Sélection de couleur
+Colors|Saber colors|Цвета мечей|Couleurs de sabre
+Left|Left|Левый|La gauche
+Right|Right|Правый|Droite
 
 // Daily Reward
 //
-DailyHeader,Daily reward,Ежедневная награда,Récompense quotidienne
-Claim,Claim,Получить,Prétendre
-Close,Close,Закрыть,Fermer
-Day,Day,День,Journée
+DailyHeader|Daily reward|Ежедневная награда|Récompense quotidienne
+Claim|Claim|Получить|Prétendre
+Close|Close|Закрыть|Fermer
+Day|Day|День|Journée
 
 // RankingLocker
 //
-Ranking,Players Rating,Рейтинг игроков,Évaluation des joueurs
-RankingText,The ranking shows the score of all players.[N]Your score is the sum of all your records.[N]This means that if you set 3 records (2k[comma]5k and 3k)[comma] then[N]your score will be equal 2k+5k+3k = 10k,В рейтинге отображаются очки всех игроков.[N]Ваши очки - это сумма всех рекордов.[N]Это значит то[comma] что если вы установили 3 рекорда (2к[comma]5к и 3к)[comma] то[N]выши очки будут равны 2к+5к+3к = 10к,Le classement montre le score de tous les joueurs.[N]Votre score est la somme de tous vos records.[N]Cela signifie que si vous définissez 3 records (2k[comma] 5k et 3k)[comma] alors[N]votre le score sera égal à 2k+5k+3k = 10k
+Ranking|Players Rating|Рейтинг игроков|Évaluation des joueurs
+RankingText|The ranking shows the score of all players.[N]Your score is the sum of all your records.[N]This means that if you set 3 records (2k,5k and 3k), then[N]your score will be equal 2k+5k+3k = 10k|В рейтинге отображаются очки всех игроков.[N]Ваши очки - это сумма всех рекордов.[N]Это значит то, что если вы установили 3 рекорда (2к,5к и 3к), то[N]выши очки будут равны 2к+5к+3к = 10к|Le classement montre le score de tous les joueurs.[N]Votre score est la somme de tous vos records.[N]Cela signifie que si vous définissez 3 records (2k, 5k et 3k), alors[N]votre le score sera égal à 2k+5k+3k = 10k
 
 // New version
 //
-UpdateAvailable,Update available,Доступно обновление,Mise à jour disponible
-YourVersion,Your game version,Ваша версия игры,Votre version de jeu
-NewVersionAlert,You can find out what's new in the update on the page in the Play store.[N]If you postpone the update[comma] something might stop working normally.,Узнать что нового в обновлении вы сможете на странице в Play маркете.[N]Если вы отложите обновление[comma] то возможно что-то перестанет нормально работать.,Vous pouvez découvrir les nouveautés de la mise à jour sur la page du Play Store.[N]Si vous retardez la mise à jour[comma] quelque chose pourrait ne plus fonctionner normalement.
+UpdateAvailable|Update available|Доступно обновление|Mise à jour disponible
+YourVersion|Your game version|Ваша версия игры|Votre version de jeu
+NewVersionAlert|You can find out what's new in the update on the page in the Play store.[N]If you postpone the update, something might stop working normally.|Узнать что нового в обновлении вы сможете на странице в Play маркете.[N]Если вы отложите обновление, то возможно что-то перестанет нормально работать.|Vous pouvez découvrir les nouveautés de la mise à jour sur la page du Play Store.[N]Si vous retardez la mise à jour, quelque chose pourrait ne plus fonctionner normalement.
 
 // Settings
 //
-Settings,Settings,Настройки,Réglages
-Disabled,Disabled,Выкл,Désactivé
-Enabled,Enabled,Вкл,Activée
-Audio,Audio,Звук,l'audio
-MenuMusic,Menu music,Музыка в меню,Menu musique
-SliceEffect,Slice effect,Эффект разрезания,Effet de tranche
-Graphics,Graphics,Графика,Graphique
-BloomQuality,Bloom quality,Качетсво блума,Qualité de floraison
-BloomPower,Bloom power,Сила блума,BLOOMPOWER
-LoadFromFile,Load from file,Загрузка из файла,Charger depuis un fichier
-Console,Console,Консоль,Console
-ShowFps,Show fps,Показывать фпс,Afficher fps
-DevStuff,Dev stuff,Приблуды разраба,Dev stuff
-MiscStuff,Misc,Разное,Divers
-KickVideo,Kick video,Эффект удара,Vidéo de coup de pied
+Settings|Settings|Настройки|Réglages
+Disabled|Disabled|Выкл|Désactivé
+Enabled|Enabled|Вкл|Activée
+Audio|Audio|Звук|l'audio
+MenuMusic|Menu music|Музыка в меню|Menu musique
+SliceEffect|Slice effect|Эффект разрезания|Effet de tranche
+Graphics|Graphics|Графика|Graphique
+BloomQuality|Bloom quality|Качетсво блума|Qualité de floraison
+BloomPower|Bloom power|Сила блума|BLOOMPOWER
+LoadFromFile|Load from file|Загрузка из файла|Charger depuis un fichier
+Console|Console|Консоль|Console
+ShowFps|Show fps|Показывать фпс|Afficher fps
+DevStuff|Dev stuff|Приблуды разраба|Dev stuff
+MiscStuff|Misc|Разное|Divers
+KickVideo|Kick video|Эффект удара|Vidéo de coup de pied
 
 
 // Account
 //
-SignUpHint,You can play without an account[comma] but the account gives the following buns,Играть можно и без аккаунта[comma] но аккаунт даёт следующие плюшки,Vous pouvez jouer sans compte[comma] mais le compte donne des petits pains
-SignUpBuns,Saving Records[N]Participation in the leaderboard[N]Ability to rate maps[N]Ability to use the editor,Сохранение рекордов[N]Участие в таблице лидеров[N]Возможность оценивать карты[N]Возможность использовать редактор,Enregistrement des enregistrements[N]Participation au classement[N]possibilité de noter les cartes[N]possibilité d'utiliser l'éditeur
-SignUp,Sign up,Зарегистрироваться,Inscrire
-SignUp(short),Sign up,Создать,Inscrire
-LogIn,Log in,Войти,Connecter
-LogOut,Log out,Выйти,Déconnecter
-RankingPlace,Ranking place,Место в рейтинге,Rang
-RankingPlaceUnknown,The ranking hasn't yet been determined,Место в рейтинге ещё не определено,Le classement n'a pas encore été déterminée
-RankingScore,score,очков,pointage
-PlayTime,In game,В игре,Dans le jeu
-dd,d,д,d
-hh,h,ч,h
-mm,m,м,m
-ss,s,сек,s
-Played,Played,Сыграл,Jouer
-map(one),map,карту,cartographie
-map(many),maps,карт,cartographie
-More,More,Подробнее,Plus
-Leaderboard,Leaderboard,Рейтинг игроков,Classement
-Registered,Registered,Зарегался,Inscrit
-in,in,в,Dans
-by,by,от,Par
-PlayedMaps,Played maps,Сыгранные карты,Joué cartes
-played,played,играл,jouer
-times,times,раз,temps
-OpenProfile,Open profile,Открыть профиль,Ouvrir profil
-Nickname,Your nickname,Твой ник,Votre pseudo
-Password,Password,Пароль,Mot de passe
-ConfirmPassword,Confirm password,Пароль ещё раз,Confirmer le mot de passe
-record,record,рекорд,record
+SignUpHint|You can play without an account, but the account gives the following buns|Играть можно и без аккаунта, но аккаунт даёт следующие плюшки|Vous pouvez jouer sans compte, mais le compte donne des petits pains
+SignUpBuns|Saving Records[N]Participation in the leaderboard[N]Ability to rate maps[N]Ability to use the editor|Сохранение рекордов[N]Участие в таблице лидеров[N]Возможность оценивать карты[N]Возможность использовать редактор|Enregistrement des enregistrements[N]Participation au classement[N]possibilité de noter les cartes[N]possibilité d'utiliser l'éditeur
+SignUp|Sign up|Зарегистрироваться|Inscrire
+SignUp(short)|Sign up|Создать|Inscrire
+LogIn|Log in|Войти|Connecter
+LogOut|Log out|Выйти|Déconnecter
+RankingPlace|Ranking place|Место в рейтинге|Rang
+RankingPlaceUnknown|The ranking hasn't yet been determined|Место в рейтинге ещё не определено|Le classement n'a pas encore été déterminée
+RankingScore|score|очков|pointage
+PlayTime|In game|В игре|Dans le jeu
+dd|d|д|d
+hh|h|ч|h
+mm|m|м|m
+ss|s|сек|s
+Played|Played|Сыграл|Jouer
+map(one)|map|карту|cartographie
+map(many)|maps|карт|cartographie
+More|More|Подробнее|Plus
+Leaderboard|Leaderboard|Рейтинг игроков|Classement
+Registered|Registered|Зарегался|Inscrit
+in|in|в|Dans
+by|by|от|Par
+PlayedMaps|Played maps|Сыгранные карты|Joué cartes
+played|played|играл|jouer
+times|times|раз|temps
+OpenProfile|Open profile|Открыть профиль|Ouvrir profil
+Nickname|Your nickname|Твой ник|Votre pseudo
+Password|Password|Пароль|Mot de passe
+ConfirmPassword|Confirm password|Пароль ещё раз|Confirmer le mot de passe
+record|record|рекорд|record
 
 
 
@@ -255,17 +256,17 @@ record,record,рекорд,record
 
 // Общие
 //
-Miss,Miss,Пропустил,Miss
+Miss|Miss|Пропустил|Miss
 
 // Pause
 //
-Pause,Pause,Пауза,Break
-Resume,Resume,Играть,Summary
-Restart,Restart,Рестарт,Redémarrer
-Menu,Menu,Меню,Menu
+Pause|Pause|Пауза|Break
+Resume|Resume|Играть|Summary
+Restart|Restart|Рестарт|Redémarrer
+Menu|Menu|Меню|Menu
 
 
-MapLeaderboard,Map leaderboard,Таблица лидеров карты,Classement de la carte
-Leaderboard(RP),Leaderboard (RP),Рейтинг (RP),Classement (RP)
-ShowAll,Show all,Показать,Montrer
-ShowRP,Show RP,Показать RP,Montrer RP
+MapLeaderboard|Map leaderboard|Таблица лидеров карты|Classement de la carte
+Leaderboard(RP)|Leaderboard (RP)|Рейтинг (RP)|Classement (RP)
+ShowAll|Show all|Показать|Montrer
+ShowRP|Show RP|Показать RP|Montrer RP

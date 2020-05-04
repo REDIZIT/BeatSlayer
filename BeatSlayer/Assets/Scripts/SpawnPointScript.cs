@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SpawnPointScript : MonoBehaviour
 {
-    public float cooldown;
-    public float pitch;
+    public float cooldown, pitch;
+    public int road;
 
     public void Spawn(BeatCubeClass.Type type)
     {
@@ -17,10 +17,10 @@ public class SpawnPointScript : MonoBehaviour
 
         GetComponent<Animator>().Play("Effect");
     }
-    private void Start()
+    public void Setup(int road, float pitch)
     {
-        //pitch = Camera.main.GetComponent<GameScript>().asource.pitch;
-        pitch = 1;
+        this.road = road;
+        this.pitch = pitch;
     }
     public void Update()
     {

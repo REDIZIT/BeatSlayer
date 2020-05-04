@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Assets.SimpleLocalization;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.SceneManagement;
@@ -9,6 +10,8 @@ using UnityEngine.UI;
 
 public class SceneControllerUI : MonoBehaviour
 {
+    public AudioSource asource;
+    
     public Animator window;
     public Text stateText, percentText;
     public Slider progressBar;
@@ -49,27 +52,34 @@ public class SceneControllerUI : MonoBehaviour
                 }
             }
         }
-        
 
 
 
-        while (ao.progress < 0.9f /*&& (Time.realtimeSinceStartup - loadStartTime) < 2*/)
-        { 
-            stateText.text = "Loading..";
-            percentText.text = ao.progress + "%";
-            progressBar.value = ao.progress;
+        float volumeDecrease = 0.05f;
+        float volume = asource == null ? 0 : asource.volume;
+        while (ao.progress < 0.9f || volume > 0.01f)
+        {
+            if (ao.progress >= 0.9f)
+            {
+                stateText.text = LocalizationManager.Localize("Done");
+                percentText.text = "100%";
+                progressBar.value = progressBar.maxValue;
+            }
+            else
+            {
+                stateText.text = LocalizationManager.Localize("Loading..");
+                percentText.text = ao.progress + "%";
+                progressBar.value = ao.progress;
+            }
+            
+            if (asource != null)
+            {
+                asource.volume -= asource.volume * volumeDecrease;
+                volume = asource.volume;
+            }
 
             yield return new WaitForEndOfFrame();
         }
-
-        
-
-
-        stateText.text = "Loaded";
-        percentText.text = "100%";
-        progressBar.value = progressBar.maxValue;
-
-        yield return new WaitForEndOfFrame();
 
         float animEndIn = loadStartTime + (60f / 20f);
         float diff = loadStartTime - Time.realtimeSinceStartup;

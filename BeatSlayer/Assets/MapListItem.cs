@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[Obsolete("Used in old UI. Use BeatmapUIItem intead")]
 public class MapListItem : MonoBehaviour
 {
     MenuScript_v2 menu;
@@ -39,7 +40,7 @@ public class MapListItem : MonoBehaviour
     public Text difficultyText;
     public Transform difficultyStarsContnet;
 
-    public void Setup(MenuScript_v2 menu, bool isPassed, MapInfo mapInfo)
+    public void Setup(MenuScript_v2 menu, bool isPassed, MapInfo mapInfo, bool isNewDesign = false)
     {
         this.menu = menu;
         this.mapInfo = mapInfo;
@@ -54,6 +55,7 @@ public class MapListItem : MonoBehaviour
             new CoverRequestPackage(coverImage, mapInfo.author + "-" + mapInfo.name, mapInfo.nick, true)
         });
 
+        if (isNewDesign) return;
 
         string filepath = Application.persistentDataPath + "/maps/" + mapInfo.group.author + "-" + mapInfo.group.name + "/" + mapInfo.nick + "/" + mapInfo.group.author + "-" + mapInfo.group.name + ".bsu";
         bool exists = File.Exists(filepath);
@@ -76,6 +78,8 @@ public class MapListItem : MonoBehaviour
         UpdateDifficulty();
 
     }
+
+
     public void SetupForLocalFile(MenuScript_v2 menu, MapInfo mapInfo)
     {
         this.menu = menu;
@@ -172,8 +176,6 @@ public class MapListItem : MonoBehaviour
         downloadClient.Dispose();
         if (e.Error == null)
         {
-            
-
             progressBar.value = 0;
             progressBar.gameObject.SetActive(false);
             playBtn.SetActive(true);
@@ -184,9 +186,11 @@ public class MapListItem : MonoBehaviour
             tempPath = Application.persistentDataPath + "/temp/" + (mapInfo.group.author.Trim() + "-" + mapInfo.group.name.Trim()) + ".bsz";
 
             TimeSpan t1 = DateTime.Now.TimeOfDay;
-            menu.UnpackBspFile(tempPath);
+            //ProjectManager.UnpackBspFile(tempPath);
+            // Deprecated
 
-            TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "download");
+            //TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "download");
+            // Deprecated
 
             menu.GetComponent<TrackListUI>().ReloadDownloadedList();
         }
@@ -213,20 +217,21 @@ public class MapListItem : MonoBehaviour
         SceneloadParameters load;
         if (mapInfo.filepath == "")
         {
-            Debug.Log("OnPlayClick() author music");
             // Load author music
-            load = SceneloadParameters.AuthorMusicPreset(mapInfo);
+            //load = SceneloadParameters.AuthorMusicPreset(mapInfo);
+            // Deprecated
 
-            TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "play");
+            //TheGreat.SendStatistics(mapInfo.group.author + "-" + mapInfo.group.name, mapInfo.nick, "play");
+            // Deprecated
         }
         else
         {
-            Debug.Log("OnPlayClick() own music");
             // Load own music
             load = SceneloadParameters.OwnMusicPreset(mapInfo.filepath, mapInfo);
         }
 
-        InGame.SceneManagement.SceneController.instance.LoadScene(load);
+        //InGame.SceneManagement.SceneController.instance.LoadScene(load);
+        // Deprecated
     }
 
     public void OnDeleteClick()

@@ -70,7 +70,7 @@ public class BossHelper : MonoBehaviour
     }
 
     void UpdateLeaders()
-    {
+    {/*
         string url = bossUrl + "?action=get";
         WWW www = new WWW(url);
 
@@ -105,7 +105,7 @@ public class BossHelper : MonoBehaviour
             item.GetChild(0).GetChild(0).GetComponent<Text>().text = "4";
             item.GetChild(1).GetComponent<Text>().text = players[3].Split(';')[0];
             item.GetChild(2).GetComponent<Text>().text = "Damage: " + players[3].Split(';')[2];
-        }
+        }*/
     }
     void UpdateBossinfo()
     {

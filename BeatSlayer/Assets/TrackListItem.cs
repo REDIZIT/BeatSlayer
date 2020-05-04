@@ -26,8 +26,7 @@ public class TrackListItem : MonoBehaviour
 
     public Color32 defaultColor, downloadedColor, newColor;
 
-
-    //TimeSpan t1;
+    
     public void Setup(GroupInfoExtended groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
     {
         //this.group = group;
@@ -41,23 +40,21 @@ public class TrackListItem : MonoBehaviour
             //mapsCountText.text = groupInfo.filepath;
         }
         else mapsCountText.text = Assets.SimpleLocalization.LocalizationManager.Localize("MapsCount") + ": " + groupInfo.mapsCount;
-
-        //t1 = DateTime.Now.TimeOfDay;
+        
         if (getSpriteFromServer)
         {
-            //menu.transform.GetComponent<DownloadHelper>().DownloadSpriteWithCallback(group, SetCover);
             menu.transform.GetComponent<DownloadHelper>().trackListItems.Add(this);
         }
 
         isLocalItem = !getSpriteFromServer;
 
         string folderPath = Application.persistentDataPath + "/maps/" + groupInfo.author + "-" + groupInfo.name;
-        //GetComponent<Image>().color =
-        //    groupInfo.novelty ? newColor 
-        //    : Directory.Exists(folderPath) && Directory.GetDirectories(folderPath).Length > 0 ? downloadedColor 
-        //    : defaultColor;
+        GetComponent<Image>().color =
+            groupInfo.IsNew ? newColor 
+            : Directory.Exists(folderPath) && Directory.GetDirectories(folderPath).Length > 0 ? downloadedColor 
+            : defaultColor;
 
-        isPassedImage.SetActive(menu.accountManager.IsPassed(groupInfo.author, groupInfo.name));
+        isPassedImage.SetActive(AccountManager.IsPassed(groupInfo.author, groupInfo.name));
     }
 
     public void OnClick()

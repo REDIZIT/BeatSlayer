@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Threading;
+using Testing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -52,11 +53,11 @@ namespace InGame.SceneManagement
                     break;
             }
 
-            yield return loader.LoadProject(loadpamars);
-
             LoadHitSounds();
 
             ui.Load();
+            
+            yield return loader.LoadProject(loadpamars);
         }
 
         public static void LoadHitSounds()
@@ -138,6 +139,7 @@ public class SceneloadParameters
     public LoadType Type { get; private set; }
 
     public MapInfo Map { get; private set; } = new MapInfo();
+    public DifficultyInfo difficultyInfo { get; private set; }
     public string Trackname { get { return Map.author + "-" + Map.name; } }
 
     public string AudioFilePath { get; private set; }
@@ -145,12 +147,13 @@ public class SceneloadParameters
 
     private SceneloadParameters() { }
 
-    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo)
+    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
-            Map = mapInfo
+            Map = mapInfo,
+            difficultyInfo = difficultyInfo
         };
         return parameters;
     }
@@ -160,7 +163,12 @@ public class SceneloadParameters
         {
             Type = LoadType.AudioFile,
             AudioFilePath = audioFilePath,
-            Map = mapInfo
+            Map = mapInfo,
+            difficultyInfo = new DifficultyInfo()
+            {
+                name = "Standard",
+                stars = 4
+            }
         };
         return parameters;
     }
@@ -187,32 +195,37 @@ public class SceneloadParameters
         };
         return parameters;
     }
-    public static SceneloadParameters ModerationPreset(string bszPath)
+    public static SceneloadParameters ModerationPreset(TestRequest request)
     {
-        string trackname = Path.GetFileNameWithoutExtension(bszPath);
+        string mapFolder = Application.persistentDataPath + "/data/moderation/map";
+
         GroupInfo groupInfo = new GroupInfo()
         {
-            author = trackname.Split('-')[0],
-            name = trackname.Split('-')[1],
+            author = request.trackname.Split('-')[0],
+            name = request.trackname.Split('-')[1],
             mapsCount = 1
         };
         MapInfo info = new MapInfo()
         {
             group = groupInfo,
-            nick = "[MODERATION *]",
+            nick = "[MODERATION *]"
         };
 
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Moderation,
-            Map = info,
-            AudioFilePath = bszPath
+            Map = info, 
+            ProjectFolderPath = mapFolder,
+            difficultyInfo = new DifficultyInfo()
+            {
+                id = request.difficultyId
+            }
         };
         return parameters;
     }
-    public static SceneloadParameters EditorTestPreset(string bsuPath)
+    public static SceneloadParameters EditorTestPreset(TestRequest request)
     {
-        string trackname = Path.GetFileNameWithoutExtension(bsuPath);
+        string trackname = Path.GetFileNameWithoutExtension(request.filepath);
         GroupInfo groupInfo = new GroupInfo()
         {
             author = trackname.Split('-')[0],
@@ -229,7 +242,11 @@ public class SceneloadParameters
         {
             Type = LoadType.ProjectFolder,
             Map = info,
-            ProjectFolderPath = new FileInfo(bsuPath).DirectoryName
+            ProjectFolderPath = new FileInfo(request.filepath).DirectoryName,
+            difficultyInfo = new DifficultyInfo()
+            {
+                id = request.difficultyId
+            }
         };
         return parameters;
     }
@@ -279,7 +296,7 @@ public class ProjectLoaderMap : IProjectLoader
         if (LoadingData.project.hasImage)
         {
             string coverFilePath = projectFolderPath + "/" + parameters.Trackname + Project.ToString(LoadingData.project.imageExtension);
-            LoadingData.cover = ProjectManager.LoadCover(coverFilePath);
+            LoadingData.cover = ProjectManager.LoadSprite(coverFilePath);
         }
     }
 }
@@ -315,18 +332,15 @@ public class ProjectLoaderModeration : IProjectLoader
 {
     public IEnumerator LoadProject(SceneloadParameters parameters)
     {
-        string bszPath = parameters.AudioFilePath;
+        string mapFolder = parameters.ProjectFolderPath;
+        string bsuPath = mapFolder + "/" + parameters.Trackname + ".bsu";
 
-        Project proj = ProjectManager.LoadProject(bszPath);
+        Project proj = ProjectManager.LoadProject(bsuPath);
         LoadingData.project = proj;
 
-        string tempAudioFilePath = bszPath.Replace(".bsz", Project.ToString(proj.audioExtension));
-        File.WriteAllBytes(tempAudioFilePath, proj.audioFile);
+        string audioPath = mapFolder + "/" + parameters.Trackname + Project.ToString(proj.audioExtension);
 
-        yield return ProjectManager.LoadAudioCoroutine(tempAudioFilePath);
-
-        File.Delete(bszPath); // DELETION FILE SO THAT THERE IS NO REPEATING LOADING MAP
-        File.Delete(tempAudioFilePath);
+        yield return ProjectManager.LoadAudioCoroutine(audioPath);
     }
 }
 public class ProjectLoaderEditorTest : IProjectLoader

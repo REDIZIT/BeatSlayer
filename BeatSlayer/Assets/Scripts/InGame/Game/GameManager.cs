@@ -1,33 +1,45 @@
 ﻿using Assets.SimpleLocalization;
 using InGame.Game;
+using InGame.Game.Spawn;
 using InGame.SceneManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using DatabaseManagement;
+using Newtonsoft.Json;
+using ProjectManagement;
 using Testing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
 
 public class GameManager : MonoBehaviour
 {
+    #region Unity components
     public SettingsManager settingsManager { get { return GetComponent<SettingsManager>(); } }
     public AccountManager accountManager;
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
     public FinishHandler finishHandler { get { return GetComponent<FinishHandler>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public GameUIManager UIManager { get { return GetComponent<GameUIManager>(); } }
+    public BeatManager beatManager { get { return GetComponent<BeatManager>(); } }
+    #endregion
 
 
-    public Replay replay;
-
+    [HideInInspector] public Replay replay;
+    [HideInInspector] public Project project;
+    [HideInInspector] public DifficultyInfo difficultyInfo;
+    [HideInInspector] public Difficulty difficulty;
+    [HideInInspector] public TestRequest testRequest;
 
 
 
@@ -55,9 +67,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float earnedScore;
     [HideInInspector] public float scoreMultiplier;
 
-    List<SpawnPointClass> spawnPointClasses = new List<SpawnPointClass>();
+    
     public GameObject BeatCubePrefab, BeatLinePrefab;
-    [HideInInspector] public Project project;
 
     public SaberController rightSaber, leftSaber;
     public Material orangeMaterial, blueMaterial;
@@ -79,7 +90,7 @@ public class GameManager : MonoBehaviour
     public GameObject finishRecordPanel;
     public Image comboValueImg;
 
-    public Sprite defaultTrackSprite;
+    public Texture2D defaultTrackTexture;
 
     [Header("Statistics UI")]
     public Image likeBtnImg;
@@ -95,7 +106,7 @@ public class GameManager : MonoBehaviour
 
     // Settings
     float sliceeffectVolume = 0.8f;
-
+    
     float bitCubeEndTime = 0; // Изначально 0.7 т.к. позиция спавнера 42, а куб доходит до 0 координаты (скорость куба 60) за 0.7 сек (получили из 42/60)
     // 70 - Нормальная дистанция для разрезания
     // 60 - Скорость куба
@@ -104,19 +115,30 @@ public class GameManager : MonoBehaviour
 
     public void InitProject()
     {
+       
         project = LoadingData.project;
 
-        beats.AddRange(project.beatCubeList.OrderBy(c => c.time).ToArray());
+
+        if(project.difficulties == null || project.difficulties.Count == 0)
+        {
+            project = ProjectUpgrader.UpgradeToDifficulty(project);
+        }
+        
+        difficulty = project.difficulties.Find(c => c.id == difficultyInfo.id);
+        Debug.Log("Id: " + difficultyInfo.id + "\nIs DIFF null? " + (difficulty == null) + "\nCount is: " + project.difficulties.Count);
+        var ls = difficulty.beatCubeList.OrderBy(c => c.time);
+
+        beats.AddRange(ls);
     }
     public void ProcessBeatTime()
     {
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
-            float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime /replay.musicSpeed;
-            if (beats.ToArray().Length > 0 && asTime >= beats[0].time)
+            //float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime / replay.musicSpeed;
+            float beatAudioTime = gameStarting ? asReplacer : audioManager.asource.time + beatManager.fieldCrossTime;
+            if (beats.Count > 0 && beatAudioTime >= beats[0].time)
             {
-                SpawnBeatCube(beats[0]);
-
+                beatManager.SpawnBeatCube(beats[0]);
                 beats.RemoveAt(0);
                 ProcessBeatTime();
             }
@@ -136,9 +158,12 @@ public class GameManager : MonoBehaviour
     }
 
 
+
     void Awake()
     {
         if (!enabled) return;
+        
+        Debug.Log("WORK BLYAT! please... I mean Awake()");
 
         #region Redirect to menu
 
@@ -162,6 +187,7 @@ public class GameManager : MonoBehaviour
         GameObject sc = Instantiate(scenes[prefsManager.prefs.selectedMapId]);
         sc.transform.position = new Vector3(0, 0, 0);
 
+        difficultyInfo = LoadingData.loadparams.difficultyInfo;
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
             InitProject();
@@ -171,19 +197,24 @@ public class GameManager : MonoBehaviour
         replay.author = project.author;
         replay.name = project.name;
         replay.nick = project.creatorNick;
-        replay.difficulty = project.difficultStars;
-        replay.cubesSpeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);
-        replay.musicSpeed = Mathf.Clamp(SSytem.instance.GetFloat("MusicSpeed") / 10f, 0.5f, 1.5f);
+        
+        Debug.Log("Is difficultyInfo null? " + (difficultyInfo == null));
+        replay.difficulty = difficultyInfo.stars;
+        
+        // Deprecated coz of Difficulty system
+        //replay.cubesSpeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);
+        //replay.musicSpeed = Mathf.Clamp(SSytem.instance.GetFloat("MusicSpeed") / 10f, 0.5f, 1.5f);
+        replay.cubesSpeed = difficulty.speed;
+        replay.musicSpeed = 1;
+
+        InitSettings();
+
+        beatManager.Setup(this, noarrows, nolines, replay);
 
 
-        try { InitSettings(); }
-        catch (System.Exception err) { trackText.text = "Error InitSettings: " + err.Message; }
+        InitGraphics();
 
-        try { InitGraphics(); }
-        catch (System.Exception err) { trackText.text = "Error InitGraphics: " + err.Message; }
-
-        try { StartForUI(); }
-        catch (System.Exception err) { trackText.text = "Error StartForUI: " + err.Message; }
+        StartForUI(); 
     }
     void InitAudio()
     {
@@ -226,11 +257,6 @@ public class GameManager : MonoBehaviour
 
         rightSaber.Init(SSytem.instance.rightColor, prefsManager.prefs.selectedSaber, prefsManager.prefs.selectedSaberEffect);
         leftSaber.Init(SSytem.instance.leftColor, prefsManager.prefs.selectedSaber, prefsManager.prefs.selectedSaberEffect);
-
-        for (int i = 0; i < spawnPoints.Length; i++)
-        {
-            spawnPointClasses.Add(new SpawnPointClass() { index = i });
-        }
     }
     void InitSettings()
     {
@@ -286,65 +312,38 @@ public class GameManager : MonoBehaviour
                 new Vector2(trackText.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition.x, 8.3f);
         }
     }
-    IEnumerator Start()
+    void Start()
     {
         trackText.text = fullTrackName + (replay.musicSpeed == 1 ? "" : " x" +replay.musicSpeed);
 
         AlignToSide();
 
-        try { InitAudio(); }
-        catch (System.Exception err) { trackText.text = "Error InitAudio: " + err.Message; Debug.LogError(err); }
+        InitAudio();
 
         gameStarting = true;
         gameStarted = true;
-        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) { audioManager.PlaySpectrumSource(); }
-        yield return new WaitForSeconds(bitCubeEndTime /replay.musicSpeed / replay.cubesSpeed);
-        audioManager.PlaySource();
-        if (paused)
+
+        StartCoroutine(beatManager.IOnStart());
+        /*if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) { audioManager.PlaySpectrumSource(); }
+        //yield return new WaitForSeconds(bitCubeEndTime /replay.musicSpeed / replay.cubesSpeed);
+
+        for (int i = 0; i < 60; i++)
         {
-            audioManager.asource.Pause();
-            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
+            yield return new WaitForEndOfFrame();
         }
-        gameStarting = false;
+*/
     }
 
-    ScreenOrientation screenOrientation = ScreenOrientation.Landscape;
+    //ScreenOrientation screenOrientation = ScreenOrientation.Landscape;
     private void Update()
     {
-        // ========================================================================================================
-        //  Пауза 3 тачами
-        try
-        {
-            if (SSytem.instance.GetInt("FingerPause") == 0)
-            {
-                if (Input.touchCount > 2
-                    && Input.touches[0].phase != TouchPhase.Began
-                    && Input.touches[1].phase != TouchPhase.Began
-                    && Input.touches[2].phase != TouchPhase.Began)
-                {
-                    if (!paused)
-                    {
-                        bool isAllIn = true;
-                        for (int i = 0; i < Input.touches.Length; i++)
-                        {
-                            Vector2 pos = Input.touches[i].position;
-                            if (!(pos.x > 50 && pos.x < Screen.width - 50 &&
-                                pos.y > 50 && pos.y < Screen.height - 50)) { isAllIn = false; break; }
-                        }
-                        if (isAllIn)
-                        {
-                            Pause();
-                        }
-                    }
-                }
-
-            }
-        }
-        catch (Exception err) { Debug.LogError("Catched error::Touch: " + err.Message); }
+        CheckFingerPause();
         
+        /* Пэтя: Да нахуй воно мэне надо xD
         try
         {
             // Настройка UI
+            
             if (Screen.orientation != screenOrientation)
             {
                 screenOrientation = Screen.orientation;
@@ -369,70 +368,61 @@ public class GameManager : MonoBehaviour
                 comboValueImg.transform.parent.eulerAngles = isPortrait ? new Vector3(145, 195f, 0) : new Vector3(19.388f, 31.207f, 9.7f);
             }
         }
-        catch (Exception err) { Debug.LogError("Catched error::UI: " + err.Message); }
+        catch (Exception err) { Debug.LogError("Catched error::UI: " + err.Message); }*/
         
 
         if (paused) return;
 
 
-        try
+        if (earnedScore >= 1)
         {
-            if (earnedScore >= 1)
+            float rounded = Mathf.FloorToInt(earnedScore) * scoreMultiplier;
+            earnedScore -= rounded;
+            replay.score += rounded;
+        }
+
+        if (gameStarted)
+        {
+            if (gameStarting)
             {
-                float rounded = Mathf.FloorToInt(earnedScore) * scoreMultiplier;
-                earnedScore -= rounded;
-                replay.score += rounded;
+                asReplacer += Time.deltaTime;
+            }
+            if (paused)
+            {
+                if (audioManager.asource.isPlaying)
+                {
+                    audioManager.asource.Pause();
+                    if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
+                }
+                return;
             }
 
-            if (!paused && gameStarted)
+            ProcessBeatTime();
+        }
+
+
+        if (trackTimeSlider.value >= 50)
+        {
+            if (trackTextSliderText.transform.parent != trackTimeSlider.transform)
             {
-                if (gameStarting)
-                {
-                    asReplacer += Time.deltaTime;
-                }
-                if (paused)
-                {
-                    if (audioManager.asource.isPlaying)
-                    {
-                        audioManager.asource.Pause();
-                        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
-                    }
-                    return;
-                }
-
-                ProcessBeatTime();
-            }
-
-
-            if (trackTimeSlider.value >= 60)
-            {
-                if (trackTextSliderText.transform.parent != trackTimeSlider.transform)
-                {
-                    trackTextSliderText.transform.SetParent(trackTimeSlider.transform);
-                }
+                trackTextSliderText.transform.SetParent(trackTimeSlider.transform);
             }
         }
-        catch (Exception err) { Debug.LogError("Catched error::Checks: " + err.Message); }
         fpsText.text = 1f / Time.smoothDeltaTime + " FPS";
 
         
-        try
+        if (audioManager.asource != null)
         {
-            if (audioManager.asource != null)
+            if (audioManager.asource.clip != null)
             {
-                if (audioManager.asource.clip != null)
+                if (audioManager.asource.time != 0)
                 {
-                    if (audioManager.asource.time != 0)
-                    {
-                        timeInSecondsText.text = SecondsToString(audioManager.asource.time) + " / " + SecondsToString(audioManager.asource.clip.length);
-                    }
+                    timeInSecondsText.text = SecondsToString(audioManager.asource.time) + " / " + SecondsToString(audioManager.asource.clip.length);
                 }
-                else Debug.LogError("asource clip is null");
             }
-            else Debug.LogError("asource is null");
+            else Debug.LogError("asource clip is null");
         }
-        catch (Exception err) { Debug.LogError("Catched error::Time: " + err.Message); }
-        
+        else Debug.LogError("asource is null");
 
 
         // =================================
@@ -440,200 +430,46 @@ public class GameManager : MonoBehaviour
         if (!gameStarted) return;
 
         finishHandler.CheckLevelFinish();
-
-        try
-        {
-            #region Level Finished
-
-            
-
-            #endregion
-        }
-        catch (Exception err) { Debug.LogError("Catched error::Level Finished: " + err.Message); }
         
-        try
+        #region Score and combo
+
+        if (!gameCompleted)
         {
-            #region Score and combo
-
-            if (!gameCompleted)
+            scoreText.text = Mathf.RoundToInt(replay.score * 10f) / 10f + "";
+            missedText.text = replay.missed.ToString();
+            perText.text = Mathf.RoundToInt(replay.Accuracy * 1000f) / 10f + "%";
+            if (comboValue >= comboValueMax && comboMultiplier < 16)
             {
-                scoreText.text = Mathf.RoundToInt(replay.score * 10f) / 10f + "";
-                missedText.text = replay.missed.ToString();
-                perText.text = Mathf.RoundToInt(replay.Accuracy * 1000f) / 10f + "%";
-                if (comboValue >= comboValueMax && comboMultiplier < 16)
-                {
-                    comboValue = 2;
-                    comboMultiplier *= 2;
-                    comboValueMax = 8 * comboMultiplier;
-                    StartCoroutine(comboMultiplierAnim());
-                }
-                else if (comboValue <= 0)
-                {
-                    if (comboMultiplier != 1)
-                    {
-                        comboMultiplier /= 2;
-                        comboValue = comboValueMax - 5;
-                    }
-                    else
-                    {
-                        comboValue = 0;
-                    }
-                }
-                if (comboValue > 0)
-                {
-                    //comboValue -= Time.deltaTime * comboMultiplier * 0.4f;
-                }
-                comboValueImg.fillAmount = comboValue / comboValueMax;
-                comboMultiplierText.text = "x" + comboMultiplier;
-                if (comboMultiplier > maxCombo) maxCombo = comboMultiplier;
-                comboMultiplierText.transform.localScale += new Vector3(comboMultiplierAnimValue, comboMultiplierAnimValue, comboMultiplierAnimValue);
+                comboValue = 2;
+                comboMultiplier *= 2;
+                comboValueMax = 8 * comboMultiplier;
+                StartCoroutine(comboMultiplierAnim());
             }
-
-            #endregion
+            else if (comboValue <= 0)
+            {
+                if (comboMultiplier != 1)
+                {
+                    comboMultiplier /= 2;
+                    comboValue = comboValueMax - 5;
+                }
+                else
+                {
+                    comboValue = 0;
+                }
+            }
+            if (comboValue > 0)
+            {
+                //comboValue -= Time.deltaTime * comboMultiplier * 0.4f;
+            }
+            comboValueImg.fillAmount = comboValue / comboValueMax;
+            comboMultiplierText.text = "x" + comboMultiplier;
+            if (comboMultiplier > maxCombo) maxCombo = comboMultiplier;
+            comboMultiplierText.transform.localScale += new Vector3(comboMultiplierAnimValue, comboMultiplierAnimValue, comboMultiplierAnimValue);
         }
-        catch (Exception err) { Debug.LogError("Catched error::Score and combo: " + err.Message); }
-        
 
-        try
-        {
-            #region Slicing
+        #endregion
 
-            if (Application.isEditor)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                bool r = false, l = false;
-                if (Input.GetMouseButtonDown(0))
-                {
-                    if (!inputTouchesStartPoses.ContainsKey(0))
-                    {
-                        inputTouchesStartPoses.Add(0, Input.mousePosition);
-                    }
-                    else
-                    {
-                        inputTouchesStartPoses[0] = Input.mousePosition;
-                    }
-
-                }
-                else if (Input.GetMouseButton(0))
-                {
-                    if (inputTouchesStartPoses[0].x >= Screen.width / 2f)
-                    {
-                        r = true;
-                        rightSaber.SetSword(Input.mousePosition);
-                    }
-                    else
-                    {
-                        l = true;
-                        leftSaber.SetSword(Input.mousePosition);
-                    }
-                }
-                rightSaber.SetEnabled(r);
-                leftSaber.SetEnabled(l);
-
-                RaycastHit[] hits = Physics.RaycastAll(ray, 100);
-                foreach (RaycastHit hit in hits)
-                {
-                    if (hit.transform.name == "LineCollider")
-                    {
-                        hit.transform.parent.GetComponent<Bit>().Spec(hit.point);
-                    }
-                    else if (hit.transform.GetComponent<Bit>() != null && !hit.transform.GetComponent<Bit>().isDead)
-                    {
-                        Bit bit = hit.transform.GetComponent<Bit>();
-                        bit.Sliced();
-                    }
-                }
-
-            }
-            else
-            {
-                bool r = false, l = false; // Включение и выключение мечей
-                for (int i = 0; i < Input.touches.Length; i++)
-                {
-                    Ray ray = Camera.main.ScreenPointToRay(Input.touches[i].position);
-                    //RaycastHit hit;
-
-                    int saberSide = 0;
-                    if (Input.touches[i].phase == TouchPhase.Began)
-                    {
-                        if (!inputTouchesStartPoses.ContainsKey(Input.touches[i].fingerId))
-                        {
-                            inputTouchesStartPoses.Add(Input.touches[i].fingerId, Input.touches[i].position);
-                        }
-                        else
-                        {
-                            inputTouchesStartPoses[Input.touches[i].fingerId] = Input.touches[i].position;
-                        }
-
-                    }
-                    else if (Input.touches[i].phase != TouchPhase.Canceled && Input.touches[i].phase != TouchPhase.Ended)
-                    {
-                        if (inputTouchesStartPoses[Input.touches[i].fingerId].x >= Screen.width / 2f)
-                        {
-                            r = true;
-                            rightSaber.SetSword(Input.touches[i].position);
-                            saberSide = 1;
-                        }
-                        else
-                        {
-                            l = true;
-                            leftSaber.SetSword(Input.touches[i].position);
-                            saberSide = -1;
-                        }
-                    }
-
-                    RaycastHit[] hits;
-                    hits = Physics.RaycastAll(ray, 100);
-
-                    for (int rayI = 0; rayI < hits.Length; rayI++)
-                    {
-                        RaycastHit hit = hits[rayI];
-
-                        if (hit.transform.name == "LineCollider")
-                        {
-                            hit.transform.parent.GetComponent<Bit>().Spec(hit.point);
-                        }
-                        else if (hit.transform.GetComponent<Bit>() != null && !hit.transform.GetComponent<Bit>().isDead)
-                        {
-                            if (hit.transform.GetComponent<Bit>().saberType == 0 || hit.transform.GetComponent<Bit>().saberType == saberSide)
-                            {
-                                hit.transform.GetComponent<Bit>().Sliced(i);
-                            }
-                        }
-                    }
-                    //if (Physics.Raycast(ray, out hit, 100))
-                    //{
-                    //    if (hit.transform.name == "LineCollider")
-                    //    {
-                    //        hit.transform.parent.GetComponent<Bit>().Spec(hit.point);
-                    //    }
-                    //    else if (hit.transform.GetComponent<Bit>() != null && !hit.transform.GetComponent<Bit>().isDead)
-                    //    {
-                    //        if(hit.transform.GetComponent<Bit>().saberType == 0 || hit.transform.GetComponent<Bit>().saberType == saberSide)
-                    //        {
-                    //            hit.transform.GetComponent<Bit>().Sliced(i);
-                    //        }
-                    //    }
-                    //}
-                }
-                //rightSaber.transform.GetChild(0).GetComponent<MeshRenderer>().enabled = r;
-                //leftSaber.transform.GetChild(0).GetComponent<MeshRenderer>().enabled = l;
-                rightSaber.SetEnabled(r);
-                leftSaber.SetEnabled(l);
-            }
-
-            foreach (SpawnPointClass c in spawnPointClasses)
-            {
-                if (c.cooldown > 0)
-                {
-                    c.cooldown -= Time.deltaTime;
-                }
-            }
-
-            #endregion
-        }
-        catch (Exception err) { Debug.LogError("Catched error::Slicing: " + err.Message); }
+        beatManager.SabersUpdate();
         
     }
     Dictionary<int, Vector3> inputTouchesStartPoses = new Dictionary<int, Vector3>();
@@ -678,14 +514,45 @@ public class GameManager : MonoBehaviour
 
     #region Pause menu buttons voids
 
+    public void CheckFingerPause()
+    {
+        // ========================================================================================================
+        //  Пауза 3 тачами
+        if (SSytem.instance.GetInt("FingerPause") == 0)
+        {
+            if (Input.touchCount > 2
+                && Input.touches[0].phase != TouchPhase.Began
+                && Input.touches[1].phase != TouchPhase.Began
+                && Input.touches[2].phase != TouchPhase.Began)
+            {
+                if (!paused)
+                {
+                    bool isAllIn = true;
+                    for (int i = 0; i < Input.touches.Length; i++)
+                    {
+                        Vector2 pos = Input.touches[i].position;
+                        if (!(pos.x > 50 && pos.x < Screen.width - 50 &&
+                              pos.y > 50 && pos.y < Screen.height - 50)) { isAllIn = false; break; }
+                    }
+                    if (isAllIn)
+                    {
+                        Pause();
+                    }
+                }
+            }
+
+        }
+    }
     public void Pause()
     {
         paused = true;
         pausePanel.SetActive(true);
         audioManager.PauseSource();
         UIManager.OnPause();
+        Time.timeScale = 0;
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
     }
+    
     public void Unpause()
     {
         pausePanel.SetActive(false);
@@ -702,14 +569,18 @@ public class GameManager : MonoBehaviour
         float encrease = 0.02f;
         while (timespeed < 1)
         {
+            if(paused) break;
+            
             encrease *= 1.001f;
             timespeed += encrease;
             if (timespeed > 1)
             {
                 timespeed = 1;
             }
-            audioManager.asource.pitch = timespeed *replay.musicSpeed;
-            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed *replay.musicSpeed;
+            
+            audioManager.asource.pitch = timespeed * replay.musicSpeed;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * replay.musicSpeed;
+            
             Time.timeScale = timespeed;
             yield return new WaitForEndOfFrame();
         }
@@ -727,6 +598,7 @@ public class GameManager : MonoBehaviour
     }
     public void Restart()
     {
+        Time.timeScale = 1;
         SceneController.instance.LoadScene(LoadingData.loadparams);
     }
     #endregion
@@ -734,63 +606,7 @@ public class GameManager : MonoBehaviour
     #region Beat cubes voids
 
     public List<GameObject> activeCubes = new List<GameObject>();
-    public void SpawnBeatCube(BeatCubeClass beat)
-    {
-        BeatCubeClass.Type type = beat.type;
-        if (type == BeatCubeClass.Type.Dir && noarrows)
-        {
-            type = BeatCubeClass.Type.Point;
-        }
-        else if (type == BeatCubeClass.Type.Line && nolines)
-        {
-            return;
-        }
-
-        GameObject c = Instantiate(beat.type == BeatCubeClass.Type.Line ? BeatLinePrefab : BeatCubePrefab);
-        activeCubes.Add(c);
-
-        c.GetComponent<Bit>().gs = this;
-        c.GetComponent<Bit>().speed *= replay.cubesSpeed;
-        c.GetComponent<Bit>().useSoundEffect = SSytem.instance.GetBool("SliceSound");
-
-        c.GetComponent<Bit>().type = type;
-        c.GetComponent<Bit>().subType = beat.subType;
-
-        c.GetComponent<Bit>().saberType = beat.saberType;
-
-        c.GetComponent<Bit>().leftSaberColor = SSytem.instance.leftColor * prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
-        c.GetComponent<Bit>().rightSaberColor = SSytem.instance.rightColor * prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
-
-        c.GetComponent<Bit>().leftArrowColor = SSytem.instance.leftDirColor * prefsManager.prefs.colorPower;
-        c.GetComponent<Bit>().rightArrowColor = SSytem.instance.rightDirColor * prefsManager.prefs.colorPower;
-
-        c.GetComponent<Bit>().vibrationTime = SSytem.instance.GetInt("Vibration") * 50;
-
-        if (beat.type == BeatCubeClass.Type.Line)
-        {
-            List<Vector3> points = new List<Vector3>();
-            for (int i = 0; i < beat.linePoints.Count; i++)
-            {
-                Vector3 v3 = beat.linePoints[i];
-                points.Add(v3);
-            }
-            c.GetComponent<Bit>().SpecSpawn(points.ToArray());
-        }
-
-        //int road = bcc[0].road == -1 ? GetBestSpawnPoint(c.GetComponent<Bit>().sliceDir) : bcc[0].road;
-        //int road = bcc[0].road;
-        int road = beat.road == -1 ? GetBestSpawnPoint(beat) : beat.road;
-
-        if (road >= spawnPoints.Length) road = UnityEngine.Random.Range(0, 3);
-        Transform selectedSpawnPoint = spawnPoints[road].transform;
-        c.transform.position = new Vector3(selectedSpawnPoint.position.x, beat.level == 0 ? 1 : 5f, selectedSpawnPoint.position.z);
-        spawnPoints[road].Spawn(beat.type);
-        c.transform.name = "BeatCube";
-
-        c.GetComponent<Bit>().Start();
-
-        GetComponent<CheatEngine>().AddCube(c.GetComponent<Bit>());
-    }
+    
     string missedBeatCubeMsg = "";
     public void MissedBeatCube()
     {
@@ -825,7 +641,7 @@ public class GameManager : MonoBehaviour
 
         if (!prefsManager.prefs.hasAchiv_Blinked)
         {
-            Social.ReportProgress(GPGamesManager.achievement_Blinked, 100, (bool success) =>
+            /*Social.ReportProgress(GPGamesManager.achievement_Blinked, 100, (bool success) =>
             {
                 if (!success) Debug.LogError("Blinked error");
                 if (success)
@@ -833,7 +649,7 @@ public class GameManager : MonoBehaviour
                     prefsManager.prefs.hasAchiv_Blinked = true;
                     prefsManager.Save();
                 }
-            });
+            });*/
         }
 
         UseSkill();
@@ -860,70 +676,12 @@ public class GameManager : MonoBehaviour
     }
     public void BeatLineSliced()
     {
-        replay.score += comboMultiplier * scoreMultiplier;
+        replay.score += comboMultiplier * scoreMultiplier * 0.1f;
         replay.sliced++;
         comboValue += 1;
     }
 
-    public int GetBestSpawnPoint(BeatCubeClass beat)
-    {
-        List<SpawnPointClass> spawnPoints = spawnPointClasses.OrderBy(o => o.cooldown).ToList();
-
-        if (beat.type == BeatCubeClass.Type.Dir)
-        {
-            List<int> available = new List<int>();
-            for (int i = 0; i < 4; i++)
-            {
-                if (spawnPoints[i].cooldown <= 0)
-                {
-                    available.Add(i);
-                }
-            }
-            int rnd = UnityEngine.Random.Range(0, available.ToArray().Length);
-            spawnPoints[rnd].cooldown = 0.3f;
-            return spawnPoints[rnd].index;
-        }
-        else
-        {
-            int rnd = UnityEngine.Random.Range(0, spawnPoints.ToArray().Length);
-            spawnPoints[rnd].cooldown = 0.3f;
-            return spawnPointClasses[rnd].index;
-        }
-
-        //// Список тех точек которые полностью свободены
-        //List<int> freePoints = new List<int>();
-
-        //// Поиск наилучшего варианта (Если freepoints пустой)
-        //float min = 999;
-        //int bestIndex = Random.Range(0,4);
-
-        //for (int i = 0; i < spawnPoints.Length; i++)
-        //{
-        //    if(spawnPoints[i].cooldown < min)
-        //    {
-        //        min = spawnPoints[i].cooldown;
-        //        bestIndex = i;
-        //    }
-
-
-        //    // Если точка полностью свободна, то добавляем её в список
-        //    if (spawnPoints[i].cooldown <= 0)
-        //    {
-        //        freePoints.Add(i);
-        //    }
-        //}
-
-        //// Если послностью свободных точек нет, то возвращаем лучший вариант 
-        //if(freePoints.ToArray().Length == 0)
-        //{
-        //    return bestIndex;
-        //}
-        //else
-        //{
-        //    // Если есть полностью свободные точки, то вернуть одну из них
-        //    return freePoints[Random.Range(0, freePoints.ToArray().Length)];
-        //}
-    }
+    
 
     #endregion
 
@@ -1041,9 +799,9 @@ public class GameManager : MonoBehaviour
         if (state == 0)
         {
             prefsManager.prefs.SetRateState(fullTrackName, liked ? 1 : -1);
-
-            //File.AppendAllText(Application.persistentDataPath + "/order.ls", (liked ? "Liked:" : "Disliked:") + fullTrackName + "\n");
-            TheGreat.SendStatistics(fullTrackName, project.creatorNick, liked ? "like" : "dislike");
+            
+            string trackname = project.author + "-" + project.name;
+            DatabaseScript.SendStatistics(trackname, project.creatorNick, difficultyInfo.id, liked ? DatabaseScript.StatisticsKeyType.Like : DatabaseScript.StatisticsKeyType.Dislike);
 
             likeBtnImg.color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);
             likeBtnImg.transform.GetChild(0).GetComponent<Image>().color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);
@@ -1070,12 +828,5 @@ public class GameManager : MonoBehaviour
         int mins = Mathf.FloorToInt(allTime / 60f);
         int secs = Mathf.FloorToInt(allTime - mins * 60);
         return new int[2] { mins, secs };
-    }
-
-
-    class SpawnPointClass
-    {
-        public int index;
-        public float cooldown;
     }
 }

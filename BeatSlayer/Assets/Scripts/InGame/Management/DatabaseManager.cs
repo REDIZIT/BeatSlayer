@@ -16,7 +16,7 @@ namespace DatabaseManagement
     {
         public static DatabaseContainer container;
 
-        public static string url_approved = "http://www.bsserver.tk/Moderation/GetApprovedGroups";
+        public static string url_approved = "http://176.107.160.146/Moderation/GetApprovedGroups";
         public static string url_groups = "http://176.107.160.146/Database/GetGroupsExtended";
 
 
@@ -60,6 +60,10 @@ namespace DatabaseManagement
                     name = trackname.Split('-')[1],
                     mapsCount = mapsCount
                 };
+
+                string[] mapFolders = Directory.GetDirectories(groupFolder);
+                info.nicks = new List<string>();
+                info.nicks.AddRange(mapFolders.Select(c => new DirectoryInfo(c).Name));
 
                 groups.Add(info);
             }

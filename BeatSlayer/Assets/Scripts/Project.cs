@@ -8,10 +8,9 @@ public class Project
     public string author, name;
     public int mins, secs;
     public string source, creatorNick;
-
+    
     public string difficultName = "Standard";
     public int difficultStars = 4;
-
 
     public bool hasImage;
     public enum ImageExtension { Jpeg, Png }
@@ -22,11 +21,19 @@ public class Project
     public AudioExtension audioExtension;
     public byte[] audioFile;
 
-    public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
+    /// <summary>
+    /// Deprecated. Use difficulties instead.
+    /// </summary>
+    /*[Obsolete("Use difficulties")] */public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
+    public List<Bookmark> bookmarks = new List<Bookmark>();
+
+    public List<Difficulty> difficulties = new List<Difficulty>();
+
 
     public void CheckDefaults()
     {
         if (beatCubeList == null) beatCubeList = new List<BeatCubeClass>();
+        if (bookmarks == null) bookmarks = new List<Bookmark>();
     }
 
     public static string ToString(ImageExtension value)
@@ -42,26 +49,28 @@ public class Project
 [Serializable]
 public class BeatCubeClass
 {
-    public float time; // Time in seconds where cube placed
+    public float time;
 
-    public int road; // 0,1,2,3
-    public int level; // 0,1 - cube height level (0-Bottom, 1-Top)
+    public int road; // 0-3 include
+    public int level; // 0-1 include
+    public float speed = 1; // 1 - default
 
     public enum Type { Point, Dir, Line }
-    public Type type; // Type of cube: Point (Any direction), Dir (arrow), Line
+    public Type type;
 
-    // Direction you need to cut
-    public enum SubType { Down, DownRight, Right, UpRight, Up, UpLeft, Left, DownLeft, Random }
+    public enum SubType { Down = 0, DownRight = 1, Right = 2, UpRight = 3, Up = 4, UpLeft = 5, Left = 6, DownLeft = 7, Random = 8}
     public SubType subType;
 
-    // For which saber (left: -1 or right: 1 or any: 0)
     public int saberType;
 
     // Used only for Line (position of start and end of line)
+    public float lineLenght = 0; // Time in seconds
+    public int lineEndRoad = 0; // Second point road (If linePoints.Count != 0, then use legacy way - linePoints)
+    public int lineEndLevel = 0;
     public List<SerializableVector3> linePoints;
 
-    // Parameterless ctor
     public BeatCubeClass() { }
+
     public BeatCubeClass(float time, int road, Type type)
     {
         this.time = time;
@@ -79,24 +88,39 @@ public class BeatCubeClass
             linePoints.Add(v3[i]);
         }
     }
+
+    public BeatCubeClass Clone()
+    {
+        return (BeatCubeClass)this.MemberwiseClone();
+    }
 }
 
-//[Serializable]
-//public class Bookmark
-//{
-//    public float time;
-//    public int type;
-//    public SerializableColor color;
+[Serializable]
+public class Bookmark
+{
+    public float time;
+    public int type;
+    public SerializableColor color;
 
-//    public Bookmark(float time, int type, SerializableColor color)
-//    {
-//        this.time = time;
-//        this.type = type;
-//        this.color = color;
-//    }
+    public Bookmark(float time, int type, SerializableColor color)
+    {
+        this.time = time;
+        this.type = type;
+        this.color = color;
+    }
 
-//    public Bookmark() { }
-//}
+    public Bookmark() { }
+}
+[Serializable]
+public class Difficulty
+{
+    public string name;
+    public int stars;
+    public int id = -1;
+    public float speed = 1;
+
+    public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
+}
 
 [System.Serializable]
 public struct SerializableVector3
@@ -148,55 +172,23 @@ public struct SerializableVector3
     }
 }
 
-
-
-
-
-
 [Serializable]
-public class ProjectV2
+public struct SerializableColor
 {
-    public string author, name;
-    public int mins, secs;
-    public string source, creatorNick;
-
-    public bool hasImage;
-    public enum ImageExtension { Jpeg, Png }
-    public ImageExtension imageExtension;
-    public byte[] image; // has bytes only in zipped file (.bsz)
-
-    public enum AudioExtension { Ogg, Mp3 }
-    public AudioExtension audioExtension;
-    public byte[] audioFile; // has bytes only in .bsz
-
-    public List<Difficulty> difficulties;
-}
-[Serializable]
-public class Difficulty
-{
-    public string name; // Selected by user
-    public int stars; // Selected by user
-
-    public float realStars; // Calculated by alg
-
-    public List<BeatCubeClass> beatCubeList = new List<BeatCubeClass>();
-
-
-    public void CalculateRealStars()
+    public float r, g, b;
+    public SerializableColor(float r, float g, float b)
     {
-        float minDelayBeforeNextCube = 9999;
-        for (int i = 1; i < beatCubeList.Count - 1; i++)
-        {
-            BeatCubeClass prevCube = beatCubeList[i - 1];
-            BeatCubeClass currentCube = beatCubeList[i];
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    public static implicit operator Color(SerializableColor color)
+    {
+        return new Color(color.r, color.g, color.b);
+    }
 
-            if(currentCube.time - prevCube.time < minDelayBeforeNextCube)
-            {
-                minDelayBeforeNextCube = currentCube.time - prevCube.time;
-            }
-        }
-
-        // Based on min delay before next cube spawn calculate real difficulty of this Difficulty (Haha difficulty of difficulty :D)
-        realStars = float.MaxValue; // XD
+    public static implicit operator SerializableColor(Color color)
+    {
+        return new SerializableColor(color.r, color.g, color.b);
     }
 }

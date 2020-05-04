@@ -11,18 +11,22 @@ namespace InGame.Game
 
         public void SetClip(AudioClip clip)
         {
-            Debug.Log("[AUDIO MANAGER] SetClip");
             asource.clip = clip;
         }
 
+        //int startFrame = 0;
+        //private void Awake()
+        //{
+        //    startFrame = Time.frameCount;
+        //}
         public void PlaySource()
         {
-            Debug.Log("Play asource");
+            //Time.timeScale = 0;
+            //Debug.Log("Frames passed: " + (Time.frameCount - startFrame));
             asource.Play();
         }
         public void PauseSource()
         {
-            Debug.Log("Pause asource");
             asource.Pause();
         }
 
@@ -30,12 +34,10 @@ namespace InGame.Game
 
         public void PlaySpectrumSource()
         {
-            Debug.Log("Play spectrumAsource");
             spectrumAsource.Play();
         }
         public void PauseSpectrumSource()
         {
-            Debug.Log("Pause spectrum source");
             spectrumAsource.Pause();
         }
 

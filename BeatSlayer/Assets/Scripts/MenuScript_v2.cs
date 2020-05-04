@@ -6,31 +6,37 @@ using System.Linq;
 using System.Net;
 using UnityEngine;
 using System.ComponentModel;
+using System.Diagnostics;
 using UnityEngine.UI;
 using Pixelplacement;
-using UnityEngine.SceneManagement;
+//using UnityEngine.SceneManagement;
 using UnityEngine.UI.Extensions;
 using Assets.SimpleLocalization;
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
+//using GooglePlayGames;
+//using GooglePlayGames.BasicApi;
 using SimpleFileBrowser;
 using UnityEngine.Video;
 using System.Xml.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
+using CoversManagement;
+//using System.Runtime.Serialization.Formatters.Binary;
 using InGame.SceneManagement;
-using SaveManagement;
+//using SaveManagement;
 using DatabaseManagement;
+using InGame.Helpers;
 using ProjectManagement;
 using Testing;
+using Debug = UnityEngine.Debug;
 
 public class MenuScript_v2 : MonoBehaviour
 {
     public DatabaseScript database;
     public DailyRewarder dailyRewarder;
+    public BeatmapUI beatmapUI;
+    
     public DownloadHelper downloadHelper { get { return GetComponent<DownloadHelper>(); } }
-    //public ListController listController { get { return GetComponent<ListController>(); } }
     public TrackListUI TrackListUI { get { return GetComponent<TrackListUI>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
@@ -87,7 +93,16 @@ public class MenuScript_v2 : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 60;
+        if(Time.timeScale != 1)
+        {
+            Debug.LogWarning("Time scale in menu not 1!");
+            Time.timeScale = 1;
+        }
         debugConsole.SetActive(true);
+        
+        #if UNITY_EDITOR
+        UrlsChecker.IsGameWorkingWithLocalhost();
+        #endif
 
         m_currentOrientation = Screen.orientation;
         nextOrientationCheckTime = Time.realtimeSinceStartup + 1f;
@@ -95,11 +110,10 @@ public class MenuScript_v2 : MonoBehaviour
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
 
         Database.Init();
+        ProjectManager.defaultTrackTexture = defaultTrackTexture;
 
 
         if (!Directory.Exists(Application.persistentDataPath + "/maps")) Directory.CreateDirectory(Application.persistentDataPath + "/maps");
-        //if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
-        //if (!File.Exists(Application.persistentDataPath + "/rsave.bsf")) TheGreat.SaveRecords(new TrackRecordGroup());
 
         if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
         if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
@@ -110,10 +124,10 @@ public class MenuScript_v2 : MonoBehaviour
         versionText.text = Application.version.ToString() + " by " + Application.installerName + " in " + Application.installMode.ToString() + " mode";
 
         // Google Play Services Auth
-        PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder().Build();
+        /*PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder().Build();
         PlayGamesPlatform.InitializeInstance(config);
         PlayGamesPlatform.Activate();
-        Social.localUser.Authenticate(LoadGPSUser);
+        Social.localUser.Authenticate(LoadGPSUser);*/
 
 
         TranslateStart();
@@ -121,6 +135,8 @@ public class MenuScript_v2 : MonoBehaviour
 
         HandleDev();
         HandleSettings();
+
+        TestManager.Setup(this);
 
         TrackListUI.RefreshDownloadedList();
 
@@ -178,6 +194,7 @@ public class MenuScript_v2 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) OnExitSwipe();
 
         TestManager.CheckUpdates();
+        TestManager.CheckModerationUpdates();
     }
 
 
@@ -312,15 +329,16 @@ public class MenuScript_v2 : MonoBehaviour
 
     void TranslateStart()
     {
-        LocalizationManager.Read("Translating");
         if(Application.isEditor)
         {
-            LocalizationManager.Language = "French";
+            LocalizationManager.Language = "Russian";
             return;
         }
         if (Application.systemLanguage == SystemLanguage.Russian || Application.systemLanguage == SystemLanguage.Ukrainian) LocalizationManager.Language = "Russian";
         else if (Application.systemLanguage == SystemLanguage.French) LocalizationManager.Language = "French";
         else LocalizationManager.Language = "English";
+        
+        LocalizationManager.Read("Translating");
     }
 
     public void ShowAchivements()
@@ -395,6 +413,7 @@ public class MenuScript_v2 : MonoBehaviour
     public Text trackName, trackAuthor, configMapCreatorText;
     public Image trackImg;
     public Sprite defaultTrackSprite;
+    public Texture2D defaultTrackTexture;
     public void OnTrackItemClicked(MenuTrackButton btn)
     {
         selectedTrack = btn;
@@ -429,6 +448,8 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void OnTrackItemClicked(TrackListItem listItem)
     {
+        beatmapUI.Open(listItem);
+        return;
         trackInfoLocker.GetComponent<Animator>().Play("TrackWindow-Open");
         trackInfoAuthorText.text = listItem.groupInfo.author;
         trackInfoNameText.text = listItem.groupInfo.name;
@@ -694,44 +715,7 @@ public class MenuScript_v2 : MonoBehaviour
         difficultPanel.SetActive(playable);
         trackRecordText.gameObject.SetActive(playable);
     }
-    public Project UnpackBspFile(string tempPath)
-    {
-        Project proj;
-
-        XmlSerializer xml = new XmlSerializer(typeof(Project));
-        FileStream loadStream = File.OpenRead(tempPath);
-        proj = (Project)xml.Deserialize(loadStream);
-        loadStream.Close();
-
-        string targetFolder = Application.persistentDataPath + "/maps/" + (proj.author.Trim() + "-" + proj.name.Trim()) + "/" + proj.creatorNick.Trim();
-        string targetFilesPath = targetFolder + "/" + (proj.author.Trim() + "-" + proj.name.Trim());
-
-        if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
-
-        Debug.Log("[UnpackBsp] TargetFolder is " + targetFolder);
-
-        // Unpack audio file
-        string audioPath = targetFilesPath + (proj.audioExtension == Project.AudioExtension.Mp3 ? ".mp3" : ".ogg");
-        File.WriteAllBytes(audioPath, proj.audioFile);
-        proj.audioFile = null;
-
-        // Unpack image file
-        if (proj.hasImage)
-        {
-            string imagePath = targetFilesPath + (proj.imageExtension == Project.ImageExtension.Jpeg ? ".jpg" : ".png");
-            File.WriteAllBytes(imagePath, proj.image);
-            proj.image = null;
-        }
-
-        // Saving unpacked file (in .bsu) into target folder
-        Stream saveStream = File.Create(targetFilesPath + ".bsu");
-        xml.Serialize(saveStream, proj);
-        saveStream.Close();
-
-        File.Delete(tempPath);
-
-        return proj;
-    }
+    
 
     public MenuTrackButton selectedTrack;
     public GameObject trackDownloadBtn, trackDownloadCancelBtn, trackChangeMapBtn, trackPlayBtn, trackDeleteBtn, difficultPanel;
@@ -777,7 +761,9 @@ public class MenuScript_v2 : MonoBehaviour
             // Moving downloaded file into right folder
             string tempPath = Application.persistentDataPath + "/temp/" + selectedTrack.fullname + ".bsz";
 
-            Project project = UnpackBspFile(tempPath);
+            //Project project = ProjectManager.UnpackBspFile(tempPath);
+            Project project = null;
+            // Deprecated
 
             string trackFolderPath = Application.persistentDataPath + "/maps/" + selectedTrack.fullname; // Here are all maps with same music
             string mapFolderPath = trackFolderPath + "/" + project.creatorNick;
@@ -1017,7 +1003,7 @@ public class MenuScript_v2 : MonoBehaviour
     public string gpsId;
     void LoadGPSUser(bool auth)
     {
-        //Debug.Log("PlayGames auth result is " + auth);
+        /*//Debug.Log("PlayGames auth result is " + auth);
         //return;
         //string username = PlayGamesPlatform.Instance.RealTime.GetSelf().Player.userName;
         string username = PlayGamesPlatform.Instance.GetUserDisplayName();
@@ -1031,7 +1017,7 @@ public class MenuScript_v2 : MonoBehaviour
         //string displayName = PlayGamesPlatform.Instance.RealTime.GetSelf().DisplayName;
         string displayName = PlayGamesPlatform.Instance.GetIdToken();
 
-        Debug.LogWarning(string.Format("GPS Info: {0}\n{1}\n{2}\n{3}\n{4}", username, id, isFiened, state, displayName));
+        Debug.LogWarning(string.Format("GPS Info: {0}\n{1}\n{2}\n{3}\n{4}", username, id, isFiened, state, displayName));*/
     }
 
     public void OpenCustomList()
@@ -1067,10 +1053,6 @@ public class MenuScript_v2 : MonoBehaviour
     }
 
     private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors){  return true; }
-
-
-
-
 
 
     static void ClearConsole()
@@ -1125,7 +1107,7 @@ public class MenuScript_v2 : MonoBehaviour
     }
 
 
-#region Server message
+    #region Server message
 
     public GameObject serverMsgAnim;
     public Sprite[] serverMsgSprites;
@@ -1169,5 +1151,5 @@ public class MenuScript_v2 : MonoBehaviour
         else { serverMsgAnim.GetComponent<Animator>().Play("CloseMsg"); isServerMsgOpenned = false; }
     }
 
-#endregion
+    #endregion
 }

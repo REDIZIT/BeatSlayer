@@ -25,5 +25,5 @@ Material:
     - _Offset: 0
     - _Threshold: 0.4
     m_Colors:
-    - _Color: {r: 1, g: 0.23921569, b: 0, a: 1}
-    - _EdgeColor: {r: 2.996078, g: 0, b: 0, a: 0}
+    - _Color: {r: 32, g: 0.3764706, b: 0, a: 1}
+    - _EdgeColor: {r: 2, g: 0, b: 0, a: 1}
