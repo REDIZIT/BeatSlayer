@@ -385,6 +385,12 @@
             <e p="MeleeWeaponTrail.cs" t="Include" />
           </e>
         </e>
+        <e p="MundoSound" t="Include">
+          <e p="Plugins" t="Include">
+            <e p="MSAudioVolume.cs" t="Include" />
+            <e p="MundoSound.cs" t="Include" />
+          </e>
+        </e>
         <e p="NuGetForUnity-master" t="Include">
           <e p="Assets" t="Include">
             <e p="NuGet" t="Include">
@@ -762,6 +768,10 @@
             <e p="Player.cs" t="Include" />
           </e>
           <e p="InGame" t="Include">
+            <e p="Audio" t="Include">
+              <e p="BeatmapAudio.cs" t="Include" />
+              <e p="NativeAudioSource.cs" t="Include" />
+            </e>
             <e p="Basics" t="Include">
               <e p="Helpers.cs" t="Include" />
               <e p="Operations.cs" t="Include" />
@@ -1188,5 +1198,6 @@
     </e>
     <e p="C:\Users\REDIZIT\AppData\Local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
     <e p="C:\Users\REDIZIT\AppData\Local\JetBrains\Rider2020.1\resharper-host\Local\Transient\ReSharperHost\v201\SolutionCaches\_BeatSlayer.-1522180128.00" t="ExcludeRecursive" />
+    <e p="C:\Users\REDIZIT\AppData\Roaming\JetBrains\Rider2020.1\extensions" t="IncludeRecursive" />
   </component>
 </project>

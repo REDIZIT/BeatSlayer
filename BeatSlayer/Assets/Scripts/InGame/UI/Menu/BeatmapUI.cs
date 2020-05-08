@@ -19,6 +19,7 @@ public class BeatmapUI : MonoBehaviour
 {
     public DatabaseScript database;
     public MenuScript_v2 menu;
+    //public BeatmapAudio bmAudio;
     
     public GameObject overlay;
 
@@ -60,6 +61,7 @@ public class BeatmapUI : MonoBehaviour
     {
         overlay.SetActive(true);
         ResetUI();
+        //bmAudio.ResetUI();
         
         authorText.text = listItem.groupInfo.author;
         nameText.text = listItem.groupInfo.name;
@@ -80,6 +82,8 @@ public class BeatmapUI : MonoBehaviour
             loadingCircle.Play();
             ClearContent(beatmapsContent);
             database.GetMapsByTrackAsync(listItem.groupInfo, RefreshBeatmapsList, ShowError);
+            
+            //bmAudio.OnOpen(listItem.groupInfo.author + "-" + listItem.groupInfo.name);
         }
 
         if(!async) RefreshBeatmapsList(mapInfos);
@@ -150,6 +154,8 @@ public class BeatmapUI : MonoBehaviour
         playBtn.SetActive(true);
         locationBtn.SetActive(true);
         deleteBtn.SetActive(true);
+        
+        
     }
     
     
@@ -438,6 +444,8 @@ public class BeatmapUI : MonoBehaviour
         {
             TestManager.DeleteRequest();
         }
+
+        //bmAudio.OnClose();
         
         overlay.SetActive(false);
     }

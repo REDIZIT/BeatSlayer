@@ -95,14 +95,14 @@ public class MenuScript_v2 : MonoBehaviour
         Application.targetFrameRate = 60;
         if(Time.timeScale != 1)
         {
-            Debug.LogWarning("Time scale in menu not 1!");
+            Debug.LogWarning("Time scale in menu is not 1!");
             Time.timeScale = 1;
         }
         debugConsole.SetActive(true);
         
-        #if UNITY_EDITOR
+        /*#if UNITY_EDITOR
         UrlsChecker.IsGameWorkingWithLocalhost();
-        #endif
+        #endif*/
 
         m_currentOrientation = Screen.orientation;
         nextOrientationCheckTime = Time.realtimeSinceStartup + 1f;
@@ -147,7 +147,11 @@ public class MenuScript_v2 : MonoBehaviour
             prefsManager.prefs.coins = 999999;
             prefsManager.Save();
         }
-
+        if (File.Exists(Application.persistentDataPath + "/nomoney.txt"))
+        {
+            prefsManager.prefs.coins = 0;
+            prefsManager.Save();
+        }
 
         mapHss.StartingScreen = prefsManager.prefs.selectedMapId;
         mapLockers[0].SetActive(!prefsManager.prefs.mapUnlocked0);
@@ -177,8 +181,10 @@ public class MenuScript_v2 : MonoBehaviour
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += delegate { videoPlayer.Play(); };
         canvasRect = GameObject.Find("Canvas").GetComponent<RectTransform>().rect.size;
-        if (Screen.height > Screen.width) canvasRect = new Vector2(canvasRect.y, canvasRect.x);
-        UpdateOrientationHanlder(true);
+        
+        // Та нахуй воно мэне нада xD
+        /*if (Screen.height > Screen.width) canvasRect = new Vector2(canvasRect.y, canvasRect.x);
+        UpdateOrientationHanlder(true);*/
     }
 
     
@@ -189,7 +195,7 @@ public class MenuScript_v2 : MonoBehaviour
 
         WebHandlers_Handle();
 
-        UpdateOrientationHanlder();
+        //UpdateOrientationHanlder();
 
         if (Input.GetKeyDown(KeyCode.Escape)) OnExitSwipe();
 

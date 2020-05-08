@@ -24,6 +24,14 @@ namespace InGame.Game.Spawn
         // Beat field stuff
         public float fieldLength;
         public float fieldCrossTime;
+        
+        /*
+#if UNITY_ANDROID
+        bool isEditor = false;
+#else
+        bool isEditor = true;
+#endif*/
+        bool isEditor = Application.isEditor;
 
         public float CubeSpeed
         {
@@ -98,7 +106,8 @@ namespace InGame.Game.Spawn
         public void SabersUpdate()
         {
             bool r = false, l = false; // Включение и выключение мечей
-            if (Application.isEditor)
+
+            if (isEditor)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -216,7 +225,7 @@ namespace InGame.Game.Spawn
             foreach (IBeat beat in cubesToPing.Distinct())
             {
                 int beatSaberType = beat.GetClass().saberType;
-                if (beatSaberType == saberSide || beatSaberType == 0 || Application.isEditor)
+                if (beatSaberType == saberSide || beatSaberType == 0 || isEditor)
                 {
                     beat.OnPoint(dir);
                     break;

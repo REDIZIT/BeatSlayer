@@ -17,8 +17,12 @@ namespace Testing
         {
             get
             {
-                if (Application.isEditor) return new DirectoryInfo(Application.persistentDataPath).Parent + "/Beat Slayer Editor";
+#if UNITY_ANDROID
                 return new DirectoryInfo(Application.persistentDataPath).Parent.Parent + "/com.REDIZIT.BeatSlayerEditor/files";
+#else
+                return new DirectoryInfo(Application.persistentDataPath).Parent + "/Beat Slayer Editor";
+#endif
+                
             }
         }
 

@@ -7,6 +7,11 @@ using UnityEngine;
 public class BeatLine : MonoBehaviour, IBeat
 {
     public BeatCubeClass cls;
+    float Speed
+    {
+        get { return bm.CubeSpeed * cls.speed; }
+    }
+    
     public BeatCubeClass GetClass() { return cls; }
 
     BeatManager bm;
@@ -59,7 +64,7 @@ public class BeatLine : MonoBehaviour, IBeat
     public float totalDist;
     void Movement()
     {
-        transform.position += new Vector3(0, 0, -bm.CubeSpeed * cls.speed);
+        transform.position += new Vector3(0, 0, -Speed);
         totalDist += bm.CubeSpeed * cls.speed;
         if (firstCap.position.z <= maxDistance)
         {
@@ -70,7 +75,7 @@ public class BeatLine : MonoBehaviour, IBeat
     void CapMovement()
     {
         // Cap speed in units/frame
-        float capSpeed = bm.CubeSpeed;
+        float capSpeed = Speed;
         float lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
         float capMax = lineEndTime * bm.fieldLength;
 
@@ -143,14 +148,14 @@ public class BeatLine : MonoBehaviour, IBeat
         float capMax = lineEndTime * bm.fieldLength;
 
         // Offset to selected road second cap at spawn
-        float capRoadOffsetTime = capMax / bm.CubeSpeed;
+        float capRoadOffsetTime = capMax / Speed;
         float capRoadOffsetDistance = secondCapRoadPos - transform.position.x;
         float capRoadOffsetSpeed = capRoadOffsetDistance / capRoadOffsetTime;
 
         gm.BeatLineSliced();
         psystem.Play();
 
-        firstCap.transform.localPosition += new Vector3(capRoadOffsetSpeed, 0, bm.CubeSpeed);
+        firstCap.transform.localPosition += new Vector3(capRoadOffsetSpeed, 0, Speed);
         if(firstCap.transform.localPosition.z >= capMax)
         {
             psystem.transform.parent = null;

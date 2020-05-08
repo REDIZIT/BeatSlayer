@@ -29,62 +29,66 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/ModerationUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/SearchUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MeleeWeaponTrail/Scripts/MeleeWeaponTrail.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/DownloadHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Prefs.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameUIManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Scripts/Controls/ComboBox/AutoCompleteComboBox.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/CheatEngine.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Audio/NativeAudioSource.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/ManagerUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/DatabaseManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/MusicFilesManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MapListItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Localization/Downloader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Misc/LoadingCircle.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/GooglePlayGames/Editor/GPGSUpgrader.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/ProjectManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MundoSound/Plugins/MSAudioVolume.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MundoSound/Plugins/MundoSound.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Examples/MenuExample/Scripts/Menus/GameMenu.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Analyzer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/SettingsManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/TrackListUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/UrlsChecker.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Project.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/MusicFilesUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/SceneControllerUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/TrackListItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/PageController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/ModerationUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/SearchUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/DownloadHelper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Android Native Audio/Scripts/AndroidNativeAudio.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameUIManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/CheatEngine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Audio/BeatmapAudio.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/DatabaseManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/MusicFilesManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/ProjectManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Examples/MenuExample/Scripts/Menus/GameMenu.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/SaberController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/SettingsManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Project.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/TrackListItem.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/MusicFilesManager.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Prefs.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Misc/LoadingCircle.cs" />
         <option value="$PROJECT_DIR$/Assets/DownloadHelper.cs" />
         <option value="$PROJECT_DIR$/../../Localization/Game/Menu.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" />
         <option value="$PROJECT_DIR$/Assets/MapListItem.cs" />
         <option value="$PROJECT_DIR$/Assets/MeleeWeaponTrail/Scripts/MeleeWeaponTrail.cs" />
         <option value="$USER_HOME$/AppData/LocalLow/REDIZIT/Beat Slayer/data/moderation/request.json" />
@@ -92,7 +96,6 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/MusicFilesUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Analyzer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/TrackListUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/SearchUI.cs" />
@@ -105,18 +108,23 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" />
         <option value="$PROJECT_DIR$/Assets/TrackListItem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/CheatEngine.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/UrlsChecker.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Project.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/Translating/Menu.csv" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Audio/BeatmapAudio.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Audio/NativeAudioSource.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
       </list>
     </option>
   </component>
@@ -175,7 +183,11 @@
       <workItem from="1588587882835" duration="3950000" />
       <workItem from="1588592038397" duration="318000" />
       <workItem from="1588594356197" duration="2384000" />
-      <workItem from="1588597748988" duration="9202000" />
+      <workItem from="1588597748988" duration="9312000" />
+      <workItem from="1588673845936" duration="14838000" />
+      <workItem from="1588769282033" duration="1438000" />
+      <workItem from="1588927438510" duration="694000" />
+      <workItem from="1588933396877" duration="2697000" />
     </task>
     <servers />
   </component>
@@ -223,13 +235,13 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="429" y="175" width="1053" height="691" key="editAsTableFormatDialogDimension/0.0.1920.1040@0.0.1920.1040" timestamp="1588600099246" />
-    <state x="616" y="240" key="run.anything.popup" timestamp="1588489478444">
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup" timestamp="1588677664266">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588489478444" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1588619742486">
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588677664266" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1588935549430">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588619742486" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588935549430" />
   </component>
 </project>

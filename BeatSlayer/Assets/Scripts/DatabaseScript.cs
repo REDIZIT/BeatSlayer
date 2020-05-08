@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class DatabaseScript : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class DatabaseScript : MonoBehaviour
     public const string url_hasMapUpdate = "http://176.107.160.146/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
     public const string url_setStatistics = "http://176.107.160.146/Database/SetStatistics?trackname={0}&nick={1}&key={2}&value=1";
     public const string url_setDifficultyStatistics = "http://176.107.160.146/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
+    public const string url_getPrelistenFile = "http://176.107.160.146/Maps/GetPrelistenFile?trackname={0}";
+    public const string url_hasPrelistenFile = "http://176.107.160.146/Maps/HasPrelistenFile?trackname={0}";
     #endregion
     
 
@@ -317,6 +320,70 @@ public class DatabaseScript : MonoBehaviour
 
         return info.publishTime.Ticks > utcTicks;
     }
+
+
+
+    #region Prelisten
+
+    public void HasPrelistenFile(string trackname, Action<bool> callback)
+    {
+        WebClient c = new WebClient();
+
+        c.DownloadStringCompleted += (sender, args) =>
+        {
+            callback(bool.Parse(args.Result));
+        };
+
+        string url = string.Format(url_hasPrelistenFile, trackname);
+        c.DownloadStringAsync(new Uri(url));
+    }
+    public void LoadPrelistenFile(string trackname, Action<AudioClip> callback)
+    {
+        StartCoroutine(ILoadPrelistenFile(trackname, callback));
+    }
+    IEnumerator ILoadPrelistenFile(string trackname, Action<AudioClip> callback)
+    {
+        string url = string.Format(url_getPrelistenFile, trackname);
+        using (WWW www = new WWW(url))
+        {
+            yield return www;
+            callback(www.GetAudioClip(false, false, AudioType.MPEG));
+        }
+        /*using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.MPEG))
+        {
+            yield return www.Send();
+
+            if (www.isNetworkError)
+            {
+                Debug.Log(www.error);
+                callback(null);
+            }
+            else
+            {
+                AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+                callback(myClip);
+            }
+        }        */
+        /*
+        
+        WWW web = new WWW(url);
+        yield return web;
+
+        if (web.bytes.Length != 0)
+        {
+            AudioClip clip = web.GetAudioClip(false, false, AudioType);
+            
+        }
+        else
+        {
+           
+        }*/
+    }
+
+    #endregion    
+    
+    
+    
 
 
     public enum StatisticsKeyType
