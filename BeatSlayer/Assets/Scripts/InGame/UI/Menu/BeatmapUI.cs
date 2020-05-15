@@ -305,11 +305,11 @@ public class BeatmapUI : MonoBehaviour
 
         recordPan.SetActive(false);
         
-        if (doServerStuff && AccountManager.account != null)
+        if (doServerStuff && AccountManager.LegacyAccount != null)
         {
             recordPan.SetActive(true);
             leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
-            AccountManager.GetBestReplay(AccountManager.account.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, (Replay replay) =>
+            AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, (Replay replay) =>
             {
                 if (replay == null)
                 {
@@ -323,7 +323,7 @@ public class BeatmapUI : MonoBehaviour
 
                     leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
                     
-                    AccountManager.GetMapLeaderboardPlace(AccountManager.account.nick,
+                    AccountManager.GetMapLeaderboardPlace(AccountManager.LegacyAccount.nick,
                         currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick,
                         (place =>
                         {

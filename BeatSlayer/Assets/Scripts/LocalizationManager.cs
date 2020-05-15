@@ -17,8 +17,8 @@ namespace Assets.SimpleLocalization
         public static event Action LocalizationChanged = () => { }; 
 
         private static readonly Dictionary<string, Dictionary<string, string>> Dictionary = new Dictionary<string, Dictionary<string, string>>();
-        private static string _language = "Unknown";
-        public static string folderPath = "GameLocalization/Master";
+        public static string _language = "Unknown";
+        public static string folderPath = "BeatSlayerLocaliztion/Master";
 
 		/// <summary>
 		/// Get or set language.

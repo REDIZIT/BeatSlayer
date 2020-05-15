@@ -13,11 +13,12 @@ using Assets.SimpleLocalization;
 using Newtonsoft.Json;
 using GooglePlayGames.BasicApi.Multiplayer;
 using ProjectManagement;
+using UnityEngine.Serialization;
 
 public class AccountManager : MonoBehaviour
 {
-    public static Account account;
-    public Account viewedAccount;
+    public static LegacyAccount LegacyAccount;
+    [FormerlySerializedAs("viewedAccount")] public LegacyAccount viewedLegacyAccount;
 
     [Header("Account page")]
     public ScrollRect accountPageRect;
@@ -64,17 +65,17 @@ public class AccountManager : MonoBehaviour
     {
         //if (instance != null) return;
 
-        if (account == null) return;
+        if (LegacyAccount == null) return;
 
         lastUploadedPlayTime += Time.unscaledDeltaTime;
-        account.playTime = account.playTime.Add(TimeSpan.FromSeconds(Time.unscaledDeltaTime));
+        LegacyAccount.playTime = LegacyAccount.playTime.Add(TimeSpan.FromSeconds(Time.unscaledDeltaTime));
 
-        if (accountPlayTime != null && viewedAccount == null)
+        if (accountPlayTime != null && viewedLegacyAccount == null)
         {
-            string days = account.playTime.ToString("dd") + LocalizationManager.Localize("dd");
-            string hours = account.playTime.ToString("hh") + LocalizationManager.Localize("hh");
-            string minutes = account.playTime.ToString("mm") + LocalizationManager.Localize("mm");
-            string secs = account.playTime.ToString("ss") + LocalizationManager.Localize("ss");
+            string days = LegacyAccount.playTime.ToString("dd") + LocalizationManager.Localize("dd");
+            string hours = LegacyAccount.playTime.ToString("hh") + LocalizationManager.Localize("hh");
+            string minutes = LegacyAccount.playTime.ToString("mm") + LocalizationManager.Localize("mm");
+            string secs = LegacyAccount.playTime.ToString("ss") + LocalizationManager.Localize("ss");
             accountPlayTime.text = LocalizationManager.Localize("PlayTime") + " " + days + " " + hours + " " + minutes + " " + secs;
 
             if (lastUploadedPlayTime >= 30)
@@ -97,7 +98,7 @@ public class AccountManager : MonoBehaviour
             if (authResult.Contains("[ERR]")) Debug.LogError("Auth error: " + authResult);
             else
             {
-                account = JsonConvert.DeserializeObject<Account>(authResult);
+                LegacyAccount = JsonConvert.DeserializeObject<LegacyAccount>(authResult);
                 // !!!!!!!!!!!!
             }
         });
@@ -116,7 +117,7 @@ public class AccountManager : MonoBehaviour
             if (authResult.Contains("[ERR]")) Debug.LogError("Auth error: " + authResult);
             else
             {
-                account = JsonConvert.DeserializeObject<Account>(authResult);
+                LegacyAccount = JsonConvert.DeserializeObject<LegacyAccount>(authResult);
                 // !!!!!!!!!!!!
             }
 
@@ -131,7 +132,7 @@ public class AccountManager : MonoBehaviour
         WebClient c = new WebClient();
 
         //string json = "";
-        string json = JsonConvert.SerializeObject(account);
+        string json = JsonConvert.SerializeObject(LegacyAccount);
         // !!!!!!!!!!!!
 
         CI.HttpClient.HttpClient client = new CI.HttpClient.HttpClient();
@@ -185,35 +186,35 @@ public class AccountManager : MonoBehaviour
         if (!(Application.internetReachability != NetworkReachability.NotReachable)) return;
 
         loadingCircle.SetActive(true);
-        if (account == null) { loadingCircle.SetActive(false); return; }
+        if (LegacyAccount == null) { loadingCircle.SetActive(false); return; }
         loadingCircle.SetActive(false);
 
-        viewedAccount = null;
+        viewedLegacyAccount = null;
 
         accountPageScreen.ChangeState(accountPageScreen.gameObject);
 
-        accountNick.text = account.nick;
-        accountEmail.text = account.email;
+        accountNick.text = LegacyAccount.nick;
+        accountEmail.text = LegacyAccount.email;
 
         
-        playedTimes.text = $"{LocalizationManager.Localize("Played")} {account.playedMaps.Count} {LocalizationManager.Localize(account.playedMaps.Count <= 1 ? "map(one)" : "map(many)")} {account.playedMaps.Sum(c => c.playTimes)} {LocalizationManager.Localize("times")}";
+        playedTimes.text = $"{LocalizationManager.Localize("Played")} {LegacyAccount.playedMaps.Count} {LocalizationManager.Localize(LegacyAccount.playedMaps.Count <= 1 ? "map(one)" : "map(many)")} {LegacyAccount.playedMaps.Sum(c => c.playTimes)} {LocalizationManager.Localize("times")}";
 
-        string days = account.playTime.ToString("dd") + LocalizationManager.Localize("dd");
-        string hours = account.playTime.ToString("hh") + LocalizationManager.Localize("hh");
-        string minutes = account.playTime.ToString("mm") + LocalizationManager.Localize("mm");
-        string secs = account.playTime.ToString("ss") + LocalizationManager.Localize("ss");
+        string days = LegacyAccount.playTime.ToString("dd") + LocalizationManager.Localize("dd");
+        string hours = LegacyAccount.playTime.ToString("hh") + LocalizationManager.Localize("hh");
+        string minutes = LegacyAccount.playTime.ToString("mm") + LocalizationManager.Localize("mm");
+        string secs = LegacyAccount.playTime.ToString("ss") + LocalizationManager.Localize("ss");
         accountPlayTime.text = LocalizationManager.Localize("PlayTime") + " " + days + " " + hours + " " + minutes + " " + secs;
 
-        accountRegTime.text = LocalizationManager.Localize("Registered") + " " + account.regTime.ToString($"dd.MM.yyyy '{LocalizationManager.Localize("in")}' HH:mm");
+        accountRegTime.text = LocalizationManager.Localize("Registered") + " " + LegacyAccount.regTime.ToString($"dd.MM.yyyy '{LocalizationManager.Localize("in")}' HH:mm");
 
-        if (account.score != 0) ratingText.text = LocalizationManager.Localize("RankingPlace") + " #" + account.ratingPlace + $"\n<size=32>{account.score} {LocalizationManager.Localize("RankingScore")}</size>";
+        if (LegacyAccount.score != 0) ratingText.text = LocalizationManager.Localize("RankingPlace") + " #" + LegacyAccount.ratingPlace + $"\n<size=32>{LegacyAccount.score} {LocalizationManager.Localize("RankingScore")}</size>";
         else ratingText.text = "<size=32>" + LocalizationManager.Localize("RankingPlaceUnknown") + "</size>";
 
-        LoadAvatar(account.nick);
+        LoadAvatar(LegacyAccount.nick);
 
-        RefreshPlayedMaps(account);
+        RefreshPlayedMaps(LegacyAccount);
 
-        RefreshLeaderboard(account);
+        RefreshLeaderboard(LegacyAccount);
     }
 
     #endregion
@@ -230,32 +231,32 @@ public class AccountManager : MonoBehaviour
 
         if (response.Contains("[ERR]")) { Debug.LogError("Loading another account err: " + response); return; }
 
-        viewedAccount = JsonConvert.DeserializeObject<Account>(response);
+        viewedLegacyAccount = JsonConvert.DeserializeObject<LegacyAccount>(response);
         // !!!!!!!!!!!!
 
 
         accountPageScreen.ChangeState(accountPageScreen.gameObject);
 
-        accountNick.text = viewedAccount.nick;
+        accountNick.text = viewedLegacyAccount.nick;
         accountEmail.text = "";
 
-        playedTimes.text = "Сыграл " + viewedAccount.playedMaps.Count + " карт(-ы) " + viewedAccount.playedMaps.Sum(c => c.playTimes) + " раз(-а)";
+        playedTimes.text = "Сыграл " + viewedLegacyAccount.playedMaps.Count + " карт(-ы) " + viewedLegacyAccount.playedMaps.Sum(c => c.playTimes) + " раз(-а)";
 
-        string days = viewedAccount.playTime.ToString("dd");
-        string hours = viewedAccount.playTime.ToString("hh");
-        string minutes = viewedAccount.playTime.ToString("mm");
+        string days = viewedLegacyAccount.playTime.ToString("dd");
+        string hours = viewedLegacyAccount.playTime.ToString("hh");
+        string minutes = viewedLegacyAccount.playTime.ToString("mm");
         accountPlayTime.text = "В игре " + days + "д " + hours + "ч " + minutes + "мин";
 
-        accountRegTime.text = "Зарегался " + viewedAccount.regTime.ToString("dd.MM.yyyy 'в' HH:mm");
+        accountRegTime.text = "Зарегался " + viewedLegacyAccount.regTime.ToString("dd.MM.yyyy 'в' HH:mm");
 
-        if (viewedAccount.score != 0) ratingText.text = "Место в рейтинге #" + viewedAccount.ratingPlace + $"\n<size=32>{viewedAccount.score} очков</size>";
+        if (viewedLegacyAccount.score != 0) ratingText.text = "Место в рейтинге #" + viewedLegacyAccount.ratingPlace + $"\n<size=32>{viewedLegacyAccount.score} очков</size>";
         else ratingText.text = "Место в рейтинге ещё не определено";
 
-        LoadAvatar(viewedAccount.nick);
+        LoadAvatar(viewedLegacyAccount.nick);
 
-        RefreshPlayedMaps(viewedAccount);
+        RefreshPlayedMaps(viewedLegacyAccount);
 
-        RefreshLeaderboard(viewedAccount);
+        RefreshLeaderboard(viewedLegacyAccount);
     }
     Task<string> LoadAnotherAccount(string nick)
     {
@@ -269,7 +270,7 @@ public class AccountManager : MonoBehaviour
 
     #endregion
 
-    async void RefreshLeaderboard(Account acc)
+    async void RefreshLeaderboard(LegacyAccount acc)
     {
         bigLeaderboardContent.parent.GetChild(1).gameObject.SetActive(true);
 
@@ -306,7 +307,7 @@ public class AccountManager : MonoBehaviour
         });
     }
 
-    void RefreshPlayedMaps(Account acc)
+    void RefreshPlayedMaps(LegacyAccount acc)
     {
         foreach (Transform child in playedMapsContent) if (child.name != "Item") Destroy(child.gameObject);
 
@@ -350,11 +351,11 @@ public class AccountManager : MonoBehaviour
 
     public void UpdateRecord(string author, string name, string nick, AccountTrackRecord newRecord)
     {
-        if (account == null) return;
+        if (LegacyAccount == null) return;
 
-        if(account.records.Exists(c => c.author == author && c.name == name && c.nick == nick))
+        if(LegacyAccount.records.Exists(c => c.author == author && c.name == name && c.nick == nick))
         {
-            AccountTrackRecord record = account.records.Find(c => c.author == author && c.name == name && c.nick == nick);
+            AccountTrackRecord record = LegacyAccount.records.Find(c => c.author == author && c.name == name && c.nick == nick);
             if(newRecord.score > record.score)
             {
                 record.score = newRecord.score;
@@ -373,13 +374,13 @@ public class AccountManager : MonoBehaviour
                 missed = newRecord.missed,
                 accuracy = newRecord.accuracy
             };
-            account.records.Add(record);
+            LegacyAccount.records.Add(record);
         }
     }
     public AccountTrackRecord GetRecord(string author, string name, string nick)
     {
-        if (account == null) return null;
-        AccountTrackRecord record = account.records.Find(c => c.author == author && c.name == name && c.nick == nick);
+        if (LegacyAccount == null) return null;
+        AccountTrackRecord record = LegacyAccount.records.Find(c => c.author == author && c.name == name && c.nick == nick);
         return record;
     }
 
@@ -390,15 +391,15 @@ public class AccountManager : MonoBehaviour
 
     public void UpdatePlayedMap(string author, string name, string nick)
     {
-        if (account == null) return;
+        if (LegacyAccount == null) return;
 
-        if (account.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick))
+        if (LegacyAccount.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick))
         {
-            account.playedMaps.Find(c => c.author == author && c.name == name && c.nick == nick).playTimes++;
+            LegacyAccount.playedMaps.Find(c => c.author == author && c.name == name && c.nick == nick).playTimes++;
         }
         else
         {
-            account.playedMaps.Add(new AccountMapInfo()
+            LegacyAccount.playedMaps.Add(new AccountMapInfo()
             {
                 author = author,
                 name = name,
@@ -410,15 +411,15 @@ public class AccountManager : MonoBehaviour
 
     public bool IsPassed(string author, string name, string nick)
     {
-        if (account == null) return false;
+        if (LegacyAccount == null) return false;
 
-        return account.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick);
+        return LegacyAccount.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick);
     }
     public static bool IsPassed(string author, string name)
     {
-        if (account == null) return false;
+        if (LegacyAccount == null) return false;
 
-        return account.playedMaps.Exists(c => c.author == author && c.name == name);
+        return LegacyAccount.playedMaps.Exists(c => c.author == author && c.name == name);
     }
 
     #endregion
@@ -427,12 +428,12 @@ public class AccountManager : MonoBehaviour
 
     public void UpdateSessionTime()
     {
-        if (account == null) return;
+        if (LegacyAccount == null) return;
 
         int secondsToAdd = Mathf.RoundToInt(lastUploadedPlayTime);
         lastUploadedPlayTime = 0;
 
-        SendRequestAsync((string response) => { }, url_playTime, account.nick, secondsToAdd);
+        SendRequestAsync((string response) => { }, url_playTime, LegacyAccount.nick, secondsToAdd);
     }
     //public float lastUpdatedSession;
     //public void UpdateSessionTime()
@@ -464,7 +465,7 @@ public class AccountManager : MonoBehaviour
 
     public void OnAvatarClick()
     {
-        if (viewedAccount != null) return;
+        if (viewedLegacyAccount != null) return;
         NativeGallery.GetImageFromGallery(new NativeGallery.MediaPickCallback(OnAvatarSelected), "Select avatar");
     }
 
@@ -478,7 +479,7 @@ public class AccountManager : MonoBehaviour
 
     public async void SendAvatarFile(string filepath)
     {
-        if (account == null) return;
+        if (LegacyAccount == null) return;
         
 
         CI.HttpClient.HttpClient client = new CI.HttpClient.HttpClient();
@@ -486,8 +487,8 @@ public class AccountManager : MonoBehaviour
         byte[] buffer = File.ReadAllBytes(filepath);
         var httpContent = new CI.HttpClient.MultipartFormDataContent();
 
-        httpContent.Add(new CI.HttpClient.StringContent(account.nick), "nick");
-        httpContent.Add(new CI.HttpClient.StringContent(account.password), "password");
+        httpContent.Add(new CI.HttpClient.StringContent(LegacyAccount.nick), "nick");
+        httpContent.Add(new CI.HttpClient.StringContent(LegacyAccount.password), "password");
 
         CI.HttpClient.ByteArrayContent content = new CI.HttpClient.ByteArrayContent(buffer, "multipart/form-data");
         httpContent.Add(content, "file", Path.GetFileName(filepath));
@@ -517,7 +518,7 @@ public class AccountManager : MonoBehaviour
         byte[] bytes = null;
 
         string imgPath = Application.persistentDataPath + "/data/account/avatar.pic";
-        if(account.nick == nick && File.Exists(imgPath))
+        if(LegacyAccount.nick == nick && File.Exists(imgPath))
         {
             bytes = File.ReadAllBytes(imgPath);
         }
@@ -527,7 +528,7 @@ public class AccountManager : MonoBehaviour
             {
                 WebClient c = new WebClient();
                 bytes = c.DownloadData(url_getAvatar + nick);
-                if(account.nick == nick) File.WriteAllBytes(imgPath, bytes);
+                if(LegacyAccount.nick == nick) File.WriteAllBytes(imgPath, bytes);
             });
 
         }
@@ -542,7 +543,7 @@ public class AccountManager : MonoBehaviour
 
     public async void OpenLeaderboard()
     {
-        if (account == null) return;
+        if (LegacyAccount == null) return;
 
         bigLeaderboardLocker.gameObject.SetActive(true);
 
@@ -585,7 +586,7 @@ public class AccountManager : MonoBehaviour
             item.GetComponentsInChildren<Text>()[2].text = score;
             item.GetComponent<AccountItemButton>().Setup(this, nick);
 
-            if(nick == account.nick)
+            if(nick == LegacyAccount.nick)
             {
                 item.GetComponent<Image>().color = new Color32(255, 70, 0, 255);
                 item.GetComponentsInChildren<Text>()[2].color = Color.white;
@@ -615,7 +616,7 @@ public class AccountManager : MonoBehaviour
 
     public static void SendReplay(Replay replay, Action<double> callback)
     {
-        replay.player = account.nick;
+        replay.player = LegacyAccount.nick;
 
         WebClient c = new WebClient();
         //c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
@@ -627,7 +628,7 @@ public class AccountManager : MonoBehaviour
         //    callback(double.Parse(e.Result, System.Globalization.CultureInfo.InvariantCulture));
         //};
 
-        string url = string.Format(url_sendReplay, account.nick, JsonConvert.SerializeObject(replay));
+        string url = string.Format(url_sendReplay, LegacyAccount.nick, JsonConvert.SerializeObject(replay));
         //c.DownloadStringAsync(new Uri(url));
         string RPstr = c.DownloadString(url);
         Debug.Log(url + "\n" + RPstr);
@@ -697,8 +698,7 @@ public class AccountManager : MonoBehaviour
 }
 
 
-
-public class Account
+public class LegacyAccount
 {
     public string nick;
     public string email;

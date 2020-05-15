@@ -74,8 +74,8 @@ namespace Searching
             {
                 ls = ls.Where(t =>
                     showType == ShowType.OnlyNew ? t.IsNew : 
-                    showType == ShowType.Played ? AccountManager.account.playedMaps.Any(m => m.author + "-" + m.name == t.author + "-" + t.name) : 
-                    AccountManager.account.playedMaps.Any(m => m.author + "-" + m.name != t.author + "-" + t.name));
+                    showType == ShowType.Played ? AccountManager.LegacyAccount.playedMaps.Any(m => m.author + "-" + m.name == t.author + "-" + t.name) : 
+                    AccountManager.LegacyAccount.playedMaps.Any(m => m.author + "-" + m.name != t.author + "-" + t.name));
             }
 
 

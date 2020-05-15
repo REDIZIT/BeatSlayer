@@ -7,17 +7,7 @@ namespace Assets.SimpleLocalization
     public class LocalizedText : MonoBehaviour
     {
         public string LocalizationKey;
-
-        [TextArea]
-        public string stringToTranslate;
-
-        public string langString;
-
-        public void OnValidate()
-        {
-            if(langString != null && stringToTranslate != null) langString = stringToTranslate.Replace("\n", "[N]").Replace(",", "[comma]");
-        }
-
+        
         public void Start()
         {
             Localize();

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -35,7 +36,7 @@ public class TextExtender : MonoBehaviour
     public Vector2 margin;
 
 
-    private void Start()
+    private void Awake()
     {
         UpdateThis();
         prevText = text.text;
@@ -59,12 +60,17 @@ public class TextExtender : MonoBehaviour
 
     public void UpdateThis()
     {
-        //if (!enabled) return;
+        if (!enabled) return;
 
         RectTransform rect = GetComponent<RectTransform>();
 
-        rect.sizeDelta = new Vector2(text.preferredWidth + margin.x * 2, text.preferredHeight + margin.y * 2);
-        text.Rebuild(CanvasUpdate.MaxUpdateValue);
+        float width = text.preferredWidth + margin.x * 2;
+        rect.sizeDelta = new Vector2(width, 0);
+        
+        //text.Rebuild(CanvasUpdate.MaxUpdateValue);
+
+        float height = text.preferredHeight + margin.y * 2;
+        rect.sizeDelta = new Vector2(width, height);
     }
 
 }

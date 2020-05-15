@@ -74,6 +74,8 @@ public class MenuScript_v2 : MonoBehaviour
     [Header("Misc")]
     public GameObject newTracksImg;
 
+    public string editorLanguage;
+
 
     public Transform tutorialLocker;
     public AudioSource aSource;
@@ -107,6 +109,8 @@ public class MenuScript_v2 : MonoBehaviour
         m_currentOrientation = Screen.orientation;
         nextOrientationCheckTime = Time.realtimeSinceStartup + 1f;
 
+        TranslateStart();
+        
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
 
         Database.Init();
@@ -128,9 +132,7 @@ public class MenuScript_v2 : MonoBehaviour
         PlayGamesPlatform.InitializeInstance(config);
         PlayGamesPlatform.Activate();
         Social.localUser.Authenticate(LoadGPSUser);*/
-
-
-        TranslateStart();
+        
         UnlockMapsTranslate();
 
         HandleDev();
@@ -337,7 +339,8 @@ public class MenuScript_v2 : MonoBehaviour
     {
         if(Application.isEditor)
         {
-            LocalizationManager.Language = "Russian";
+            LocalizationManager._language = editorLanguage;
+            LocalizationManager.Read();
             return;
         }
         if (Application.systemLanguage == SystemLanguage.Russian || Application.systemLanguage == SystemLanguage.Ukrainian) LocalizationManager.Language = "Russian";

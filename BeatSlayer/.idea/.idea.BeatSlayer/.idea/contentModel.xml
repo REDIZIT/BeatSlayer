@@ -32,8 +32,6 @@
             <e p="shot.cs" t="Include" />
           </e>
         </e>
-        <e p="BossHelper.cs" t="Include" />
-        <e p="BossLevel.cs" t="Include" />
         <e p="Cleaner" t="Include">
           <e p="Editor" t="Include">
             <e p="AssetReferenceCollection.cs" t="Include" />
@@ -100,6 +98,10 @@
           <e p="LocalizationSyncEditor.cs" t="Include" />
           <e p="ShaderReferenceCollection.cs" t="Include" />
         </e>
+        <e p="EmojiInfo" t="Include">
+          <e p="info.txt" t="Include" />
+        </e>
+        <e p="EmojiTexture.cs" t="Include" />
         <e p="FlexibleColorPicker" t="Include">
           <e p="Materials" t="Include">
             <e p="FCP_Gradient.shader" t="Include" />
@@ -611,6 +613,11 @@
             <e p="NativeGallery.cs" t="Include" />
             <e p="readme.txt" t="Include" />
           </e>
+          <e p="Other" t="Include">
+            <e p="UnityMainThreadDispatcher-master" t="Include">
+              <e p="UnityMainThreadDispatcher.cs" t="Include" />
+            </e>
+          </e>
           <e p="RainbowFolders" t="Include">
             <e p="Editor" t="Include">
               <e p="Scripts" t="Include">
@@ -724,7 +731,6 @@
             </e>
           </e>
         </e>
-        <e p="PollScript.cs" t="Include" />
         <e p="PullToRefresh" t="Include">
           <e p="Examples" t="Include">
             <e p="Scripts" t="Include">
@@ -737,7 +743,6 @@
             <e p="UIRefreshControl.cs" t="Include" />
           </e>
         </e>
-        <e p="SaberBehavior.cs" t="Include" />
         <e p="ScreenShooter.cs" t="Include" />
         <e p="Scripts" t="Include">
           <e p="Analyzer.cs" t="Include" />
@@ -754,6 +759,9 @@
             <e p="CustomDropdown.cs" t="Include" />
             <e p="CustomSlider.cs" t="Include" />
             <e p="CustomToggle.cs" t="Include" />
+            <e p="InputField" t="Include">
+              <e p="CustomInputField.cs" t="Include" />
+            </e>
             <e p="SettingsManager.cs" t="Include" />
             <e p="Sliders" t="Include">
               <e p="RangeSlider.cs" t="Include" />
@@ -763,6 +771,7 @@
           </e>
           <e p="DailyRewarder.cs" t="Include" />
           <e p="DatabaseScript.cs" t="Include" />
+          <e p="EmojiAtlasBaker.cs" t="Include" />
           <e p="GPGamesManager.cs" t="Include" />
           <e p="GRAY" t="Include">
             <e p="Player.cs" t="Include" />
@@ -790,6 +799,9 @@
               <e p="GameManager.cs" t="Include" />
               <e p="GameUIManager.cs" t="Include" />
             </e>
+            <e p="Helpers" t="Include">
+              <e p="TextContainer.cs" t="Include" />
+            </e>
             <e p="Management" t="Include">
               <e p="AccountManager.cs" t="Include" />
               <e p="CoversManager.cs" t="Include" />
@@ -798,6 +810,30 @@
               <e p="MusicFilesManager.cs" t="Include" />
               <e p="ProjectManager.cs" t="Include" />
               <e p="TestManager.cs" t="Include" />
+            </e>
+            <e p="Multiplayer" t="Include">
+              <e p="Account" t="Include">
+                <e p="Account.cs" t="Include" />
+                <e p="AccountSignUI.cs" t="Include" />
+                <e p="AccountUI.cs" t="Include" />
+                <e p="Profile" t="Include">
+                  <e p="ProfileEditUI.cs" t="Include" />
+                  <e p="ProfileUI.cs" t="Include" />
+                </e>
+              </e>
+              <e p="Chat" t="Include">
+                <e p="ChatAvatarLoader.cs" t="Include" />
+                <e p="ChatMessageItem.cs" t="Include" />
+                <e p="ChatUI.cs" t="Include" />
+              </e>
+              <e p="MultiplayerCore.cs" t="Include" />
+              <e p="Notifications" t="Include">
+                <e p="NotificationUI.cs" t="Include" />
+                <e p="NotificationUIItem.cs" t="Include" />
+              </e>
+              <e p="WebAPI" t="Include">
+                <e p="WebAPI.cs" t="Include" />
+              </e>
             </e>
             <e p="Ranking.cs" t="Include" />
             <e p="SceneController.cs" t="Include" />
@@ -845,6 +881,7 @@
             <e p="AdvancedSaveManager.cs" t="Include" />
             <e p="SSytem.cs" t="Include" />
           </e>
+          <e p="ShowOffEmoji.cs" t="Include" />
           <e p="SpawnPointScript.cs" t="Include" />
           <e p="SuperBlur" t="Include">
             <e p="Core" t="Include">
@@ -862,8 +899,13 @@
           </e>
         </e>
         <e p="ScrollRectRefresher.cs" t="Include" />
+        <e p="Shaders" t="Include">
+          <e p="AlphaGradientShader.shader" t="Include" />
+          <e p="AndroidTransparent" t="Include">
+            <e p="AndroidTransparent.shader" t="Include" />
+          </e>
+        </e>
         <e p="SpectrumVisualizer.cs" t="Include" />
-        <e p="testscript.cs" t="Include" />
         <e p="TextMesh Pro" t="Include">
           <e p="Resources" t="Include">
             <e p="LineBreaking Following Characters.txt" t="Include" />

@@ -210,14 +210,14 @@ public class FinishHandler : MonoBehaviour
 
         RPText.text = ".";
 
-        if (AccountManager.account == null) yield break;
+        if (AccountManager.LegacyAccount == null) yield break;
 
         uploadingText.SetActive(true);
 
         RPText.text = "..";
 
         Replay bestReplay = null;
-        AccountManager.GetBestReplay(AccountManager.account.nick, trackname, gm.project.creatorNick, (Replay replay) =>
+        AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, trackname, gm.project.creatorNick, (Replay replay) =>
         {
             bestReplay = replay;
         });
@@ -271,7 +271,7 @@ public class FinishHandler : MonoBehaviour
         foreach (var item in leaderboardReplays)
         {
             place++;
-            CreateLeaderboardItem(item, prefab, place, item.player == AccountManager.account.nick);
+            CreateLeaderboardItem(item, prefab, place, item.player == AccountManager.LegacyAccount.nick);
             height += 80 + 4;
         }
 

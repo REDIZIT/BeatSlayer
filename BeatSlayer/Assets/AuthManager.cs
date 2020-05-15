@@ -41,7 +41,7 @@ public class AuthManager : MonoBehaviour
         }
         else
         {
-            //locker.SetActive(true);
+            
         }
     }
     private void Update()
@@ -79,7 +79,7 @@ public class AuthManager : MonoBehaviour
                 locker.SetActive(false);
 
                 string filepath = Application.persistentDataPath + "/session.txt";
-                File.WriteAllText(filepath, AccountManager.account.nick + ":" + AccountManager.account.password);
+                File.WriteAllText(filepath, AccountManager.LegacyAccount.nick + ":" + AccountManager.LegacyAccount.password);
             }
         }
         else if(req == "SignUp")
@@ -114,7 +114,7 @@ public class AuthManager : MonoBehaviour
     {
         if (!(Application.internetReachability != NetworkReachability.NotReachable)) return;
 
-        if (AccountManager.account == null)
+        if (AccountManager.LegacyAccount == null)
         {
             locker.SetActive(true);
             locker.transform.GetChild(1).gameObject.SetActive(true);
@@ -207,7 +207,7 @@ public class AuthManager : MonoBehaviour
         File.Delete(Application.persistentDataPath + "/session.txt");
         File.Delete(Application.persistentDataPath + "/data/account/avatar.pic");
 
-        AccountManager.account = null;
+        AccountManager.LegacyAccount = null;
     }
 
 
