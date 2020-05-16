@@ -8,13 +8,14 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 using BeatSlayerServer.Multiplayer.Accounts;
+using GameNet;
 using Profile;
 
 namespace Multiplayer.Accounts
 {
     public class AccountUI : MonoBehaviour
     {
-        MultiplayerCore core;
+        MultiplayerMenuWrapper wrapper;
         public AccountSignUI signUI;
         public ProfileUI profileUI;
         public ProfileEditUI profileEditUI;
@@ -25,25 +26,44 @@ namespace Multiplayer.Accounts
 
         public GameObject messageWindow;
         public Text messageBodyText;
-        
 
-        public void OnConnect(MultiplayerCore core)
+
+        // Invoked by wrapper on configuration netcore
+        public void Configure()
         {
-            this.core = core;
+            NetCore.Subs.Accounts_OnLogIn += OnLogIn;
+        }
+
+        public void OnConnect(MultiplayerMenuWrapper wrapper)
+        {
+            this.wrapper = wrapper;
+            //Subscribe();
             LogInBySession();
         }
 
+        /*void Subscribe()
+        {
+            MultiplayerCore.subscribtions.Accounts_OnLogIn += OnLogIn;
+            MultiplayerCore.subscribtions.Accounts_OnSignUp += OnSignUp;
+            //MultiplayerCore.subscribtions.Accounts_OnAccountView += OnAccountView;
+            MultiplayerCore.subscribtions.Accounts_OnRestore += OnRestore;
+            MultiplayerCore.subscribtions.Accounts_OnConfirmRestore += OnConfirmRestore;
+            MultiplayerCore.subscribtions.Accounts_OnChangeEmail += OnChangeEmail;
+            MultiplayerCore.subscribtions.Accounts_OnChangePassword += OnChangePassword;
+        }*/
+        
+
         private void Update()
         {
-            if (core == null || core.account == null) return;
-            core.account.InGameTime += TimeSpan.FromSeconds(Time.unscaledDeltaTime);
+            if (wrapper == null || NetCorePayload.CurrentAccount== null) return;
+            NetCorePayload.CurrentAccount.InGameTime += TimeSpan.FromSeconds(Time.unscaledDeltaTime);
             if(Time.realtimeSinceStartup - inGameTimeSent > 30) UpdateInGameTime();
         }
 
 
         public void OnProfileBtnClick()
         {
-            if (core.account == null)
+            if (NetCorePayload.CurrentAccount== null)
             {
                 signUI.ShowLogIn();
             }
@@ -77,19 +97,18 @@ namespace Multiplayer.Accounts
                 File.Delete(path);
                 return;
             }
-            Debug.Log("Decrypted: " + decrypted);
+
             string[] lines = decrypted.Split('|');
             string nick = lines[0];
             string password = lines[1];
             
-            Debug.Log("Auto log in with " + nick + " and " + password);
             isLoginBySession = true;
             LogIn(nick, password);
         }
 
         public void RefreshSession(string password)
         {
-            sessionToWrite = core.account.Nick + "|" + password;
+            sessionToWrite = NetCorePayload.CurrentAccount.Nick + "|" + password;
             DeleteSession();
             CreateSession();
         }
@@ -113,36 +132,37 @@ namespace Multiplayer.Accounts
 
         public void LogIn(string nick, string password)
         {
-            core.conn.InvokeAsync("Accounts_LogIn", nick, password);
+            //MultiplayerCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
+            NetCore.ServerActions.Accounts_LogIn(nick, password);
             sessionToWrite = nick + '|' + password;
         }
         public void SignUp(string nick, string password, string country, string email)
         {
-            core.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
+            MultiplayerCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
         }
         public void LogOut()
         {
             DeleteSession();
-            core.account = null;
+            NetCorePayload.CurrentAccount= null;
             
         }
 
         public void UpdateInGameTime()
         {
-            if (core.account == null) return;
+            if (NetCorePayload.CurrentAccount== null) return;
             float toSend = Time.realtimeSinceStartup - inGameTimeSent;
             inGameTimeSent = Time.realtimeSinceStartup;
 
-            core.conn.InvokeAsync("Accounts_UpdateInGameTime", core.account.Nick, Mathf.Round(toSend));
+            //MultiplayerCore.conn.InvokeAsync("Accounts_UpdateInGameTime", NetCorePayload.CurrentAccount.Nick, Mathf.Round(toSend));
         }
         
         public void Restore(string nick, string password)
         {
-            core.conn.InvokeAsync("Accounts_Restore", nick, password);
+            MultiplayerCore.conn.InvokeAsync("Accounts_Restore", nick, password);
         }
         public void ConfirmRestore(string code)
         {
-            core.conn.InvokeAsync("Accounts_ConfirmRestore", code);
+            MultiplayerCore.conn.InvokeAsync("Accounts_ConfirmRestore", code);
         }
 
         public void OnChangePassword(OperationMessage msg)
@@ -158,7 +178,7 @@ namespace Multiplayer.Accounts
         
         public void ViewAccount(string nick)
         {
-            core.conn.InvokeAsync("Accounts_View", nick);
+            MultiplayerCore.conn.InvokeAsync("Accounts_View", nick);
         }
 
 
@@ -166,7 +186,7 @@ namespace Multiplayer.Accounts
 
         public void SaveAvatarToCache(bool force = false)
         {
-            if (core.account == null) return;
+            if (NetCorePayload.CurrentAccount== null) return;
             
             string filepath = Application.persistentDataPath + "/data/account/avatar.pic";
             /*if (!force && File.Exists(filepath))
@@ -176,7 +196,7 @@ namespace Multiplayer.Accounts
                 return;
             }
             */
-            Web.WebAPI.GetAvatar(core.account.Nick, bytes =>
+            Web.WebAPI.GetAvatar(NetCorePayload.CurrentAccount.Nick, bytes =>
             {
                 File.WriteAllBytes(filepath, bytes);
                 profileUI.OnGetAvatar(bytes);
@@ -185,7 +205,7 @@ namespace Multiplayer.Accounts
 
         public void SaveBackgroundToCache(bool force = false)
         {
-            if (core.account == null) return;
+            if (NetCorePayload.CurrentAccount== null) return;
             
             string filepath = Application.persistentDataPath + "/data/account/background.pic";
             /*if (!force && File.Exists(filepath))
@@ -195,7 +215,7 @@ namespace Multiplayer.Accounts
                 return;
             }
             */
-            Web.WebAPI.GetBackground(core.account.Nick, bytes =>
+            Web.WebAPI.GetBackground(NetCorePayload.CurrentAccount.Nick, bytes =>
             {
                 File.WriteAllBytes(filepath, bytes);
                 profileUI.OnGetBackground(bytes);
@@ -214,7 +234,7 @@ namespace Multiplayer.Accounts
             }
             if (op.Type == OperationMessage.OperationType.Success)
             {
-                core.account = JsonConvert.DeserializeObject<Account>(op.Message);
+                NetCorePayload.CurrentAccount= JsonConvert.DeserializeObject<Account>(op.Message);
                 CreateSession();
                 SaveAvatarToCache();
                 SaveBackgroundToCache();

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Assets.SimpleLocalization;
+using GameNet;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,6 @@ namespace Profile
 {
     public class ProfileUI : MonoBehaviour
     {
-        public MultiplayerCore core;
         public ProfileEditUI editui;
 
         public Animator anim;
@@ -20,8 +20,8 @@ namespace Profile
         [Header("Header")] 
         public RawImage avatarImage;
         public Text nickText;
-        //public RawImage backgroundImage;
-        public Image backgroundImage;
+        public RawImage backgroundImage;
+        //public Image backgroundImage;
         public RectTransform header;
         public GameObject devIcon;
 
@@ -42,8 +42,8 @@ namespace Profile
 
         private void Update()
         {
-            if (core.account == null) return;
-            inGameText.text = GetTimeString(core.account.InGameTime);
+            if (NetCorePayload.CurrentAccount == null) return;
+            inGameText.text = GetTimeString(NetCorePayload.CurrentAccount.InGameTime);
         }
 
         public void OnEditBtnClick()
@@ -69,25 +69,25 @@ namespace Profile
         }
         public void ShowOwnAccount()
         {
-            if (core.account == null) return;
+            if (NetCorePayload.CurrentAccount == null) return;
 
             Open();
             
             anim.Play("Show");
-            nickText.text = core.account.Nick;
-            devIcon.SetActive(core.account.Nick == "REDIZIT");
+            nickText.text = NetCorePayload.CurrentAccount.Nick;
+            devIcon.SetActive(NetCorePayload.CurrentAccount.Nick == "REDIZIT");
 
 
             ShowButtons(true, true);
             
 
-            placeText.text = core.account.PlaceInRanking <= 0 ? "-" : "#" + core.account.PlaceInRanking;
-            inGameText.text = GetTimeString(core.account.InGameTime);
-            RPText.text = core.account.RP + "";
-            accuracyText.text = core.account.Accuracy == -1 ? "-" : Mathf.Floor(core.account.Accuracy * 10000) / 100f + "%";
-            scoreText.text = core.account.AllScore + "";
-            hitText.text = core.account.Hits + "";
-            maxComboText.text = core.account.MaxCombo + "";
+            placeText.text = NetCorePayload.CurrentAccount.PlaceInRanking <= 0 ? "-" : "#" + NetCorePayload.CurrentAccount.PlaceInRanking;
+            inGameText.text = GetTimeString(NetCorePayload.CurrentAccount.InGameTime);
+            RPText.text = NetCorePayload.CurrentAccount.RP + "";
+            accuracyText.text = NetCorePayload.CurrentAccount.Accuracy == -1 ? "-" : Mathf.Floor(NetCorePayload.CurrentAccount.Accuracy * 10000) / 100f + "%";
+            scoreText.text = NetCorePayload.CurrentAccount.AllScore + "";
+            hitText.text = NetCorePayload.CurrentAccount.Hits + "";
+            maxComboText.text = NetCorePayload.CurrentAccount.MaxCombo + "";
             
             placeText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             inGameText.transform.parent.GetComponent<TextContainer>().UpdateThis();
@@ -108,9 +108,9 @@ namespace Profile
                 publishedPlayText.text = core.account.PublishedMapsPlayed + "";
                 publishedLikesText.text = core.account.PublishedMapsLiked + "";
             }*/
-            publishedMapsText.text = core.account.MapsPublished + "";
-            publishedPlayText.text = core.account.PublishedMapsPlayed + "";
-            publishedLikesText.text = core.account.PublishedMapsLiked + "";
+            publishedMapsText.text = NetCorePayload.CurrentAccount.MapsPublished + "";
+            publishedPlayText.text = NetCorePayload.CurrentAccount.PublishedMapsPlayed + "";
+            publishedLikesText.text = NetCorePayload.CurrentAccount.PublishedMapsLiked + "";
         }
 
         void ShowButtons(bool isViewPage, bool isOwnAccount = true)
@@ -139,8 +139,8 @@ namespace Profile
         }
         public void OnGetBackground(byte[] bytes)
         {
-            //backgroundImage.texture = ProjectManager.LoadTexture(bytes);
-            backgroundImage.sprite = ProjectManager.LoadSprite(bytes);
+            backgroundImage.texture = ProjectManager.LoadTexture(bytes);
+            //backgroundImage.sprite = ProjectManager.LoadSprite(bytes);
             FitHeaderBackgrounImage();
         }
         
@@ -152,10 +152,10 @@ namespace Profile
             float headerWidth = header.rect.width;
             float headerHeight = header.rect.height;
 
-            //float bgWidth = backgroundImage.texture.width;
-            //float bgHeight = backgroundImage.texture.height;
-            float bgWidth = backgroundImage.sprite.rect.width;
-            float bgHeight = backgroundImage.sprite.rect.height;
+            float bgWidth = backgroundImage.texture.width;
+            float bgHeight = backgroundImage.texture.height;
+            //float bgWidth = backgroundImage.sprite.rect.width;
+            //float bgHeight = backgroundImage.sprite.rect.height;
 
             float scale = headerWidth / bgWidth;
             

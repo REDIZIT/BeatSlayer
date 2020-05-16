@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" addBOMForNewFiles="with BOM under Windows, with no BOM otherwise" />
+  <component name="Encoding" addBOMForNewFiles="with BOM under Windows, with no BOM otherwise">
+    <file url="file://$USER_HOME$/Downloads/BeatmapUI (1).csv" charset="US-ASCII" />
+    <file url="file://$USER_HOME$/Downloads/BeatmapUI.csv" charset="UTF-8" />
+    <file url="file://$USER_HOME$/Downloads/Menu (1).csv" charset="UTF-16" />
+  </component>
 </project>

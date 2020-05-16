@@ -13,8 +13,17 @@ namespace Web
 {
     public static class WebAPI
     {
-        //public const string apibase = "https://localhost:5001";
-        public const string apibase = "http://www.bsserver.tk";
+        public const string apibase_local = "https://localhost:5001";
+        public const string apibase_prod = "http://www.bsserver.tk";
+
+        public static string apibase
+        {
+            get
+            {
+                return MultiplayerCore.ConnType == ConnectionType.Local ? apibase_local : apibase_prod;
+            }
+        }
+
         public const string url_uploadAvatar = "/WebAPI/UploadAvatar?nick={0}";
         public const string url_getAvatar = "/WebAPI/GetAvatar?nick={0}";
         public const string url_uploadBackground = "/WebAPI/UploadBackground?nick={0}";        
@@ -26,12 +35,25 @@ namespace Web
             string url = apibase + string.Format(url_uploadAvatar, nick);
             SendFile(nick, url, bytes, Path.GetFileName(filename), callback);
         }
+        public static void UploadAvatar(string nick, Texture2D tex, Action<OperationMessage> callback)
+        {
+            byte[] bytes = tex.EncodeToPNG();
+            string url = apibase + string.Format(url_uploadAvatar, nick);
+            SendFile(nick, url, bytes, "avatar.png", callback);
+        }
         public static void UploadBackground(string nick, string filename, Action<OperationMessage> callback)
         {
             byte[] bytes = File.ReadAllBytes(filename);
             string url = apibase + string.Format(url_uploadBackground, nick);
             SendFile(nick, url, bytes, Path.GetFileName(filename), callback);
         }
+        public static void UploadBackground(string nick, Texture2D tex, Action<OperationMessage> callback)
+        {
+            byte[] bytes = tex.EncodeToPNG();
+            string url = apibase + string.Format(url_uploadBackground, nick);
+            SendFile(nick, url, bytes, "avatar.png", callback);
+        }
+        
         
 
         public static void GetAvatar(string nick, Action<byte[]> callback)

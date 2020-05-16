@@ -9,18 +9,11 @@ namespace Multiplayer.Chat
 {
     public class ChatAvatarLoader
     {
-        public MultiplayerCore core;
         public List<ChatAvatarRequest> ls = new List<ChatAvatarRequest>();
         private ChatAvatarRequest currentRequest;
         
         public Dictionary<string, Texture2D> avatars = new Dictionary<string, Texture2D>();
 
-        public ChatAvatarLoader(MultiplayerCore core)
-        {
-            this.core = core;
-        }
-        
-        
         public void Request(RawImage img, string nick)
         {
             ChatAvatarRequest req = new ChatAvatarRequest(img, nick);
@@ -48,7 +41,7 @@ namespace Multiplayer.Chat
             }
             else
             {
-                core.conn.InvokeAsync("Accounts_GetAvatar", currentRequest.nick);
+                MultiplayerCore.conn.InvokeAsync("Accounts_GetAvatar", currentRequest.nick);
             }
         }
 

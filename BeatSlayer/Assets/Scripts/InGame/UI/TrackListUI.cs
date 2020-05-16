@@ -129,12 +129,8 @@ public class TrackListUI : MonoBehaviour
         }
 
         List<GroupInfoExtended> sortedList = SearchUI.OnSearch(GetData()).ToList();
-
-        DateTime d1 = DateTime.Now;
-
+        
         RefreshList(sortedList);
-
-        Debug.Log("Refresh time is " + (DateTime.Now - d1).TotalMilliseconds);
     }
     void RefreshList(List<GroupInfoExtended> ls)
     {

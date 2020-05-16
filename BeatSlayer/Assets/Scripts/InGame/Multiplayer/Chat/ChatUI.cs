@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Dynamic;
+using BeatSlayerServer.Multiplayer.Accounts;
+using GameNet;
 using UnityEngine;
 using InGame.Helpers;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -14,15 +16,11 @@ namespace Multiplayer.Chat
 {
     public class ChatUI : MonoBehaviour
     {
-        public MultiplayerCore core;
         public ChatAvatarLoader avatarLoader;
 
         // Hub methods
-        public const string method_getGroups = "Chat_GetGroups"; 
-        public const string method_joinGroup = "Chat_JoinGroup";
         public const string method_leaveGroup = "Chat_LeaveGroup";
-        public const string method_sendMessage = "Chat_SendMessage";
-        
+
         
         List<ChatMessage> chatMessages = new List<ChatMessage>();
         string selectedGroupName;
@@ -37,21 +35,28 @@ namespace Multiplayer.Chat
         public Transform groupContent;
 
 
-        
+
+
+        public void Configure()
+        {
+            NetCore.Subs.OnJoinGroup += OnJoinGroup;
+            NetCore.Subs.OnGetGroups += OnGetGroups;
+        }
         
         private void Start()
         {
             prefab = HelperUI.ClearContent(content);
             prefab.SetActive(false);
             field.onEndEdit = OnSendBtnClicked;
-            avatarLoader = new ChatAvatarLoader(core);
+            avatarLoader = new ChatAvatarLoader();
         }
         
 
         public void OnConnect()
         {
-            core.conn.InvokeAsync(method_getGroups);
-            onlineText.text = "Connected";
+            //MultiplayerCore.conn.InvokeAsync(method_getGroups);
+            NetCore.ServerActions.Chat.GetGroups();
+            //onlineText.text = "Connected";
         }
 
         public void OnConnectionLost()
@@ -65,11 +70,10 @@ namespace Multiplayer.Chat
         public void OnSendBtnClicked()
         {
             if (field.text.Trim() == "") return;
-            if (AccountManager.LegacyAccount == null) return;
-            
-            Debug.Log("OnSendBtnClicked() Connection state: " + core.conn.State);
-            
-            core.conn.InvokeAsync(method_sendMessage,AccountManager.LegacyAccount.nick, field.text, AccountManager.LegacyAccount.Role, selectedGroupName);
+            //if (MultiplayerCore.account == null) return;
+
+            //NetCore.ServerActions.SendChatMessage(MultiplayerCore.account.Nick, field.text, MultiplayerCore.account.Role, selectedGroupName);
+            NetCore.ServerActions.SendChatMessage("REDIZIT", field.text, BeatSlayerServer.Multiplayer.Accounts.AccountRole.Developer, "Global");
             field.text = "";
         }
         
@@ -78,6 +82,7 @@ namespace Multiplayer.Chat
         
         public void OnSendChatMessage(string json)
         {
+            Debug.Log(json);
             ChatMessage msg = JsonConvert.DeserializeObject<ChatMessage>(json);
             
             HelperUI.AddContent<ChatMessageItem>(content, prefab, item =>
@@ -98,17 +103,19 @@ namespace Multiplayer.Chat
             selectedGroupName = groups[0];
             groupText.text = selectedGroupName;
 
-            core.conn.InvokeAsync(method_joinGroup, AccountManager.LegacyAccount.nick, selectedGroupName);
-            
+            Debug.Log("Try to join " + selectedGroupName + " group");
+            NetCore.ServerActions.Chat.JoinGroup(NetCorePayload.CurrentAccount.Nick, selectedGroupName);
+
             //groupDropdown.ClearOptions();
             //groupDropdown.AddOptions(groups);
-            
+
         }
 
         public void OnJoinGroup(string json)
         {
+            Debug.Log("OnJoinGroup " + json);
             List<ChatMessage> msgs = JsonConvert.DeserializeObject<List<ChatMessage>>(json);
-            //List<ChatMessage> msg = JsonConvert.DeserializeObject<List<ChatMessage>>(json);
+            
             HelperUI.FillContent<ChatMessageItem, ChatMessage>(content, msgs, (item, message) =>
             {
                 item.message = message;
@@ -116,14 +123,6 @@ namespace Multiplayer.Chat
                 
                 avatarLoader.Request(item.image, item.message.nick);
             });
-        }
-
-        public void JoinGroup(string groupName)
-        {
-            core.conn.InvokeAsync(method_leaveGroup, AccountManager.LegacyAccount.nick, selectedGroupName);
-            selectedGroupName = groupName;
-            groupText.text = selectedGroupName;
-            core.conn.InvokeAsync(method_joinGroup, AccountManager.LegacyAccount.nick, selectedGroupName);
         }
         
         

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using Assets.SimpleLocalization;
+using GameNet;
 using InGame.Helpers;
 using Microsoft.AspNetCore.SignalR.Client;
 using Multiplayer.Accounts;
+using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +14,6 @@ namespace Profile
 {
     public class ProfileEditUI : MonoBehaviour
     {
-        public MultiplayerCore core;
         public AccountUI ui;
         
         public GameObject body;
@@ -28,24 +29,37 @@ namespace Profile
         public InputField newEmailField, codeField;
         private string newEmail;
         public GameObject newEmailCodeLine;
-        
+
 
         public void Open()
         {
             body.SetActive(true);
             viewBody.SetActive(false);
-            currentEmailText.text = (string.IsNullOrWhiteSpace(core.account.Email)) ? "-" : core.account.Email;
-            newEmailCodeLine.SetActive(!string.IsNullOrWhiteSpace(core.account.Email));
+            currentEmailText.text = (string.IsNullOrWhiteSpace(NetCorePayload.CurrentAccount.Email)) ? "-" : NetCorePayload.CurrentAccount.Email;
+            newEmailCodeLine.SetActive(!string.IsNullOrWhiteSpace(NetCorePayload.CurrentAccount.Email));
         }
 
 
         public void OnAvatarBtnClick()
         {
+            //string path = Application.persistentDataPath + "/newavatar.jpg";
+
             NativeGallery.GetImageFromGallery(new NativeGallery.MediaPickCallback(path =>
             {
-                Web.WebAPI.UploadAvatar(core.account.Nick, path, message =>
+                Texture2D tex = ProjectManager.LoadTexture(path);
+                ImageCropper.Instance.Show(tex, (result, image, croppedImage) =>
                 {
-                    ui.SaveAvatarToCache(true);
+                    if (result)
+                    {
+                        ui.profileUI.avatarImage.texture = croppedImage;
+                        Web.WebAPI.UploadAvatar(NetCorePayload.CurrentAccount.Nick, croppedImage, message =>
+                        {
+                            ui.SaveAvatarToCache(true);
+                        });   
+                    }
+                }, new ImageCropper.Settings()
+                {
+                    markTextureNonReadable = false, ovalSelection = false, selectionMaxAspectRatio = 1, selectionMinAspectRatio = 1
                 });
             }), LocalizationManager.Localize("SelectAvatar"));
         }
@@ -55,10 +69,20 @@ namespace Profile
         {
             NativeGallery.GetImageFromGallery(new NativeGallery.MediaPickCallback(path =>
             {
-                Web.WebAPI.UploadBackground(core.account.Nick, path, message =>
+                Texture2D tex = ProjectManager.LoadTexture(path);
+                ImageCropper.Instance.Show(tex, (result, image, croppedImage) =>
                 {
-                    //ui.profileUI.OnGetBackground(File.ReadAllBytes(path));
-                    ui.SaveAvatarToCache(true);
+                    if (result)
+                    {
+                        ui.profileUI.backgroundImage.texture = croppedImage;
+                        Web.WebAPI.UploadBackground(NetCorePayload.CurrentAccount.Nick, croppedImage, message =>
+                        {
+                            ui.SaveBackgroundToCache(true);
+                        });   
+                    }
+                }, new ImageCropper.Settings()
+                {
+                    markTextureNonReadable = false, ovalSelection = false
                 });
             }), LocalizationManager.Localize("SelectBackground"));
         }
@@ -85,13 +109,13 @@ namespace Profile
             if (canContinue)
             {
                 newpassword = password1Field.text;
-                core.conn.InvokeAsync("Accounts_ChangePassword", core.account.Nick, currentPasswordField.text, newpassword);
+                MultiplayerCore.conn.InvokeAsync("Accounts_ChangePassword", NetCorePayload.CurrentAccount.Nick, currentPasswordField.text, newpassword);
             }
         }
         public void OnEmailChangeBtnClick()
         {
             bool canContinue = true;
-            bool isEmptyEmail = string.IsNullOrWhiteSpace(core.account.Email);
+            bool isEmptyEmail = string.IsNullOrWhiteSpace(NetCorePayload.CurrentAccount.Email);
             
             HelperUI.ColorInputField(newEmailField, true);
             HelperUI.ColorInputField(codeField, true);
@@ -114,9 +138,9 @@ namespace Profile
                 if (isEmptyEmail)
                 {
                     newEmail = newEmailField.text;
-                    core.conn.InvokeAsync("Accounts_ChangeEmptyEmail", core.account.Nick, newEmailField.text);
+                    MultiplayerCore.conn.InvokeAsync("Accounts_ChangeEmptyEmail", NetCorePayload.CurrentAccount.Nick, newEmailField.text);
                 }
-                else core.conn.InvokeAsync("Accounts_ChangeEmail", core.account.Nick, codeField.text);
+                else MultiplayerCore.conn.InvokeAsync("Accounts_ChangeEmail", NetCorePayload.CurrentAccount.Nick, codeField.text);
             }
         }
         public void OnEmailChangeCodeBtnClick()
@@ -131,7 +155,7 @@ namespace Profile
             if (canContinue)
             {
                 newEmail = newEmailField.text;
-                core.conn.InvokeAsync("Accounts_SendChangeEmailCode", core.account.Nick, newEmail);   
+                MultiplayerCore.conn.InvokeAsync("Accounts_SendChangeEmailCode", NetCorePayload.CurrentAccount.Nick, newEmail);   
             }
         }
         
@@ -155,7 +179,7 @@ namespace Profile
             if (msg.Type == OperationMessage.OperationType.Success)
             {
                 currentEmailText.text = newEmail;
-                core.account.Email = newEmail;
+                NetCorePayload.CurrentAccount.Email = newEmail;
                 newEmailCodeLine.SetActive(true);
                 ui.ShowMessage(LocalizationManager.Localize("EmailChangeOk"));
             }

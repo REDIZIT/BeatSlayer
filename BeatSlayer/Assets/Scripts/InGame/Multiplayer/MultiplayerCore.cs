@@ -8,80 +8,79 @@ using Multiplayer.Accounts;
 using Multiplayer.Chat;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Web;
 
-public class MultiplayerCore : MonoBehaviour
+
+public static class MultiplayerCore
 {
-    public ChatUI chatUI;
-    public AccountUI accountUI;
-    public Account account;
-    
-    
-    private const string url_hub = "http://www.bsserver.tk/GameHub";
-    //private const string url_hub = "https://localhost:5001/GameHub";
-    private int reconnectTry;
-    private bool tryToReconnect = true;
-
-    public bool doReconnect;
-
-    public HubConnection conn;
-    
-    private void Start()
+    private const string url_prod_hub = "http://www.bsserver.tk/GameHub";
+    private const string url_local_hub = "https://localhost:5001/GameHub";
+    public static string url_hub
     {
-        BuildConnection();
-        Subscribe();
-        Connect();
-        
-        
-        Application.quitting += () =>
+        get
         {
-            conn.StopAsync();
-            tryToReconnect = false;
-        };
-    }
-
-
-    IEnumerator IOnDisconnect(Exception err)
-    {
-        chatUI.OnConnectionLost();
-        if (err != null)
-        {
-            Debug.LogError("Disconnected due to " + err);
-            Reconnect();
+            return ConnType == ConnectionType.Local ? url_local_hub : url_prod_hub;
         }
-        
-        yield break;
     }
+    
+    
 
-    async void Reconnect()
+    private static ConnectionType _connType;
+    public static ConnectionType ConnType
+    {
+        get
+        {
+            if (Application.isEditor)
+            {
+                return _connType;
+            }
+            else
+            {
+                return ConnectionType.Production;
+            }
+        }
+        set
+        {
+            _connType = value;
+        }
+    }
+    
+    
+    public static HubConnection conn;
+    public static Action onConnected;
+    public static Action<Exception> onDisconnected;
+    
+
+    
+    public static async void Reconnect()
     {
         Debug.Log("Reconnecting");
 
-        BuildConnection();
-        Subscribe();
         Connect();
     }
     
-    public void BuildConnection()
+    public static void BuildConnection()
     {
         conn = new HubConnectionBuilder()
-            .WithUrl(new Uri(url_hub))
+            .WithUrl(new Uri(MultiplayerCore.url_hub))
             .Build();
         
-        //conn.KeepAliveInterval = TimeSpan.FromSeconds(3);
-        //conn.ServerTimeout = TimeSpan.FromSeconds(3*3);
+        conn.KeepAliveInterval = TimeSpan.FromSeconds(3);
+        conn.ServerTimeout = TimeSpan.FromSeconds(3*3);
 
         conn.Closed += (err =>
         {
-            UnityMainThreadDispatcher.Instance().Enqueue(IOnDisconnect(err));
+            onDisconnected(err);
             return Task.Delay(0);
         });
+        
         //conn.Reconnecting += OnReconnecting;
         //conn.Reconnected += OnReconnected;
-
     }
-    public async void Connect()
+    public static async void Connect()
     {
-        Debug.Log("Connect()");
+        BuildConnection();
+        SubscribeOnConnection();
         bool doReconnect = false;
         
         try
@@ -96,8 +95,10 @@ public class MultiplayerCore : MonoBehaviour
             }
             else
             {
-                chatUI.OnConnect();
-                accountUI.OnConnect(this);
+                //AcceptSubscribers();
+                onConnected();
+                //chatUI.OnConnect();
+                //accountUI.OnConnect(this);
             }
         }
         catch (Exception e)
@@ -110,25 +111,135 @@ public class MultiplayerCore : MonoBehaviour
         if(doReconnect) UnityMainThreadDispatcher.Instance().Enqueue(Reconnect);
     }
     
-    public void Subscribe()
-    {
-        conn.On<string>("OnSendChatMessage", chatUI.OnSendChatMessage);
-        
-        conn.On<string>("OnGetGroups", chatUI.OnGetGroups);
-        conn.On<string>("OnJoinGroup", chatUI.OnJoinGroup);
-        
-        
-        conn.On<byte[]>("OnGetAvatar", chatUI.OnGetAvatar);
-        conn.On<int>("OnOnlineChange", chatUI.OnOnlineChange);
+    
+    // This class contains all info about events which can invoke server
+    public static Subscribtions subscribtions;
 
-        conn.On<OperationMessage>("Accounts_OnLogIn", accountUI.OnLogIn);
-        conn.On<OperationMessage>("Accounts_OnSignUp", accountUI.OnSignUp);
-        conn.On<OperationMessage>("Accounts_OnRestore", accountUI.OnRestore);
-        conn.On<OperationMessage>("Accounts_OnChangePassword", accountUI.OnChangePassword);
-        conn.On<OperationMessage>("Accounts_OnChangeEmail", accountUI.OnChangeEmail);
-        conn.On<bool>("Accounts_OnConfirmRestore", accountUI.OnConfirmRestore);
+    // This class contains all info about events which can invoke client
+    //public static Requests requests;
+    
+    // Used to invoke events on server (Needed due to conn.On overwrite delegates)
+    private static SubInvoker subInvoker;
+    
+    // List of methods need to call to handle all subscribes
+    static Action subscribers;
+
+    
+    
+    
+   /* public static void ClearSubscribtions()
+    {
+        Debug.Log("ClearSubscribtions");
+        subscribers = null;
+        subscribtions = new Subscribtions();
+    }
+    public static void Subscribe(Action acceptMethod)
+    {
+        Debug.Log("Subscribe");
+        subscribers += acceptMethod;
+    }
+
+    public static void AcceptSubscribers()
+    {
+        Debug.Log("AcceptSubscribers. Is Null? " + (subscribers == null));
+        subscribers?.Invoke();
+    }*/
+    
+    static void SubscribeOnConnection()
+    {
+        subscribtions = new Subscribtions();
+        subInvoker = new SubInvoker(subscribtions);
+        
+        conn.On<string>("OnSendChatMessage", subInvoker.OnSendChatMessage);
+        conn.On<string>("OnGetGroups", (s =>
+        {
+            Debug.Log("Core.OnGetGroups: " + s);
+            subInvoker.OnGetGroups(s);
+        }));
+        conn.On<string>("OnJoinGroup", (s =>
+        {
+            Debug.Log("Core.OnJoinGroup: " + s);
+            subInvoker.OnJoinGroup(s);
+        }));
+        
+        conn.On<byte[]>("OnGetAvatar", subInvoker.OnGetAvatar);
+        conn.On<int>("OnOnlineChange", subInvoker.OnOnlineChange);
+
+        conn.On<OperationMessage>("Accounts_OnLogIn", subInvoker.Accounts_OnLogIn);
+        conn.On<OperationMessage>("Accounts_OnSignUp", subInvoker.Accounts_OnSignUp);
+        conn.On<OperationMessage>("Accounts_OnRestore", subInvoker.Accounts_OnRestore);
+        conn.On<OperationMessage>("Accounts_OnChangePassword", subInvoker.Accounts_OnChangePassword);
+        conn.On<OperationMessage>("Accounts_OnChangeEmail", subInvoker.Accounts_OnChangeEmail);
+        conn.On<bool>("Accounts_OnConfirmRestore", subInvoker.Accounts_OnConfirmRestore);
+    }
+    
+    public static class Requests
+    {
+        public static void Chat_GetGroups() => MultiplayerCore.conn.InvokeAsync("Chat_GetGroups");
+        public static void Chat_JoinGroup(string nick, string groupName)
+        {
+            throw new Exception("Rabotay blyat");
+            Debug.Log("Request: Chat_JoinGroup groupname: " + groupName);
+            MultiplayerCore.conn.InvokeAsync("Chat_JoinGroup", nick, groupName);
+        }
     }
 }
+
+public class SubInvoker
+{
+    private Subscribtions subs;
+
+    public SubInvoker(Subscribtions subs)
+    {
+        this.subs = subs;
+    }
+
+    
+    public void Accounts_OnLogIn(OperationMessage msg) => subs.Accounts_OnLogIn(msg);
+    public void Accounts_OnSignUp(OperationMessage msg) => subs.Accounts_OnSignUp(msg);
+    public void Accounts_OnRestore(OperationMessage msg) => subs.Accounts_OnRestore(msg);
+    public void Accounts_OnChangePassword(OperationMessage msg) => subs.Accounts_OnChangePassword(msg);
+    public void Accounts_OnChangeEmail(OperationMessage msg) => subs.Accounts_OnChangeEmail(msg);
+    public void Accounts_OnConfirmRestore(bool msg) => subs.Accounts_OnConfirmRestore(msg);
+    
+
+    public void OnOnlineChange(int onlineNumber) => subs.OnOnlineChange(onlineNumber);
+    public void OnSendChatMessage(string message)
+    {
+        Debug.Log("Core.OnSendChatMessage: " + message);
+        subs.OnSendChatMessage(message);
+    }
+
+    public void OnGetGroups(string groups) => subs.OnGetGroups(groups);
+    public void OnJoinGroup(string groupHistory) => subs.OnJoinGroup(groupHistory);
+    public void OnGetAvatar(byte[] picture) => subs.OnGetAvatar(picture);
+}
+public class Subscribtions
+{
+    public Action<OperationMessage> Accounts_OnLogIn;
+    public Action<OperationMessage> Accounts_OnSignUp;
+    public Action<OperationMessage> Accounts_OnRestore;
+    public Action<OperationMessage> Accounts_OnChangePassword;
+    public Action<OperationMessage> Accounts_OnChangeEmail;
+    public Action<bool> Accounts_OnConfirmRestore;
+    
+    
+    public Action<string> OnSendChatMessage;
+    public Action<string> OnGetGroups;
+    public Action<string> OnJoinGroup;
+    
+    public Action<byte[]> OnGetAvatar;
+    public Action<int> OnOnlineChange;
+}
+
+
+
+
+
+
+
+public enum ConnectionType { Production, Local }
+
 public class OperationMessage
 {
     public enum OperationType

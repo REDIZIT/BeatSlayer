@@ -576,6 +576,24 @@
               <e p="AndroidManifest.xml" t="Include" />
             </e>
           </e>
+          <e p="ImageCropper" t="Include">
+            <e p="Demo" t="Include">
+              <e p="ImageCropperDemo.cs" t="Include" />
+            </e>
+            <e p="Scripts" t="Include">
+              <e p="CircleGraphic.cs" t="Include" />
+              <e p="FadeOverlayGraphic.cs" t="Include" />
+              <e p="FontSizeSynchronizer.cs" t="Include" />
+              <e p="ImageCropper.cs" t="Include" />
+              <e p="ImageCropperUtils.cs" t="Include" />
+              <e p="ISelectionHandler.cs" t="Include" />
+              <e p="SelectionCornersFitter.cs" t="Include" />
+              <e p="SelectionGraphicsSynchronizer.cs" t="Include" />
+              <e p="SelectionMovementHandler.cs" t="Include" />
+              <e p="SelectionResizeHandler.cs" t="Include" />
+              <e p="SizeChangeListener.cs" t="Include" />
+            </e>
+          </e>
           <e p="IngameDebugConsole" t="Include">
             <e p="Scripts" t="Include">
               <e p="CircularBuffer.cs" t="Include" />
@@ -827,6 +845,7 @@
                 <e p="ChatUI.cs" t="Include" />
               </e>
               <e p="MultiplayerCore.cs" t="Include" />
+              <e p="MultiplayerMenuWrapper.cs" t="Include" />
               <e p="Notifications" t="Include">
                 <e p="NotificationUI.cs" t="Include" />
                 <e p="NotificationUIItem.cs" t="Include" />
@@ -834,6 +853,10 @@
               <e p="WebAPI" t="Include">
                 <e p="WebAPI.cs" t="Include" />
               </e>
+            </e>
+            <e p="NetCore" t="Include">
+              <e p="NetCore.cs" t="Include" />
+              <e p="NetCorePayload.cs" t="Include" />
             </e>
             <e p="Ranking.cs" t="Include" />
             <e p="SceneController.cs" t="Include" />
