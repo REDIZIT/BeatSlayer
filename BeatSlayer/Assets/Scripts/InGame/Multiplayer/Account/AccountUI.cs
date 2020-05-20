@@ -32,30 +32,18 @@ namespace Multiplayer.Accounts
         public void Configure()
         {
             NetCore.Subs.Accounts_OnLogIn += OnLogIn;
+            NetCore.Subs.Accounts_OnSignUp += OnSignUp;
         }
 
         public void OnConnect(MultiplayerMenuWrapper wrapper)
         {
             this.wrapper = wrapper;
-            //Subscribe();
             LogInBySession();
         }
 
-        /*void Subscribe()
-        {
-            MultiplayerCore.subscribtions.Accounts_OnLogIn += OnLogIn;
-            MultiplayerCore.subscribtions.Accounts_OnSignUp += OnSignUp;
-            //MultiplayerCore.subscribtions.Accounts_OnAccountView += OnAccountView;
-            MultiplayerCore.subscribtions.Accounts_OnRestore += OnRestore;
-            MultiplayerCore.subscribtions.Accounts_OnConfirmRestore += OnConfirmRestore;
-            MultiplayerCore.subscribtions.Accounts_OnChangeEmail += OnChangeEmail;
-            MultiplayerCore.subscribtions.Accounts_OnChangePassword += OnChangePassword;
-        }*/
-        
-
         private void Update()
         {
-            if (wrapper == null || NetCorePayload.CurrentAccount== null) return;
+            if (wrapper == null || NetCorePayload.CurrentAccount == null) return;
             NetCorePayload.CurrentAccount.InGameTime += TimeSpan.FromSeconds(Time.unscaledDeltaTime);
             if(Time.realtimeSinceStartup - inGameTimeSent > 30) UpdateInGameTime();
         }
@@ -63,7 +51,7 @@ namespace Multiplayer.Accounts
 
         public void OnProfileBtnClick()
         {
-            if (NetCorePayload.CurrentAccount== null)
+            if (NetCorePayload.CurrentAccount == null)
             {
                 signUI.ShowLogIn();
             }
@@ -133,23 +121,23 @@ namespace Multiplayer.Accounts
         public void LogIn(string nick, string password)
         {
             //MultiplayerCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
-            NetCore.ServerActions.Accounts_LogIn(nick, password);
+            NetCore.ServerActions.Account.LogIn(nick, password);
             sessionToWrite = nick + '|' + password;
         }
         public void SignUp(string nick, string password, string country, string email)
         {
-            MultiplayerCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
+            NetCore.ServerActions.Account.SignUp(nick, password, country, email);
         }
         public void LogOut()
         {
             DeleteSession();
-            NetCorePayload.CurrentAccount= null;
+            NetCorePayload.CurrentAccount = null;
             
         }
 
         public void UpdateInGameTime()
         {
-            if (NetCorePayload.CurrentAccount== null) return;
+            if (NetCorePayload.CurrentAccount == null) return;
             float toSend = Time.realtimeSinceStartup - inGameTimeSent;
             inGameTimeSent = Time.realtimeSinceStartup;
 
@@ -158,11 +146,11 @@ namespace Multiplayer.Accounts
         
         public void Restore(string nick, string password)
         {
-            MultiplayerCore.conn.InvokeAsync("Accounts_Restore", nick, password);
+            NetCore.ServerActions.Account.Restore(nick, password);
         }
         public void ConfirmRestore(string code)
         {
-            MultiplayerCore.conn.InvokeAsync("Accounts_ConfirmRestore", code);
+            NetCore.ServerActions.Account.ConfirmRestore(code);
         }
 
         public void OnChangePassword(OperationMessage msg)
@@ -174,13 +162,6 @@ namespace Multiplayer.Accounts
         {
             profileEditUI.OnChangeEmail(msg);
         }
-        
-        
-        public void ViewAccount(string nick)
-        {
-            MultiplayerCore.conn.InvokeAsync("Accounts_View", nick);
-        }
-
 
 
 
@@ -234,11 +215,21 @@ namespace Multiplayer.Accounts
             }
             if (op.Type == OperationMessage.OperationType.Success)
             {
-                NetCorePayload.CurrentAccount= JsonConvert.DeserializeObject<Account>(op.Message);
+                NetCorePayload.CurrentAccount = JsonConvert.DeserializeObject<Account>(op.Message);
                 CreateSession();
                 SaveAvatarToCache();
                 SaveBackgroundToCache();
+                
+                wrapper.chatUI.OnLogIn();
             }
+        }
+
+        public void OnSceneLoad()
+        {
+            SaveAvatarToCache();
+            SaveBackgroundToCache();
+            
+            //wrapper.chatUI.OnLogIn();
         }
 
         public void OnSignUp(OperationMessage op)

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using GameNet;
 using Microsoft.AspNetCore.SignalR.Client;
 using ProjectManagement;
 using UnityEngine;
@@ -14,6 +15,13 @@ namespace Multiplayer.Chat
         
         public Dictionary<string, Texture2D> avatars = new Dictionary<string, Texture2D>();
 
+
+        public void Configure()
+        {
+            NetCore.Subs.Accounts_OnGetAvatar += OnGetAvatar;
+        }
+        
+        
         public void Request(RawImage img, string nick)
         {
             ChatAvatarRequest req = new ChatAvatarRequest(img, nick);
@@ -41,7 +49,7 @@ namespace Multiplayer.Chat
             }
             else
             {
-                MultiplayerCore.conn.InvokeAsync("Accounts_GetAvatar", currentRequest.nick);
+                NetCore.ServerActions.Account.GetAvatar(currentRequest.nick);
             }
         }
 

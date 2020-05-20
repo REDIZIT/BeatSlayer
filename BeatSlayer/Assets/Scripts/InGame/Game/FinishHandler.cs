@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using BeatSlayerServer.Multiplayer.Accounts;
+using GameNet;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,6 +39,8 @@ public class FinishHandler : MonoBehaviour
     public Text leaderboardLoadingText;
 
 
+    
+    
 
     public void CheckLevelFinish()
     {
@@ -72,7 +76,7 @@ public class FinishHandler : MonoBehaviour
 
             gm.RateBtnUpdate();
 
-            FinishAchievements();
+            //FinishAchievements();
             
             if(LoadingData.loadparams.Type == SceneloadParameters.LoadType.Moderation)
             {
@@ -210,34 +214,44 @@ public class FinishHandler : MonoBehaviour
 
         RPText.text = ".";
 
-        if (AccountManager.LegacyAccount == null) yield break;
+        if (NetCorePayload.CurrentAccount == null) yield break;
 
         uploadingText.SetActive(true);
 
         RPText.text = "..";
 
-        Replay bestReplay = null;
-        AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, trackname, gm.project.creatorNick, (Replay replay) =>
+        ReplayInfo bestReplay = null;
+        bool bestReplayGot = false;
+        /*AccountManager.GetBestReplay(NetCorePayload.CurrentAccount.Nick, trackname, gm.project.creatorNick, (ReplayInfo replay) =>
         {
             bestReplay = replay;
-        });
+            bestReplayGot = true;
+            Debug.Log("Best replay got");
+        });*/
 
-        yield return bestReplay;
-
-        if (bestReplay != null && bestReplay.score > gm.replay.score)
+        /*NetCore.Subs.Accounts_OnGetBestReplay += info =>
         {
-            recordText.SetActive(true);
-        }
+            Debug.Log("Best replay got!");
+            Debug.Log("Going forward");
+            if (bestReplay != null && bestReplay.Score > gm.replay.score)
+            {
+                recordText.SetActive(true);
+            }
 
-        
-        AccountManager.SendReplay(gm.replay, (double RP) =>
-        {
-            RPText.text = Mathf.RoundToInt((float)RP).ToString();
-            LoadLeaderboard();
-            uploadingText.SetActive(false);
-        });
 
-        gm.accountManager.UpdateSessionTime();
+            AccountManager.SendReplay(gm.replay, (float RP) =>
+            {
+                Debug.Log("OnSendReplay");
+                RPText.text = Mathf.RoundToInt((float) RP).ToString();
+                LoadLeaderboard();
+                uploadingText.SetActive(false);
+            });
+
+            gm.accountManager.UpdateSessionTime();
+        };*/
+        Debug.Log("Before getbestreplay: " + NetCore.State);
+        NetCore.ServerActions.Account.GetBestReplay(NetCorePayload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
+        Debug.Log("After getbestreplay: " + NetCore.State);
     }
 
 
@@ -271,7 +285,7 @@ public class FinishHandler : MonoBehaviour
         foreach (var item in leaderboardReplays)
         {
             place++;
-            CreateLeaderboardItem(item, prefab, place, item.player == AccountManager.LegacyAccount.nick);
+            CreateLeaderboardItem(item, prefab, place, item.player == NetCorePayload.CurrentAccount.Nick);
             height += 80 + 4;
         }
 

@@ -97,16 +97,28 @@ public class BeatCube : MonoBehaviour, IBeat
         else
         {
             float angle = Mathf.Atan2(direction.x, direction.y);
-            float degrees = 180 - (angle * 180f / Mathf.PI);
-            if (degrees < 0) degrees = 360 + degrees;
+            float degrees = Mathf.Rad2Deg * angle;
 
-            float targetDeg = (int) cls.subType * 45;
-            if (targetDeg < 0) targetDeg = 360 + targetDeg;
-
-            if (Mathf.Abs(targetDeg - degrees) <= 45)
+                
+            float targetDeg = Mathf.Repeat(-8 + 4, 8) * 45;
+            float anglediff = (degrees - targetDeg + 180 + 360) % 360 - 180;
+            
+            if (anglediff <= 45 && anglediff >= -45)
             {
                 Slice();
             }
+            /*float angle = Mathf.Atan2(direction.x, direction.y);
+            float degrees = 180 - (angle * 180f / Mathf.PI);
+            //if (degrees < 0) degrees = 360 + degrees;
+
+            float targetDeg = (int) cls.subType * 45;
+            //if (targetDeg < 0) targetDeg = 360 + targetDeg;
+
+            Debug.Log(targetDeg - degrees);
+            if (Mathf.Abs(targetDeg - degrees) <= 45)
+            {
+                Slice();
+            }*/
         }
     }
 

@@ -801,6 +801,7 @@
             </e>
             <e p="Basics" t="Include">
               <e p="Helpers.cs" t="Include" />
+              <e p="OperationMessage.cs" t="Include" />
               <e p="Operations.cs" t="Include" />
               <e p="SaveManager.cs" t="Include" />
               <e p="UrlsChecker.cs" t="Include" />
@@ -831,7 +832,6 @@
             </e>
             <e p="Multiplayer" t="Include">
               <e p="Account" t="Include">
-                <e p="Account.cs" t="Include" />
                 <e p="AccountSignUI.cs" t="Include" />
                 <e p="AccountUI.cs" t="Include" />
                 <e p="Profile" t="Include">
@@ -844,7 +844,6 @@
                 <e p="ChatMessageItem.cs" t="Include" />
                 <e p="ChatUI.cs" t="Include" />
               </e>
-              <e p="MultiplayerCore.cs" t="Include" />
               <e p="MultiplayerMenuWrapper.cs" t="Include" />
               <e p="Notifications" t="Include">
                 <e p="NotificationUI.cs" t="Include" />
@@ -860,6 +859,12 @@
             </e>
             <e p="Ranking.cs" t="Include" />
             <e p="SceneController.cs" t="Include" />
+            <e p="Server-side" t="Include">
+              <e p="Account.cs" t="Include" />
+              <e p="GroupInfo.cs" t="Include" />
+              <e p="MapInfo.cs" t="Include" />
+              <e p="ReplayInfo.cs" t="Include" />
+            </e>
             <e p="UI" t="Include">
               <e p="LeaderboardUI.cs" t="Include" />
               <e p="LeaderboardUIItem.cs" t="Include" />

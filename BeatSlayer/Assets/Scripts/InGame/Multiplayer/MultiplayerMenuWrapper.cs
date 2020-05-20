@@ -14,7 +14,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public AccountUI accountUI;
 
     [Header("Server connection override")]
-    public ConnectionType connType;
+    public NetCore.ConnectionType connType;
     public bool forceChangeConnType;
 
 
@@ -30,13 +30,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     {
         if (forceChangeConnType)
         {
-            MultiplayerCore.ConnType = connType;
+            NetCore.ConnType = connType;
         }
-
-        MultiplayerCore.onConnected = OnConnect;
-        MultiplayerCore.onDisconnected = OnDisconnected;
-
-        
     }
 
     private void Start()
@@ -52,13 +47,15 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             NetCore.OnFullReady += () =>
             {
                 accountUI.ShowMessage("Ready");
+                accountUI.OnSceneLoad();
             };
 
             NetCore.OnConnect += OnConnect;
+            NetCore.OnDisconnect += OnDisconnected;
             
             // Subscribe/Resubscribe all
             NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
-            NetCore.Subs.OnSendChatMessage += chatUI.OnSendChatMessage;
+            NetCore.Subs.Accounts_OnGetBestReplay += info => Debug.Log("Got best replay with json = " + info);
 
             accountUI.Configure();
             chatUI.Configure();
@@ -67,7 +64,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S))
+        /*if (Input.GetKeyDown(KeyCode.S))
         {
             Debug.Log("Reloading scene");
             SceneManager.LoadScene("Menu");
@@ -77,22 +74,21 @@ public class MultiplayerMenuWrapper : MonoBehaviour
         {
             Debug.Log("Send test");
             NetCore.ServerActions.Test();
-        }
+        }*/
     }
 
     public void OnConnect()
     {
-        Debug.Log("Wrapper.OnConnect");
-        chatUI.OnConnect();
         accountUI.OnConnect(this);
+        NetCore.ServerActions.Account.GetBestReplay("REDIZIT", "kasai harcores-cycle hit", "idxracer");
     }
 
 
 
 
-    void OnDisconnected(Exception err)
+    void OnDisconnected(/*Exception err*/)
     {
-        UnityMainThreadDispatcher.Instance().Enqueue(IOnDisconnected(err));
+        UnityMainThreadDispatcher.Instance().Enqueue(IOnDisconnected(null));
     }
     IEnumerator IOnDisconnected(Exception err)
     {
@@ -100,7 +96,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
         if (err != null)
         {
             Debug.LogError("Disconnected due to " + err);
-            MultiplayerCore.Reconnect();
+            //MultiplayerCore.Reconnect();
         }
         
         yield break;

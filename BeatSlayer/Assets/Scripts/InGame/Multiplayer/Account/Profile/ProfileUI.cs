@@ -76,6 +76,7 @@ namespace Profile
             anim.Play("Show");
             nickText.text = NetCorePayload.CurrentAccount.Nick;
             devIcon.SetActive(NetCorePayload.CurrentAccount.Nick == "REDIZIT");
+            Debug.Log("Show page for " + NetCorePayload.CurrentAccount.Nick + " with " + NetCorePayload.CurrentAccount.Accuracy + " accuracy");
 
 
             ShowButtons(true, true);

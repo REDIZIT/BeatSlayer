@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using DatabaseManagement;
+using GameNet;
 using Newtonsoft.Json;
 using ProjectManagement;
 using Testing;
@@ -220,6 +221,11 @@ public class GameManager : MonoBehaviour
         InitGraphics();
 
         StartForUI(); 
+        
+        /*NetCore.Configure(() =>
+        {
+            finishHandler.Configure();
+        });*/
     }
     void InitAudio()
     {

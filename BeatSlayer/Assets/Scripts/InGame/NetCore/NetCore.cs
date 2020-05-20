@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using BeatSlayerServer.Multiplayer.Accounts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -13,15 +15,38 @@ namespace GameNet
 {
     public static class NetCore
     {
-        public static HubConnection conn;
-        public static Subscribtions Subs { get; private set; }
-        
+        static HubConnection conn;
+        public static HubConnectionState State => conn.State;
+        public static Subscriptions Subs { get; private set; }
+        //public static Invokes Actions { get; private set; }
+
+        public static string Url_Hub
+        {
+            get
+            {
+                return ConnType == ConnectionType.Local
+                    ? "https://localhost:5001/GameHub"
+                    : "http://bsserver.tk/GameHub";
+            }
+        }
+        public enum ConnectionType { Production, Local }
+
+        public static ConnectionType ConnType = ConnectionType.Local;
+
+
+
         public static Action OnConnect, OnDisconnect, OnReconnect, OnFullReady;
 
+        
+        
         public static bool TryReconnect { get; set; }
         public static int ReconnectAttempt { get; private set; }
 
 
+        
+        
+        
+        
 
         static NetCore()
         {
@@ -32,10 +57,11 @@ namespace GameNet
             Application.quitting += () =>
             {
                 conn.StopAsync();
+                TryReconnect = false;
             };
             
             TryReconnect = true;
-            OnSceneLoad();
+            //OnSceneLoad();
         }
 
 
@@ -45,11 +71,20 @@ namespace GameNet
         // (External usage)
         public static void Configure(Action config)
         {
-            Subs = new Subscribtions();
-            
-            config();
-            
-            OnFullReady?.Invoke();
+            Subs = new Subscriptions();
+            OnFullReady = null;
+            OnConnect = null;
+            OnDisconnect = null;
+            OnReconnect = null;
+
+            UnityMainThreadDispatcher dispatcher = UnityMainThreadDispatcher.Instance();
+            dispatcher.Enqueue(() =>
+            {
+                Debug.Log("NetCore.Configure via Dispatcher");
+                config();
+                
+                OnFullReady?.Invoke();
+            });
         }
 
         
@@ -63,11 +98,19 @@ namespace GameNet
         // (Internal usage)
         static void OnSceneLoad()
         {
-            if (conn == null)
+            Debug.Log("NetCore.OnSceneLoad()");
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                Debug.Log("CreateConnection");
-                CreateConnection();
-            }
+                if (conn == null)
+                {
+                    Debug.Log("CreateConnection via Dispatcher");
+                    CreateConnection();
+                }
+                else
+                {
+                     Debug.Log("Dont create connection via Dispatcher (" + conn.State + ")");
+                }
+            });
         }
 
         // This method is invoked on first load
@@ -75,7 +118,8 @@ namespace GameNet
         static void CreateConnection()
         {
             BuildConnection();
-            Subscribe();
+            SubcribeOnServerCalls();
+            SubcribeOnClientInvokes();
             Connect();
         }
         
@@ -101,14 +145,20 @@ namespace GameNet
             {
                 ReconnectAttempt = 0;
                 OnConnect?.Invoke();
-                OnFullReady?.Invoke();
+                //OnFullReady?.Invoke();
             }
-            else if(TryReconnect)
+            else
             {
-                ReconnectAttempt++;
-                Debug.Log("Try to reconnect. Attempt " + ReconnectAttempt);
-                Connect();
+                Reconnect();
             }
+        }
+
+        static void Reconnect()
+        {
+            if (!TryReconnect) return;
+            ReconnectAttempt++;
+            Debug.Log("Try to reconnect. Attempt " + ReconnectAttempt);
+            Connect();
         }
 
         // This method creates new connection
@@ -116,8 +166,10 @@ namespace GameNet
         static void BuildConnection()
         {
             conn = new HubConnectionBuilder()
-                .WithUrl(new Uri(MultiplayerCore.url_hub))
+                .WithUrl(new Uri(Url_Hub))
                 .Build();
+            
+            Debug.Log("Build connecting with " + Url_Hub);
         
             conn.KeepAliveInterval = TimeSpan.FromSeconds(3);
             conn.ServerTimeout = TimeSpan.FromSeconds(3*3);
@@ -125,6 +177,7 @@ namespace GameNet
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed");
+                Reconnect();
                 return null;
             });
         }
@@ -132,50 +185,93 @@ namespace GameNet
         // This method invoke conn.On<T1,T2,TN> for EACH FIELD in NetCore.Subs
         // This is internal method used only after building connection
         // (Internal usage)
-        static void Subscribe()
+        static void SubcribeOnServerCalls()
         {
-            Subs = new Subscribtions();
+            Subs = new Subscriptions();
+           
 
-            var fields = typeof(Subscribtions).GetFields();
+            var fields = typeof(Subscriptions).GetFields();
             foreach (var field in fields)
             {
                 Type t = field.FieldType;
                 conn.On(field.Name, t.GenericTypeArguments, (objects =>
                 {
-                    FieldInfo info = typeof(Subscribtions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
+                    FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
                     object yourfield = info.GetValue(Subs);
                     MethodInfo method = yourfield.GetType().GetMethod("Invoke");
                     
                     method.Invoke(yourfield, objects);
-                    
-                    return Task.Delay(0); 
+
+                    return null;
                 }));
             }
         }
+
+        static void SubcribeOnClientInvokes()
+        {
+            /*Actions = new Invokes();
+
+            
+            MethodInfo mi = Actions.GetType().GetMethod("Invoke");
+            Action del = (Action)Delegate.CreateDelegate(typeof(Action), mi);
+
+            
+            Actions.Test = del;
+            Actions.Test();*/
+        }
+
+
+        
         
         
         #endregion
         
         
         
-        // Client want to get OnTest()
-        // NetCore.Subs.OnTest += (...)
-        //
-        // Client want to invoke Test() on server
-        // NetCore.ServerActions.Test()
         
-        // How to add new feature
-        // NetCube.Sub.NewFeature()
-
-
+        
+        
         // This class contains implementation of server-side methods
         // (External usage)
         public static class ServerActions
         {
             public static void Test() => NetCore.conn.InvokeAsync("Test");
-            public static void Accounts_LogIn(string nick, string password) => NetCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
-            public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group) => NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
+            public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group) 
+                => NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 
+            public static class Account
+            {
+                public static void LogIn(string nick, string password) =>
+                    NetCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
+                
+                public static void SignUp(string nick, string password, string country, string email) =>
+                    NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
+                
+                public static void GetAvatar(string nick) => conn.InvokeAsync("Accounts_GetAvatar", nick);
+
+                public static void ChangePassword(string nick, string oldpass, string newpass) =>
+                    conn.InvokeAsync("Accounts_ChangePassword", nick, oldpass, newpass);
+                public static void Restore(string nick, string password) =>
+                    conn.InvokeAsync("Accounts_Restore", nick, password);
+                public static void ConfirmRestore(string code) => 
+                    conn.InvokeAsync("Accounts_ConfirmRestore", code);
+                
+                
+                public static void ChangeEmptyEmail(string nick, string email) =>
+                    conn.InvokeAsync("Accounts_ChangeEmptyEmail", nick, email);
+                
+                public static void ChangeEmail(string nick, string email) =>
+                    conn.InvokeAsync("Accounts_ChangeEmail", nick, email);
+
+                public static void SendChangeEmailCode(string nick, string email) =>
+                    conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
+                
+                public static void SendReplay(string json) =>
+                    conn.InvokeAsync("Accounts_SendReplay", json);
+
+                public static void GetBestReplay(string nick, string trackname, string creatornick) =>
+                    conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+            }
             public static class Chat
             {
                 public static void GetGroups() => NetCore.conn.InvokeAsync("Chat_GetGroups");
@@ -184,17 +280,38 @@ namespace GameNet
         }
 
 
+        
+        
         // This class contains all methods which can invoke server on client-side
         // How server determine what should invoke? -Field name :D
         // Server: Client.Caller.SendAsync("MethodName", args)
         // There must be Action with name same as MethodName, else server won't be able to find it.
-        public class Subscribtions
+        public class Subscriptions
         {
             public Action OnTest;
             public Action<OperationMessage> Accounts_OnLogIn;
+            public Action<OperationMessage> Accounts_OnSignUp;
             public Action<string> OnJoinGroup;
             public Action<string> OnGetGroups;
             public Action<string> OnSendChatMessage;
+
+            public Action<byte[]> Accounts_OnGetAvatar;
+            public Action<string, string, string> Accounts_ChangePassword;
+            
+            public Action<float> Accounts_OnSendReplay;
+            public Action<string> Accounts_OnGetBestReplay;
         }
+
+        /*public class Invokes
+        {
+            public Action Test { get; set; }
+            //public void Test(string nick, string password) {}
+            //public void Test(string nick, string password) => NetCore.Invoke();
+            
+            public void Invoke()
+            {
+                Debug.Log("ITS AAAALLLIIIIVVEEEE!!!");
+            }
+        }*/
     }
 }

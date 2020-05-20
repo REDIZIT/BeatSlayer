@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using GameNet;
 using Newtonsoft.Json;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -20,7 +21,7 @@ namespace Web
         {
             get
             {
-                return MultiplayerCore.ConnType == ConnectionType.Local ? apibase_local : apibase_prod;
+                return NetCore.ConnType == NetCore.ConnectionType.Local ? apibase_local : apibase_prod;
             }
         }
 

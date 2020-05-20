@@ -39,8 +39,13 @@ namespace Multiplayer.Chat
 
         public void Configure()
         {
+            NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
             NetCore.Subs.OnJoinGroup += OnJoinGroup;
             NetCore.Subs.OnGetGroups += OnGetGroups;
+            NetCore.OnFullReady += () =>
+            {
+                if (NetCorePayload.CurrentAccount != null) NetCore.ServerActions.Chat.GetGroups();
+            };
         }
         
         private void Start()
@@ -51,18 +56,16 @@ namespace Multiplayer.Chat
             avatarLoader = new ChatAvatarLoader();
         }
         
-
-        public void OnConnect()
-        {
-            //MultiplayerCore.conn.InvokeAsync(method_getGroups);
-            NetCore.ServerActions.Chat.GetGroups();
-            //onlineText.text = "Connected";
-        }
-
         public void OnConnectionLost()
         {
             onlineText.text = "Connection lost";
         }
+
+        public void OnLogIn()
+        {
+            NetCore.ServerActions.Chat.GetGroups();
+        }
+        
 
         
         
@@ -71,9 +74,8 @@ namespace Multiplayer.Chat
         {
             if (field.text.Trim() == "") return;
             //if (MultiplayerCore.account == null) return;
-
-            //NetCore.ServerActions.SendChatMessage(MultiplayerCore.account.Nick, field.text, MultiplayerCore.account.Role, selectedGroupName);
-            NetCore.ServerActions.SendChatMessage("REDIZIT", field.text, BeatSlayerServer.Multiplayer.Accounts.AccountRole.Developer, "Global");
+            
+            NetCore.ServerActions.SendChatMessage(NetCorePayload.CurrentAccount.Nick, field.text, BeatSlayerServer.Multiplayer.Accounts.AccountRole.Developer, "Global");
             field.text = "";
         }
         

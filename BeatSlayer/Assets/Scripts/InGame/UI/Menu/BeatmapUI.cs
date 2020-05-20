@@ -6,14 +6,18 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Assets.SimpleLocalization;
+using BeatSlayerServer.Multiplayer.Accounts;
 using InGame.Helpers;
 using InGame.SceneManagement;
 using InGame.UI;
+using Newtonsoft.Json;
 using Pixelplacement;
 using ProjectManagement;
 using Testing;
 using UnityEngine;
 using UnityEngine.UI;
+using GroupInfo = ProjectManagement.GroupInfo;
+using MapInfo = ProjectManagement.MapInfo;
 
 public class BeatmapUI : MonoBehaviour
 {
@@ -309,8 +313,9 @@ public class BeatmapUI : MonoBehaviour
         {
             recordPan.SetActive(true);
             leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
-            AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, (Replay replay) =>
+            AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, (string replaystr) =>
             {
+                ReplayInfo replay = JsonConvert.DeserializeObject<ReplayInfo>(replaystr);
                 if (replay == null)
                 {
                     recordText.text = "";
@@ -319,7 +324,7 @@ public class BeatmapUI : MonoBehaviour
                 else
                 {
                     recordText.text =
-                        $"{replay.score}   <color=#f00>{replay.missed}</color>   <color=#eee>{replay.Accuracy * 100}%</color>   <color=#08f>{replay.RP}</color>";
+                        $"{replay.Score}   <color=#f00>{replay.Missed}</color>   <color=#eee>{replay.Accuracy * 100}%</color>   <color=#08f>{replay.RP}</color>";
 
                     leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
                     

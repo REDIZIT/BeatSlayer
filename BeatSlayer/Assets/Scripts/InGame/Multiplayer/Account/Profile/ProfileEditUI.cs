@@ -109,7 +109,7 @@ namespace Profile
             if (canContinue)
             {
                 newpassword = password1Field.text;
-                MultiplayerCore.conn.InvokeAsync("Accounts_ChangePassword", NetCorePayload.CurrentAccount.Nick, currentPasswordField.text, newpassword);
+                NetCore.ServerActions.Account.ChangePassword(NetCorePayload.CurrentAccount.Nick, currentPasswordField.text, newpassword);
             }
         }
         public void OnEmailChangeBtnClick()
@@ -138,9 +138,9 @@ namespace Profile
                 if (isEmptyEmail)
                 {
                     newEmail = newEmailField.text;
-                    MultiplayerCore.conn.InvokeAsync("Accounts_ChangeEmptyEmail", NetCorePayload.CurrentAccount.Nick, newEmailField.text);
+                    NetCore.ServerActions.Account.ChangeEmptyEmail(NetCorePayload.CurrentAccount.Nick, newEmailField.text);
                 }
-                else MultiplayerCore.conn.InvokeAsync("Accounts_ChangeEmail", NetCorePayload.CurrentAccount.Nick, codeField.text);
+                else NetCore.ServerActions.Account.ChangeEmail(NetCorePayload.CurrentAccount.Nick, codeField.text);
             }
         }
         public void OnEmailChangeCodeBtnClick()
@@ -155,7 +155,7 @@ namespace Profile
             if (canContinue)
             {
                 newEmail = newEmailField.text;
-                MultiplayerCore.conn.InvokeAsync("Accounts_SendChangeEmailCode", NetCorePayload.CurrentAccount.Nick, newEmail);   
+                NetCore.ServerActions.Account.SendChangeEmailCode(NetCorePayload.CurrentAccount.Nick, newEmail);   
             }
         }
         

@@ -10,6 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Assets.SimpleLocalization;
+using BeatSlayerServer.Multiplayer.Accounts;
+using GameNet;
 using Newtonsoft.Json;
 using GooglePlayGames.BasicApi.Multiplayer;
 using ProjectManagement;
@@ -614,32 +616,37 @@ public class AccountManager : MonoBehaviour
         bigLeaderboardContent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -contentY);
     }
 
-    public static void SendReplay(Replay replay, Action<double> callback)
+    public static void SendReplay(Replay replay, Action<float> callback)
     {
-        replay.player = LegacyAccount.nick;
+        //replay.player = LegacyAccount.nick;
 
-        WebClient c = new WebClient();
-        //c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
-        //{
-        //    if(e.Error != null) Debug.LogError("SendReplay error: " + e.Error);
-        //    Debug.Log("SendReplay response is " + e.Result);
-        //    //if (!e.Cancelled && e.Error != null) Debug.LogError("SendReplay\n" + e.Error);
-
-        //    callback(double.Parse(e.Result, System.Globalization.CultureInfo.InvariantCulture));
-        //};
+        /*WebClient c = new WebClient();
 
         string url = string.Format(url_sendReplay, LegacyAccount.nick, JsonConvert.SerializeObject(replay));
-        //c.DownloadStringAsync(new Uri(url));
-        string RPstr = c.DownloadString(url);
-        Debug.Log(url + "\n" + RPstr);
-        callback(double.Parse(RPstr, System.Globalization.CultureInfo.InvariantCulture));
-    }
-    public static void GetBestReplay(string player, string trackname, string nick, Action<Replay> callback)
-    {
-        WebClient c = new WebClient();
-        string url = string.Format(url_getBestReplay, player, trackname, nick);
+        string RPstr = c.DownloadString(url);*/
 
-        c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
+        //callback(double.Parse(RPstr, System.Globalization.CultureInfo.InvariantCulture));
+
+        replay.player = NetCorePayload.CurrentAccount.Nick;
+        string json = JsonConvert.SerializeObject(replay);
+
+        NetCore.Subs.Accounts_OnSendReplay += RP =>
+        {
+            Debug.Log("Accounts_OnSendReplay " + RP);
+            callback(RP);
+        };
+        
+        NetCore.ServerActions.Account.SendReplay(json);
+    }
+    public static void GetBestReplay(string player, string trackname, string nick, Action<string> callback)
+    {
+        //WebClient c = new WebClient();
+        //string url = string.Format(url_getBestReplay, player, trackname, nick);
+
+        NetCore.Subs.Accounts_OnGetBestReplay += callback;
+        NetCore.ServerActions.Account.GetBestReplay(player, trackname, nick);
+
+        /*c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
         {
             if (!e.Cancelled && e.Error != null)
             {
@@ -660,7 +667,7 @@ public class AccountManager : MonoBehaviour
             }
         };
         
-        c.DownloadStringAsync(new Uri(url));
+        c.DownloadStringAsync(new Uri(url));*/
     }
 
     public static void GetMapLeaderboardPlace(string player, string trackname, string nick, Action<int> callback)
