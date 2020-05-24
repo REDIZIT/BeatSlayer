@@ -75,6 +75,7 @@ public class TextContainer : MonoBehaviour
         float maxWidth = 0;
         float maxHeight = 0;
 
+        if (texts == null) return;
         foreach (var text in texts)
         {
             float width = extendHorizont ? text.preferredWidth + padding.x * 2 : Rect.sizeDelta.x;

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Ranking;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;

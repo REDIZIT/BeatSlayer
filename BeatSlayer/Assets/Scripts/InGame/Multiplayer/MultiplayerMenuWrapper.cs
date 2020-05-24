@@ -7,28 +7,27 @@ using Multiplayer.Accounts;
 using Multiplayer.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MultiplayerMenuWrapper : MonoBehaviour
 {
     public ChatUI chatUI;
     public AccountUI accountUI;
+    public FriendsUI friendsUI;
 
     [Header("Server connection override")]
     public NetCore.ConnectionType connType;
     public bool forceChangeConnType;
 
-
-
-    private int reconnectTry;
-    private bool tryToReconnect = true;
-
-    public bool doReconnect;
-
+    [Header("UI")] 
+    public Animator serverStateAnim;
+    public Text serverStateText;
+    private float timeUntilClose;
     
 
     private void Awake()
     {
-        if (forceChangeConnType)
+        if (Application.isEditor && forceChangeConnType)
         {
             NetCore.ConnType = connType;
         }
@@ -36,30 +35,28 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Start()
     {
-        Application.quitting += () =>
-        {
-            //MultiplayerCore.conn.StopAsync();
-            tryToReconnect = false;
-        };
-        
         NetCore.Configure(() =>
         {
             NetCore.OnFullReady += () =>
             {
-                accountUI.ShowMessage("Ready");
+                //accountUI.ShowMessage("Ready");
                 accountUI.OnSceneLoad();
             };
 
             NetCore.OnConnect += OnConnect;
+            NetCore.OnReconnect += OnReconnecting;
             NetCore.OnDisconnect += OnDisconnected;
-            
+
             // Subscribe/Resubscribe all
             NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
-            NetCore.Subs.Accounts_OnGetBestReplay += info => Debug.Log("Got best replay with json = " + info);
 
             accountUI.Configure();
             chatUI.Configure();
+            friendsUI.Configure();
         });
+
+
+        Debug.Log("Url is " + NetCore.Url_Hub);
     }
 
     private void Update()
@@ -75,32 +72,51 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             Debug.Log("Send test");
             NetCore.ServerActions.Test();
         }*/
+        if (timeUntilClose > 0) timeUntilClose -= Time.deltaTime;
+        else
+        {
+            timeUntilClose = 0;
+            serverStateAnim.Play("Hide");
+        }
     }
 
     public void OnConnect()
     {
+        if(NetCore.ReconnectAttempt != 0) ShowState("Connected", 3); 
         accountUI.OnConnect(this);
-        NetCore.ServerActions.Account.GetBestReplay("REDIZIT", "kasai harcores-cycle hit", "idxracer");
     }
 
 
 
 
-    void OnDisconnected(/*Exception err*/)
+    void OnDisconnected()
     {
-        UnityMainThreadDispatcher.Instance().Enqueue(IOnDisconnected(null));
-    }
-    IEnumerator IOnDisconnected(Exception err)
-    {
-        chatUI.OnConnectionLost();
-        if (err != null)
+        UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            Debug.LogError("Disconnected due to " + err);
-            //MultiplayerCore.Reconnect();
-        }
-        
-        yield break;
+            ShowState("Connection lost", 120);
+            chatUI.OnConnectionLost();
+            //if (err != null)
+            //{
+                //Debug.LogError("Disconnected due to " + err);
+            //}
+        });
     }
 
+    void OnReconnecting()
+    {
+        ShowState("Reconnecting.. attempt " + (NetCore.ReconnectAttempt), 30);
+    }
     
+    
+    public void ShowState(string state, float time)
+    {
+        timeUntilClose = time;
+        serverStateAnim.Play("Show");
+        serverStateText.text = state;
+    }
+
+    public void HideState()
+    {
+        serverStateAnim.Play("Hide");
+    }
 }

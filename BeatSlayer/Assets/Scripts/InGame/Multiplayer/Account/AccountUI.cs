@@ -33,6 +33,7 @@ namespace Multiplayer.Accounts
         {
             NetCore.Subs.Accounts_OnLogIn += OnLogIn;
             NetCore.Subs.Accounts_OnSignUp += OnSignUp;
+            NetCore.Subs.Accounts_OnView += OnView;
         }
 
         public void OnConnect(MultiplayerMenuWrapper wrapper)
@@ -44,7 +45,7 @@ namespace Multiplayer.Accounts
         private void Update()
         {
             if (wrapper == null || NetCorePayload.CurrentAccount == null) return;
-            NetCorePayload.CurrentAccount.InGameTime += TimeSpan.FromSeconds(Time.unscaledDeltaTime);
+            NetCorePayload.CurrentAccount.InGameTimeTicks += TimeSpan.FromSeconds(Time.unscaledDeltaTime).Ticks;
             if(Time.realtimeSinceStartup - inGameTimeSent > 30) UpdateInGameTime();
         }
 
@@ -179,9 +180,8 @@ namespace Multiplayer.Accounts
             */
             Web.WebAPI.GetAvatar(NetCorePayload.CurrentAccount.Nick, bytes =>
             {
-                File.WriteAllBytes(filepath, bytes);
                 profileUI.OnGetAvatar(bytes);
-            });
+            }, true);
         }
 
         public void SaveBackgroundToCache(bool force = false)
@@ -198,9 +198,8 @@ namespace Multiplayer.Accounts
             */
             Web.WebAPI.GetBackground(NetCorePayload.CurrentAccount.Nick, bytes =>
             {
-                File.WriteAllBytes(filepath, bytes);
                 profileUI.OnGetBackground(bytes);
-            });
+            }, true);
         }
         
         
@@ -208,19 +207,21 @@ namespace Multiplayer.Accounts
         
         public void OnLogIn(OperationMessage op)
         {
-            Debug.Log("OnLogIn " + op.Message);
+            Debug.Log("OnLogIn " + JsonConvert.SerializeObject(op,Formatting.Indented));
             if (!isLoginBySession)
             {
                 signUI.OnLogInResult(op);
             }
             if (op.Type == OperationMessage.OperationType.Success)
             {
-                NetCorePayload.CurrentAccount = JsonConvert.DeserializeObject<Account>(op.Message);
+                NetCorePayload.CurrentAccount = op.Account;
                 CreateSession();
                 SaveAvatarToCache();
                 SaveBackgroundToCache();
                 
-                wrapper.chatUI.OnLogIn();
+                Debug.Log("I have coins: " + op.Account.Coins);
+                
+                NetCore.OnLogIn?.Invoke();
             }
         }
 
@@ -236,10 +237,9 @@ namespace Multiplayer.Accounts
         {
             signUI.OnSignUpResult(op);
         }
-        public void OnAccountView(string json)
+        public void OnView(AccountData acc)
         {
-            OperationResult result = JsonConvert.DeserializeObject<OperationResult>(json);
-            Account acc = JsonConvert.DeserializeObject<Account>(json);
+            profileUI.ShowAccount(acc);
         }
 
         public void OnRestore(OperationMessage success)

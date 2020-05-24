@@ -12,6 +12,7 @@ using DatabaseManagement;
 using GameNet;
 using Newtonsoft.Json;
 using ProjectManagement;
+using Ranking;
 using Testing;
 using TMPro;
 using UnityEngine;
@@ -206,6 +207,7 @@ public class GameManager : MonoBehaviour
         
         Debug.Log("Is difficultyInfo null? " + (difficultyInfo == null));
         replay.difficulty = difficultyInfo.stars;
+        replay.diffucltyName = difficultyInfo.name;
         
         // Deprecated coz of Difficulty system
         //replay.cubesSpeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);

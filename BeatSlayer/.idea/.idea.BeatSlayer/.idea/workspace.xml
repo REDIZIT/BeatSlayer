@@ -31,22 +31,14 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Shaders/AndroidTransparent/AndroidTransparent.shader" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MeleeWeaponTrail/Scripts/MeleeWeaponTrail.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Prefs.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/AuthManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Scripts/Controls/ComboBox/AutoCompleteComboBox.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatMessageItem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/GroupInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/78945DCA-7E9F-49CD-88C6-11024C49DCEB/4c/7a0a2f74/NetCore.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Audio/NativeAudioSource.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ManagerUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/MapInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SpectrumVisualizer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/InputField/CustomInputField.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/MenuHelpers/ShopHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatAvatarLoader.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MapListItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Localization/LocalizedText.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Localization/Downloader.cs" root0="FORCE_HIGHLIGHTING" />
@@ -54,18 +46,46 @@
     <setting file="file://$PROJECT_DIR$/Assets/GooglePlayGames/Editor/GPGSUpgrader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MundoSound/Plugins/MSAudioVolume.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MundoSound/Plugins/MundoSound.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Shaders/AlphaGradientShader.shader" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Analyzer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Android Native Audio/Scripts/AndroidNativeAudio.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ShowOffEmoji.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/WebAPI/WebAPI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Audio/BeatmapAudio.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUIItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Plugins/Other/UnityMainThreadDispatcher-master/UnityMainThreadDispatcher.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/SaberController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DailyRewarder.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Project.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Friends/FriendsUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/FriendInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Prefs.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatMessageItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/FriendItemUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/GroupInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ManagerUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/MapInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DatabaseScript.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/InputField/CustomInputField.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MapListItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Shaders/AlphaGradientShader.shader" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/78AFCDD7-A608-4612-8C49-45F03EB135B8/27/977cdef7/Action.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Ranking.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ReplayItemUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/SceneController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/TrackListUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/UrlsChecker.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/MusicFilesUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/SceneControllerUI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/Account.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/OperationMessage.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUIItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/PageController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileEditUI.cs" root0="FORCE_HIGHLIGHTING" />
@@ -75,65 +95,46 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/DownloadHelper.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Android Native Audio/Scripts/AndroidNativeAudio.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/GooglePlayGames/Platforms/Android/AndroidTurnBasedMultiplayerClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ShowOffEmoji.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameUIManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/WebAPI/WebAPI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/CheatEngine.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Audio/BeatmapAudio.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Plugins/ImageCropper/Scripts/ImageCropper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Plugins/ImageCropper/Demo/ImageCropperDemo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Operations.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/CoversManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUIItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/DatabaseManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/MusicFilesManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/ProjectManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/unity-ui-extensions/Examples/MenuExample/Scripts/Menus/GameMenu.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Plugins/Other/UnityMainThreadDispatcher-master/UnityMainThreadDispatcher.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/SaberController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupItemUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCorePayload.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/SettingsManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/E1319B71-95C3-43E7-9B38-5CD3AA43F5DC/e1/0617cd97/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountSignUI.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Project.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TrackListItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/SaveTest/AdvancedSaveManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/SaveTest/SSytem.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/TestManager.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/CustomUI/InputField/CustomInputField.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/ShowOffEmoji.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Profile/ProfileUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUIItem.cs" />
-        <option value="$APPLICATION_CONFIG_DIR$/consoles/.datagrid/cell" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/Localization/LocalizedText.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" />
-        <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/Menu.csv" />
         <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/AccountSign.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" />
         <option value="$PROJECT_DIR$/Assets/AuthManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/SaveTest/SSytem.cs" />
         <option value="$USER_HOME$/AppData/LocalLow/REDIZIT/Beat Slayer/data/account/.session" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountSignUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Account.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/AccountView.csv" />
@@ -146,27 +147,40 @@
         <option value="$USER_HOME$/Downloads/BeatmapUI.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/NetCore.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerCore.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCorePayload.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatMessageItem.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/OperationMessage.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatAvatarLoader.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/WebAPI/WebAPI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileEditUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/GroupInfo.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/MapInfo.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/GroupInfo.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ReplayItemUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/FriendInfo.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCorePayload.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/OperationMessage.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/FriendItemUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Friends/FriendsUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupData.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupItemUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/WebAPI/WebAPI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/Prefs.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/DailyRewarder.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/Account.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Ranking.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUIItem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MenuHelpers/ShopHelper.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
       </list>
     </option>
   </component>
@@ -177,6 +191,8 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34994584" />
+    <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.30010834" />
     <property name="Discover.Launch.Via.Unity" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
@@ -243,6 +259,11 @@
       <workItem from="1589707569362" duration="8097000" />
       <workItem from="1589736613699" duration="1337000" />
       <workItem from="1589782043029" duration="6442000" />
+      <workItem from="1590074518359" duration="28756000" />
+      <workItem from="1590171548331" duration="7226000" />
+      <workItem from="1590247135264" duration="12159000" />
+      <workItem from="1590321272960" duration="3051000" />
+      <workItem from="1590351045888" duration="2078000" />
     </task>
     <servers />
   </component>
@@ -278,15 +299,79 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="92" y="92" width="1736" height="856" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588439332761" />
+    <state width="1877" height="375" key="GridCell.Tab.0.bottom" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.0.center" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.0.left" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.0.right" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.1.bottom" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.1.center" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.1.left" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.1.right" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.2.bottom" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.2.center" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.2.left" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.2.right" timestamp="1590318809783">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809783" />
+    <state width="1877" height="375" key="GridCell.Tab.3.bottom" timestamp="1590318809784">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.3.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809784" />
+    <state width="1877" height="375" key="GridCell.Tab.3.center" timestamp="1590318809784">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.3.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809784" />
+    <state width="1877" height="375" key="GridCell.Tab.3.left" timestamp="1590318809784">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.3.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809784" />
+    <state width="1877" height="375" key="GridCell.Tab.3.right" timestamp="1590318809784">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="375" key="GridCell.Tab.3.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590318809784" />
     <state x="552" y="251" key="Rider.ProjectTemplateDialog.Size" timestamp="1588597918816">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="251" key="Rider.ProjectTemplateDialog.Size/0.0.1920.1040@0.0.1920.1040" timestamp="1588597918816" />
-    <state x="2699" y="263" key="RiderGenerateDialog" timestamp="1589654020291">
-      <screen x="1920" y="70" width="1920" height="1040" />
+    <state x="779" y="193" key="RiderGenerateDialog" timestamp="1590083631578">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="2699" y="263" key="RiderGenerateDialog/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589654020291" />
-    <state x="779" y="193" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588501495891" />
+    <state x="779" y="193" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590083631578" />
     <state x="411" y="130" key="SettingsEditor" timestamp="1589563982461">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -305,12 +390,12 @@
     </state>
     <state x="2536" y="310" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589654272199" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1589540128711" />
-    <state x="2543" y="295" width="672" height="678" key="search.everywhere.popup" timestamp="1589796341868">
-      <screen x="1920" y="70" width="1920" height="1040" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590355467114">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="2543" y="290" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.65.1920.1040@1920.65.1920.1040" timestamp="1589580428851" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.70.1920.1040@0.0.1920.1040" timestamp="1589717157563" />
     <state x="2543" y="295" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589796341868" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1589543616419" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590355467114" />
   </component>
 </project>

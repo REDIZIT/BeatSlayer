@@ -23,7 +23,7 @@ public class DailyRewarder : MonoBehaviour
 
     public int day;
 
-    public void Calculate()
+    /*public void Calculate()
     {
         DateTime prevGame = prefsManager.prefs.prevPlay;
         if (prevGame.Day != DateTime.Now.Day)
@@ -71,5 +71,5 @@ public class DailyRewarder : MonoBehaviour
         Camera.main.GetComponent<MenuScript_v2>().coinsTexts[1].text = prefsManager.prefs.coins + "";
 
         prefsManager.Save();
-    }
+    }*/
 }

@@ -835,14 +835,21 @@
                 <e p="AccountSignUI.cs" t="Include" />
                 <e p="AccountUI.cs" t="Include" />
                 <e p="Profile" t="Include">
+                  <e p="FriendItemUI.cs" t="Include" />
                   <e p="ProfileEditUI.cs" t="Include" />
                   <e p="ProfileUI.cs" t="Include" />
+                  <e p="ReplayItemUI.cs" t="Include" />
                 </e>
               </e>
               <e p="Chat" t="Include">
                 <e p="ChatAvatarLoader.cs" t="Include" />
+                <e p="ChatGroupData.cs" t="Include" />
+                <e p="ChatGroupItemUI.cs" t="Include" />
                 <e p="ChatMessageItem.cs" t="Include" />
                 <e p="ChatUI.cs" t="Include" />
+              </e>
+              <e p="Friends" t="Include">
+                <e p="FriendsUI.cs" t="Include" />
               </e>
               <e p="MultiplayerMenuWrapper.cs" t="Include" />
               <e p="Notifications" t="Include">
@@ -861,6 +868,7 @@
             <e p="SceneController.cs" t="Include" />
             <e p="Server-side" t="Include">
               <e p="Account.cs" t="Include" />
+              <e p="FriendInfo.cs" t="Include" />
               <e p="GroupInfo.cs" t="Include" />
               <e p="MapInfo.cs" t="Include" />
               <e p="ReplayInfo.cs" t="Include" />

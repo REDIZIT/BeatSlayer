@@ -15,6 +15,7 @@ using GameNet;
 using Newtonsoft.Json;
 using GooglePlayGames.BasicApi.Multiplayer;
 using ProjectManagement;
+using Ranking;
 using UnityEngine.Serialization;
 
 public class AccountManager : MonoBehaviour
@@ -616,60 +617,34 @@ public class AccountManager : MonoBehaviour
         bigLeaderboardContent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -contentY);
     }
 
-    public static void SendReplay(Replay replay, Action<float> callback)
+    
+    
+    
+    
+    public static void SendReplay(Replay replay, Action<ReplaySendData> callback)
     {
-        //replay.player = LegacyAccount.nick;
-
-        /*WebClient c = new WebClient();
-
-        string url = string.Format(url_sendReplay, LegacyAccount.nick, JsonConvert.SerializeObject(replay));
-        string RPstr = c.DownloadString(url);*/
-
-        //callback(double.Parse(RPstr, System.Globalization.CultureInfo.InvariantCulture));
-
         replay.player = NetCorePayload.CurrentAccount.Nick;
         string json = JsonConvert.SerializeObject(replay);
 
-        NetCore.Subs.Accounts_OnSendReplay += RP =>
+        NetCore.Subs.Accounts_OnSendReplay += data =>
         {
-            Debug.Log("Accounts_OnSendReplay " + RP);
-            callback(RP);
+            Debug.Log("Accounts_OnSendReplay " + data.Coins);
+            callback(data);
         };
         
         NetCore.ServerActions.Account.SendReplay(json);
     }
-    public static void GetBestReplay(string player, string trackname, string nick, Action<string> callback)
+    public static void GetBestReplay(string player, string trackname, string nick, Action<ReplayData> callback)
     {
-        //WebClient c = new WebClient();
-        //string url = string.Format(url_getBestReplay, player, trackname, nick);
-
         NetCore.Subs.Accounts_OnGetBestReplay += callback;
         NetCore.ServerActions.Account.GetBestReplay(player, trackname, nick);
-
-        /*c.DownloadStringCompleted += (object sender, DownloadStringCompletedEventArgs e) =>
-        {
-            if (!e.Cancelled && e.Error != null)
-            {
-                Debug.Log("GetBestReplay\n" + e.Error); callback(null);
-                callback(null);
-            }
-            else 
-            {
-                if (e.Result == "")
-                {
-                    callback(null);
-                }
-                else
-                {
-                    Replay replay = JsonConvert.DeserializeObject<Replay>(e.Result);
-                    callback(replay);   
-                }
-            }
-        };
-        
-        c.DownloadStringAsync(new Uri(url));*/
     }
 
+    
+    
+    
+    
+    
     public static void GetMapLeaderboardPlace(string player, string trackname, string nick, Action<int> callback)
     {
         string url = string.Format(url_getMapLeaderboardPlace, player, trackname, nick);

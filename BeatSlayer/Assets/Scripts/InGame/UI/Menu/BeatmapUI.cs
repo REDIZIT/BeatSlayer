@@ -313,9 +313,8 @@ public class BeatmapUI : MonoBehaviour
         {
             recordPan.SetActive(true);
             leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
-            AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, (string replaystr) =>
+            AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, replay =>
             {
-                ReplayInfo replay = JsonConvert.DeserializeObject<ReplayInfo>(replaystr);
                 if (replay == null)
                 {
                     recordText.text = "";

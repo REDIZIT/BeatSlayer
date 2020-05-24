@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Dynamic;
-using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using UnityEngine;
 using InGame.Helpers;
@@ -23,7 +22,7 @@ namespace Multiplayer.Chat
 
         
         List<ChatMessage> chatMessages = new List<ChatMessage>();
-        string selectedGroupName;
+        public string selectedGroupName;
         
         
         [Header("UI")]
@@ -46,6 +45,17 @@ namespace Multiplayer.Chat
             {
                 if (NetCorePayload.CurrentAccount != null) NetCore.ServerActions.Chat.GetGroups();
             };
+            NetCore.OnLogIn += () =>
+            {
+                //onlineText.text = "Онлайн: -";
+                NetCore.ServerActions.Chat.GetGroups();
+            };
+            NetCore.Subs.OnOnlineChange += (int online) =>
+            {
+                onlineText.text = "Онлайн: " + online;
+            };
+            
+            avatarLoader.Configure();
         }
         
         private void Start()
@@ -60,24 +70,26 @@ namespace Multiplayer.Chat
         {
             onlineText.text = "Connection lost";
         }
-
-        public void OnLogIn()
-        {
-            NetCore.ServerActions.Chat.GetGroups();
-        }
-        
-
-        
         
         
         public void OnSendBtnClicked()
         {
             if (field.text.Trim() == "") return;
-            //if (MultiplayerCore.account == null) return;
-            
-            NetCore.ServerActions.SendChatMessage(NetCorePayload.CurrentAccount.Nick, field.text, BeatSlayerServer.Multiplayer.Accounts.AccountRole.Developer, "Global");
+
+            NetCore.ServerActions.SendChatMessage(NetCorePayload.CurrentAccount.Nick, field.text, NetCorePayload.CurrentAccount.Role, selectedGroupName);
             field.text = "";
         }
+
+        public void JoinGroup(ChatGroupData data)
+        {
+            if (NetCorePayload.CurrentAccount == null) return;
+            
+            NetCore.ServerActions.Chat.JoinGroup(NetCorePayload.CurrentAccount.Nick, data.Name);
+            selectedGroupName = data.Name;
+            groupText.text = data.Name;
+        }
+        
+        
         
         
         
@@ -98,24 +110,24 @@ namespace Multiplayer.Chat
             chatMessages.Add(msg);
         }
 
-        public void OnGetGroups(string json)
+        public void OnGetGroups(List<ChatGroupData> groups)
         {
-            Debug.Log(json);
-            List<string> groups = JsonConvert.DeserializeObject<List<string>>(json);
-            selectedGroupName = groups[0];
+            
+            Debug.Log(" << OnGetGroups");
+            selectedGroupName = groups[0].Name;
             groupText.text = selectedGroupName;
 
             Debug.Log("Try to join " + selectedGroupName + " group");
             NetCore.ServerActions.Chat.JoinGroup(NetCorePayload.CurrentAccount.Nick, selectedGroupName);
-
-            //groupDropdown.ClearOptions();
-            //groupDropdown.AddOptions(groups);
-
+            
+            HelperUI.FillContent<ChatGroupItemUI, ChatGroupData>(groupContent, groups, (ui, data) =>
+            {
+                ui.Refresh(data);
+            });
         }
 
         public void OnJoinGroup(string json)
         {
-            Debug.Log("OnJoinGroup " + json);
             List<ChatMessage> msgs = JsonConvert.DeserializeObject<List<ChatMessage>>(json);
             
             HelperUI.FillContent<ChatMessageItem, ChatMessage>(content, msgs, (item, message) =>

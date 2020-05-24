@@ -25,6 +25,7 @@ using CoversManagement;
 using InGame.SceneManagement;
 //using SaveManagement;
 using DatabaseManagement;
+using GameNet;
 using InGame.Helpers;
 using ProjectManagement;
 using Testing;
@@ -144,25 +145,19 @@ public class MenuScript_v2 : MonoBehaviour
 
         #region Loading prefs
 
-        if (File.Exists(Application.persistentDataPath + "/Money.txt"))
-        {
-            prefsManager.prefs.coins = 999999;
-            prefsManager.Save();
-        }
-        if (File.Exists(Application.persistentDataPath + "/nomoney.txt"))
-        {
-            prefsManager.prefs.coins = 0;
-            prefsManager.Save();
-        }
 
         mapHss.StartingScreen = prefsManager.prefs.selectedMapId;
         mapLockers[0].SetActive(!prefsManager.prefs.mapUnlocked0);
         mapLockers[1].SetActive(!prefsManager.prefs.mapUnlocked1);
         mapLockers[2].SetActive(!prefsManager.prefs.mapUnlocked2);
         mapLockers[3].SetActive(!prefsManager.prefs.mapUnlocked3);
-        coinsTexts[0].text = prefsManager.prefs.coins.ToString();
-        coinsTexts[1].text = prefsManager.prefs.coins.ToString();
-        coinsTexts[2].text = prefsManager.prefs.coins.ToString();
+
+        if(NetCorePayload.CurrentAccount != null) RefreshCoinsTexts();
+        NetCore.OnLogIn += () =>
+        {
+            RefreshCoinsTexts();
+        };
+        
 
         #endregion
 
@@ -177,7 +172,7 @@ public class MenuScript_v2 : MonoBehaviour
             CheckServerMessage();
         }
 
-        dailyRewarder.Calculate();
+        //dailyRewarder.Calculate();
         CheckAchievement();
 
         videoPlayer.Prepare();
@@ -928,12 +923,13 @@ public class MenuScript_v2 : MonoBehaviour
     }
     public void UnlockMap(Button btn)
     {
-        int coins = prefsManager.prefs.coins;
+        int coins = NetCorePayload.CurrentAccount.Coins;
         int mapIndex = int.Parse(btn.name.Replace("Locker", ""));
         int cost = mapsCosts[mapIndex];
         if (coins >= cost)
         {
-            prefsManager.prefs.coins = coins - cost;
+            NetCorePayload.CurrentAccount.Coins -= cost;
+            NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -cost);
             if (mapIndex == 0) prefsManager.prefs.mapUnlocked0 = true;
             else if (mapIndex == 1) prefsManager.prefs.mapUnlocked1 = true;
             else if (mapIndex == 2) prefsManager.prefs.mapUnlocked2 = true;
@@ -1030,23 +1026,11 @@ public class MenuScript_v2 : MonoBehaviour
         Debug.LogWarning(string.Format("GPS Info: {0}\n{1}\n{2}\n{3}\n{4}", username, id, isFiened, state, displayName));*/
     }
 
-    public void OpenCustomList()
+    public void RefreshCoinsTexts()
     {
-        FileBrowser.Filter filter = new FileBrowser.Filter("Project", ".bsu");
-        FileBrowser.SetFilters(false, filter);
-        FileBrowser.ShowLoadDialog(OnCustomTrackSelected, delegate { }, false, Application.persistentDataPath);
-
+        foreach (var t in coinsTexts) t.text = NetCorePayload.CurrentAccount.Coins.ToString();
     }
-    // 'From file' button
-    void OnCustomTrackSelected(string path)
-    {
-        string bsuPath = path;
-
-
-        SceneloadParameters parameters = SceneloadParameters.FromFilePreset(bsuPath);
-        SceneController.instance.LoadScene(parameters);
-    }
-
+    
     public void CloseEditorAvailableForever()
     {
         prefsManager.prefs.showedEditorAvailableWindow = true;

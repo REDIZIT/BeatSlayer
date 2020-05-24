@@ -4,11 +4,23 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using GameNet;
 
 namespace BeatSlayerServer.Multiplayer.Accounts
 {
-    public class Account
+    public enum AccountRole
     {
+        Player,
+        Moderator,
+        Developer
+    }
+    
+    
+    public class AccountData
+    {
+        
+       
+
         public int Id { get; set; }
         public string Nick { get; set; }
 
@@ -20,10 +32,32 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         public AccountRole Role { get; set; }
 
 
-        public TimeSpan InGameTime { get; set; }
+
+        public List<AccountData> Friends { get; set; }
+
+
+
+        /*public TimeSpan InGameTime { get; set; }
 
         public DateTime SignUpTime { get; set; }
-        public DateTime LastLoginTime { get; set; }
+        public DateTime LastLoginTime { get; set; }*/
+        public long InGameTimeTicks { get; set; }
+        public long SignUpTimeUtcTicks { get; set; }
+        public long LastLoginTimeUtcTicks { get; set; }
+        public long LastActiveTimeUtcTicks { get; set; }
+
+        public TimeSpan InGameTime => new TimeSpan(InGameTimeTicks);
+        public DateTime SignUpTimeUtc => new DateTime(SignUpTimeUtcTicks);
+        public DateTime LastLoginTimeUtc => new DateTime(LastLoginTimeUtcTicks);
+        public DateTime LastActiveTimeUtc => new DateTime(LastActiveTimeUtcTicks);
+
+
+        public bool IsOnline => (DateTime.UtcNow - LastActiveTimeUtc).TotalSeconds < 40;
+
+
+
+
+
         public string Country { get; set; }
 
 
@@ -50,16 +84,7 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         public int PublishedMapsLiked { get; set; }
 
 
-
-
-
-        private Account() { }
-    }
-
-    public enum AccountRole
-    {
-        Player,
-        Moderator,
-        Developer
+        // Shop stuff
+        public int Coins { get; set; }
     }
 }

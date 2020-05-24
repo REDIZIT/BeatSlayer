@@ -7,6 +7,6 @@ namespace GameNet
     // This is container for InGame vars
     public static class NetCorePayload
     {
-        public static Account CurrentAccount { get; set; }
+        public static AccountData CurrentAccount { get; set; }
     }
 }

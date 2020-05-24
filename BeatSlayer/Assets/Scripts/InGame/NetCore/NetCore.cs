@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BeatSlayerServer.Multiplayer.Accounts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
+using Ranking;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,7 +19,7 @@ namespace GameNet
         static HubConnection conn;
         public static HubConnectionState State => conn.State;
         public static Subscriptions Subs { get; private set; }
-        //public static Invokes Actions { get; private set; }
+        public static Invokes Actions { get; private set; }
 
         public static string Url_Hub
         {
@@ -31,11 +32,12 @@ namespace GameNet
         }
         public enum ConnectionType { Production, Local }
 
-        public static ConnectionType ConnType = ConnectionType.Local;
+        public static ConnectionType ConnType;
 
 
 
         public static Action OnConnect, OnDisconnect, OnReconnect, OnFullReady;
+        public static Action OnLogIn;
 
         
         
@@ -52,16 +54,19 @@ namespace GameNet
         {
             SceneManager.activeSceneChanged += (arg0, scene) =>
             {
-                OnSceneLoad();
+                //Debug.Log("activeSceneChanged");
+                //if(Time.realtimeSinceStartup > 5) OnSceneLoad();
             };
             Application.quitting += () =>
             {
-                conn.StopAsync();
+                conn?.StopAsync();
                 TryReconnect = false;
             };
             
             TryReconnect = true;
+            
             //OnSceneLoad();
+            
         }
 
 
@@ -76,11 +81,11 @@ namespace GameNet
             OnConnect = null;
             OnDisconnect = null;
             OnReconnect = null;
-
-            UnityMainThreadDispatcher dispatcher = UnityMainThreadDispatcher.Instance();
-            dispatcher.Enqueue(() =>
+            
+            OnSceneLoad();
+            
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                Debug.Log("NetCore.Configure via Dispatcher");
                 config();
                 
                 OnFullReady?.Invoke();
@@ -119,7 +124,7 @@ namespace GameNet
         {
             BuildConnection();
             SubcribeOnServerCalls();
-            SubcribeOnClientInvokes();
+            //SubcribeOnClientInvokes();
             Connect();
         }
         
@@ -135,30 +140,46 @@ namespace GameNet
             try
             {
                 await conn.StartAsync();
+                if (conn.State == HubConnectionState.Connected)
+                {
+                    Debug.Log("[ Connected ]");
+                    OnConnect?.Invoke();
+                    ReconnectAttempt = 0;
+                    //OnFullReady?.Invoke();
+                }
+                else
+                {
+                    Debug.Log("[ Reconnecting ]");
+                    if (Application.isPlaying)
+                    {
+                        OnReconnect?.Invoke();
+                        Reconnect();   
+                    }
+                }
             }
             catch (Exception err)
             {
                 Debug.Log("Connection failed: " + err);
+                Debug.Log("[ Reconnecting ]");
+                if (Application.isPlaying)
+                {
+                    OnReconnect?.Invoke();
+                    Reconnect();
+                }
             }
             
-            if (conn.State == HubConnectionState.Connected)
-            {
-                ReconnectAttempt = 0;
-                OnConnect?.Invoke();
-                //OnFullReady?.Invoke();
-            }
-            else
-            {
-                Reconnect();
-            }
         }
 
-        static void Reconnect()
+        static async void Reconnect()
         {
             if (!TryReconnect) return;
+            await Task.Delay(3000);
             ReconnectAttempt++;
             Debug.Log("Try to reconnect. Attempt " + ReconnectAttempt);
-            Connect();
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                Connect();
+            });
         }
 
         // This method creates new connection
@@ -176,7 +197,8 @@ namespace GameNet
 
             conn.Closed += (err =>
             {
-                Debug.Log("Conn closed");
+                Debug.Log("Conn closed due to " + err.Message);
+                OnDisconnect?.Invoke();
                 Reconnect();
                 return null;
             });
@@ -209,17 +231,49 @@ namespace GameNet
 
         static void SubcribeOnClientInvokes()
         {
-            /*Actions = new Invokes();
+            Actions = new Invokes();
 
             
-            MethodInfo mi = Actions.GetType().GetMethod("Invoke");
-            Action del = (Action)Delegate.CreateDelegate(typeof(Action), mi);
+            //MethodInfo mi = Actions.GetType().GetMethod("Invoke");
+            //Action del = (Action)Delegate.CreateDelegate(typeof(Action), mi);
 
             
-            Actions.Test = del;
-            Actions.Test();*/
+            //Actions.Test = del;
+            //Actions.Test();
+            
+            
+            var fields = typeof(Invokes).GetFields();
+            foreach (var field in fields)
+            {
+                Type t = field.FieldType;
+                FieldInfo info = typeof(Invokes).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
+
+                var act = info.GetValue(Actions);
+
+                var del = (Action)act;
+                
+                
+                info.SetValue(Actions, act);
+                
+                /*conn.On(field.Name, t.GenericTypeArguments, (objects =>
+                {
+                    FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
+                    object yourfield = info.GetValue(Subs);
+                    MethodInfo method = yourfield.GetType().GetMethod("Invoke");
+                    
+                    method.Invoke(yourfield, objects);
+
+                    return null;
+                }));*/
+            }
+
+            Actions.Log("Suka but no blyat");
         }
-
+        //static void DoInvoke(MethodInfo)
+        static void SuperVoid(string name, params object[] objs)
+        {
+            Debug.Log("> Invoke " + name);
+        }
 
         
         
@@ -247,6 +301,13 @@ namespace GameNet
                 public static void SignUp(string nick, string password, string country, string email) =>
                     NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
                 
+                public static void Search(string nick) =>
+                    NetCore.conn.InvokeAsync("Accounts_Search", nick);
+                public static void View(string nick) =>
+                    NetCore.conn.InvokeAsync("Accounts_View", nick);
+                
+                
+                
                 public static void GetAvatar(string nick) => conn.InvokeAsync("Accounts_GetAvatar", nick);
 
                 public static void ChangePassword(string nick, string oldpass, string newpass) =>
@@ -271,6 +332,27 @@ namespace GameNet
 
                 public static void GetBestReplay(string nick, string trackname, string creatornick) =>
                     conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+
+                public static void GetBestReplays(string nick, int count) =>
+                    conn.InvokeAsync("Accounts_GetBestReplays", nick, count);
+            }
+
+            public static class Friends
+            {
+                public static void GetFriends(string nick) =>
+                    conn.InvokeAsync("Friends_GetFriends", nick);
+                
+                public static void AddFriend(string addNick, string nick) =>
+                    conn.InvokeAsync("Friends_AddFriend",addNick, nick);
+                
+                public static void RemoveFriend(string fromNick, string nick) =>
+                    conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
+            }
+
+            public static class Shop
+            {
+                public static void SendCoins(string nick, int coins) =>
+                    conn.InvokeAsync("Shop_SendCoins", nick, coins);
             }
             public static class Chat
             {
@@ -286,32 +368,40 @@ namespace GameNet
         // How server determine what should invoke? -Field name :D
         // Server: Client.Caller.SendAsync("MethodName", args)
         // There must be Action with name same as MethodName, else server won't be able to find it.
+        
+        // Some rules to use SignalR (пиздец, а нормально можно было сделать?! Вот чтоб без ебли в жопу!)
+        // 1) If you want to send class USE {GET;SET} !!!!
+        // 2) Don't use ctors at all, data won't be sent
         public class Subscriptions
         {
             public Action OnTest;
             public Action<OperationMessage> Accounts_OnLogIn;
             public Action<OperationMessage> Accounts_OnSignUp;
+            public Action<List<AccountData>> Accounts_OnSearch;
+            public Action<AccountData> Accounts_OnView;
+            
+            public Action<int> OnOnlineChange;
+            
             public Action<string> OnJoinGroup;
-            public Action<string> OnGetGroups;
+            public Action<List<ChatGroupData>> OnGetGroups;
             public Action<string> OnSendChatMessage;
 
             public Action<byte[]> Accounts_OnGetAvatar;
             public Action<string, string, string> Accounts_ChangePassword;
             
-            public Action<float> Accounts_OnSendReplay;
-            public Action<string> Accounts_OnGetBestReplay;
+            public Action<ReplaySendData> Accounts_OnSendReplay;
+            public Action<List<ReplayData>> Accounts_OnGetBestReplays;
+            public Action<ReplayData> Accounts_OnGetBestReplay;
+
+            public Action<List<AccountData>> Friends_OnGetFriends;
         }
 
-        /*public class Invokes
+        public class Invokes
         {
-            public Action Test { get; set; }
+            public Action Test;
+            public Action<string> Log = (str) => SuperVoid("Log", str);
             //public void Test(string nick, string password) {}
             //public void Test(string nick, string password) => NetCore.Invoke();
-            
-            public void Invoke()
-            {
-                Debug.Log("ITS AAAALLLIIIIVVEEEE!!!");
-            }
-        }*/
+        }
     }
 }

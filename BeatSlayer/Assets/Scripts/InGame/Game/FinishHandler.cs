@@ -8,6 +8,7 @@ using System.Net;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using ProjectManagement;
+using Ranking;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +23,7 @@ public class FinishHandler : MonoBehaviour
     public GameObject finishOverlay;
     public RawImage coverImage;
     public Text authorText, nameText, creatorText;
-    public Text scoreText, missedText, accuracyText, RPText;
+    public Text scoreText, missedText, accuracyText, RPText, coinsText;
     public GameObject uploadingText, recordText;
     public GameObject heartIcon;
     public GameObject goToEditorBtn;
@@ -66,10 +67,10 @@ public class FinishHandler : MonoBehaviour
             FinishServerActions();
 
 
-            int coins = prefsManager.prefs.coins;
+            int coins = NetCorePayload.CurrentAccount.Coins;
             int addCoins = Mathf.RoundToInt(gm.replay.score / 16f * gm.maxCombo / 2f * gm.scoreMultiplier);
             
-            prefsManager.prefs.coins = coins + addCoins;
+            NetCorePayload.CurrentAccount.Coins = coins + addCoins;
             prefsManager.Save();
 
             HandleFinishUI();
@@ -220,7 +221,7 @@ public class FinishHandler : MonoBehaviour
 
         RPText.text = "..";
 
-        ReplayInfo bestReplay = null;
+        ReplayData bestReplay = null;
         bool bestReplayGot = false;
         /*AccountManager.GetBestReplay(NetCorePayload.CurrentAccount.Nick, trackname, gm.project.creatorNick, (ReplayInfo replay) =>
         {
@@ -229,7 +230,7 @@ public class FinishHandler : MonoBehaviour
             Debug.Log("Best replay got");
         });*/
 
-        /*NetCore.Subs.Accounts_OnGetBestReplay += info =>
+        NetCore.Subs.Accounts_OnGetBestReplay += info =>
         {
             Debug.Log("Best replay got!");
             Debug.Log("Going forward");
@@ -239,19 +240,23 @@ public class FinishHandler : MonoBehaviour
             }
 
 
-            AccountManager.SendReplay(gm.replay, (float RP) =>
+            AccountManager.SendReplay(gm.replay, (ReplaySendData data) =>
             {
                 Debug.Log("OnSendReplay");
-                RPText.text = Mathf.RoundToInt((float) RP).ToString();
+                
+                RPText.text = Mathf.RoundToInt((float) 1).ToString();
+                coinsText.text = "+" + data.Coins;
+                NetCorePayload.CurrentAccount.Coins += data.Coins;
+                
                 LoadLeaderboard();
                 uploadingText.SetActive(false);
             });
 
             gm.accountManager.UpdateSessionTime();
-        };*/
-        Debug.Log("Before getbestreplay: " + NetCore.State);
+        };
+        //Debug.Log("Before getbestreplay: " + NetCore.State);
         NetCore.ServerActions.Account.GetBestReplay(NetCorePayload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
-        Debug.Log("After getbestreplay: " + NetCore.State);
+        //Debug.Log("After getbestreplay: " + NetCore.State);
     }
 
 
