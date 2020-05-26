@@ -1,93 +1,85 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GameNet;
+using InGame.Helpers;
+using Notifications;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Multiplayer.Notification
 {
     public class NotificationUI : MonoBehaviour
     {
         public NotificationUIItem item;
+        public Animator anim;
+        public Transform content;
+        public GameObject window;
 
-        private void Start()
-        {
-            NotificationFriendInvite not = new NotificationFriendInvite("Shrek");
-            ShowNotification(not);
-        }
+        public Image iconImage;
+        public Color defaultIconColor, activeIconColor;
+        public GameObject countGo;
+        public Text countText;
 
-        public void ShowNotification(Notification notification)
-        {
-            item.Refresh(notification);
-        }
-    }
 
-    public interface Notification
-    {
-         NotificationType Type { get; }
-         string Header { get; }
-         string Body { get; }
-    }
-
-    public class NotificationFriendInvite : Notification
-    {
-        public NotificationType Type
+        public void Configure()
         {
-            get { return NotificationType.FriendInvite; }
-        }
-
-        public string Header
-        {
-            get { return "Запрос в друзья"; }
-        }
-        public string Body
-        {
-            get { return $"<color=#f40>{nick}</color> хочет добавить вас в друзья"; }
+            NetCore.OnLogIn += () =>
+            {
+                RefreshIcon();
+            };
         }
         
-        public string nick;
-        public NotificationFriendInvite(string nick)
+        
+        
+        public void ShowNotification(NotificationInfo notification)
         {
-            this.nick = nick;
-        }
-    }
-
-    public class NotificationModeration : Notification
-    {
-        public NotificationType Type { get { return NotificationType.Moderation; } }
-
-        public string moderatorNick;
-        public string map;
-        public ModerationResult result;
-
-        public NotificationModeration(string moderatorNick, string map, ModerationResult result)
-        {
-            this.moderatorNick = moderatorNick;
-            this.map = map;
-            this.result = result;
+            anim.Play("Show");
+            item.Refresh(notification);
         }
 
-        public string Header
+        public void OnShowAllBtnClick()
         {
-            get { return "Карта рассмотрена"; }
+            if (NetCorePayload.CurrentAccount == null) return;
+            window.SetActive(true);
+            HelperUI.FillContent<NotificationUIItem, NotificationInfo>(content,
+                NetCorePayload.CurrentAccount.Notifications,
+                (uiItem, info) =>
+                {
+                    uiItem.Refresh(info, true);
+                });
         }
-        public string Body
+
+
+
+        public void RefreshIcon()
         {
-            get
-            {
-                return $"Модератор {moderatorNick} " + (result == ModerationResult.Approved ? "одобрил" : "отклонил") + " твою карту";
-            }
+            if (NetCorePayload.CurrentAccount == null) return;
+            bool active = NetCorePayload.CurrentAccount.Notifications.Count > 0;
+            
+            countGo.SetActive(active);
+            iconImage.color = active ? activeIconColor : defaultIconColor;
+            countText.text = NetCorePayload.CurrentAccount.Notifications.Count + "";
         }
-    }
+        
+        
+        
+        
+        
 
-    public enum NotificationType
-    {
-        FriendInvite,
-        Moderation
-    }
+        public void Hide()
+        {
+            anim.Play("Hide");
+        }
 
-    public enum ModerationResult
-    {
-        Approved,
-        Rejected
+        public void Accept(NotificationInfo not)
+        {
+            NetCore.ServerActions.Notifications.Accept(NetCorePayload.CurrentAccount.Nick, not.Id);
+        }
+
+        public void Reject(NotificationInfo not)
+        {
+            NetCore.ServerActions.Notifications.Reject(NetCorePayload.CurrentAccount.Nick, not.Id);
+        }
     }
 }

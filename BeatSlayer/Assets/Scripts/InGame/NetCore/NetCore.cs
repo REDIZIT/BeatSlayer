@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BeatSlayerServer.Multiplayer.Accounts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
+using Notifications;
 using Ranking;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,11 +27,12 @@ namespace GameNet
             get
             {
                 return ConnType == ConnectionType.Local
-                    ? "https://localhost:5001/GameHub"
-                    : "http://bsserver.tk/GameHub";
+                    ? "https://localhost:5001/GameHub" : ConnType == ConnectionType.Development 
+                        ? "http://www.bsserver.tk:8888/GameHub"
+                            : "http://bsserver.tk/GameHub";
             }
         }
-        public enum ConnectionType { Production, Local }
+        public enum ConnectionType { Production, Local, Development }
 
         public static ConnectionType ConnType;
 
@@ -191,9 +193,6 @@ namespace GameNet
                 .Build();
             
             Debug.Log("Build connecting with " + Url_Hub);
-        
-            conn.KeepAliveInterval = TimeSpan.FromSeconds(3);
-            conn.ServerTimeout = TimeSpan.FromSeconds(3*3);
 
             conn.Closed += (err =>
             {
@@ -286,6 +285,7 @@ namespace GameNet
         
         
         // This class contains implementation of server-side methods
+        // (Piece of 90 lines of code ._.) 
         // (External usage)
         public static class ServerActions
         {
@@ -293,10 +293,25 @@ namespace GameNet
             public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group) 
                 => NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 
+            public static void UpdateInGameTime()
+            {
+                if (NetCorePayload.CurrentAccount == null) return;
+                if (NetCorePayload.PrevInGameTimeUpdate == 0) NetCorePayload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
+                int seconds = Mathf.RoundToInt(Time.realtimeSinceStartup - NetCorePayload.PrevInGameTimeUpdate);
+                if (seconds < 30) return;
+                NetCorePayload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
+                NetCore.conn.InvokeAsync("Accounts_UpdateInGameTime", NetCorePayload.CurrentAccount.Nick, seconds);
+            }
+
             public static class Account
             {
-                public static void LogIn(string nick, string password) =>
+                public static void LogIn(string nick, string password)
+                {
                     NetCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
+                    UpdateInGameTime();
+                }
+                    
+                
                 
                 public static void SignUp(string nick, string password, string country, string email) =>
                     NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
@@ -305,9 +320,10 @@ namespace GameNet
                     NetCore.conn.InvokeAsync("Accounts_Search", nick);
                 public static void View(string nick) =>
                     NetCore.conn.InvokeAsync("Accounts_View", nick);
-                
-                
-                
+
+
+
+
                 public static void GetAvatar(string nick) => conn.InvokeAsync("Accounts_GetAvatar", nick);
 
                 public static void ChangePassword(string nick, string oldpass, string newpass) =>
@@ -342,13 +358,23 @@ namespace GameNet
                 public static void GetFriends(string nick) =>
                     conn.InvokeAsync("Friends_GetFriends", nick);
                 
-                public static void AddFriend(string addNick, string nick) =>
-                    conn.InvokeAsync("Friends_AddFriend",addNick, nick);
+                public static void InviteFriend(string addNick, string nick) =>
+                    conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
                 
                 public static void RemoveFriend(string fromNick, string nick) =>
                     conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
             }
 
+            public static class Notifications
+            {
+                public static void Accept(string nick, int id) =>
+                    conn.InvokeAsync("Friends_AcceptInvite", nick, id);
+                
+                public static void Reject(string nick, int id) =>
+                    conn.InvokeAsync("Friends_RejectInvite", nick, id);
+            }
+            
+            
             public static class Shop
             {
                 public static void SendCoins(string nick, int coins) =>
@@ -394,6 +420,9 @@ namespace GameNet
             public Action<ReplayData> Accounts_OnGetBestReplay;
 
             public Action<List<AccountData>> Friends_OnGetFriends;
+
+
+            public Action<NotificationInfo> Notification_OnSend;
         }
 
         public class Invokes

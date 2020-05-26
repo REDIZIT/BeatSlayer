@@ -5,6 +5,7 @@ using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using Multiplayer.Accounts;
 using Multiplayer.Chat;
+using Multiplayer.Notification;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,7 +15,9 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public ChatUI chatUI;
     public AccountUI accountUI;
     public FriendsUI friendsUI;
+    public NotificationUI notificationUI;
 
+    
     [Header("Server connection override")]
     public NetCore.ConnectionType connType;
     public bool forceChangeConnType;
@@ -53,6 +56,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             accountUI.Configure();
             chatUI.Configure();
             friendsUI.Configure();
+            notificationUI.Configure();
         });
 
 
@@ -78,6 +82,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             timeUntilClose = 0;
             serverStateAnim.Play("Hide");
         }
+
+        NetCore.ServerActions.UpdateInGameTime();
     }
 
     public void OnConnect()

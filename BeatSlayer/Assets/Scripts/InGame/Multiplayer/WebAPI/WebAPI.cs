@@ -67,7 +67,7 @@ namespace Web
                 callback(ProjectManager.LoadTexture(bytes));
             });
         }
-        public static void GetAvatar(string nick, Action<byte[]> callback, bool forceUpdate = false)
+        public static void GetAvatar(string nick, Action<byte[]> callback, bool forceUpdate = true)
         {
             string filepath = Application.persistentDataPath + "/data/account/avatar.pic";
             byte[] bytes = LoadImage(filepath, nick);
@@ -90,7 +90,7 @@ namespace Web
             else callback(bytes);
         }
 
-        public static void GetBackground(string nick, Action<byte[]> callback, bool forceUpdate = false)
+        public static void GetBackground(string nick, Action<byte[]> callback, bool forceUpdate = true)
         {
             string filepath = Application.persistentDataPath + "/data/account/background.pic";
             byte[] bytes = LoadImage(filepath, nick);

@@ -5,6 +5,8 @@ using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using InGame.Helpers;
 using Multiplayer.Accounts;
+using Multiplayer.Notification;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +16,7 @@ public class FriendsUI : MonoBehaviour
     public Transform content;
     
     public AccountUI accountUI;
+    public NotificationUI notificationUI;
 
     public Text label;
     
@@ -27,6 +30,7 @@ public class FriendsUI : MonoBehaviour
     {
         NetCore.Subs.Friends_OnGetFriends += list =>
         {
+            NetCorePayload.CurrentAccount.Friends = list;
             ShowList(list, true);
         };
         NetCore.Subs.Accounts_OnSearch += list =>
@@ -42,6 +46,16 @@ public class FriendsUI : MonoBehaviour
                 NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
             }
         };
+
+        NetCore.Subs.Notification_OnSend += info =>
+        {
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                Debug.Log("Got notification");
+                Debug.Log(JsonConvert.SerializeObject(info));
+                notificationUI.ShowNotification(info);  
+            });
+        };
     }
 
     public void RemoveFriend(string fromNick)
@@ -50,7 +64,7 @@ public class FriendsUI : MonoBehaviour
     }
     public void AddFriend(string addNick)
     {
-        NetCore.ServerActions.Friends.AddFriend(addNick, NetCorePayload.CurrentAccount.Nick);
+        NetCore.ServerActions.Friends.InviteFriend(addNick, NetCorePayload.CurrentAccount.Nick);
     }
 
 

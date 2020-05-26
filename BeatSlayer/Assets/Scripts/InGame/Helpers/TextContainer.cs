@@ -26,6 +26,7 @@ public class TextContainer : MonoBehaviour
 {
     [Tooltip("Text component which will extend this object")]
     public List<Text> texts;
+    public List<HorizontalLayoutGroup> layoutGroups;
     
     private RectTransform Rect
     {
@@ -80,6 +81,14 @@ public class TextContainer : MonoBehaviour
         {
             float width = extendHorizont ? text.preferredWidth + padding.x * 2 : Rect.sizeDelta.x;
             float height = extendVertical ? text.preferredHeight + padding.y * 2 : Rect.sizeDelta.y;
+
+            if (width > maxWidth) maxWidth = width;
+            if (height > maxHeight) maxHeight = height;
+        }
+        foreach (var group in layoutGroups)
+        {
+            float width = extendHorizont ? group.preferredWidth + padding.x * 2 : Rect.sizeDelta.x;
+            float height = extendVertical ? group.preferredHeight + padding.y * 2 : Rect.sizeDelta.y;
 
             if (width > maxWidth) maxWidth = width;
             if (height > maxHeight) maxHeight = height;
