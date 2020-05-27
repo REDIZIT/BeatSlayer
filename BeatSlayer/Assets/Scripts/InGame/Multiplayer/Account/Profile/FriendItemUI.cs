@@ -53,7 +53,7 @@ public class FriendItemUI : MonoBehaviour
 
     public void OnAddBtnClick()
     {
-        //NetCorePayload.CurrentAccount.Friends.Add(data);
+        NetCorePayload.CurrentAccount.Friends.Add(data);
         ui.AddFriend(data.Nick);
         RefreshButtons();
     }

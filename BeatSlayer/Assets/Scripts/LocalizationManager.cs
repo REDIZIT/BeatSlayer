@@ -39,7 +39,6 @@ namespace Assets.SimpleLocalization
             if (Dictionary.Count > 0) return;
 
             var textAssets = Resources.LoadAll<TextAsset>(folderPath);
-            List<string> conflicts = new List<string>();
 
             foreach (var textAsset in textAssets)
             {
@@ -69,23 +68,18 @@ namespace Assets.SimpleLocalization
                     {
                         if(key.Contains("//") || key == "" || key == "\n" || key == @"
 " || key == " ") continue;
-                        
                         try
                         {
                             Dictionary[languages[j]].Add(key, columns[j]);
                         }
                         catch (Exception err)
                         {
-                            //Debug.LogWarning("Line " + key + " => " + err.Message);
-                            conflicts.Add(key);
+                            Debug.LogWarning("Line " + key + " => " + err.Message);
                             Dictionary[languages[j]][key] = columns[j];
                         }
                     }
                 }
             }
-            
-            Debug.LogWarning(string.Format("LocalManager found {0} conflicts\n{1}",
-                conflicts.Count, string.Join("\n", conflicts)));
         }
 
         /// <summary>

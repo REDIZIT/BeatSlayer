@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using GameNet;
-using InGame.Helpers;
-using Notifications;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Multiplayer.Notification
 {
     public class NotificationUI : MonoBehaviour
     {
         public NotificationUIItem item;
-        public Animator anim;
-        public Transform content;
-        public GameObject window;
 
+<<<<<<< HEAD
         public Image iconImage;
         public Color defaultIconColor, activeIconColor;
         public GameObject countGo;
@@ -31,58 +25,87 @@ namespace Multiplayer.Notification
                     RefreshIcon();
                 };
             };
-        }
-        
-        
-        
-        public void ShowNotification(NotificationInfo notification)
+=======
+        private void Start()
         {
-            anim.Play("Show");
+            NotificationFriendInvite not = new NotificationFriendInvite("Shrek");
+            ShowNotification(not);
+>>>>>>> parent of ae2d14c... Before redesign
+        }
+
+        public void ShowNotification(Notification notification)
+        {
             item.Refresh(notification);
         }
+    }
 
-        public void OnShowAllBtnClick()
+    public interface Notification
+    {
+         NotificationType Type { get; }
+         string Header { get; }
+         string Body { get; }
+    }
+
+    public class NotificationFriendInvite : Notification
+    {
+        public NotificationType Type
         {
-            if (NetCorePayload.CurrentAccount == null) return;
-            window.SetActive(true);
-            HelperUI.FillContent<NotificationUIItem, NotificationInfo>(content,
-                NetCorePayload.CurrentAccount.Notifications,
-                (uiItem, info) =>
-                {
-                    uiItem.Refresh(info, true);
-                });
+            get { return NotificationType.FriendInvite; }
         }
 
-
-
-        public void RefreshIcon()
+        public string Header
         {
-            if (NetCorePayload.CurrentAccount == null) return;
-            bool active = NetCorePayload.CurrentAccount.Notifications.Count > 0;
-            
-            countGo.SetActive(active);
-            iconImage.color = active ? activeIconColor : defaultIconColor;
-            countText.text = NetCorePayload.CurrentAccount.Notifications.Count + "";
+            get { return "Запрос в друзья"; }
+        }
+        public string Body
+        {
+            get { return $"<color=#f40>{nick}</color> хочет добавить вас в друзья"; }
         }
         
-        
-        
-        
-        
-
-        public void Hide()
+        public string nick;
+        public NotificationFriendInvite(string nick)
         {
-            anim.Play("Hide");
+            this.nick = nick;
+        }
+    }
+
+    public class NotificationModeration : Notification
+    {
+        public NotificationType Type { get { return NotificationType.Moderation; } }
+
+        public string moderatorNick;
+        public string map;
+        public ModerationResult result;
+
+        public NotificationModeration(string moderatorNick, string map, ModerationResult result)
+        {
+            this.moderatorNick = moderatorNick;
+            this.map = map;
+            this.result = result;
         }
 
-        public void Accept(NotificationInfo not)
+        public string Header
         {
-            NetCore.ServerActions.Notifications.Accept(NetCorePayload.CurrentAccount.Nick, not.Id);
+            get { return "Карта рассмотрена"; }
         }
+        public string Body
+        {
+            get
+            {
+                return $"Модератор {moderatorNick} " + (result == ModerationResult.Approved ? "одобрил" : "отклонил") + " твою карту";
+            }
+        }
+    }
 
-        public void Reject(NotificationInfo not)
-        {
-            NetCore.ServerActions.Notifications.Reject(NetCorePayload.CurrentAccount.Nick, not.Id);
-        }
+    public enum NotificationType
+    {
+        FriendInvite,
+        Moderation
+    }
+
+    public enum ModerationResult
+    {
+        Approved,
+        Rejected
     }
 }

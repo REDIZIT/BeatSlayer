@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using GameNet;
-using Notifications;
 
 namespace BeatSlayerServer.Multiplayer.Accounts
 {
@@ -34,8 +33,7 @@ namespace BeatSlayerServer.Multiplayer.Accounts
 
 
 
-        public List<AccountData> Friends { get; set; } = new List<AccountData>();
-        public List<NotificationInfo> Notifications { get; set; } = new List<NotificationInfo>();
+        public List<AccountData> Friends { get; set; }
 
 
 
@@ -54,7 +52,7 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         public DateTime LastActiveTimeUtc => new DateTime(LastActiveTimeUtcTicks);
 
 
-        public bool IsOnline => (DateTime.UtcNow - LastActiveTimeUtc).TotalMinutes < 3;
+        public bool IsOnline => (DateTime.UtcNow - LastActiveTimeUtc).TotalSeconds < 40;
 
 
 

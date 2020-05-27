@@ -124,15 +124,8 @@ namespace Multiplayer.Accounts
         public void LogIn(string nick, string password)
         {
             //MultiplayerCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
-            try
-            {
-                NetCore.ServerActions.Account.LogIn(nick, password);
-                sessionToWrite = nick + '|' + password;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Login error: " + e.Message);
-            }
+            NetCore.ServerActions.Account.LogIn(nick, password);
+            sessionToWrite = nick + '|' + password;
         }
         public void SignUp(string nick, string password, string country, string email)
         {
@@ -227,7 +220,13 @@ namespace Multiplayer.Accounts
                 SaveAvatarToCache();
                 SaveBackgroundToCache();
                 
+<<<<<<< HEAD
                 NetCore.OnLogIn();
+=======
+                Debug.Log("I have coins: " + op.Account.Coins);
+                
+                NetCore.OnLogIn?.Invoke();
+>>>>>>> parent of ae2d14c... Before redesign
             }
         }
 
@@ -245,7 +244,6 @@ namespace Multiplayer.Accounts
         }
         public void OnView(AccountData acc)
         {
-            Debug.Log("OnView: " + JsonConvert.SerializeObject(acc, Formatting.Indented));
             profileUI.ShowAccount(acc);
         }
 

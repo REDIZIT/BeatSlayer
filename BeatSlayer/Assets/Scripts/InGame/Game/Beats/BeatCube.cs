@@ -103,7 +103,10 @@ public class BeatCube : MonoBehaviour, IBeat
             float targetDeg = Mathf.Repeat(-8 + 4, 8) * 45;
             float anglediff = (degrees - targetDeg + 180 + 360) % 360 - 180;
             
+<<<<<<< HEAD
             Debug.Log(anglediff + $" ({degrees} / {targetDeg})");
+=======
+>>>>>>> parent of ae2d14c... Before redesign
             if (anglediff <= 45 && anglediff >= -45)
             {
                 Slice();

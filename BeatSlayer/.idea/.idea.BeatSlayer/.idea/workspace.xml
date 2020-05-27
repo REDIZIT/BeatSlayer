@@ -105,7 +105,6 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Plugins/ImageCropper/Demo/ImageCropperDemo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/78AFCDD7-A608-4612-8C49-45F03EB135B8/db/602fcdc1/TimeSpan.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatLine.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUIItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Operations.cs" root0="FORCE_HIGHLIGHTING" />
@@ -123,7 +122,6 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/SettingsManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/E1319B71-95C3-43E7-9B38-5CD3AA43F5DC/e1/0617cd97/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountSignUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TrackListItem.cs" root0="FORCE_HIGHLIGHTING" />
@@ -133,6 +131,17 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+<<<<<<< HEAD
+=======
+        <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/AccountSign.csv" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/CustomUI/TextExtender.cs" />
+        <option value="$PROJECT_DIR$/Assets/AuthManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/SaveTest/SSytem.cs" />
+        <option value="$USER_HOME$/AppData/LocalLow/REDIZIT/Beat Slayer/data/account/.session" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountSignUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Account.cs" />
+        <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/AccountView.csv" />
+>>>>>>> parent of ae2d14c... Before redesign
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" />
         <option value="$PROJECT_DIR$/Assets/Shaders/AlphaGradientShader.shader" />
         <option value="$PROJECT_DIR$/Assets/Shaders/AndroidTransparent/AndroidTransparent.shader" />
@@ -145,22 +154,38 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatMessageItem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatAvatarLoader.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileEditUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/Menu/BeatmapUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/MapInfo.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/GroupInfo.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ReplayItemUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/FriendInfo.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCorePayload.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/OperationMessage.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/FriendItemUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Friends/FriendsUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupData.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupItemUI.cs" />
+<<<<<<< HEAD
+=======
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/WebAPI/WebAPI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" />
+>>>>>>> parent of ae2d14c... Before redesign
         <option value="$PROJECT_DIR$/Assets/Scripts/Prefs.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DailyRewarder.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/Account.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Ranking.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Management/AccountManager.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUIItem.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/GameManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MenuHelpers/ShopHelper.cs" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/FriendItemUI.cs" />
@@ -184,6 +209,10 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
+=======
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
+>>>>>>> parent of ae2d14c... Before redesign
       </list>
     </option>
   </component>
@@ -201,9 +230,8 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="database.data.extractors.current.id" value="Comma-separated (CSV)_id" />
-    <property name="idea.background.editor" value="D:\D\## Фотографии ##\Wallpapers\qSdMuQp7HX8.jpg,5,scale,center" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
@@ -267,6 +295,7 @@
       <workItem from="1590171548331" duration="7226000" />
       <workItem from="1590247135264" duration="12159000" />
       <workItem from="1590321272960" duration="3051000" />
+<<<<<<< HEAD
       <workItem from="1590351045888" duration="2673000" />
       <workItem from="1590366635628" duration="7217000" />
       <workItem from="1590436196189" duration="11535000" />
@@ -275,6 +304,9 @@
       <workItem from="1590515548679" duration="1751000" />
       <workItem from="1590567893337" duration="3094000" />
       <workItem from="1590601466306" duration="2724000" />
+=======
+      <workItem from="1590351045888" duration="2078000" />
+>>>>>>> parent of ae2d14c... Before redesign
     </task>
     <servers />
   </component>
@@ -302,10 +334,6 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="724" y="321" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1590436264174">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="724" y="321" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1590436264174" />
     <state x="718" y="379" key="ANALYSIS_DLG_com.jetbrains.rider.actions.impl.cleanup.RiderCodeCleanupAction$actionPerformed$dlg$1" timestamp="1589059786425">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -387,11 +415,11 @@
     </state>
     <state x="2699" y="263" key="RiderGenerateDialog/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589654020291" />
     <state x="779" y="193" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590083631578" />
-    <state x="461" y="164" key="SettingsEditor" timestamp="1590489282581">
+    <state x="411" y="130" key="SettingsEditor" timestamp="1589563982461">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="411" y="130" key="SettingsEditor/0.0.1920.1040/1920.116.1920.1040@0.0.1920.1040" timestamp="1589563982461" />
-    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1590489282581" />
+    <state x="411" y="130" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1588967182850" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1589796725528">
       <screen x="1920" y="70" width="1920" height="1040" />
     </state>
@@ -400,21 +428,25 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="429" y="175" width="1053" height="691" key="editAsTableFormatDialogDimension/0.0.1920.1040@0.0.1920.1040" timestamp="1589366833181" />
-    <state x="251" y="106" width="1103" height="856" key="org.intellij.images.editor.actions.BackgroundImageDialog" timestamp="1590489281928">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="251" y="106" width="1103" height="856" key="org.intellij.images.editor.actions.BackgroundImageDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590489281928" />
     <state x="2536" y="310" width="672" height="677" key="run.anything.popup" timestamp="1589654272199">
       <screen x="1920" y="70" width="1920" height="1040" />
     </state>
     <state x="2536" y="310" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589654272199" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1589540128711" />
+<<<<<<< HEAD
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590602346701">
+=======
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590355467114">
+>>>>>>> parent of ae2d14c... Before redesign
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="2543" y="290" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.65.1920.1040@1920.65.1920.1040" timestamp="1589580428851" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.70.1920.1040@0.0.1920.1040" timestamp="1589717157563" />
     <state x="2543" y="295" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589796341868" />
+<<<<<<< HEAD
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590602346701" />
+=======
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590355467114" />
+>>>>>>> parent of ae2d14c... Before redesign
   </component>
 </project>

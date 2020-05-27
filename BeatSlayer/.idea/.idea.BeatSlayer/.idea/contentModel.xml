@@ -856,7 +856,6 @@
               </e>
               <e p="MultiplayerMenuWrapper.cs" t="Include" />
               <e p="Notifications" t="Include">
-                <e p="NotificationInfo.cs" t="Include" />
                 <e p="NotificationUI.cs" t="Include" />
                 <e p="NotificationUIItem.cs" t="Include" />
               </e>
