@@ -84,17 +84,16 @@ public class MenuScript_v2 : MonoBehaviour
 
 
 
-
-
-
-
-
-
-
-
-
-    private void Awake()
+    public void Awake()
     {
+        NetCore.Configurators += () =>
+        {
+            NetCore.OnLogIn += () =>
+            {
+                RefreshCoinsTexts();
+            };
+        };
+
         Application.targetFrameRate = 60;
         if(Time.timeScale != 1)
         {
@@ -153,10 +152,7 @@ public class MenuScript_v2 : MonoBehaviour
         mapLockers[3].SetActive(!prefsManager.prefs.mapUnlocked3);
 
         if(NetCorePayload.CurrentAccount != null) RefreshCoinsTexts();
-        NetCore.OnLogIn += () =>
-        {
-            RefreshCoinsTexts();
-        };
+       
         
 
         #endregion
@@ -211,7 +207,7 @@ public class MenuScript_v2 : MonoBehaviour
         }
         
 
-        playCustomBtn.SetActive(SSytem.instance.GetInt("EnableFileLoad") == 1);
+        //playCustomBtn.SetActive(SSytem.instance.GetInt("EnableFileLoad") == 1);
 
         GetComponent<AudioSource>().volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
 
@@ -1038,7 +1034,6 @@ public class MenuScript_v2 : MonoBehaviour
     }
     public void OpenWebsite()
     {
-        //Application.OpenURL("https://really-big-server.herokuapp.com/download.php");
         Application.OpenURL("https://beat-slayer.glitch.me/editor");
     }
     public void OpenUrl(string url)

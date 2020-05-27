@@ -33,31 +33,31 @@ namespace Multiplayer.Chat
 
         public Transform groupContent;
 
-
-
-
-        public void Configure()
-        {
-            NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
-            NetCore.Subs.OnJoinGroup += OnJoinGroup;
-            NetCore.Subs.OnGetGroups += OnGetGroups;
-            NetCore.OnFullReady += () =>
-            {
-                if (NetCorePayload.CurrentAccount != null) NetCore.ServerActions.Chat.GetGroups();
-            };
-            NetCore.OnLogIn += () =>
-            {
-                //onlineText.text = "Онлайн: -";
-                NetCore.ServerActions.Chat.GetGroups();
-            };
-            NetCore.Subs.OnOnlineChange += (int online) =>
-            {
-                onlineText.text = "Онлайн: " + online;
-            };
-            
-            avatarLoader.Configure();
-        }
         
+        private void Awake()
+        {
+            NetCore.Configurators += () =>
+            {
+                NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
+                NetCore.Subs.OnJoinGroup += OnJoinGroup;
+                NetCore.Subs.OnGetGroups += OnGetGroups;
+                NetCore.OnFullReady += () =>
+                {
+                    if (NetCorePayload.CurrentAccount != null) NetCore.ServerActions.Chat.GetGroups();
+                };
+                NetCore.OnLogIn += () =>
+                {
+                    NetCore.ServerActions.Chat.GetGroups();
+                };
+                NetCore.Subs.OnOnlineChange += (int online) =>
+                {
+                    onlineText.text = "Онлайн: " + online;
+                };
+                
+                avatarLoader.Configure();
+            };
+        }
+
         private void Start()
         {
             prefab = HelperUI.ClearContent(content);
@@ -112,12 +112,9 @@ namespace Multiplayer.Chat
 
         public void OnGetGroups(List<ChatGroupData> groups)
         {
-            
-            Debug.Log(" << OnGetGroups");
             selectedGroupName = groups[0].Name;
             groupText.text = selectedGroupName;
 
-            Debug.Log("Try to join " + selectedGroupName + " group");
             NetCore.ServerActions.Chat.JoinGroup(NetCorePayload.CurrentAccount.Nick, selectedGroupName);
             
             HelperUI.FillContent<ChatGroupItemUI, ChatGroupData>(groupContent, groups, (ui, data) =>

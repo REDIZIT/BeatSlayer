@@ -27,8 +27,8 @@ namespace GameNet
             get
             {
                 return ConnType == ConnectionType.Local
-                    ? "https://localhost:5001/GameHub" : ConnType == ConnectionType.Development 
-                        ? "http://www.bsserver.tk:8888/GameHub"
+                    ? "https://localhost:5010/GameHub" : ConnType == ConnectionType.Development 
+                        ? "http://www.bsserver.tk:5010/GameHub"
                             : "http://bsserver.tk/GameHub";
             }
         }
@@ -40,6 +40,11 @@ namespace GameNet
 
         public static Action OnConnect, OnDisconnect, OnReconnect, OnFullReady;
         public static Action OnLogIn;
+
+        
+        // There are delegates of NetCore config methods (Instead of Configure(Action config))
+        // Subs here your config code. This is invoked when wrapper invoke NetCore.Configure
+        public static Action Configurators;
 
         
         
@@ -71,24 +76,24 @@ namespace GameNet
             
         }
 
-
-        // This methods is invoked by Wrapper
-        // In config you should set up all subs, evetns and etc
-        // There is automatic send OnFullReady on configuration end
+        
+        // Use after completing Configurators subs
+        // This method apply configuration for current scene
         // (External usage)
-        public static void Configure(Action config)
+        public static void Configure()
         {
             Subs = new Subscriptions();
             OnFullReady = null;
             OnConnect = null;
             OnDisconnect = null;
             OnReconnect = null;
+            OnLogIn = null;
             
             OnSceneLoad();
             
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                config();
+                Configurators?.Invoke();
                 
                 OnFullReady?.Invoke();
             });
@@ -144,10 +149,8 @@ namespace GameNet
                 await conn.StartAsync();
                 if (conn.State == HubConnectionState.Connected)
                 {
-                    Debug.Log("[ Connected ]");
                     OnConnect?.Invoke();
                     ReconnectAttempt = 0;
-                    //OnFullReady?.Invoke();
                 }
                 else
                 {
@@ -192,8 +195,6 @@ namespace GameNet
                 .WithUrl(new Uri(Url_Hub))
                 .Build();
             
-            Debug.Log("Build connecting with " + Url_Hub);
-
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed due to " + err.Message);

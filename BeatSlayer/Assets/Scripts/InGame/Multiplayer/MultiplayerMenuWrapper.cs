@@ -16,7 +16,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public AccountUI accountUI;
     public FriendsUI friendsUI;
     public NotificationUI notificationUI;
-
+    public MenuScript_v2 menu;
+    
     
     [Header("Server connection override")]
     public NetCore.ConnectionType connType;
@@ -38,7 +39,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Start()
     {
-        NetCore.Configure(() =>
+        NetCore.Configurators += () =>
         {
             NetCore.OnFullReady += () =>
             {
@@ -52,12 +53,18 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
             // Subscribe/Resubscribe all
             NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
+        };
+        NetCore.Configure();
+        /*NetCore.Configure(() =>
+        {
+            
 
-            accountUI.Configure();
-            chatUI.Configure();
-            friendsUI.Configure();
-            notificationUI.Configure();
-        });
+            //accountUI.Configure();
+            //chatUI.Configure();
+            //friendsUI.Configure();
+            //notificationUI.Configure();
+            //menu.Configure();
+        });*/
 
 
         Debug.Log("Url is " + NetCore.Url_Hub);

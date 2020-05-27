@@ -23,38 +23,38 @@ public class FriendsUI : MonoBehaviour
     public RectTransform scrollview;
     public InputField searchField;
     public GameObject noFriends, noMatches;
-    
-    
-    
-    public void Configure()
-    {
-        NetCore.Subs.Friends_OnGetFriends += list =>
-        {
-            NetCorePayload.CurrentAccount.Friends = list;
-            ShowList(list, true);
-        };
-        NetCore.Subs.Accounts_OnSearch += list =>
-        {
-            ShowList(list, false);
-        };
-        
-        NetCore.OnLogIn += () =>
-        {
-            Debug.Log(" > On Log In");
-            if (NetCorePayload.CurrentAccount != null)
-            {
-                NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
-            }
-        };
 
-        NetCore.Subs.Notification_OnSend += info =>
+
+    private void Awake()
+    {
+        NetCore.Configurators += () =>
         {
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            NetCore.Subs.Friends_OnGetFriends += list =>
             {
-                Debug.Log("Got notification");
-                Debug.Log(JsonConvert.SerializeObject(info));
-                notificationUI.ShowNotification(info);  
-            });
+                NetCorePayload.CurrentAccount.Friends = list;
+                ShowList(list, true);
+            };
+            NetCore.Subs.Accounts_OnSearch += list =>
+            {
+                ShowList(list, false);
+            };
+        
+            NetCore.OnLogIn += () =>
+            {
+                if (NetCorePayload.CurrentAccount != null)
+                {
+                    NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
+                }
+            };
+
+            NetCore.Subs.Notification_OnSend += info =>
+            {
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    Debug.Log(JsonConvert.SerializeObject(info));
+                    notificationUI.ShowNotification(info);  
+                });
+            };
         };
     }
 

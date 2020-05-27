@@ -22,11 +22,14 @@ namespace Multiplayer.Notification
         public Text countText;
 
 
-        public void Configure()
+        public void Awake()
         {
-            NetCore.OnLogIn += () =>
+            NetCore.Configurators += () =>
             {
-                RefreshIcon();
+                NetCore.OnLogIn += () =>
+                {
+                    RefreshIcon();
+                };
             };
         }
         

@@ -28,12 +28,14 @@ namespace Multiplayer.Accounts
         public Text messageBodyText;
 
 
-        // Invoked by wrapper on configuration netcore
-        public void Configure()
+        private void Awake()
         {
-            NetCore.Subs.Accounts_OnLogIn += OnLogIn;
-            NetCore.Subs.Accounts_OnSignUp += OnSignUp;
-            NetCore.Subs.Accounts_OnView += OnView;
+            NetCore.Configurators += () =>
+            {
+                NetCore.Subs.Accounts_OnLogIn += OnLogIn;
+                NetCore.Subs.Accounts_OnSignUp += OnSignUp;
+                NetCore.Subs.Accounts_OnView += OnView;
+            };
         }
 
         public void OnConnect(MultiplayerMenuWrapper wrapper)
@@ -214,7 +216,6 @@ namespace Multiplayer.Accounts
         
         public void OnLogIn(OperationMessage op)
         {
-            Debug.Log("OnLogIn " + JsonConvert.SerializeObject(op,Formatting.Indented));
             if (!isLoginBySession)
             {
                 signUI.OnLogInResult(op);
@@ -226,9 +227,7 @@ namespace Multiplayer.Accounts
                 SaveAvatarToCache();
                 SaveBackgroundToCache();
                 
-                Debug.Log("I have notifications: " + op.Account.Notifications.Count);
-                
-                NetCore.OnLogIn?.Invoke();
+                NetCore.OnLogIn();
             }
         }
 

@@ -795,6 +795,9 @@
             <e p="Player.cs" t="Include" />
           </e>
           <e p="InGame" t="Include">
+            <e p="Anims" t="Include">
+              <e p="PlayBtnAnim.cs" t="Include" />
+            </e>
             <e p="Audio" t="Include">
               <e p="BeatmapAudio.cs" t="Include" />
               <e p="NativeAudioSource.cs" t="Include" />

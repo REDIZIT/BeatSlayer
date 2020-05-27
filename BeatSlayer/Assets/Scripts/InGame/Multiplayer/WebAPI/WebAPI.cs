@@ -15,7 +15,7 @@ namespace Web
 {
     public static class WebAPI
     {
-        public const string apibase_local = "https://localhost:5001";
+        public const string apibase_local = "https://localhost:5010";
         public const string apibase_prod = "http://www.bsserver.tk";
 
         public static string apibase

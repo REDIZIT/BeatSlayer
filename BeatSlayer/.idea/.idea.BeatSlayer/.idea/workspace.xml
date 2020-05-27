@@ -72,6 +72,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/GRAY/Player.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomUI/InputField/CustomInputField.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Anims/PlayBtnAnim.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MapListItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Shaders/AlphaGradientShader.shader" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" root0="FORCE_HIGHLIGHTING" />
@@ -132,7 +133,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/AccountView.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/Helpers.cs" />
         <option value="$PROJECT_DIR$/Assets/Shaders/AlphaGradientShader.shader" />
         <option value="$PROJECT_DIR$/Assets/Shaders/AndroidTransparent/AndroidTransparent.shader" />
@@ -153,7 +153,6 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Basics/OperationMessage.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupData.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatGroupItemUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Prefs.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DailyRewarder.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Ranking.cs" />
@@ -161,7 +160,6 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/UI/LeaderboardUIItem.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MenuHelpers/ShopHelper.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Helpers/TextContainer.cs" />
@@ -172,17 +170,20 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatCube.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/LocalizationManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/Account.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCorePayload.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/WebAPI/WebAPI.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/Profile.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion/Master/Notifications.csv" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUIItem.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUI.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Anims/PlayBtnAnim.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Chat/ChatUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Friends/FriendsUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Notifications/NotificationUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
       </list>
     </option>
   </component>
@@ -272,6 +273,8 @@
       <workItem from="1590489075158" duration="10000" />
       <workItem from="1590489099897" duration="1003000" />
       <workItem from="1590515548679" duration="1751000" />
+      <workItem from="1590567893337" duration="3094000" />
+      <workItem from="1590601466306" duration="2724000" />
     </task>
     <servers />
   </component>
@@ -406,12 +409,12 @@
     </state>
     <state x="2536" y="310" width="672" height="677" key="run.anything.popup/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589654272199" />
     <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1589540128711" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590516609188">
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590602346701">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="2543" y="290" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.65.1920.1040@1920.65.1920.1040" timestamp="1589580428851" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.70.1920.1040@0.0.1920.1040" timestamp="1589717157563" />
     <state x="2543" y="295" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.70.1920.1040@1920.70.1920.1040" timestamp="1589796341868" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590516609188" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590602346701" />
   </component>
 </project>
