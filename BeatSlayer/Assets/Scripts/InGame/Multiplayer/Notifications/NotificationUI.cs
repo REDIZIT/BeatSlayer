@@ -10,6 +10,7 @@ namespace Multiplayer.Notification
         public NotificationUIItem item;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         public Image iconImage;
         public Color defaultIconColor, activeIconColor;
         public GameObject countGo;
@@ -31,14 +32,42 @@ namespace Multiplayer.Notification
             NotificationFriendInvite not = new NotificationFriendInvite("Shrek");
             ShowNotification(not);
 >>>>>>> parent of ae2d14c... Before redesign
+=======
+        private void Start()
+        {
+            NotificationFriendInvite not = new NotificationFriendInvite("Shrek");
+            ShowNotification(not);
         }
 
         public void ShowNotification(Notification notification)
         {
             item.Refresh(notification);
+>>>>>>> parent of ae2d14c... Before redesign
         }
     }
 
+<<<<<<< HEAD
+        public void ShowNotification(Notification notification)
+        {
+            item.Refresh(notification);
+=======
+    public interface Notification
+    {
+         NotificationType Type { get; }
+         string Header { get; }
+         string Body { get; }
+    }
+
+    public class NotificationFriendInvite : Notification
+    {
+        public NotificationType Type
+        {
+            get { return NotificationType.FriendInvite; }
+>>>>>>> parent of ae2d14c... Before redesign
+        }
+    }
+
+<<<<<<< HEAD
     public interface Notification
     {
          NotificationType Type { get; }
@@ -53,6 +82,8 @@ namespace Multiplayer.Notification
             get { return NotificationType.FriendInvite; }
         }
 
+=======
+>>>>>>> parent of ae2d14c... Before redesign
         public string Header
         {
             get { return "Запрос в друзья"; }

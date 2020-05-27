@@ -47,6 +47,7 @@ public class FriendsUI : MonoBehaviour
             NetCore.OnLogIn += () =>
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if (NetCorePayload.CurrentAccount != null)
                 {
                     NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
@@ -61,6 +62,10 @@ public class FriendsUI : MonoBehaviour
                     notificationUI.ShowNotification(info);  
                 });
             };
+=======
+                NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
+            }
+>>>>>>> parent of ae2d14c... Before redesign
 =======
                 NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
             }

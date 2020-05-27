@@ -221,8 +221,11 @@ namespace Multiplayer.Accounts
                 SaveBackgroundToCache();
                 
 <<<<<<< HEAD
+<<<<<<< HEAD
                 NetCore.OnLogIn();
 =======
+=======
+>>>>>>> parent of ae2d14c... Before redesign
                 Debug.Log("I have coins: " + op.Account.Coins);
                 
                 NetCore.OnLogIn?.Invoke();
