@@ -28,9 +28,14 @@ namespace GameNet
                 return ConnType == ConnectionType.Local
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     ? "https://localhost:5010/GameHub" : ConnType == ConnectionType.Development 
                         ? "http://www.bsserver.tk:5010/GameHub"
                             : "http://bsserver.tk/GameHub";
+=======
+                    ? "https://localhost:5001/GameHub"
+                    : "http://bsserver.tk/GameHub";
+>>>>>>> parent of ae2d14c... Before redesign
 =======
                     ? "https://localhost:5001/GameHub"
                     : "http://bsserver.tk/GameHub";

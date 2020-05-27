@@ -11,6 +11,7 @@ namespace Multiplayer.Notification
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         public Image iconImage;
         public Color defaultIconColor, activeIconColor;
         public GameObject countGo;
@@ -35,6 +36,10 @@ namespace Multiplayer.Notification
 =======
         private void Start()
         {
+=======
+        private void Start()
+        {
+>>>>>>> parent of ae2d14c... Before redesign
             NotificationFriendInvite not = new NotificationFriendInvite("Shrek");
             ShowNotification(not);
         }
@@ -46,6 +51,7 @@ namespace Multiplayer.Notification
         }
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         public void ShowNotification(Notification notification)
         {
@@ -64,9 +70,24 @@ namespace Multiplayer.Notification
         {
             get { return NotificationType.FriendInvite; }
 >>>>>>> parent of ae2d14c... Before redesign
+=======
+    public interface Notification
+    {
+         NotificationType Type { get; }
+         string Header { get; }
+         string Body { get; }
+    }
+
+    public class NotificationFriendInvite : Notification
+    {
+        public NotificationType Type
+        {
+            get { return NotificationType.FriendInvite; }
+>>>>>>> parent of ae2d14c... Before redesign
         }
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     public interface Notification
     {
@@ -82,6 +103,8 @@ namespace Multiplayer.Notification
             get { return NotificationType.FriendInvite; }
         }
 
+=======
+>>>>>>> parent of ae2d14c... Before redesign
 =======
 >>>>>>> parent of ae2d14c... Before redesign
         public string Header
@@ -99,11 +122,19 @@ namespace Multiplayer.Notification
             this.nick = nick;
         }
     }
+<<<<<<< HEAD
 
     public class NotificationModeration : Notification
     {
         public NotificationType Type { get { return NotificationType.Moderation; } }
 
+=======
+
+    public class NotificationModeration : Notification
+    {
+        public NotificationType Type { get { return NotificationType.Moderation; } }
+
+>>>>>>> parent of ae2d14c... Before redesign
         public string moderatorNick;
         public string map;
         public ModerationResult result;

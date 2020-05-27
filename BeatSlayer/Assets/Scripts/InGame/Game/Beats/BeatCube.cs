@@ -105,7 +105,10 @@ public class BeatCube : MonoBehaviour, IBeat
             
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             Debug.Log(anglediff + $" ({degrees} / {targetDeg})");
+=======
+>>>>>>> parent of ae2d14c... Before redesign
 =======
 >>>>>>> parent of ae2d14c... Before redesign
 =======

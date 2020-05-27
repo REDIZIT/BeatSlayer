@@ -16,10 +16,14 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public FriendsUI friendsUI;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public NotificationUI notificationUI;
     public MenuScript_v2 menu;
     
     
+=======
+
+>>>>>>> parent of ae2d14c... Before redesign
 =======
 
 >>>>>>> parent of ae2d14c... Before redesign
