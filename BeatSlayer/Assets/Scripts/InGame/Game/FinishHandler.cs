@@ -233,7 +233,6 @@ public class FinishHandler : MonoBehaviour
         NetCore.Subs.Accounts_OnGetBestReplay += info =>
         {
             Debug.Log("Best replay got!");
-            Debug.Log("Going forward");
             if (bestReplay != null && bestReplay.Score > gm.replay.score)
             {
                 recordText.SetActive(true);

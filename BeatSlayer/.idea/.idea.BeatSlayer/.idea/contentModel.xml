@@ -856,6 +856,7 @@
               </e>
               <e p="MultiplayerMenuWrapper.cs" t="Include" />
               <e p="Notifications" t="Include">
+                <e p="NotificationInfo.cs" t="Include" />
                 <e p="NotificationUI.cs" t="Include" />
                 <e p="NotificationUIItem.cs" t="Include" />
               </e>
@@ -875,6 +876,9 @@
               <e p="GroupInfo.cs" t="Include" />
               <e p="MapInfo.cs" t="Include" />
               <e p="ReplayInfo.cs" t="Include" />
+            </e>
+            <e p="TestZone" t="Include">
+              <e p="TestAngle.cs" t="Include" />
             </e>
             <e p="UI" t="Include">
               <e p="LeaderboardUI.cs" t="Include" />

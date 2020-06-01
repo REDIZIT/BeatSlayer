@@ -19,7 +19,9 @@ namespace Multiplayer.Accounts
         public AccountSignUI signUI;
         public ProfileUI profileUI;
         public ProfileEditUI profileEditUI;
-        
+        public MenuScript_v2 menu;
+
+
         private bool isLoginBySession = false;
         private string sessionToWrite = "";
         private float inGameTimeSent;
@@ -209,31 +211,25 @@ namespace Multiplayer.Accounts
         
         public void OnLogIn(OperationMessage op)
         {
-            if (!isLoginBySession)
+            Debug.Log(" << OnLogIn");
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                signUI.OnLogInResult(op);
-            }
-            if (op.Type == OperationMessage.OperationType.Success)
-            {
-                NetCorePayload.CurrentAccount = op.Account;
-                CreateSession();
-                SaveAvatarToCache();
-                SaveBackgroundToCache();
-                
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                NetCore.OnLogIn();
-=======
-=======
->>>>>>> parent of ae2d14c... Before redesign
-=======
->>>>>>> parent of ae2d14c... Before redesign
-                Debug.Log("I have coins: " + op.Account.Coins);
-                
-                NetCore.OnLogIn?.Invoke();
->>>>>>> parent of ae2d14c... Before redesign
-            }
+                if (!isLoginBySession)
+                {
+                    signUI.OnLogInResult(op);
+                }
+                if (op.Type == OperationMessage.OperationType.Success)
+                {
+                    NetCorePayload.CurrentAccount = op.Account;
+                    CreateSession();
+                    SaveAvatarToCache();
+                    SaveBackgroundToCache();
+
+                    SyncCoins();
+
+                    NetCore.OnLogIn();
+                }
+            });
         }
 
         public void OnSceneLoad()
@@ -261,6 +257,20 @@ namespace Multiplayer.Accounts
         public void OnConfirmRestore(bool success)
         {
             signUI.OnConfirmRestore(success);
+        }
+
+        public void SyncCoins()
+        {
+            if (NetCorePayload.CurrentAccount == null) return;
+
+            int coins = menu.prefsManager.prefs.coins;
+
+            if (NetCorePayload.CurrentAccount.Coins == -1)
+            {
+                Debug.Log("Sync coins: " + coins + " / " + NetCorePayload.CurrentAccount.Coins);
+                NetCorePayload.CurrentAccount.Coins = coins;
+                NetCore.ServerActions.Shop.SyncCoins(NetCorePayload.CurrentAccount.Nick, coins);
+            }
         }
     }
 }

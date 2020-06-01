@@ -14,11 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Folders:
   - Type: 0
-    Key: Audio
-    IsRecursive: 0
-    SmallIcon: {fileID: 2800000, guid: 4372cfb8a7d3b5b4d9b899147b193270, type: 3}
-    LargeIcon: {fileID: 2800000, guid: 65e13c9890ffa26478506eda78683d5c, type: 3}
-  - Type: 0
     Key: Editor
     IsRecursive: 0
     SmallIcon: {fileID: 2800000, guid: ec2951dbd8c22234c8fdf92529d860fd, type: 3}
@@ -158,3 +153,18 @@ MonoBehaviour:
     IsRecursive: 0
     SmallIcon: {fileID: 2800000, guid: 0a498e8f7fbcbef4db91d2d411e3f70f, type: 3}
     LargeIcon: {fileID: 2800000, guid: b88339035f924f94eab1e64bac79149f, type: 3}
+  - Type: 1
+    Key: Assets/Scripts/InGame
+    IsRecursive: 0
+    SmallIcon: {fileID: 2800000, guid: bc1d6bab13fce1c448e2b0870277ce43, type: 3}
+    LargeIcon: {fileID: 2800000, guid: a257b7f6126c9e74f86c966b806ffbf7, type: 3}
+  - Type: 1
+    Key: Assets/Scripts/InGame/Multiplayer
+    IsRecursive: 0
+    SmallIcon: {fileID: 2800000, guid: bc1d6bab13fce1c448e2b0870277ce43, type: 3}
+    LargeIcon: {fileID: 2800000, guid: a257b7f6126c9e74f86c966b806ffbf7, type: 3}
+  - Type: 1
+    Key: Assets/Scripts/InGame/NetCore
+    IsRecursive: 0
+    SmallIcon: {fileID: 2800000, guid: bc1d6bab13fce1c448e2b0870277ce43, type: 3}
+    LargeIcon: {fileID: 2800000, guid: a257b7f6126c9e74f86c966b806ffbf7, type: 3}

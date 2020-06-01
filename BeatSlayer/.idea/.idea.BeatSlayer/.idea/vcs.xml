@@ -3,6 +3,5 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Assets/Resources/BeatSlayerLocaliztion" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Assets/Resources/GameLocalization" vcs="Git" />
   </component>
 </project>

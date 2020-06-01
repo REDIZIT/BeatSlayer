@@ -170,8 +170,6 @@ public class GameManager : MonoBehaviour
     {
         if (!enabled) return;
         
-        Debug.Log("WORK BLYAT! please... I mean Awake()");
-
         #region Redirect to menu
 
         if (LoadingData.loadparams == null || (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Menu && this.enabled))

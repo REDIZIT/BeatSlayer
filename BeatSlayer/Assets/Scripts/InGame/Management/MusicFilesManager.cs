@@ -84,9 +84,7 @@ namespace MusicFilesManagement
 
                     data.files.AddRange(files.Where(c => !data.files.Contains(c)));
                 }
-                Debug.LogError("Data files count is " + data.files.Count);
-
-                Debug.LogError("SearchTask() end with " + (DateTime.Now - dt1).TotalMilliseconds + "ms");
+                Debug.LogError("Data files count is " + data.files.Count + " in " + (DateTime.Now - dt1).TotalMilliseconds + "ms");
 
                 SaveData();
             });

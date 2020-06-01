@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.SimpleLocalization;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using InGame.Helpers;
 using Multiplayer.Accounts;
+using Multiplayer.Notification;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +17,7 @@ public class FriendsUI : MonoBehaviour
     public Transform content;
     
     public AccountUI accountUI;
+    public NotificationUI notificationUI;
 
     public Text label;
     
@@ -24,15 +28,7 @@ public class FriendsUI : MonoBehaviour
 
     private void Awake()
     {
-<<<<<<< HEAD
         NetCore.Configurators += () =>
-=======
-        NetCore.Subs.Friends_OnGetFriends += list =>
-        {
-            ShowList(list, true);
-        };
-        NetCore.Subs.Accounts_OnSearch += list =>
->>>>>>> parent of ae2d14c... Before redesign
         {
             NetCore.Subs.Friends_OnGetFriends += list =>
             {
@@ -43,12 +39,9 @@ public class FriendsUI : MonoBehaviour
             {
                 ShowList(list, false);
             };
-        
+            
             NetCore.OnLogIn += () =>
             {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
                 if (NetCorePayload.CurrentAccount != null)
                 {
                     NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
@@ -63,28 +56,27 @@ public class FriendsUI : MonoBehaviour
                     notificationUI.ShowNotification(info);  
                 });
             };
-=======
-                NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
-            }
->>>>>>> parent of ae2d14c... Before redesign
-=======
-                NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
-            }
->>>>>>> parent of ae2d14c... Before redesign
-=======
-                NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
-            }
->>>>>>> parent of ae2d14c... Before redesign
         };
     }
 
+    public void OnPeopleBtnClick()
+    {
+        label.text = LocalizationManager.Localize("Friends");
+        searchField.gameObject.SetActive(false);
+        scrollview.offsetMax = new Vector2(scrollview.offsetMax.x, 0);
+        NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
+    }
+    
+    
+    
+    
     public void RemoveFriend(string fromNick)
     {
         NetCore.ServerActions.Friends.RemoveFriend(fromNick, NetCorePayload.CurrentAccount.Nick);
     }
     public void AddFriend(string addNick)
     {
-        NetCore.ServerActions.Friends.AddFriend(addNick, NetCorePayload.CurrentAccount.Nick);
+        NetCore.ServerActions.Friends.InviteFriend(addNick, NetCorePayload.CurrentAccount.Nick);
     }
 
 
@@ -107,20 +99,19 @@ public class FriendsUI : MonoBehaviour
     
     
     
-    
     public void OnSearchBtnClick()
     {
         HelperUI.ClearContent(content);
         if (searchField.gameObject.activeSelf)
         {
-            label.text = "Friends";
+            label.text = LocalizationManager.Localize("Friends");
             searchField.gameObject.SetActive(false);
             scrollview.offsetMax = new Vector2(scrollview.offsetMax.x, 0);
             NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
         }
         else
         {
-            label.text = "Search";
+            label.text = LocalizationManager.Localize("Search");
             searchField.gameObject.SetActive(true);
             scrollview.offsetMax = new Vector2(scrollview.offsetMax.x, -100);
         }

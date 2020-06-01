@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Dynamic;
+using Assets.SimpleLocalization;
 using GameNet;
 using UnityEngine;
 using InGame.Helpers;
@@ -38,20 +39,26 @@ namespace Multiplayer.Chat
         {
             NetCore.Configurators += () =>
             {
+                Debug.Log(" > Configure ChatUI");
                 NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
                 NetCore.Subs.OnJoinGroup += OnJoinGroup;
                 NetCore.Subs.OnGetGroups += OnGetGroups;
                 NetCore.OnFullReady += () =>
                 {
-                    if (NetCorePayload.CurrentAccount != null) NetCore.ServerActions.Chat.GetGroups();
+                    if (NetCorePayload.CurrentAccount != null)
+                    {
+                        Debug.Log("NetCore.ServerActions.Chat.GetGroups();");
+                        NetCore.ServerActions.Chat.GetGroups();
+                    }
                 };
                 NetCore.OnLogIn += () =>
                 {
+                    Debug.Log(" >>> ChatUI.GetGroups");
                     NetCore.ServerActions.Chat.GetGroups();
                 };
                 NetCore.Subs.OnOnlineChange += (int online) =>
                 {
-                    onlineText.text = "Онлайн: " + online;
+                    onlineText.text = LocalizationManager.Localize("Online") + ": " + online;
                 };
                 
                 avatarLoader.Configure();
@@ -96,7 +103,6 @@ namespace Multiplayer.Chat
         
         public void OnSendChatMessage(string json)
         {
-            Debug.Log(json);
             ChatMessage msg = JsonConvert.DeserializeObject<ChatMessage>(json);
             
             HelperUI.AddContent<ChatMessageItem>(content, prefab, item =>

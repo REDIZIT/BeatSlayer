@@ -37,6 +37,7 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         public InputField restore_newPassword, restore_code;
         public GameObject restore_resultPan;
         public Text restore_resultText;
+
         
         public void ShowLogIn()
         {

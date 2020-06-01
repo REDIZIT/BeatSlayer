@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using GameNet;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -10,7 +11,7 @@ namespace Multiplayer.Chat
 {
     public class ChatAvatarLoader
     {
-        public List<ChatAvatarRequest> ls = new List<ChatAvatarRequest>();
+        List<ChatAvatarRequest> ls = new List<ChatAvatarRequest>();
         private ChatAvatarRequest currentRequest;
         
         public Dictionary<string, Texture2D> avatars = new Dictionary<string, Texture2D>();
@@ -24,10 +25,14 @@ namespace Multiplayer.Chat
         
         public void Request(RawImage img, string nick)
         {
-            ChatAvatarRequest req = new ChatAvatarRequest(img, nick);
-            ls.Add(req);
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                ChatAvatarRequest req = new ChatAvatarRequest(img, nick);
+                ls.Add(req);
 
-            OnListChange();
+                OnListChange();
+            });
+            
         }
 
 
@@ -35,7 +40,7 @@ namespace Multiplayer.Chat
         {
             if (ls.Count == 0) return;
             if (currentRequest != null) return;
-            
+
             currentRequest = ls[0];
 
             if (avatars.ContainsKey(currentRequest.nick))
@@ -55,15 +60,35 @@ namespace Multiplayer.Chat
 
         public void OnGetAvatar(byte[] bytes)
         {
-            Texture2D tex = ProjectManager.LoadTexture(bytes);
-            currentRequest.img.texture = tex;
+            if(currentRequest == null) Debug.LogError("WTF UNITY!?");
             
-            avatars.Add(currentRequest.nick, tex);
-
-            ls.RemoveAt(0);
-            currentRequest = null;
-
-            OnListChange();
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                Texture2D tex = ProjectManager.LoadTexture(bytes);
+                if(currentRequest == null) Debug.LogError("WTF UNITY THREADS!?");
+                
+                try
+                {
+                    avatars.Add(currentRequest.nick, tex);
+                    ls.RemoveAt(0);
+                    
+                    currentRequest.img.texture = tex;
+                    currentRequest = null;
+                    
+                    OnListChange();
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("Is tex null? " + (tex == null));
+                    Debug.Log("Is bytes null? " + (bytes == null || bytes.Length == 0));
+                    Debug.Log("Is req null? " + (currentRequest == null));
+                    Debug.Log("Is img null? " + (currentRequest.img == null));
+                    Debug.Log("Is texture null? " + (currentRequest.img.texture == null));
+                    Debug.LogError(e);
+                }
+                
+               
+            });
         }
     }
 

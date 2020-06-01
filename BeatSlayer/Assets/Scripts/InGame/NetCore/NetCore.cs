@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BeatSlayerServer.Multiplayer.Accounts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
+using Notifications;
 using Ranking;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,34 +22,23 @@ namespace GameNet
         public static Subscriptions Subs { get; private set; }
         public static Invokes Actions { get; private set; }
 
-        public static string Url_Hub
+        public static string Url_Server
         {
             get
             {
                 return ConnType == ConnectionType.Local
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    ? "https://localhost:5010/GameHub" : ConnType == ConnectionType.Development 
-                        ? "http://www.bsserver.tk:5010/GameHub"
-                            : "http://bsserver.tk/GameHub";
-=======
-                    ? "https://localhost:5001/GameHub"
-                    : "http://bsserver.tk/GameHub";
->>>>>>> parent of ae2d14c... Before redesign
-=======
-                    ? "https://localhost:5001/GameHub"
-                    : "http://bsserver.tk/GameHub";
->>>>>>> parent of ae2d14c... Before redesign
-=======
-                    ? "https://localhost:5001/GameHub"
-                    : "http://bsserver.tk/GameHub";
->>>>>>> parent of ae2d14c... Before redesign
+                    ? "https://localhost:5010" : ConnType == ConnectionType.Development
+                        ? "http://www.bsserver.tk:5010"
+                            : "http://bsserver.tk";
             }
         }
-        public enum ConnectionType { Production, Local }
+        public static string Url_Hub
+        {
+            get { return Url_Server + "/GameHub"; }
+        }
+        public enum ConnectionType { Production, Local, Development }
 
-        public static ConnectionType ConnType;
+        public static ConnectionType ConnType = ConnectionType.Development;
 
 
 
@@ -75,8 +65,10 @@ namespace GameNet
         {
             SceneManager.activeSceneChanged += (arg0, scene) =>
             {
+                Debug.Log("OnSceneChanged");
+                //NetCore.Configurators = null;
                 //Debug.Log("activeSceneChanged");
-                //if(Time.realtimeSinceStartup > 5) OnSceneLoad();
+                //if(Time.realtimeSinceStartup > 5) OnSceneLoad(); 
             };
             Application.quitting += () =>
             {
@@ -101,13 +93,15 @@ namespace GameNet
             OnConnect = null;
             OnDisconnect = null;
             OnReconnect = null;
-            OnLogIn = null;
+            //OnLogIn = null;
             
             OnSceneLoad();
             
+            Debug.Log(" > Configure()");
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                Configurators?.Invoke();
+                Debug.Log(" > Configure() in unity thread");
+                Configurators.Invoke();
                 
                 OnFullReady?.Invoke();
             });
@@ -124,7 +118,6 @@ namespace GameNet
         // (Internal usage)
         static void OnSceneLoad()
         {
-            Debug.Log("NetCore.OnSceneLoad()");
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
                 if (conn == null)
@@ -209,18 +202,11 @@ namespace GameNet
                 .WithUrl(new Uri(Url_Hub))
                 .Build();
             
-<<<<<<< HEAD
-=======
-            Debug.Log("Build connecting with " + Url_Hub);
-        
-            conn.KeepAliveInterval = TimeSpan.FromSeconds(3);
-            conn.ServerTimeout = TimeSpan.FromSeconds(3*3);
-
->>>>>>> parent of ae2d14c... Before redesign
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed due to " + err.Message);
                 OnDisconnect?.Invoke();
+                BuildConnection();
                 Reconnect();
                 return null;
             });
@@ -308,6 +294,7 @@ namespace GameNet
         
         
         // This class contains implementation of server-side methods
+        // (Piece of 90 lines of code ._.) 
         // (External usage)
         public static class ServerActions
         {
@@ -315,10 +302,25 @@ namespace GameNet
             public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group) 
                 => NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 
+            public static void UpdateInGameTime()
+            {
+                if (NetCorePayload.CurrentAccount == null) return;
+                if (NetCorePayload.PrevInGameTimeUpdate == 0) NetCorePayload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
+                int seconds = Mathf.RoundToInt(Time.realtimeSinceStartup - NetCorePayload.PrevInGameTimeUpdate);
+                if (seconds < 30) return;
+                NetCorePayload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
+                NetCore.conn.InvokeAsync("Accounts_UpdateInGameTime", NetCorePayload.CurrentAccount.Nick, seconds);
+            }
+
             public static class Account
             {
-                public static void LogIn(string nick, string password) =>
+                public static void LogIn(string nick, string password)
+                {
                     NetCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
+                    UpdateInGameTime();
+                }
+                    
+                
                 
                 public static void SignUp(string nick, string password, string country, string email) =>
                     NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
@@ -327,10 +329,12 @@ namespace GameNet
                     NetCore.conn.InvokeAsync("Accounts_Search", nick);
                 public static void View(string nick) =>
                     NetCore.conn.InvokeAsync("Accounts_View", nick);
-                
-                
-                
-                public static void GetAvatar(string nick) => conn.InvokeAsync("Accounts_GetAvatar", nick);
+
+
+
+
+                public static void GetAvatar(string nick) => 
+                    conn.InvokeAsync("Accounts_GetAvatar", nick);
 
                 public static void ChangePassword(string nick, string oldpass, string newpass) =>
                     conn.InvokeAsync("Accounts_ChangePassword", nick, oldpass, newpass);
@@ -364,17 +368,30 @@ namespace GameNet
                 public static void GetFriends(string nick) =>
                     conn.InvokeAsync("Friends_GetFriends", nick);
                 
-                public static void AddFriend(string addNick, string nick) =>
-                    conn.InvokeAsync("Friends_AddFriend",addNick, nick);
+                public static void InviteFriend(string addNick, string nick) =>
+                    conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
                 
                 public static void RemoveFriend(string fromNick, string nick) =>
                     conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
             }
 
+            public static class Notifications
+            {
+                public static void Accept(string nick, int id) =>
+                    conn.InvokeAsync("Friends_AcceptInvite", nick, id);
+                
+                public static void Reject(string nick, int id) =>
+                    conn.InvokeAsync("Friends_RejectInvite", nick, id);
+            }
+            
+            
             public static class Shop
             {
                 public static void SendCoins(string nick, int coins) =>
                     conn.InvokeAsync("Shop_SendCoins", nick, coins);
+
+                public static void SyncCoins(string nick, int coins) =>
+                    conn.InvokeAsync("Shop_SyncCoins", nick, coins);
             }
             public static class Chat
             {
@@ -416,6 +433,9 @@ namespace GameNet
             public Action<ReplayData> Accounts_OnGetBestReplay;
 
             public Action<List<AccountData>> Friends_OnGetFriends;
+
+
+            public Action<NotificationInfo> Notification_OnSend;
         }
 
         public class Invokes

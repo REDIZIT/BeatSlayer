@@ -134,7 +134,10 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of ae2d14c... Before redesign
 =======
 >>>>>>> parent of ae2d14c... Before redesign
 =======
@@ -181,6 +184,9 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/AccountUI.cs" />
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of ae2d14c... Before redesign
+=======
 >>>>>>> parent of ae2d14c... Before redesign
 =======
 >>>>>>> parent of ae2d14c... Before redesign
@@ -197,6 +203,7 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/Beats/BeatManager.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Game/FinishHandler.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MenuHelpers/ShopHelper.cs" />
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -223,6 +230,10 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/MultiplayerMenuWrapper.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/NetCore/NetCore.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MenuScript_v2.cs" />
+=======
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
+>>>>>>> parent of ae2d14c... Before redesign
 =======
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Multiplayer/Account/Profile/ProfileUI.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/InGame/Server-side/ReplayInfo.cs" />
@@ -320,6 +331,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       <workItem from="1590351045888" duration="2673000" />
       <workItem from="1590366635628" duration="7217000" />
       <workItem from="1590436196189" duration="11535000" />
@@ -328,6 +340,9 @@
       <workItem from="1590515548679" duration="1751000" />
       <workItem from="1590567893337" duration="3094000" />
       <workItem from="1590601466306" duration="2724000" />
+=======
+      <workItem from="1590351045888" duration="2078000" />
+>>>>>>> parent of ae2d14c... Before redesign
 =======
       <workItem from="1590351045888" duration="2078000" />
 >>>>>>> parent of ae2d14c... Before redesign
@@ -466,7 +481,11 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590602346701">
+=======
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590355467114">
+>>>>>>> parent of ae2d14c... Before redesign
 =======
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590355467114">
 >>>>>>> parent of ae2d14c... Before redesign
@@ -484,7 +503,11 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590602346701" />
+=======
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590355467114" />
+>>>>>>> parent of ae2d14c... Before redesign
 =======
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590355467114" />
 >>>>>>> parent of ae2d14c... Before redesign

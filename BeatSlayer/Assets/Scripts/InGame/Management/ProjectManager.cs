@@ -56,8 +56,6 @@ namespace ProjectManagement
 
             if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
 
-            Debug.Log("[UnpackBsp] TargetFolder is " + targetFolder);
-
             // Unpack audio file
             string audioPath = targetFilesPath + (proj.audioExtension == Project.AudioExtension.Mp3 ? ".mp3" : ".ogg");
             File.WriteAllBytes(audioPath, proj.audioFile);

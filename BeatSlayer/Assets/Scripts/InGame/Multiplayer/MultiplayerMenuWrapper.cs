@@ -5,6 +5,7 @@ using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using Multiplayer.Accounts;
 using Multiplayer.Chat;
+using Multiplayer.Notification;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,22 +15,10 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public ChatUI chatUI;
     public AccountUI accountUI;
     public FriendsUI friendsUI;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     public NotificationUI notificationUI;
     public MenuScript_v2 menu;
     
     
-=======
-
->>>>>>> parent of ae2d14c... Before redesign
-=======
-
->>>>>>> parent of ae2d14c... Before redesign
-=======
-
->>>>>>> parent of ae2d14c... Before redesign
     [Header("Server connection override")]
     public NetCore.ConnectionType connType;
     public bool forceChangeConnType;
@@ -64,26 +53,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
             // Subscribe/Resubscribe all
             NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
-<<<<<<< HEAD
         };
         NetCore.Configure();
-        /*NetCore.Configure(() =>
-        {
-            
-
-            //accountUI.Configure();
-            //chatUI.Configure();
-            //friendsUI.Configure();
-            //notificationUI.Configure();
-            //menu.Configure();
-        });*/
-=======
-
-            accountUI.Configure();
-            chatUI.Configure();
-            friendsUI.Configure();
-        });
->>>>>>> parent of ae2d14c... Before redesign
 
 
         Debug.Log("Url is " + NetCore.Url_Hub);
@@ -108,6 +79,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             timeUntilClose = 0;
             serverStateAnim.Play("Hide");
         }
+
+        NetCore.ServerActions.UpdateInGameTime();
     }
 
     public void OnConnect()

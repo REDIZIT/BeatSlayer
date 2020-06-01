@@ -298,6 +298,8 @@ public class DatabaseScript : MonoBehaviour
 
     public static bool HasUpdateForMap(string trackname, string nick)
     {
+        if (Application.internetReachability == NetworkReachability.NotReachable) return false;
+    
         trackname = trackname.Replace("&", "%amp%");
         nick = nick.Replace("&", "%amp%");
 
@@ -311,6 +313,8 @@ public class DatabaseScript : MonoBehaviour
     }
     public bool HasUpdateForMap(MapInfo info)
     {
+        if (Application.internetReachability == NetworkReachability.NotReachable) return false;
+        
         string trackname = info.author + "-" + info.name;
         string nick = info.nick;
 

@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Assets.SimpleLocalization;
 using BeatSlayerServer.Multiplayer.Accounts;
+using CoversManagement;
 using InGame.Helpers;
 using InGame.SceneManagement;
 using InGame.UI;
@@ -65,7 +66,6 @@ public class BeatmapUI : MonoBehaviour
     {
         overlay.SetActive(true);
         ResetUI();
-        //bmAudio.ResetUI();
         
         authorText.text = listItem.groupInfo.author;
         nameText.text = listItem.groupInfo.name;
@@ -86,11 +86,40 @@ public class BeatmapUI : MonoBehaviour
             loadingCircle.Play();
             ClearContent(beatmapsContent);
             database.GetMapsByTrackAsync(listItem.groupInfo, RefreshBeatmapsList, ShowError);
-            
-            //bmAudio.OnOpen(listItem.groupInfo.author + "-" + listItem.groupInfo.name);
         }
 
         if(!async) RefreshBeatmapsList(mapInfos);
+    }
+    public void Open(GroupInfoExtended group)
+    {
+        overlay.SetActive(true);
+        ResetUI();
+
+        authorText.text = group.author;
+        nameText.text = group.name;
+        CoversManager.AddPackages(new List<CoverRequestPackage>()
+        {
+            new CoverRequestPackage(coverImage, group.author + "-" + group.name, priority: true)
+        });
+        //coverImage.texture = group.texture;
+
+
+        // Refresh list of player's maps
+        List<MapInfo> mapInfos = null;
+        bool async = false;
+        isGroupDeleted = false;
+        testRequest = null;
+
+        if (group.groupType == GroupInfo.GroupType.Own) mapInfos = database.GetCustomMaps(group);
+        else
+        {
+            async = true;
+            loadingCircle.Play();
+            ClearContent(beatmapsContent);
+            database.GetMapsByTrackAsync(group, RefreshBeatmapsList, ShowError);
+        }
+
+        if (!async) RefreshBeatmapsList(mapInfos);
     }
 
     public void OpenModeration(TestRequest request, Project proj)
@@ -261,7 +290,7 @@ public class BeatmapUI : MonoBehaviour
         bool isDownloaded =
             ProjectManager.IsMapDownloaded(currentMapInfo.author, currentMapInfo.name, currentMapInfo.nick) ||
             currentMapInfo.group.groupType == GroupInfo.GroupType.Own;
-        bool hasUpdate = DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.nick);
+        bool hasUpdate = currentMapInfo.group.groupType == GroupInfo.GroupType.Own ? false : DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.nick);
         bool isTest = testRequest != null;
 
         if (testRequest != null)

@@ -10,6 +10,7 @@ namespace InGame.Animations
     {
         public Animator anim;
         public GameObject mainUI;
+        public MusicFilesUI musicFilesUI;
         
         public GameObject authorPage, ownPage;
         public GameObject overlay;
@@ -44,6 +45,8 @@ namespace InGame.Animations
             
             authorPage.SetActive(false);
             ownPage.SetActive(true);
+            
+            musicFilesUI.Refresh();
         }
 
 

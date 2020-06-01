@@ -28,10 +28,11 @@ namespace Profile
         public RawImage avatarImage;
         public Text nickText;
         public RawImage backgroundImage;
-        public Texture2D defaultBackground;
-        //public Image backgroundImage;
+        public Texture2D defaultBackground, defaultAvatar;
         public RectTransform header;
         public GameObject devIcon;
+        public Text onlineText;
+        public GameObject onlineCircle;
 
         [Header("Buttons")]
         public Button writeBtn;
@@ -44,6 +45,7 @@ namespace Profile
         public GameObject publishedMapsContent;
         public Text publishedMapsText, publishedPlayText, publishedLikesText;
         public Transform bestReplaysContent;
+        public GameObject noBestResultsText;
 
 
 
@@ -51,8 +53,8 @@ namespace Profile
 
         private void Update()
         {
-            if (NetCorePayload.CurrentAccount == null) return;
-            inGameText.text = GetTimeString(NetCorePayload.CurrentAccount.InGameTime);
+            if (NetCorePayload.CurrentAccount == null || data == null) return;
+            if (data.Nick == NetCorePayload.CurrentAccount.Nick) inGameText.text = GetTimeString(NetCorePayload.CurrentAccount.InGameTime);
         }
 
         public void OnEditBtnClick()
@@ -79,54 +81,7 @@ namespace Profile
         public void ShowOwnAccount()
         {
             if (NetCorePayload.CurrentAccount == null) return;
-            this.data = NetCorePayload.CurrentAccount ;
-
-            GetAvatar(NetCorePayload.CurrentAccount.Nick);
-            GetBackground(NetCorePayload.CurrentAccount.Nick);
-            
-            Open();
-            
-            anim.Play("Show");
-            nickText.text = NetCorePayload.CurrentAccount.Nick;
-            devIcon.SetActive(NetCorePayload.CurrentAccount.Nick == "REDIZIT");
-            Debug.Log("Show page for " + NetCorePayload.CurrentAccount.Nick + " with " + NetCorePayload.CurrentAccount.Accuracy + " accuracy");
-
-
-            ShowButtons(true, NetCorePayload.CurrentAccount);
-            
-
-            placeText.text = NetCorePayload.CurrentAccount.PlaceInRanking <= 0 ? "-" : "#" + NetCorePayload.CurrentAccount.PlaceInRanking;
-            inGameText.text = GetTimeString(NetCorePayload.CurrentAccount.InGameTime);
-            RPText.text = NetCorePayload.CurrentAccount.RP + "";
-            accuracyText.text = NetCorePayload.CurrentAccount.Accuracy == -1 ? "-" : Mathf.Floor(NetCorePayload.CurrentAccount.Accuracy * 10000) / 100f + "%";
-            scoreText.text = NetCorePayload.CurrentAccount.AllScore + "";
-            hitText.text = NetCorePayload.CurrentAccount.Hits + "";
-            maxComboText.text = NetCorePayload.CurrentAccount.MaxCombo + "";
-            
-            placeText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            inGameText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            RPText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            accuracyText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            scoreText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            hitText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            maxComboText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            
-            shortStatLayout.CalculateLayoutInputHorizontal();
-            shortStatLayout.SetLayoutHorizontal();
-            
-            /*publishedMapsContent.SetActive(false);
-            if (core.account.MapsPublished > 0)
-            {
-                publishedMapsContent.SetActive(true);
-                publishedMapsText.text = core.account.MapsPublished + "";
-                publishedPlayText.text = core.account.PublishedMapsPlayed + "";
-                publishedLikesText.text = core.account.PublishedMapsLiked + "";
-            }*/
-            publishedMapsText.text = NetCorePayload.CurrentAccount.MapsPublished + "";
-            publishedPlayText.text = NetCorePayload.CurrentAccount.PublishedMapsPlayed + "";
-            publishedLikesText.text = NetCorePayload.CurrentAccount.PublishedMapsLiked + "";
-
-            LoadBestReplays();
+            ShowAccount(NetCorePayload.CurrentAccount);
         }
 
         public void ShowAccount(AccountData data)
@@ -134,15 +89,26 @@ namespace Profile
             Open();
             this.data = data;
 
+            
+            avatarImage.texture = defaultAvatar;
+            backgroundImage.texture = defaultBackground;
+            
             GetAvatar(data.Nick);
             GetBackground(data.Nick);
+            
+            FitHeaderBackgrounImage();
             
             
             
             anim.Play("Show");
             nickText.text = data.Nick;
             devIcon.SetActive(data.Nick == "REDIZIT");
-            Debug.Log("Show page for " + data.Nick + " with " + data.Accuracy + " accuracy");
+
+            bool isOnline = data.Nick == NetCorePayload.CurrentAccount.Nick ? true : data.IsOnline;
+            onlineCircle.SetActive(isOnline);
+            onlineText.text = isOnline
+                ? LocalizationManager.Localize("Online")
+                : LocalizationManager.Localize("WasOnline", GetDateTimeString(data.LastActiveTimeUtc.ToLocalTime()));
 
 
             ShowButtons(true, data);
@@ -154,7 +120,7 @@ namespace Profile
             accuracyText.text = data.Accuracy == -1 ? "-" : Mathf.Floor(data.Accuracy * 10000) / 100f + "%";
             scoreText.text = data.AllScore + "";
             hitText.text = data.Hits + "";
-            maxComboText.text = data.MaxCombo + "";
+            maxComboText.text = data.MaxCombo >= 0 ? data.MaxCombo + "" : "-";
             
             placeText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             inGameText.transform.parent.GetComponent<TextContainer>().UpdateThis();
@@ -177,7 +143,7 @@ namespace Profile
         public void OnAddFriendBtnClick()
         {
             //NetCore.ServerActions.Friends.AddFriend(data.Nick, NetCorePayload.CurrentAccount.Nick);
-            NetCorePayload.CurrentAccount.Friends.Add(data);
+            //NetCorePayload.CurrentAccount.Friends.Add(data);
             friendsUI.AddFriend(data.Nick);
             ShowButtons(true, data);
         }
@@ -200,13 +166,14 @@ namespace Profile
             GameObject prefab;
             NetCore.Subs.Accounts_OnGetBestReplays += list =>
             {
+                noBestResultsText.SetActive(list.Count == 0);
                 HelperUI.FillContent<ReplayItemUI, ReplayData>(bestReplaysContent, list, (ui, item) =>
                 {
                     ui.Refresh(item);
                 });
             };
             prefab = HelperUI.ClearContent(bestReplaysContent);
-            NetCore.ServerActions.Account.GetBestReplays(NetCorePayload.CurrentAccount.Nick, 5);
+            NetCore.ServerActions.Account.GetBestReplays(data.Nick, 5);
         }
 
         void ShowButtons(bool isViewPage, AccountData data)
@@ -242,21 +209,6 @@ namespace Profile
             {
                 OnGetAvatar(bytes);
             });
-            /*bool loadFromWeb = false;
-            if (NetCorePayload.CurrentAccount == null)
-            {
-                loadFromWeb = true;
-            }
-            else
-            {
-                loadFromWeb = NetCorePayload.CurrentAccount.Nick != nick;
-            }
-
-            if (loadFromWeb)
-            {
-                
-            }
-            else OnGetAvatar(File.ReadAllBytes(Application.persistentDataPath + "/data/account/avatar.pic"));*/
         }
         public void GetBackground(string nick)
         {
@@ -264,24 +216,6 @@ namespace Profile
             {
                 OnGetBackground(bytes);
             });
-            /*bool loadFromWeb = false;
-            if (NetCorePayload.CurrentAccount == null)
-            {
-                loadFromWeb = true;
-            }
-            else
-            {
-                loadFromWeb = NetCorePayload.CurrentAccount.Nick != nick;
-            }
-
-            if (loadFromWeb)
-            {
-                Web.WebAPI.GetBackground(nick, bytes =>
-                {
-                    OnGetBackground(bytes);
-                });
-            }
-            else OnGetBackground(File.ReadAllBytes(Application.persistentDataPath + "/data/account/background.pic"));*/
         }
         public void OnGetAvatar(byte[] bytes)
         {
@@ -327,6 +261,31 @@ namespace Profile
             string s = LocalizationManager.Localize("s");
 
             return $"{days}{d} {hours}{h} {minutes}{m} {seconds}{s}";
+        }
+
+        public string GetDateTimeString(DateTime dt)
+        {
+            TimeSpan df = DateTime.Now - dt;
+            int dfDays = DateTime.Now.DayOfYear - dt.DayOfYear;
+            
+            if (dfDays == 0)
+            {
+                if (df.Hours < 1)
+                {
+                    return (df.Minutes < 10 ? "0" + df.Minutes : "" + df.Minutes) + LocalizationManager.Localize("m") + " " + LocalizationManager.Localize("ago");    
+                }
+                return df.Hours + LocalizationManager.Localize("h") + " " + 
+                       (df.Minutes < 10 ? "0" + df.Minutes : "" + df.Minutes) + LocalizationManager.Localize("m") + " " +
+                       LocalizationManager.Localize("ago");
+            }
+            else
+            {
+                if (dfDays == 1)
+                {
+                    return LocalizationManager.Localize("yesterday") + " " + dt.ToLongTimeString();
+                }
+                return dt.ToLongDateString() + " " + dt.ToLongTimeString();
+            }
         }
     }
 }

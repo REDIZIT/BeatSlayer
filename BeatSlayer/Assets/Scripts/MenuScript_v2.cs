@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using UnityEngine;
 using System.ComponentModel;
-using System.Diagnostics;
 using UnityEngine.UI;
 using Pixelplacement;
 //using UnityEngine.SceneManagement;
@@ -14,19 +13,12 @@ using UnityEngine.UI.Extensions;
 using Assets.SimpleLocalization;
 //using GooglePlayGames;
 //using GooglePlayGames.BasicApi;
-using SimpleFileBrowser;
 using UnityEngine.Video;
-using System.Xml.Serialization;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using System.Reflection;
-using CoversManagement;
 //using System.Runtime.Serialization.Formatters.Binary;
 using InGame.SceneManagement;
 //using SaveManagement;
 using DatabaseManagement;
 using GameNet;
-using InGame.Helpers;
 using ProjectManagement;
 using Testing;
 using Debug = UnityEngine.Debug;
@@ -41,6 +33,8 @@ public class MenuScript_v2 : MonoBehaviour
     public TrackListUI TrackListUI { get { return GetComponent<TrackListUI>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
+    public TutorialManager tutorialManager;
+
 
     public SpectrumVisualizer spectrumVisualizer;
     public AudioSource secondAudioSource;
@@ -75,10 +69,12 @@ public class MenuScript_v2 : MonoBehaviour
     [Header("Misc")]
     public GameObject newTracksImg;
 
-    public string editorLanguage;
+    public Language language;
+    public enum Language
+    {
+        English, Russian, French
+    }
 
-
-    public Transform tutorialLocker;
     public AudioSource aSource;
 
 
@@ -135,7 +131,7 @@ public class MenuScript_v2 : MonoBehaviour
         
         UnlockMapsTranslate();
 
-        HandleDev();
+        CheckFolders();
         HandleSettings();
 
         TestManager.Setup(this);
@@ -150,6 +146,12 @@ public class MenuScript_v2 : MonoBehaviour
         mapLockers[1].SetActive(!prefsManager.prefs.mapUnlocked1);
         mapLockers[2].SetActive(!prefsManager.prefs.mapUnlocked2);
         mapLockers[3].SetActive(!prefsManager.prefs.mapUnlocked3);
+
+        if(File.Exists(Application.persistentDataPath + "/Money.txt"))
+        {
+            prefsManager.prefs.coins = 9999999;
+            prefsManager.Save();
+        }
 
         if(NetCorePayload.CurrentAccount != null) RefreshCoinsTexts();
        
@@ -180,13 +182,8 @@ public class MenuScript_v2 : MonoBehaviour
         UpdateOrientationHanlder(true);*/
     }
 
-
-    private Vector3 mpos;
     private void Update()
     {
-
-        UpdateTutorial();
-
         WebHandlers_Handle();
 
         //UpdateOrientationHanlder();
@@ -306,32 +303,11 @@ public class MenuScript_v2 : MonoBehaviour
             CurrentOrientation = orientation;
         }
     }
-
-    void UpdateTutorial()
-    {
-        bool isPortait = false; // Screen.height > Screen.width
-
-        foreach (Transform page in tutorialLocker.GetChild(1).GetChild(0))
-        {
-            foreach (Transform item in page)
-            {
-                if (item.name == "LandVer")
-                {
-                    item.gameObject.SetActive(!isPortait);
-                }
-                else if (item.name == "PortVer")
-                {
-                    item.gameObject.SetActive(isPortait);
-                }
-            }
-        }
-    }
-
     void TranslateStart()
     {
         if(Application.isEditor)
         {
-            LocalizationManager._language = editorLanguage;
+            LocalizationManager._language = language.ToString();
             LocalizationManager.Read();
             return;
         }
@@ -358,19 +334,23 @@ public class MenuScript_v2 : MonoBehaviour
 
     
 
-    void HandleDev()
+    void CheckFolders()
     {
+        bool showTutorial = false;
+
+
         if (!Directory.Exists(Application.persistentDataPath + "/saved"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/saved");
-            tutorialLocker.gameObject.SetActive(true);
-            prefsManager.Save();
+            showTutorial = true;
         }
         if (!Directory.Exists(Application.persistentDataPath + "/custom"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/custom");
-            tutorialLocker.gameObject.SetActive(true);
+            showTutorial = true;
         }
+
+        if (showTutorial) tutorialManager.ShowOverlay();
     }
 
     
@@ -388,27 +368,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     #endregion
 
-    
-
-    //public void OnSearchOwnMusic(InputField field)
-    //{
-    //    string search = field.text.ToLower();
-
-    //    //foreach (Transform child in listController.ownMusicList) child.gameObject.SetActive(false);
-
-    //    List<UserTrackClass> sorted = listController.ownMusicArray.Where(c => (c.author + "-" + c.name).ToLower().Contains(search)).ToList();
-
-    //    float contentSize = 0;
-    //    for (int i = 0; i < listController.ownMusicList.childCount; i++)
-    //    {
-    //        GameObject item = listController.ownMusicList.GetChild(i).gameObject;
-    //        TrackListItem track = item.GetComponent<TrackListItem>();
-    //        //item.SetActive(sorted.Exists(c => c.author == track.group.author && c.name == track.group.name));
-    //    }
-        
-    //    listController.authorMusicList.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentSize + 15);
-    //}
-
+   
 
     public State configScreen;
     public Text trackName, trackAuthor, configMapCreatorText;
@@ -931,9 +891,7 @@ public class MenuScript_v2 : MonoBehaviour
             else if (mapIndex == 2) prefsManager.prefs.mapUnlocked2 = true;
             else if (mapIndex == 3) prefsManager.prefs.mapUnlocked3 = true;
             //btn.gameObject.SetActive(false);
-            coinsTexts[0].text = coins - cost + "";
-            coinsTexts[1].text = coins - cost + "";
-            coinsTexts[2].text = coins - cost + "";
+            RefreshCoinsTexts();
             selectMapBtn.interactable = true;
 
             //if (!prefsManager.prefs.hasAchiv_NewMapNewLife)
@@ -1041,18 +999,6 @@ public class MenuScript_v2 : MonoBehaviour
         Application.OpenURL(url);
     }
 
-    private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors){  return true; }
-
-
-    static void ClearConsole()
-    {
-        return;
-        //var logEntries = System.Type.GetType("UnityEditor.LogEntries, UnityEditor.dll");
-
-        //var clearMethod = logEntries.GetMethod("Clear", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-
-        //clearMethod.Invoke(null, null);
-    }
 
     public void CheckAchievement()
     {

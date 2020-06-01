@@ -38,6 +38,7 @@ public class Prefs
     // Other
     public int selectedMapId = 0;
     public bool mapUnlocked0, mapUnlocked1, mapUnlocked2, mapUnlocked3;
+    public int coins = 0;
     Dictionary<string, int> _records = new Dictionary<string, int>();
     public int GetRecord(string trackname)
     {

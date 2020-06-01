@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Notifications;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,8 @@ namespace Multiplayer.Notification
 {
     public class NotificationUIItem : MonoBehaviour
     {
-        public Notification notification;
+        public NotificationUI ui;
+        public NotificationInfo notification;
 
         public RectTransform rect;
         public HorizontalLayoutGroup buttonsLayoutGroup;
@@ -16,18 +18,35 @@ namespace Multiplayer.Notification
         public Text headerText, bodyText;
         public GameObject addBtn, declineBtn, laterBtn, okBtn;
 
+        public bool deleteAfterClick = false;
+
 
         private void Awake()
         {
             rect = GetComponent<RectTransform>();
         }
 
-        public void Refresh(Notification notification)
+        public void Refresh(NotificationInfo notification, bool deleteAfterClick = false)
         {
             this.notification = notification;
+            this.deleteAfterClick = deleteAfterClick;
 
-            headerText.text = notification.Header;
-            bodyText.text = notification.Body;
+            string header;
+            string body;
+
+            if (notification.Type == Notifications.NotificationType.FriendInvite)
+            {
+                header = "Заявка в друзья";
+                body = $"<color=#f40>{notification.RequesterNick}</color> хочет добавить тебя в друзья";
+            }
+            else
+            {
+                header = "Карта рассмотрена";
+                body = "[ No body ]";
+            }
+                    
+            headerText.text = header;
+            bodyText.text = body;
 
 
             bool btn_add = false, btn_decline = false, btn_later = false, btn_ok = false;
@@ -38,20 +57,42 @@ namespace Multiplayer.Notification
                 btn_decline = true;
                 btn_later = true;
             }
-            else if (notification.Type == NotificationType.Moderation)
+            else if (notification.Type == NotificationType.MapModeration)
             {
                 btn_ok = true;
             }
             
             addBtn.SetActive(btn_add);
             declineBtn.SetActive(btn_decline);
-            laterBtn.SetActive(btn_later);
+            laterBtn.SetActive(!deleteAfterClick && btn_later);
             okBtn.SetActive(btn_ok);
 
-            FitWindowSize();
+            //FitWindowSize();
         }
 
-        public void FitWindowSize()
+
+        public void OnLaterBtnClick()
+        {
+            ui.Hide();
+            if(deleteAfterClick) Destroy(gameObject);
+        }
+
+        public void OnAcceptBtnClick()
+        {
+            ui.Accept(notification);
+            if(deleteAfterClick) Destroy(gameObject);
+        }
+
+        public void OnRejectBtnClick()
+        {
+            ui.Reject(notification);
+            if(deleteAfterClick) Destroy(gameObject);
+        }
+        
+        
+        
+
+        /*public void FitWindowSize()
         {
             buttonsLayoutGroup.CalculateLayoutInputHorizontal();
             
@@ -65,14 +106,14 @@ namespace Multiplayer.Notification
             
             
             
-            //bodyText.CalculateLayoutInputHorizontal();
-            //bodyText.CalculateLayoutInputVertical();
+            bodyText.CalculateLayoutInputHorizontal();
+            bodyText.CalculateLayoutInputVertical();
             
             float heightByBody = bodyText.preferredHeight + 20;
             float height = heightByBody;
 
             float heightToAdd = 76 + 100;
             rect.sizeDelta = new Vector2(width, heightToAdd + height);
-        }
+        }*/
     }
 }
