@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,14 +29,17 @@ namespace Multiplayer.Accounts
         public Text messageBodyText;
 
 
-        private void Awake()
+        public void Configuration()
         {
-            NetCore.Configurators += () =>
+            NetCore.Subs.Accounts_OnLogIn += OnLogIn;
+            NetCore.Subs.Accounts_OnSignUp += OnSignUp;
+            NetCore.Subs.Accounts_OnView += OnView;
+            /*NetCore.Configurators += () =>
             {
                 NetCore.Subs.Accounts_OnLogIn += OnLogIn;
                 NetCore.Subs.Accounts_OnSignUp += OnSignUp;
                 NetCore.Subs.Accounts_OnView += OnView;
-            };
+            };*/
         }
 
         public void OnConnect(MultiplayerMenuWrapper wrapper)
@@ -76,6 +78,13 @@ namespace Multiplayer.Accounts
         
         void LogInBySession()
         {
+            // This is old session code (for compatibility
+            if(File.Exists(Application.persistentDataPath + "/session.txt"))
+            {
+                LogInByOldSession();
+                return;
+            }
+
             string path = Application.persistentDataPath + "/data/account/.session";
             if (!File.Exists(path)) return;
 
@@ -99,6 +108,21 @@ namespace Multiplayer.Accounts
             LogIn(nick, password);
         }
 
+        void LogInByOldSession()
+        {
+            string path = Application.persistentDataPath + "/session.txt";
+            if (!File.Exists(path)) return;
+
+            string content = File.ReadAllText(path);
+            string nick = content.Split(':')[0];
+            string password = content.Split(':')[1];
+
+            File.Delete(path);
+            LogIn(nick, password);
+        }
+
+
+
         public void RefreshSession(string password)
         {
             sessionToWrite = NetCorePayload.CurrentAccount.Nick + "|" + password;
@@ -119,6 +143,8 @@ namespace Multiplayer.Accounts
         void DeleteSession()
         {
             File.Delete(Application.persistentDataPath + "/data/account/.session");
+            File.Delete(Application.persistentDataPath + "/data/account/avatar.pic");
+            File.Delete(Application.persistentDataPath + "/data/account/background.pic");
             isLoginBySession = false;
             sessionToWrite = "";
         }
@@ -216,6 +242,7 @@ namespace Multiplayer.Accounts
             {
                 if (!isLoginBySession)
                 {
+                    Debug.Log(" << OnLogInResult");
                     signUI.OnLogInResult(op);
                 }
                 if (op.Type == OperationMessage.OperationType.Success)

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameNet;
 using InGame.Helpers;
 using Notifications;
@@ -16,6 +14,8 @@ namespace Multiplayer.Notification
         public Transform content;
         public GameObject window;
 
+        public GameObject noNotificationsText;
+
         public Image iconImage;
         public Color defaultIconColor, activeIconColor;
         public GameObject countGo;
@@ -24,12 +24,22 @@ namespace Multiplayer.Notification
 
         public void Awake()
         {
-            NetCore.Configurators += () =>
+            /*NetCore.Configurators += () =>
             {
-                NetCore.OnLogIn += () =>
-                {
-                    RefreshIcon();
-                };
+                
+            };*/
+            /*ShowNotification(new NotificationInfo()
+            {
+                RequesterNick = "REDIZIT",
+                TargetNick = "Tester!",
+                Type = NotificationType.FriendInviteAccept
+            });*/
+        }
+        public void Configuration()
+        {
+            NetCore.OnLogIn += () =>
+            {
+                RefreshIcon();
             };
         }
         
@@ -44,7 +54,10 @@ namespace Multiplayer.Notification
         public void OnShowAllBtnClick()
         {
             if (NetCorePayload.CurrentAccount == null) return;
+
             window.SetActive(true);
+            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+
             HelperUI.FillContent<NotificationUIItem, NotificationInfo>(content,
                 NetCorePayload.CurrentAccount.Notifications,
                 (uiItem, info) =>
@@ -65,10 +78,6 @@ namespace Multiplayer.Notification
             countText.text = NetCorePayload.CurrentAccount.Notifications.Count + "";
         }
         
-        
-        
-        
-        
 
         public void Hide()
         {
@@ -78,11 +87,31 @@ namespace Multiplayer.Notification
         public void Accept(NotificationInfo not)
         {
             NetCore.ServerActions.Notifications.Accept(NetCorePayload.CurrentAccount.Nick, not.Id);
+
+            NetCorePayload.CurrentAccount.Notifications.Remove(not);
+            RefreshIcon();
+            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            Hide();
         }
 
         public void Reject(NotificationInfo not)
         {
             NetCore.ServerActions.Notifications.Reject(NetCorePayload.CurrentAccount.Nick, not.Id);
+
+            NetCorePayload.CurrentAccount.Notifications.Remove(not);
+            RefreshIcon();
+            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            Hide();
+        }
+
+        public void Ok(NotificationInfo not)
+        {
+            NetCore.ServerActions.Notifications.Ok(NetCorePayload.CurrentAccount.Nick, not.Id);
+
+            NetCorePayload.CurrentAccount.Notifications.Remove(not);
+            RefreshIcon();
+            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            Hide();
         }
     }
 }

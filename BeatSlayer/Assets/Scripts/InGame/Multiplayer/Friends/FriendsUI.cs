@@ -28,34 +28,40 @@ public class FriendsUI : MonoBehaviour
 
     private void Awake()
     {
-        NetCore.Configurators += () =>
+        /*NetCore.Configurators += () =>
         {
-            NetCore.Subs.Friends_OnGetFriends += list =>
-            {
-                NetCorePayload.CurrentAccount.Friends = list;
-                ShowList(list, true);
-            };
-            NetCore.Subs.Accounts_OnSearch += list =>
-            {
-                ShowList(list, false);
-            };
             
-            NetCore.OnLogIn += () =>
-            {
-                if (NetCorePayload.CurrentAccount != null)
-                {
-                    NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
-                }
-            };
+        };*/
+    }
+    public void Configuration()
+    {
+        NetCore.Subs.Friends_OnGetFriends += list =>
+        {
+            NetCorePayload.CurrentAccount.Friends = list;
+            ShowList(list, true);
+        };
+        NetCore.Subs.Accounts_OnSearch += list =>
+        {
+            ShowList(list, false);
+        };
 
-            NetCore.Subs.Notification_OnSend += info =>
+        NetCore.OnLogIn += () =>
+        {
+            if (NetCorePayload.CurrentAccount != null)
             {
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    Debug.Log(JsonConvert.SerializeObject(info));
-                    notificationUI.ShowNotification(info);  
-                });
-            };
+                NetCore.ServerActions.Friends.GetFriends(NetCorePayload.CurrentAccount.Nick);
+            }
+        };
+
+        NetCore.Subs.Notification_OnSend += info =>
+        {
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                Debug.Log(JsonConvert.SerializeObject(info));
+                NetCorePayload.CurrentAccount.Notifications.Add(info);
+                notificationUI.ShowNotification(info);
+                notificationUI.RefreshIcon();
+            });
         };
     }
 

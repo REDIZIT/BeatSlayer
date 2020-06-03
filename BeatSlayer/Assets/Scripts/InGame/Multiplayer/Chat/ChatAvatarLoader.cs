@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using GameNet;
-using Microsoft.AspNetCore.SignalR.Client;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;

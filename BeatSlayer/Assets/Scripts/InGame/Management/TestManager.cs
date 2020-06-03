@@ -17,7 +17,7 @@ namespace Testing
         {
             get
             {
-#if UNITY_ANDROID
+#if !UNITY_EDITOR
                 return new DirectoryInfo(Application.persistentDataPath).Parent.Parent + "/com.REDIZIT.BeatSlayerEditor/files";
 #else
                 return new DirectoryInfo(Application.persistentDataPath).Parent + "/Beat Slayer Editor";
@@ -77,6 +77,7 @@ namespace Testing
                 }
                 
                 menu.beatmapUI.OpenModeration(request, proj);
+                DeleteRequest();
             }
         }
 

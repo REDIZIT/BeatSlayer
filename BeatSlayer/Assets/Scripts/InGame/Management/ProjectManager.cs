@@ -102,6 +102,16 @@ namespace ProjectManagement
                 LoadingData.aclip = www.GetAudioClip();
             }
         }
+        public static IEnumerator LoadAudioCoroutine(string path, Action<AudioClip> callback)
+        {
+            // Must work in unity main thread!
+            using (WWW www = new WWW("file:///" + path))
+            {
+                yield return www;
+                Debug.Log("Clip loaded");
+                callback(www.GetAudioClip());
+            }
+        }
         
         
         
@@ -164,6 +174,22 @@ namespace ProjectManagement
             return "";
         }
         
+        public static string GetRealPath(string pathWithoutExtension, params string[] extensions)
+        {
+            foreach (var ext in extensions)
+            {
+                string extension = ext;
+                if (!extension.Contains(".")) extension = "." + extension;
+
+                string path = pathWithoutExtension + extension;
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+
+            return "";
+        }
     }
 
     

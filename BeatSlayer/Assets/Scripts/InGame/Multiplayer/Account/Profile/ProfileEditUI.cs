@@ -4,7 +4,6 @@ using System.IO;
 using Assets.SimpleLocalization;
 using GameNet;
 using InGame.Helpers;
-using Microsoft.AspNetCore.SignalR.Client;
 using Multiplayer.Accounts;
 using ProjectManagement;
 using UnityEngine;

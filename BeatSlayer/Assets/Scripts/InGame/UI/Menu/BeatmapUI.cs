@@ -24,6 +24,7 @@ public class BeatmapUI : MonoBehaviour
 {
     public DatabaseScript database;
     public MenuScript_v2 menu;
+    public MenuAudioManager menuAudioManager;
     //public BeatmapAudio bmAudio;
     
     public GameObject overlay;
@@ -89,6 +90,10 @@ public class BeatmapUI : MonoBehaviour
         }
 
         if(!async) RefreshBeatmapsList(mapInfos);
+
+
+        Debug.Log("Open");
+        menuAudioManager.OnMapSelected(listItem.groupInfo);
     }
     public void Open(GroupInfoExtended group)
     {
@@ -101,7 +106,6 @@ public class BeatmapUI : MonoBehaviour
         {
             new CoverRequestPackage(coverImage, group.author + "-" + group.name, priority: true)
         });
-        //coverImage.texture = group.texture;
 
 
         // Refresh list of player's maps
@@ -125,7 +129,7 @@ public class BeatmapUI : MonoBehaviour
     public void OpenModeration(TestRequest request, Project proj)
     {
         overlay.SetActive(true);
-        GetComponent<StateMachine>().ChangeState("TracksScreen");
+        //GetComponent<StateMachine>().ChangeState("TracksScreen");
         ResetUI();
         ShowAlert("Moderation");
 

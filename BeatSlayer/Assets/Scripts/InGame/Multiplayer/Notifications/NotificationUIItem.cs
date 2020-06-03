@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.SimpleLocalization;
 using Notifications;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,8 @@ namespace Multiplayer.Notification
 
         public bool deleteAfterClick = false;
 
+        Func<string, string> Local = LocalizationManager.Localize;
+
 
         private void Awake()
         {
@@ -31,44 +34,62 @@ namespace Multiplayer.Notification
             this.notification = notification;
             this.deleteAfterClick = deleteAfterClick;
 
-            string header;
-            string body;
 
-            if (notification.Type == Notifications.NotificationType.FriendInvite)
+            HandleType();
+        }
+
+        public void HandleType()
+        {
+            string header = "";
+            string body = "";
+            bool btn_add = false, btn_decline = false, btn_later = false, btn_ok = false;
+
+
+
+            switch (notification.Type)
             {
-                header = "Заявка в друзья";
-                body = $"<color=#f40>{notification.RequesterNick}</color> хочет добавить тебя в друзья";
+                case NotificationType.FriendInvite:
+                    header = Local("FriendInvite");
+                    body = string.Format(Local("FriendInviteBody"), notification.RequesterNick);
+                    btn_add = true;
+                    btn_decline = true;
+                    btn_later = true;
+                    break;
+                case NotificationType.FriendInviteAccept:
+                    header = Local("FriendInviteAccept");
+                    body = string.Format(Local("FriendInviteAcceptBody"), notification.RequesterNick);
+                    btn_ok = true;
+                    break;
+                case NotificationType.FriendInviteReject:
+                    header = Local("FriendInviteReject");
+                    body = string.Format(Local("FriendInviteRejectBody"), notification.RequesterNick);
+                    btn_ok = true;
+                    break;
+                case NotificationType.MapModeration:
+                    header = "Карта рассмотрена";
+                    body = "[ No body ]";
+                    btn_ok = true;
+                    break;
+                default:
+                    Debug.LogError("Notification switch error for " + notification.Type.ToString());
+                    break;
             }
-            else
-            {
-                header = "Карта рассмотрена";
-                body = "[ No body ]";
-            }
-                    
+
+
+
+
+
             headerText.text = header;
             bodyText.text = body;
 
-
-            bool btn_add = false, btn_decline = false, btn_later = false, btn_ok = false;
-
-            if (notification.Type == NotificationType.FriendInvite)
-            {
-                btn_add = true;
-                btn_decline = true;
-                btn_later = true;
-            }
-            else if (notification.Type == NotificationType.MapModeration)
-            {
-                btn_ok = true;
-            }
-            
             addBtn.SetActive(btn_add);
             declineBtn.SetActive(btn_decline);
             laterBtn.SetActive(!deleteAfterClick && btn_later);
             okBtn.SetActive(btn_ok);
 
-            //FitWindowSize();
         }
+
+
 
 
         public void OnLaterBtnClick()
@@ -89,6 +110,11 @@ namespace Multiplayer.Notification
             if(deleteAfterClick) Destroy(gameObject);
         }
         
+        public void OnOkBtnClick()
+        {
+            ui.Ok(notification);
+            if (deleteAfterClick) Destroy(gameObject);
+        }
         
         
 

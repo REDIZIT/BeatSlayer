@@ -8,6 +8,8 @@ public class SettingsManager : MonoBehaviour
     public CustomSlider cubesSpeedSlider, musicSpeedSlider;
     public CustomToggle noArrowsToggle, noLinesToggle;
 
+    public MenuAudioManager menuAudioManager;
+
     public AudioSource asource;
 
     public bool RequestSettingBool(string key)
@@ -57,13 +59,11 @@ public class SettingsManager : MonoBehaviour
 
     public void OnMusicSwitch(Toggle toggle)
     {
-        Debug.Log("on? " + toggle.isOn);
-        if (toggle.isOn) asource.GetComponent<MenuScript_v2>().spectrumVisualizer.Init();
-        else asource.GetComponent<MenuScript_v2>().spectrumVisualizer.Stop();
+        if (toggle.isOn) menuAudioManager.OnSetOn();
+        else menuAudioManager.OnSetOff();
     }
     public void OnMusicVolumeChange(Slider slider)
     {
-        Debug.Log("slider: " + slider.value);
         asource.volume = slider.value * 0.2f;
     }
 }

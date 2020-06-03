@@ -39,7 +39,13 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Start()
     {
-        NetCore.Configurators += () =>
+        /*NetCore.Configurators += () =>
+        {
+            
+        };
+        */
+
+        NetCore.Configure(() =>
         {
             NetCore.OnFullReady += () =>
             {
@@ -53,8 +59,13 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
             // Subscribe/Resubscribe all
             NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
-        };
-        NetCore.Configure();
+
+            accountUI.Configuration();
+            chatUI.Configuration();
+            friendsUI.Configuration();
+            notificationUI.Configuration();
+            menu.Configuration();
+        });
 
 
         Debug.Log("Url is " + NetCore.Url_Hub);

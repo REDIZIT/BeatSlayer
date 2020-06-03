@@ -29,13 +29,15 @@ public class ShopHelper : MonoBehaviour
 
     private void Start()
     {
+        content = skillsScrollView.GetChild(0).GetChild(0);
+        skills = menuscript.prefsManager.prefs.skills;
+        boosters = menuscript.prefsManager.prefs.boosters;
+        UpdateSkillsView();
         NetCore.OnLogIn += () =>
         {
-            content = skillsScrollView.GetChild(0).GetChild(0);
-            skills = menuscript.prefsManager.prefs.skills;
-            boosters = menuscript.prefsManager.prefs.boosters;
+            
 
-            UpdateSkillsView();
+            
         };
     }
 
@@ -158,7 +160,7 @@ public class ShopHelper : MonoBehaviour
         item.GetChild(0).GetComponent<Image>().sprite = sprite;
         item.GetChild(1).GetComponent<Text>().text = LocalizationManager.Localize(header);
         item.GetChild(2).GetComponent<Text>().text = LocalizationManager.Localize(description);
-        item.GetChild(3).GetComponent<Button>().interactable = NetCorePayload.CurrentAccount.Coins >= cost;
+        item.GetChild(3).GetComponent<Button>().interactable = NetCorePayload.CurrentAccount == null ? false : NetCorePayload.CurrentAccount.Coins >= cost;
         string youhave = LocalizationManager.Localize("YouHave");
         string costStr = LocalizationManager.Localize("Cost");
         item.GetChild(4).GetComponent<Text>().text = youhave + ": " + count + "\n" + costStr + ": " + cost;

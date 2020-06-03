@@ -7,7 +7,6 @@ using Assets.SimpleLocalization;
 using GameNet;
 using UnityEngine;
 using InGame.Helpers;
-using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using ProjectManagement;
 using UnityEngine.UI;
@@ -35,34 +34,34 @@ namespace Multiplayer.Chat
         public Transform groupContent;
 
         
-        private void Awake()
+        public void Configuration()
         {
-            NetCore.Configurators += () =>
+            /*NetCore.Configurators += () =>
             {
-                Debug.Log(" > Configure ChatUI");
-                NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
-                NetCore.Subs.OnJoinGroup += OnJoinGroup;
-                NetCore.Subs.OnGetGroups += OnGetGroups;
-                NetCore.OnFullReady += () =>
-                {
-                    if (NetCorePayload.CurrentAccount != null)
-                    {
-                        Debug.Log("NetCore.ServerActions.Chat.GetGroups();");
-                        NetCore.ServerActions.Chat.GetGroups();
-                    }
-                };
-                NetCore.OnLogIn += () =>
-                {
-                    Debug.Log(" >>> ChatUI.GetGroups");
-                    NetCore.ServerActions.Chat.GetGroups();
-                };
-                NetCore.Subs.OnOnlineChange += (int online) =>
-                {
-                    onlineText.text = LocalizationManager.Localize("Online") + ": " + online;
-                };
                 
-                avatarLoader.Configure();
+            };*/
+            NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
+            NetCore.Subs.OnJoinGroup += OnJoinGroup;
+            NetCore.Subs.OnGetGroups += OnGetGroups;
+            NetCore.OnFullReady += () =>
+            {
+                if (NetCorePayload.CurrentAccount != null)
+                {
+                    Debug.Log("NetCore.ServerActions.Chat.GetGroups();");
+                    NetCore.ServerActions.Chat.GetGroups();
+                }
             };
+            NetCore.OnLogIn += () =>
+            {
+                Debug.Log(" >>> ChatUI.GetGroups");
+                NetCore.ServerActions.Chat.GetGroups();
+            };
+            NetCore.Subs.OnOnlineChange += (int online) =>
+            {
+                onlineText.text = LocalizationManager.Localize("Online") + ": " + online;
+            };
+
+            avatarLoader.Configure();
         }
 
         private void Start()

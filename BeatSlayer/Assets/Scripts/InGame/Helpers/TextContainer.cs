@@ -37,6 +37,7 @@ public class TextContainer : MonoBehaviour
     public bool extendHorizont, extendVertical;
 
     public Vector2 padding;
+    public Vector2 minSize;
 
     private Vector2 defaultRect;
 
@@ -80,6 +81,9 @@ public class TextContainer : MonoBehaviour
         {
             float width = extendHorizont ? text.preferredWidth + padding.x * 2 : Rect.sizeDelta.x;
             float height = extendVertical ? text.preferredHeight + padding.y * 2 : Rect.sizeDelta.y;
+
+            if (width < minSize.x) width = minSize.x;
+            if (height < minSize.y) height = minSize.y;
 
             if (width > maxWidth) maxWidth = width;
             if (height > maxHeight) maxHeight = height;

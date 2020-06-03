@@ -4,17 +4,19 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
+using Debug = UnityEngine.Debug;
+using System.Diagnostics;
 
 public class SpectrumVisualizer : MonoBehaviour
 {
     public AudioSource aSource;
     public RectTransform[] bars;
 
-    public float bpm;
-    float timeFromBeat;
+    public RawImage bgVideo;
+    public Color defaultColor;
+    public float bgWhiteEffect;
 
-    public Text musicSourceText;
+    public float avgTime;
 
     public bool isInited;
 
@@ -32,7 +34,7 @@ public class SpectrumVisualizer : MonoBehaviour
 
     public void Start()
     {
-        if (SSytem.instance.GetBool("MenuMusic"))
+        /*if (SSytem.instance.GetBool("MenuMusic"))
         {
             if(!isInited)
             {
@@ -46,7 +48,7 @@ public class SpectrumVisualizer : MonoBehaviour
         else
         {
             Stop();
-        }
+        }*/
     }
 
     public void Init()
@@ -55,32 +57,6 @@ public class SpectrumVisualizer : MonoBehaviour
     }
     public IEnumerator IEInit()
     {
-        //string[] maps = Directory.GetDirectories(Application.persistentDataPath + "/maps");
-
-        //if (maps.Length == 0) yield break;
-
-        //string mapPath = maps[UnityEngine.Random.Range(0, maps.Length - 1)];
-        //string nickPath = Directory.GetDirectories(mapPath)[0];
-        //string audioPath = nickPath + "/" + new DirectoryInfo(mapPath).Name + ".mp3";
-        //if (!File.Exists(audioPath)) audioPath = nickPath + "/" + new DirectoryInfo(mapPath).Name + ".ogg";
-
-        //musicSourceText.text = $"♪   {new DirectoryInfo(mapPath).Name}   ♪";
-
-        //DateTime t1 = DateTime.Now;
-        //Debug.Log("Loading " + audioPath);
-        //using (WWW w = new WWW("file:///" + audioPath))
-        //{
-        //    yield return w;
-        //    DateTime t2 = DateTime.Now;
-        //    aSource.clip = w.GetAudioClip();
-        //    DateTime t3 = DateTime.Now;
-        //    Debug.Log("Clip load time: " + (t3 - t2).TotalMilliseconds);
-        //}
-
-
-        //Debug.Log("File load time: " + (DateTime.Now - t1).TotalMilliseconds);
-
-
         float rectWidth = GetComponent<RectTransform>().sizeDelta.x;
         float spacing = rectWidth / 64f;
 
@@ -97,9 +73,6 @@ public class SpectrumVisualizer : MonoBehaviour
         transform.GetChild(0).gameObject.SetActive(false);
 
         isInited = true;
-
-        aSource.Play();
-
         yield return new WaitForEndOfFrame();
     }
 
@@ -110,10 +83,6 @@ public class SpectrumVisualizer : MonoBehaviour
         transform.GetChild(0).gameObject.SetActive(false);
 
         isInited = false;
-
-        aSource.Stop();
-
-        musicSourceText.text = "";
     }
 
 
@@ -122,14 +91,23 @@ public class SpectrumVisualizer : MonoBehaviour
         if (!isInited) return;
 
         float[] data = new float[64];
+
+       // Stopwatch w = new Stopwatch();
+        //w.Start();
+
+        //aSource.GetSpectrumData(data, 0, FFTWindow.BlackmanHarris);
         aSource.GetSpectrumData(data, 0, FFTWindow.Hamming);
 
+       
+
+        float volume = 0;
         for (int i = 0; i < bars.Length; i++)
         {
             float height = data[i] * multiplier + (data[i] * i * normalizePower);
+            volume += height;
 
 
-            if(height > heights[i])
+            if (height > heights[i])
             {
                 decrease[i] = decreaseStart;
                 heights[i] = height;
@@ -147,21 +125,18 @@ public class SpectrumVisualizer : MonoBehaviour
         }
 
 
-        //float beatsPerSecond = bpm / 60f;
-        //float minScale = 0.8f;
-        //float maxScale = 1;
+        //w.Stop();
+        //Debug.Log(w.ElapsedMilliseconds);
+        //avgTime = w.ElapsedMilliseconds;
 
-        //timeFromBeat += Time.deltaTime;
+        AnimateBackground(volume);
+    }
+    
 
-        //if(timeFromBeat >= 60f / bpm)
-        //{
-        //    transform.localScale = Vector3.one;
-        //    timeFromBeat = 0;
-        //}
-        //else
-        //{
-        //    transform.localScale -= Vector3.one * Time.deltaTime * 0.2f;
-        //}
-        
+    void AnimateBackground(float v)
+    {
+        float volume = v * bgWhiteEffect;
+        Color clr = defaultColor + Color.white * volume * volume;
+        bgVideo.color = clr;
     }
 }

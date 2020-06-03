@@ -2,12 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using BeatSlayerServer.Multiplayer.Accounts;
 using Microsoft.AspNetCore.SignalR.Client;
-using Newtonsoft.Json;
 using Notifications;
 using Ranking;
 using UnityEngine;
@@ -15,10 +13,14 @@ using UnityEngine.SceneManagement;
 
 namespace GameNet
 {
+    /// <summary>
+    /// This class is controlling SignalR connection and messaging between server and client
+    /// </summary>
     public static class NetCore
     {
         static HubConnection conn;
         public static HubConnectionState State => conn.State;
+        //public static ConnectionState State => conn.State;
         public static Subscriptions Subs { get; private set; }
         public static Invokes Actions { get; private set; }
 
@@ -67,19 +69,16 @@ namespace GameNet
             {
                 Debug.Log("OnSceneChanged");
                 //NetCore.Configurators = null;
-                //Debug.Log("activeSceneChanged");
                 //if(Time.realtimeSinceStartup > 5) OnSceneLoad(); 
             };
             Application.quitting += () =>
             {
+                //conn?.Stop();
                 conn?.StopAsync();
                 TryReconnect = false;
             };
             
             TryReconnect = true;
-            
-            //OnSceneLoad();
-            
         }
 
         
@@ -103,6 +102,24 @@ namespace GameNet
                 Debug.Log(" > Configure() in unity thread");
                 Configurators.Invoke();
                 
+                OnFullReady?.Invoke();
+            });
+        }
+        public static void Configure(Action config)
+        {
+            Subs = new Subscriptions();
+            OnFullReady = null;
+            OnConnect = null;
+            OnDisconnect = null;
+            OnReconnect = null;
+
+            OnSceneLoad();
+
+            Debug.Log(" > Configure()");
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                config();
+
                 OnFullReady?.Invoke();
             });
         }
@@ -151,9 +168,12 @@ namespace GameNet
         // (Internal usage)
         static async void Connect()
         {
+            Debug.Log("> Connect");
             try
             {
+                //await conn.Start();
                 await conn.StartAsync();
+                Debug.Log(" << Connection ends");
                 if (conn.State == HubConnectionState.Connected)
                 {
                     OnConnect?.Invoke();
@@ -182,10 +202,12 @@ namespace GameNet
             
         }
 
-        static async void Reconnect()
+        static async void Reconnect(bool force = false)
         {
             if (!TryReconnect) return;
-            await Task.Delay(3000);
+            
+            if(!force) await Task.Delay(3000);
+
             ReconnectAttempt++;
             Debug.Log("Try to reconnect. Attempt " + ReconnectAttempt);
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
@@ -198,16 +220,20 @@ namespace GameNet
         // (Internal usage)
         static void BuildConnection()
         {
+            Debug.Log("> Create HubConnection with " + Url_Hub);
+            //conn = new HubConnection(Url_Hub);
             conn = new HubConnectionBuilder()
                 .WithUrl(new Uri(Url_Hub))
                 .Build();
+
+            var b = new HubConnectionBuilder();
             
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed due to " + err.Message);
                 OnDisconnect?.Invoke();
                 BuildConnection();
-                Reconnect();
+                Reconnect(true);
                 return null;
             });
         }
@@ -217,6 +243,7 @@ namespace GameNet
         // (Internal usage)
         static void SubcribeOnServerCalls()
         {
+            Debug.Log("> Sub on server calls");
             Subs = new Subscriptions();
            
 
@@ -239,7 +266,7 @@ namespace GameNet
 
         static void SubcribeOnClientInvokes()
         {
-            Actions = new Invokes();
+            /*Actions = new Invokes();
 
             
             //MethodInfo mi = Actions.GetType().GetMethod("Invoke");
@@ -263,7 +290,7 @@ namespace GameNet
                 
                 info.SetValue(Actions, act);
                 
-                /*conn.On(field.Name, t.GenericTypeArguments, (objects =>
+                conn.On(field.Name, t.GenericTypeArguments, (objects =>
                 {
                     FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
                     object yourfield = info.GetValue(Subs);
@@ -272,10 +299,10 @@ namespace GameNet
                     method.Invoke(yourfield, objects);
 
                     return null;
-                }));*/
+                }));
             }
 
-            Actions.Log("Suka but no blyat");
+            Actions.Log("Suka but no blyat");*/
         }
         //static void DoInvoke(MethodInfo)
         static void SuperVoid(string name, params object[] objs)
@@ -283,24 +310,25 @@ namespace GameNet
             Debug.Log("> Invoke " + name);
         }
 
-        
-        
-        
+
+
+
         #endregion
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
         // This class contains implementation of server-side methods
         // (Piece of 90 lines of code ._.) 
+        // Блять, вот как убрать этот пиздец?
         // (External usage)
         public static class ServerActions
         {
             public static void Test() => NetCore.conn.InvokeAsync("Test");
-            public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group) 
-                => NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
+            public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group)
+               =>  NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 
             public static void UpdateInGameTime()
             {
@@ -322,76 +350,57 @@ namespace GameNet
                     
                 
                 
-                public static void SignUp(string nick, string password, string country, string email) =>
-                    NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
-                
-                public static void Search(string nick) =>
-                    NetCore.conn.InvokeAsync("Accounts_Search", nick);
-                public static void View(string nick) =>
-                    NetCore.conn.InvokeAsync("Accounts_View", nick);
+                public static void SignUp(string nick, string password, string country, string email) =>NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
+
+                public static void Search(string nick) =>NetCore.conn.InvokeAsync("Accounts_Search", nick);
+                public static void View(string nick) =>NetCore.conn.InvokeAsync("Accounts_View", nick);
 
 
 
 
-                public static void GetAvatar(string nick) => 
-                    conn.InvokeAsync("Accounts_GetAvatar", nick);
+                public static void GetAvatar(string nick) => conn.InvokeAsync("Accounts_GetAvatar", nick);
 
-                public static void ChangePassword(string nick, string oldpass, string newpass) =>
-                    conn.InvokeAsync("Accounts_ChangePassword", nick, oldpass, newpass);
-                public static void Restore(string nick, string password) =>
-                    conn.InvokeAsync("Accounts_Restore", nick, password);
-                public static void ConfirmRestore(string code) => 
-                    conn.InvokeAsync("Accounts_ConfirmRestore", code);
-                
-                
-                public static void ChangeEmptyEmail(string nick, string email) =>
-                    conn.InvokeAsync("Accounts_ChangeEmptyEmail", nick, email);
-                
-                public static void ChangeEmail(string nick, string email) =>
-                    conn.InvokeAsync("Accounts_ChangeEmail", nick, email);
+                public static void ChangePassword(string nick, string oldpass, string newpass) =>conn.InvokeAsync("Accounts_ChangePassword", nick, oldpass, newpass);
+                public static void Restore(string nick, string password) =>conn.InvokeAsync("Accounts_Restore", nick, password);
+                public static void ConfirmRestore(string code) => conn.InvokeAsync("Accounts_ConfirmRestore", code);
 
-                public static void SendChangeEmailCode(string nick, string email) =>
-                    conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
-                
-                public static void SendReplay(string json) =>
-                    conn.InvokeAsync("Accounts_SendReplay", json);
 
-                public static void GetBestReplay(string nick, string trackname, string creatornick) =>
-                    conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+                public static void ChangeEmptyEmail(string nick, string email) =>conn.InvokeAsync("Accounts_ChangeEmptyEmail", nick, email);
 
-                public static void GetBestReplays(string nick, int count) =>
-                    conn.InvokeAsync("Accounts_GetBestReplays", nick, count);
+                public static void ChangeEmail(string nick, string email) =>conn.InvokeAsync("Accounts_ChangeEmail", nick, email);
+
+                public static void SendChangeEmailCode(string nick, string email) =>conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
+
+                public static void SendReplay(string json)  => conn.InvokeAsync("Accounts_SendReplay", json);
+
+                public static void GetBestReplay(string nick, string trackname, string creatornick) =>conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+
+                public static void GetBestReplays(string nick, int count) => conn.InvokeAsync("Accounts_GetBestReplays", nick, count);
             }
 
             public static class Friends
             {
-                public static void GetFriends(string nick) =>
-                    conn.InvokeAsync("Friends_GetFriends", nick);
+                public static void GetFriends(string nick) =>conn.InvokeAsync("Friends_GetFriends", nick);
                 
-                public static void InviteFriend(string addNick, string nick) =>
-                    conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
+                public static void InviteFriend(string addNick, string nick) =>conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
                 
-                public static void RemoveFriend(string fromNick, string nick) =>
-                    conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
+                public static void RemoveFriend(string fromNick, string nick) =>conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
             }
 
             public static class Notifications
             {
-                public static void Accept(string nick, int id) =>
-                    conn.InvokeAsync("Friends_AcceptInvite", nick, id);
+                public static void Accept(string nick, int id) => conn.InvokeAsync("Friends_AcceptInvite", nick, id);
                 
-                public static void Reject(string nick, int id) =>
-                    conn.InvokeAsync("Friends_RejectInvite", nick, id);
+                public static void Reject(string nick, int id) => conn.InvokeAsync("Friends_RejectInvite", nick, id);
+                public static void Ok(string nick, int id) => conn.InvokeAsync("Notification_Ok", nick, id);
             }
             
             
             public static class Shop
             {
-                public static void SendCoins(string nick, int coins) =>
-                    conn.InvokeAsync("Shop_SendCoins", nick, coins);
+                public static void SendCoins(string nick, int coins) =>conn.InvokeAsync("Shop_SendCoins", nick, coins);
 
-                public static void SyncCoins(string nick, int coins) =>
-                    conn.InvokeAsync("Shop_SyncCoins", nick, coins);
+                public static void SyncCoins(string nick, int coins) => conn.InvokeAsync("Shop_SyncCoins", nick, coins);
             }
             public static class Chat
             {

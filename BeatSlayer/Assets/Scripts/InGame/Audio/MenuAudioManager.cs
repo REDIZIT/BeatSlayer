@@ -1,0 +1,104 @@
+﻿using ProjectManagement;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class MenuAudioManager : MonoBehaviour
+{
+    public AudioSource asource;
+    public AdvancedSaveManager saveManager;
+
+    public SpectrumVisualizer spectrum;
+    public Text audioText;
+
+    
+
+    // == Settings ========
+    bool ThemeSongEnabled;
+    float Volume;
+
+    private void Start()
+    {
+        OnSceneLoaded();
+    }
+
+
+
+
+    public void OnSceneLoaded()
+    {
+        ThemeSongEnabled = SSytem.instance.GetBool("MenuMusic");
+        asource.volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
+
+        if (ThemeSongEnabled)
+        {
+            asource.Play();
+            SetAudioText(asource.clip.name);
+            spectrum.Init();
+        }
+    }
+
+    // Invoked when player select group.
+    public void OnMapSelected(GroupInfoExtended group)
+    {
+        return;
+        StartCoroutine(IEOnMapSelected(group));
+    }
+    IEnumerator IEOnMapSelected(GroupInfoExtended group)
+    {
+        string trackname = group.author + "-" + group.name;
+        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+
+        if (!Directory.Exists(groupFolder)) yield break;
+
+        string mapFolder = Directory.GetDirectories(groupFolder)[0];
+
+
+
+        string unknownAudioPath = mapFolder + "/" + trackname;
+        string audioFilePath = ProjectManager.GetRealPath(unknownAudioPath, ".mp3", ".ogg");
+
+        if (audioFilePath == "") yield break;
+
+
+
+        AudioClip clip = null;
+        yield return ProjectManager.LoadAudioCoroutine(audioFilePath, (c) => clip = c);
+
+        if (clip == null) yield break;
+
+
+
+        asource.clip = clip;
+        asource.Play();
+        asource.time = 30;
+        SetAudioText(trackname.Replace("-", " - "));
+    }
+
+
+    // Invoked when player set checkmark in settings
+    public void OnSetOn()
+    {
+        spectrum.Init();
+        asource.Play();
+        SetAudioText(asource.clip.name);
+    }
+    public void OnSetOff()
+    {
+        spectrum.Stop();
+        asource.Stop();
+        SetAudioText("");
+    }
+
+
+
+
+
+    void SetAudioText(string content)
+    {
+        if (content == "") audioText.text = "";
+        else audioText.text = $"♪    {content}    ♪";
+    }
+}

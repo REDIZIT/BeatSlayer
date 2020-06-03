@@ -35,11 +35,6 @@ public class MenuScript_v2 : MonoBehaviour
     public AccountManager accountManager;
     public TutorialManager tutorialManager;
 
-
-    public SpectrumVisualizer spectrumVisualizer;
-    public AudioSource secondAudioSource;
-
-
     public GameObject debugConsole;
     public GameObject[] screens;
 
@@ -75,20 +70,19 @@ public class MenuScript_v2 : MonoBehaviour
         English, Russian, French
     }
 
-    public AudioSource aSource;
-
-
-
-
+    public void Configuration()
+    {
+        NetCore.OnLogIn += () =>
+        {
+            RefreshCoinsTexts();
+        };
+    }
     public void Awake()
     {
-        NetCore.Configurators += () =>
+       /* NetCore.Configurators += () =>
         {
-            NetCore.OnLogIn += () =>
-            {
-                RefreshCoinsTexts();
-            };
-        };
+            
+        };*/
 
         Application.targetFrameRate = 60;
         if(Time.timeScale != 1)
@@ -206,11 +200,8 @@ public class MenuScript_v2 : MonoBehaviour
 
         //playCustomBtn.SetActive(SSytem.instance.GetInt("EnableFileLoad") == 1);
 
-        GetComponent<AudioSource>().volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
-
         //GetComponent<MenuSpectrum>().useMenuMusic = SSytem.instance.GetBool("MenuMusic");
         //GetComponent<MenuSpectrum>().useKickVideo = SSytem.instance.GetBool("KickVideo");
-        //spectrumVisualizer.Start();
     }
 
 
