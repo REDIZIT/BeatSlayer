@@ -623,7 +623,7 @@ public class AccountManager : MonoBehaviour
     
     public static void SendReplay(Replay replay, Action<ReplaySendData> callback)
     {
-        replay.player = NetCorePayload.CurrentAccount.Nick;
+        replay.player = Payload.CurrentAccount.Nick;
         string json = JsonConvert.SerializeObject(replay);
 
         NetCore.Subs.Accounts_OnSendReplay += data =>
@@ -715,12 +715,6 @@ public class LegacyAccount
     }
     public double TotalRP { get { return replays.Sum(c => c.RP); } }
     public List<Replay> replays = new List<Replay>();
-}
-public enum AccountRole
-{
-    Player = 0,
-    Developer = 1,
-    Moderator = 2
 }
 public class AccountTrackRecord
 {

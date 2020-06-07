@@ -50,15 +50,15 @@ namespace Multiplayer.Accounts
 
         private void Update()
         {
-            if (wrapper == null || NetCorePayload.CurrentAccount == null) return;
-            NetCorePayload.CurrentAccount.InGameTimeTicks += TimeSpan.FromSeconds(Time.unscaledDeltaTime).Ticks;
+            if (wrapper == null || Payload.CurrentAccount == null) return;
+            Payload.CurrentAccount.InGameTimeTicks += TimeSpan.FromSeconds(Time.unscaledDeltaTime).Ticks;
             if(Time.realtimeSinceStartup - inGameTimeSent > 30) UpdateInGameTime();
         }
 
 
         public void OnProfileBtnClick()
         {
-            if (NetCorePayload.CurrentAccount == null)
+            if (Payload.CurrentAccount == null)
             {
                 signUI.ShowLogIn();
             }
@@ -120,12 +120,16 @@ namespace Multiplayer.Accounts
             File.Delete(path);
             LogIn(nick, password);
         }
-
+        public static bool HasSession(bool old = false)
+        {
+            if(old) return File.Exists(Application.persistentDataPath + "/session.txt");
+            else return File.Exists(Application.persistentDataPath + "/data/account/.session");
+        }
 
 
         public void RefreshSession(string password)
         {
-            sessionToWrite = NetCorePayload.CurrentAccount.Nick + "|" + password;
+            sessionToWrite = Payload.CurrentAccount.Nick + "|" + password;
             DeleteSession();
             CreateSession();
         }
@@ -162,13 +166,13 @@ namespace Multiplayer.Accounts
         public void LogOut()
         {
             DeleteSession();
-            NetCorePayload.CurrentAccount = null;
+            Payload.CurrentAccount = null;
             
         }
 
         public void UpdateInGameTime()
         {
-            if (NetCorePayload.CurrentAccount == null) return;
+            if (Payload.CurrentAccount == null) return;
             float toSend = Time.realtimeSinceStartup - inGameTimeSent;
             inGameTimeSent = Time.realtimeSinceStartup;
 
@@ -198,7 +202,7 @@ namespace Multiplayer.Accounts
 
         public void SaveAvatarToCache(bool force = false)
         {
-            if (NetCorePayload.CurrentAccount== null) return;
+            if (Payload.CurrentAccount== null) return;
             
             string filepath = Application.persistentDataPath + "/data/account/avatar.pic";
             /*if (!force && File.Exists(filepath))
@@ -208,7 +212,7 @@ namespace Multiplayer.Accounts
                 return;
             }
             */
-            Web.WebAPI.GetAvatar(NetCorePayload.CurrentAccount.Nick, bytes =>
+            Web.WebAPI.GetAvatar(Payload.CurrentAccount.Nick, bytes =>
             {
                 profileUI.OnGetAvatar(bytes);
             }, true);
@@ -216,7 +220,7 @@ namespace Multiplayer.Accounts
 
         public void SaveBackgroundToCache(bool force = false)
         {
-            if (NetCorePayload.CurrentAccount== null) return;
+            if (Payload.CurrentAccount== null) return;
             
             string filepath = Application.persistentDataPath + "/data/account/background.pic";
             /*if (!force && File.Exists(filepath))
@@ -226,7 +230,7 @@ namespace Multiplayer.Accounts
                 return;
             }
             */
-            Web.WebAPI.GetBackground(NetCorePayload.CurrentAccount.Nick, bytes =>
+            Web.WebAPI.GetBackground(Payload.CurrentAccount.Nick, bytes =>
             {
                 profileUI.OnGetBackground(bytes);
             }, true);
@@ -247,7 +251,7 @@ namespace Multiplayer.Accounts
                 }
                 if (op.Type == OperationMessage.OperationType.Success)
                 {
-                    NetCorePayload.CurrentAccount = op.Account;
+                    Payload.CurrentAccount = op.Account;
                     CreateSession();
                     SaveAvatarToCache();
                     SaveBackgroundToCache();
@@ -288,15 +292,15 @@ namespace Multiplayer.Accounts
 
         public void SyncCoins()
         {
-            if (NetCorePayload.CurrentAccount == null) return;
+            if (Payload.CurrentAccount == null) return;
 
             int coins = menu.prefsManager.prefs.coins;
 
-            if (NetCorePayload.CurrentAccount.Coins == -1)
+            if (Payload.CurrentAccount.Coins == -1)
             {
-                Debug.Log("Sync coins: " + coins + " / " + NetCorePayload.CurrentAccount.Coins);
-                NetCorePayload.CurrentAccount.Coins = coins;
-                NetCore.ServerActions.Shop.SyncCoins(NetCorePayload.CurrentAccount.Nick, coins);
+                Debug.Log("Sync coins: " + coins + " / " + Payload.CurrentAccount.Coins);
+                Payload.CurrentAccount.Coins = coins;
+                NetCore.ServerActions.Shop.SyncCoins(Payload.CurrentAccount.Nick, coins);
             }
         }
     }

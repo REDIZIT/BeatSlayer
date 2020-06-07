@@ -92,7 +92,8 @@ public class PageController : MonoBehaviour
     public void ShowScrollViewApproved()
     {
         refreshListCallback = ui.RefreshApprovedList;
-        refreshListCallback(-1);
+        //refreshListCallback(-1);
+        refreshListCallback(0);
 
         approvedScrollView.SetActive(true);
         authorScrollView.SetActive(false);
@@ -101,7 +102,8 @@ public class PageController : MonoBehaviour
     public void ShowScrollViewAuthor()
     {
         refreshListCallback = ui.RefreshAllMusicList;
-        refreshListCallback(-1);
+        //refreshListCallback(-1);
+        refreshListCallback(0);
 
         approvedScrollView.SetActive(false);
         authorScrollView.SetActive(true);
@@ -110,7 +112,8 @@ public class PageController : MonoBehaviour
     public void ShowScrollViewDownloaded()
     {
         refreshListCallback = ui.RefreshDownloadedList;
-        refreshListCallback(-1);
+        //refreshListCallback(-1);
+        refreshListCallback(0);
 
         approvedScrollView.SetActive(false);
         authorScrollView.SetActive(false);

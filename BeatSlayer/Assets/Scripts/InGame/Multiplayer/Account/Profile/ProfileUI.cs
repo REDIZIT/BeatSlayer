@@ -53,21 +53,21 @@ namespace Profile
 
         private void Update()
         {
-            if (NetCorePayload.CurrentAccount == null || data == null) return;
-            if (data.Nick == NetCorePayload.CurrentAccount.Nick) inGameText.text = GetTimeString(NetCorePayload.CurrentAccount.InGameTime);
+            if (Payload.CurrentAccount == null || data == null) return;
+            if (data.Nick == Payload.CurrentAccount.Nick) inGameText.text = GetTimeString(Payload.CurrentAccount.InGameTime);
         }
 
         public void OnEditBtnClick()
         {
             editui.Open();
 
-            ShowButtons(false, NetCorePayload.CurrentAccount);
+            ShowButtons(false, Payload.CurrentAccount);
         }
 
         public void OnEndEditBtnClick()
         {
             Open();
-            ShowButtons(true, NetCorePayload.CurrentAccount);
+            ShowButtons(true, Payload.CurrentAccount);
         }
         
         
@@ -80,8 +80,8 @@ namespace Profile
         }
         public void ShowOwnAccount()
         {
-            if (NetCorePayload.CurrentAccount == null) return;
-            ShowAccount(NetCorePayload.CurrentAccount);
+            if (Payload.CurrentAccount == null) return;
+            ShowAccount(Payload.CurrentAccount);
         }
 
         public void ShowAccount(AccountData data)
@@ -104,7 +104,7 @@ namespace Profile
             nickText.text = data.Nick;
             devIcon.SetActive(data.Nick == "REDIZIT");
 
-            bool isOnline = data.Nick == NetCorePayload.CurrentAccount.Nick ? true : data.IsOnline;
+            bool isOnline = data.Nick == Payload.CurrentAccount.Nick ? true : data.IsOnline;
             onlineCircle.SetActive(isOnline);
             onlineText.text = isOnline
                 ? LocalizationManager.Localize("Online")
@@ -151,7 +151,7 @@ namespace Profile
         public void OnRemoveFriendBtnClick()
         {
             //NetCore.ServerActions.Friends.RemoveFriend(data.Nick, NetCorePayload.CurrentAccount.Nick);
-            NetCorePayload.CurrentAccount.Friends.RemoveAll(c => c.Nick == data.Nick);
+            Payload.CurrentAccount.Friends.RemoveAll(c => c.Nick == data.Nick);
             friendsUI.RemoveFriend(data.Nick);
             ShowButtons(true, data);
         }
@@ -178,12 +178,12 @@ namespace Profile
 
         void ShowButtons(bool isViewPage, AccountData data)
         {
-            bool isOwnAccount = NetCorePayload.CurrentAccount != null && NetCorePayload.CurrentAccount.Nick == data.Nick;
+            bool isOwnAccount = Payload.CurrentAccount != null && Payload.CurrentAccount.Nick == data.Nick;
 
             if (isViewPage)
             {
-                bool isFriend = NetCorePayload.CurrentAccount != null
-                                && NetCorePayload.CurrentAccount.Friends.Any(c => c.Nick == data.Nick);
+                bool isFriend = Payload.CurrentAccount != null
+                                && Payload.CurrentAccount.Friends.Any(c => c.Nick == data.Nick);
                 
                 writeBtn.gameObject.SetActive(!isOwnAccount);
                 addFriendBtn.gameObject.SetActive(!isOwnAccount && !isFriend);

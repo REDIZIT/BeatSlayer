@@ -53,13 +53,13 @@ namespace Multiplayer.Notification
 
         public void OnShowAllBtnClick()
         {
-            if (NetCorePayload.CurrentAccount == null) return;
+            if (Payload.CurrentAccount == null) return;
 
             window.SetActive(true);
-            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            noNotificationsText.SetActive(Payload.CurrentAccount.Notifications.Count == 0);
 
             HelperUI.FillContent<NotificationUIItem, NotificationInfo>(content,
-                NetCorePayload.CurrentAccount.Notifications,
+                Payload.CurrentAccount.Notifications,
                 (uiItem, info) =>
                 {
                     uiItem.Refresh(info, true);
@@ -70,12 +70,12 @@ namespace Multiplayer.Notification
 
         public void RefreshIcon()
         {
-            if (NetCorePayload.CurrentAccount == null) return;
-            bool active = NetCorePayload.CurrentAccount.Notifications.Count > 0;
+            if (Payload.CurrentAccount == null) return;
+            bool active = Payload.CurrentAccount.Notifications.Count > 0;
             
             countGo.SetActive(active);
             iconImage.color = active ? activeIconColor : defaultIconColor;
-            countText.text = NetCorePayload.CurrentAccount.Notifications.Count + "";
+            countText.text = Payload.CurrentAccount.Notifications.Count + "";
         }
         
 
@@ -86,31 +86,31 @@ namespace Multiplayer.Notification
 
         public void Accept(NotificationInfo not)
         {
-            NetCore.ServerActions.Notifications.Accept(NetCorePayload.CurrentAccount.Nick, not.Id);
+            NetCore.ServerActions.Notifications.Accept(Payload.CurrentAccount.Nick, not.Id);
 
-            NetCorePayload.CurrentAccount.Notifications.Remove(not);
+            Payload.CurrentAccount.Notifications.Remove(not);
             RefreshIcon();
-            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            noNotificationsText.SetActive(Payload.CurrentAccount.Notifications.Count == 0);
             Hide();
         }
 
         public void Reject(NotificationInfo not)
         {
-            NetCore.ServerActions.Notifications.Reject(NetCorePayload.CurrentAccount.Nick, not.Id);
+            NetCore.ServerActions.Notifications.Reject(Payload.CurrentAccount.Nick, not.Id);
 
-            NetCorePayload.CurrentAccount.Notifications.Remove(not);
+            Payload.CurrentAccount.Notifications.Remove(not);
             RefreshIcon();
-            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            noNotificationsText.SetActive(Payload.CurrentAccount.Notifications.Count == 0);
             Hide();
         }
 
         public void Ok(NotificationInfo not)
         {
-            NetCore.ServerActions.Notifications.Ok(NetCorePayload.CurrentAccount.Nick, not.Id);
+            NetCore.ServerActions.Notifications.Ok(Payload.CurrentAccount.Nick, not.Id);
 
-            NetCorePayload.CurrentAccount.Notifications.Remove(not);
+            Payload.CurrentAccount.Notifications.Remove(not);
             RefreshIcon();
-            noNotificationsText.SetActive(NetCorePayload.CurrentAccount.Notifications.Count == 0);
+            noNotificationsText.SetActive(Payload.CurrentAccount.Notifications.Count == 0);
             Hide();
         }
     }

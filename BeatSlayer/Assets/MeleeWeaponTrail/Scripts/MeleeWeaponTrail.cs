@@ -17,6 +17,8 @@ public class MeleeWeaponTrail : MonoBehaviour
 	bool _emit = true;
 	public bool Emit { set{_emit = value;} }
 
+	public bool DontUseThisFrame { get; set; }
+
 	bool _use = true;
 	public bool Use { set{_use = value;} }
 
@@ -106,6 +108,15 @@ public class MeleeWeaponTrail : MonoBehaviour
 		{
 			return;
 		}
+		if(DontUseThisFrame)
+        {
+			DontUseThisFrame = false;
+			_trailMesh.Clear();
+			_points.Clear();
+			_smoothedPoints.Clear();
+			return;
+		}
+
 
 		if (_emit && _emitTime != 0)
 		{

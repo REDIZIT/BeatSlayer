@@ -10,6 +10,7 @@ using InGame.Helpers;
 using Newtonsoft.Json;
 using ProjectManagement;
 using UnityEngine.UI;
+using BeatSlayerServer.Multiplayer.Accounts;
 
 namespace Multiplayer.Chat
 {
@@ -45,7 +46,7 @@ namespace Multiplayer.Chat
             NetCore.Subs.OnGetGroups += OnGetGroups;
             NetCore.OnFullReady += () =>
             {
-                if (NetCorePayload.CurrentAccount != null)
+                if (Payload.CurrentAccount != null)
                 {
                     Debug.Log("NetCore.ServerActions.Chat.GetGroups();");
                     NetCore.ServerActions.Chat.GetGroups();
@@ -82,15 +83,15 @@ namespace Multiplayer.Chat
         {
             if (field.text.Trim() == "") return;
 
-            NetCore.ServerActions.SendChatMessage(NetCorePayload.CurrentAccount.Nick, field.text, NetCorePayload.CurrentAccount.Role, selectedGroupName);
+            NetCore.ServerActions.SendChatMessage(Payload.CurrentAccount.Nick, field.text, Payload.CurrentAccount.Role, selectedGroupName);
             field.text = "";
         }
 
         public void JoinGroup(ChatGroupData data)
         {
-            if (NetCorePayload.CurrentAccount == null) return;
+            if (Payload.CurrentAccount == null) return;
             
-            NetCore.ServerActions.Chat.JoinGroup(NetCorePayload.CurrentAccount.Nick, data.Name);
+            NetCore.ServerActions.Chat.JoinGroup(Payload.CurrentAccount.Nick, data.Name);
             selectedGroupName = data.Name;
             groupText.text = data.Name;
         }
@@ -120,7 +121,7 @@ namespace Multiplayer.Chat
             selectedGroupName = groups[0].Name;
             groupText.text = selectedGroupName;
 
-            NetCore.ServerActions.Chat.JoinGroup(NetCorePayload.CurrentAccount.Nick, selectedGroupName);
+            NetCore.ServerActions.Chat.JoinGroup(Payload.CurrentAccount.Nick, selectedGroupName);
             
             HelperUI.FillContent<ChatGroupItemUI, ChatGroupData>(groupContent, groups, (ui, data) =>
             {

@@ -110,7 +110,7 @@ namespace InGame.Game.Spawn
 
             if (isEditor)
             {
-                /*if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0))
                 {
                     if (!inputTouchesStartPoses.ContainsKey(0))
                     {
@@ -134,7 +134,7 @@ namespace InGame.Game.Spawn
                         l = true;
                         gm.leftSaber.SetSword(Input.mousePosition);
                     }
-                }*/
+                }
 
                 RaycastSaber(Input.mousePosition, prevMousePos, r ? 1 : l ? -1 : 0);
                 prevMousePos = Input.mousePosition;

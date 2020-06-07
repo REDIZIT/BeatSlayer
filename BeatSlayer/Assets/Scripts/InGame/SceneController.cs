@@ -91,6 +91,8 @@ namespace InGame.SceneManagement
 
 public static class LoadingData
 {
+    public static int sceneLoadCount;
+
     public static SceneloadParameters loadparams;
 
     public static Project project;

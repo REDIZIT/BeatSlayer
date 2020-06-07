@@ -11,6 +11,7 @@ using ProjectManagement;
 using Ranking;
 using UnityEngine;
 using UnityEngine.UI;
+using Web;
 
 public class FinishHandler : MonoBehaviour
 {
@@ -66,19 +67,20 @@ public class FinishHandler : MonoBehaviour
 
             FinishServerActions();
 
+            if(Payload.CurrentAccount != null)
+            {
+                int coins = Payload.CurrentAccount.Coins;
+                int addCoins = Mathf.RoundToInt(gm.replay.score / 16f * gm.maxCombo / 2f * gm.scoreMultiplier);
 
-            int coins = NetCorePayload.CurrentAccount.Coins;
-            int addCoins = Mathf.RoundToInt(gm.replay.score / 16f * gm.maxCombo / 2f * gm.scoreMultiplier);
-            
-            NetCorePayload.CurrentAccount.Coins = coins + addCoins;
-            prefsManager.Save();
+                Payload.CurrentAccount.Coins = coins + addCoins;
+                prefsManager.Save();
+            }
+
 
             HandleFinishUI();
 
             gm.RateBtnUpdate();
 
-            //FinishAchievements();
-            
             if(LoadingData.loadparams.Type == SceneloadParameters.LoadType.Moderation)
             {
                 string filepath = Application.persistentDataPath + "/data/moderation/" + LoadingData.loadparams.Map.author + "-" + LoadingData.loadparams.Map.name + ".bsz";
@@ -122,8 +124,8 @@ public class FinishHandler : MonoBehaviour
     }
     public void UpdateDifficulty()
     {
-        int difficulty = LoadingData.loadparams.Map.difficultyStars;
-        string diffName = LoadingData.loadparams.Map.difficultyName;
+        int difficulty = LoadingData.loadparams.difficultyInfo.stars;
+        string diffName = LoadingData.loadparams.difficultyInfo.name;//LoadingData.loadparams.Map.difficultyName;
 
         difficultyText.text = diffName;
         float xOffset = difficultyText.preferredWidth + 20;
@@ -194,11 +196,19 @@ public class FinishHandler : MonoBehaviour
     }
     IEnumerator IEFinishServerActions()
     {
-        string trackname = gm.project.author + "-" + gm.project.name;
-        
+        string trackname = gm.project.author.Trim() + "-" + gm.project.name.Trim();
+
+        DatabaseScript.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, DatabaseScript.StatisticsKeyType.Play);
+        WebAPI.OnMapPlayed(LoadingData.loadparams.Map.approved);
+
+        if (Payload.CurrentAccount == null)
+        {
+            leaderboardLoadingText.text = LocalizationManager.Localize("NotLoggedIn");
+        }
+
         if (!LoadingData.loadparams.Map.approved)
         {
-            leaderboardLoadingText.text = "Not approved map";
+            leaderboardLoadingText.text = LocalizationManager.Localize("NotApprovedMap");
             yield break;
         }
 
@@ -207,19 +217,15 @@ public class FinishHandler : MonoBehaviour
 
         if (!DatabaseScript.DoesMapExist(trackname, gm.project.creatorNick))
         {
-            leaderboardLoadingText.text = "Map has been deleted";
+            leaderboardLoadingText.text = LocalizationManager.Localize("MapHasBeenDeleted");
             yield break;
         }
-        
-        DatabaseScript.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, DatabaseScript.StatisticsKeyType.Play);
-
-        RPText.text = ".";
-
-        if (NetCorePayload.CurrentAccount == null) yield break;
+       
+        if (Payload.CurrentAccount == null) yield break;
 
         uploadingText.SetActive(true);
 
-        RPText.text = "..";
+        RPText.text = ".";
 
         ReplayData bestReplay = null;
         bool bestReplayGot = false;
@@ -245,7 +251,7 @@ public class FinishHandler : MonoBehaviour
                 
                 RPText.text = Mathf.RoundToInt((float) 1).ToString();
                 coinsText.text = "+" + data.Coins;
-                NetCorePayload.CurrentAccount.Coins += data.Coins;
+                Payload.CurrentAccount.Coins += data.Coins;
                 
                 LoadLeaderboard();
                 uploadingText.SetActive(false);
@@ -254,7 +260,7 @@ public class FinishHandler : MonoBehaviour
             gm.accountManager.UpdateSessionTime();
         };
         //Debug.Log("Before getbestreplay: " + NetCore.State);
-        NetCore.ServerActions.Account.GetBestReplay(NetCorePayload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
+        NetCore.ServerActions.Account.GetBestReplay(Payload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
         //Debug.Log("After getbestreplay: " + NetCore.State);
     }
 
@@ -289,7 +295,7 @@ public class FinishHandler : MonoBehaviour
         foreach (var item in leaderboardReplays)
         {
             place++;
-            CreateLeaderboardItem(item, prefab, place, item.player == NetCorePayload.CurrentAccount.Nick);
+            CreateLeaderboardItem(item, prefab, place, item.player == Payload.CurrentAccount.Nick);
             height += 80 + 4;
         }
 

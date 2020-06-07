@@ -160,7 +160,7 @@ public class ShopHelper : MonoBehaviour
         item.GetChild(0).GetComponent<Image>().sprite = sprite;
         item.GetChild(1).GetComponent<Text>().text = LocalizationManager.Localize(header);
         item.GetChild(2).GetComponent<Text>().text = LocalizationManager.Localize(description);
-        item.GetChild(3).GetComponent<Button>().interactable = NetCorePayload.CurrentAccount == null ? false : NetCorePayload.CurrentAccount.Coins >= cost;
+        item.GetChild(3).GetComponent<Button>().interactable = Payload.CurrentAccount == null ? false : Payload.CurrentAccount.Coins >= cost;
         string youhave = LocalizationManager.Localize("YouHave");
         string costStr = LocalizationManager.Localize("Cost");
         item.GetChild(4).GetComponent<Text>().text = youhave + ": " + count + "\n" + costStr + ": " + cost;
@@ -183,26 +183,26 @@ public class ShopHelper : MonoBehaviour
         if(text.text == LocalizationManager.Localize("Time travel"))
         {
             skills[0].count++;
-            NetCorePayload.CurrentAccount.Coins -= skills[0].cost;
-            NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -skills[0].cost);
+            Payload.CurrentAccount.Coins -= skills[0].cost;
+            NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -skills[0].cost);
         }
         else if (text.text == LocalizationManager.Localize("Explosion"))
         {
             skills[1].count++;
-            NetCorePayload.CurrentAccount.Coins -= skills[1].cost;
-            NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -skills[1].cost);
+            Payload.CurrentAccount.Coins -= skills[1].cost;
+            NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -skills[1].cost);
         }
         else if (text.text == LocalizationManager.Localize("Coins booster (x2)"))
         {
             boosters[0].count++;
-            NetCorePayload.CurrentAccount.Coins -= boosters[0].cost;
-            NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -boosters[0].cost);
+            Payload.CurrentAccount.Coins -= boosters[0].cost;
+            NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -boosters[0].cost);
         }
         else if (text.text == LocalizationManager.Localize("Coins decelerator (/2)"))
         {
             boosters[1].count++;
-            NetCorePayload.CurrentAccount.Coins -= boosters[1].cost;
-            NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -boosters[1].cost);
+            Payload.CurrentAccount.Coins -= boosters[1].cost;
+            NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -boosters[1].cost);
         }
 
         //menuscript.coinsTexts[0].text = NetCorePayload.CurrentAccount.Coins.ToString();
@@ -238,11 +238,11 @@ public class ShopHelper : MonoBehaviour
     {
         if (!menuscript.prefsManager.prefs.boughtSabers[id])
         {
-            if (NetCorePayload.CurrentAccount.Coins >= menuscript.prefsManager.prefs.sabersCosts[id])
+            if (Payload.CurrentAccount.Coins >= menuscript.prefsManager.prefs.sabersCosts[id])
             {
                 menuscript.prefsManager.prefs.boughtSabers[id] = true;
-                NetCorePayload.CurrentAccount.Coins -= menuscript.prefsManager.prefs.sabersCosts[id];
-                NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -menuscript.prefsManager.prefs.sabersCosts[id]);
+                Payload.CurrentAccount.Coins -= menuscript.prefsManager.prefs.sabersCosts[id];
+                NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -menuscript.prefsManager.prefs.sabersCosts[id]);
 
                 menuscript.prefsManager.Save();
                 UpdateSabersView();
@@ -265,11 +265,11 @@ public class ShopHelper : MonoBehaviour
     {
         if (!menuscript.prefsManager.prefs.boughtSaberEffects[id])
         {
-            if (NetCorePayload.CurrentAccount.Coins >= menuscript.prefsManager.prefs.saberEffectsCosts[id])
+            if (Payload.CurrentAccount.Coins >= menuscript.prefsManager.prefs.saberEffectsCosts[id])
             {
                 menuscript.prefsManager.prefs.boughtSaberEffects[id] = true;
-                NetCorePayload.CurrentAccount.Coins -= menuscript.prefsManager.prefs.saberEffectsCosts[id];
-                NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -menuscript.prefsManager.prefs.saberEffectsCosts[id]);
+                Payload.CurrentAccount.Coins -= menuscript.prefsManager.prefs.saberEffectsCosts[id];
+                NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -menuscript.prefsManager.prefs.saberEffectsCosts[id]);
                 menuscript.RefreshCoinsTexts();
 
                 menuscript.prefsManager.Save();

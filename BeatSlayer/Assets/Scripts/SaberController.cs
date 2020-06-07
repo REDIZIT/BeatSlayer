@@ -6,6 +6,7 @@ using UnityEngine;
 public class SaberController : MonoBehaviour
 {
     public LineRenderer lineRenderer;
+    public MeleeWeaponTrail Trail => GetComponent<MeleeWeaponTrail>();
 
     public bool isUsing;
 
@@ -28,12 +29,17 @@ public class SaberController : MonoBehaviour
         //transform.GetChild(0).eulerAngles = new Vector3(transform.GetChild(0).eulerAngles.x, transform.GetChild(0).eulerAngles.y, (float)GetSwordAngle(transform.localPosition, pos));
         //transform.GetChild(0).eulerAngles = new Vector3(transform.GetChild(0).eulerAngles.x, transform.GetChild(0).eulerAngles.y, curve.Evaluate(pos.x / Screen.width) * 45);
 
+        if (!transform.GetChild(saberSkinId).gameObject.activeSelf)
+        {
+            Debug.Log("DontUseThisFrame");
+            Trail.DontUseThisFrame = true;
+        }
+
         float xScale = (Screen.width > Screen.height ? camScale : camScale / 2f);
         float yScale = (Screen.width < Screen.height ? camScale : camScale / 2f);
 
         transform.localPosition = cam.ScreenToViewportPoint(new Vector3((pos.x - Screen.width / 2f) * xScale, (pos.y - Screen.height / 2f) * yScale) + new Vector3(0, 0, camOffset));
         transform.LookAt(rightHand);
-
     }
 
     double GetSwordAngle(Vector3 a, Vector3 b)

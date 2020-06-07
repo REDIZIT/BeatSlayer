@@ -22,6 +22,7 @@ using GameNet;
 using ProjectManagement;
 using Testing;
 using Debug = UnityEngine.Debug;
+using Web;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -79,11 +80,6 @@ public class MenuScript_v2 : MonoBehaviour
     }
     public void Awake()
     {
-       /* NetCore.Configurators += () =>
-        {
-            
-        };*/
-
         Application.targetFrameRate = 60;
         if(Time.timeScale != 1)
         {
@@ -147,7 +143,7 @@ public class MenuScript_v2 : MonoBehaviour
             prefsManager.Save();
         }
 
-        if(NetCorePayload.CurrentAccount != null) RefreshCoinsTexts();
+        if(Payload.CurrentAccount != null) RefreshCoinsTexts();
        
         
 
@@ -170,10 +166,16 @@ public class MenuScript_v2 : MonoBehaviour
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += delegate { videoPlayer.Play(); };
         canvasRect = GameObject.Find("Canvas").GetComponent<RectTransform>().rect.size;
-        
+
         // Та нахуй воно мэне нада xD
         /*if (Screen.height > Screen.width) canvasRect = new Vector2(canvasRect.y, canvasRect.x);
         UpdateOrientationHanlder(true);*/
+
+        if(LoadingData.sceneLoadCount == 0)
+        {
+            WebAPI.OnGameLaunch();
+        }
+        LoadingData.sceneLoadCount++;
     }
 
     private void Update()
@@ -870,13 +872,13 @@ public class MenuScript_v2 : MonoBehaviour
     }
     public void UnlockMap(Button btn)
     {
-        int coins = NetCorePayload.CurrentAccount.Coins;
+        int coins = Payload.CurrentAccount.Coins;
         int mapIndex = int.Parse(btn.name.Replace("Locker", ""));
         int cost = mapsCosts[mapIndex];
         if (coins >= cost)
         {
-            NetCorePayload.CurrentAccount.Coins -= cost;
-            NetCore.ServerActions.Shop.SendCoins(NetCorePayload.CurrentAccount.Nick, -cost);
+            Payload.CurrentAccount.Coins -= cost;
+            NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -cost);
             if (mapIndex == 0) prefsManager.prefs.mapUnlocked0 = true;
             else if (mapIndex == 1) prefsManager.prefs.mapUnlocked1 = true;
             else if (mapIndex == 2) prefsManager.prefs.mapUnlocked2 = true;
@@ -973,7 +975,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void RefreshCoinsTexts()
     {
-        foreach (var t in coinsTexts) t.text = NetCorePayload.CurrentAccount.Coins.ToString();
+        foreach (var t in coinsTexts) t.text = Payload.CurrentAccount.Coins.ToString();
     }
     
     public void CloseEditorAvailableForever()

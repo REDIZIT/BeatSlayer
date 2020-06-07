@@ -273,7 +273,10 @@ public class DatabaseScript : MonoBehaviour
         string url = string.Format(url_doesMapExist, trackname, nick);
         WebClient c = new WebClient();
         string response = c.DownloadString(url);
-        return bool.Parse(response);
+        bool b = bool.Parse(response);
+
+        Debug.Log("Does map " + trackname + " by " + nick + " exists? " + b);
+        return b;
     }
     
 

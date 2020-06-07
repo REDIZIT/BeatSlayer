@@ -679,7 +679,7 @@ MonoBehaviour:
   _emit: 1
   _emitTime: 0
   _material: {fileID: 2100000, guid: 5f402d1520e5fa74fa21e08f85b71370, type: 2}
-  _lifeTime: 0.4
+  _lifeTime: 0.2
   _colors:
   - {r: 0, g: 0.58571386, b: 1, a: 1}
   _sizes: []
@@ -25562,6 +25562,7 @@ GameObject:
   - component: {fileID: 1901715890}
   - component: {fileID: 1901715891}
   - component: {fileID: 1901715892}
+  - component: {fileID: 1901715893}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -25988,6 +25989,7 @@ MonoBehaviour:
   musicSpeedSlider: {fileID: 0}
   noArrowsToggle: {fileID: 0}
   noLinesToggle: {fileID: 0}
+  menuAudioManager: {fileID: 0}
   asource: {fileID: 0}
 --- !u!114 &1901715888
 MonoBehaviour:
@@ -26140,6 +26142,18 @@ MonoBehaviour:
   - {fileID: 1673334101}
   - {fileID: 36067687}
   - {fileID: 991465219}
+--- !u!114 &1901715893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901715873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5fd0786873b8734aaf78370c84f1499, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1912990741
 GameObject:
   m_ObjectHideFlags: 0
@@ -29793,7 +29807,7 @@ MonoBehaviour:
   _emit: 1
   _emitTime: 0
   _material: {fileID: 2100000, guid: 5f402d1520e5fa74fa21e08f85b71370, type: 2}
-  _lifeTime: 0.4
+  _lifeTime: 0.2
   _colors:
   - {r: 1, g: 0.34901962, b: 0, a: 1}
   _sizes: []

@@ -18,7 +18,7 @@ public class BeatmapUIItem : MonoBehaviour
 
     public GameObject downloadIndicator, approvedImage, passedImage;
 
-    public void Setup(MapInfo info)
+    public void Setup(MapInfo info, bool isOnlyOneElement)
     {
         mapInfo = info;
         
@@ -35,9 +35,15 @@ public class BeatmapUIItem : MonoBehaviour
         downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.author, mapInfo.name, mapInfo.nick));
         approvedImage.SetActive(mapInfo.approved);
         passedImage.SetActive(AccountManager.IsPassed(mapInfo.author, mapInfo.name));
+
+        GetComponent<Toggle>().isOn = isOnlyOneElement;
+        if(isOnlyOneElement)
+        {
+            //ui.OnBeatmapItemClicked(this);
+        }
     }
 
-    public void Setup(DifficultyInfo difficulty)
+    public void Setup(DifficultyInfo difficulty, int i)
     {
         this.difficulty = difficulty;
 
@@ -48,6 +54,8 @@ public class BeatmapUIItem : MonoBehaviour
         likesText.text = difficulty.likes.ToString();
         dislikesText.text = difficulty.dislikes.ToString();
         //playCountText.text = difficulty.playCount.ToString();
+
+        GetComponent<Toggle>().isOn = i == 0;
     }
 
 

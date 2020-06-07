@@ -29,7 +29,7 @@ namespace GameNet
             get
             {
                 return ConnType == ConnectionType.Local
-                    ? "https://localhost:5010" : ConnType == ConnectionType.Development
+                    ? "https://localhost:5011" : ConnType == ConnectionType.Development
                         ? "http://www.bsserver.tk:5010"
                             : "http://bsserver.tk";
             }
@@ -173,9 +173,9 @@ namespace GameNet
             {
                 //await conn.Start();
                 await conn.StartAsync();
-                Debug.Log(" << Connection ends");
                 if (conn.State == HubConnectionState.Connected)
                 {
+                    Debug.Log("[ Connected ]");
                     OnConnect?.Invoke();
                     ReconnectAttempt = 0;
                 }
@@ -220,11 +220,14 @@ namespace GameNet
         // (Internal usage)
         static void BuildConnection()
         {
-            Debug.Log("> Create HubConnection with " + Url_Hub);
+            Debug.Log("> Create HubConnection (autoreconnect = true) with " + Url_Hub);
             //conn = new HubConnection(Url_Hub);
             conn = new HubConnectionBuilder()
                 .WithUrl(new Uri(Url_Hub))
+                .WithAutomaticReconnect()
                 .Build();
+
+            conn.KeepAliveInterval = new TimeSpan(0, 0, 5);
 
             var b = new HubConnectionBuilder();
             
@@ -332,12 +335,12 @@ namespace GameNet
 
             public static void UpdateInGameTime()
             {
-                if (NetCorePayload.CurrentAccount == null) return;
-                if (NetCorePayload.PrevInGameTimeUpdate == 0) NetCorePayload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
-                int seconds = Mathf.RoundToInt(Time.realtimeSinceStartup - NetCorePayload.PrevInGameTimeUpdate);
+                if (Payload.CurrentAccount == null) return;
+                if (Payload.PrevInGameTimeUpdate == 0) Payload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
+                int seconds = Mathf.RoundToInt(Time.realtimeSinceStartup - Payload.PrevInGameTimeUpdate);
                 if (seconds < 30) return;
-                NetCorePayload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
-                NetCore.conn.InvokeAsync("Accounts_UpdateInGameTime", NetCorePayload.CurrentAccount.Nick, seconds);
+                Payload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
+                NetCore.conn.InvokeAsync("Accounts_UpdateInGameTime", Payload.CurrentAccount.Nick, seconds);
             }
 
             public static class Account
@@ -360,31 +363,31 @@ namespace GameNet
 
                 public static void GetAvatar(string nick) => conn.InvokeAsync("Accounts_GetAvatar", nick);
 
-                public static void ChangePassword(string nick, string oldpass, string newpass) =>conn.InvokeAsync("Accounts_ChangePassword", nick, oldpass, newpass);
-                public static void Restore(string nick, string password) =>conn.InvokeAsync("Accounts_Restore", nick, password);
+                public static void ChangePassword(string nick, string oldpass, string newpass) => conn.InvokeAsync("Accounts_ChangePassword", nick, oldpass, newpass);
+                public static void Restore(string nick, string password) => conn.InvokeAsync("Accounts_Restore", nick, password);
                 public static void ConfirmRestore(string code) => conn.InvokeAsync("Accounts_ConfirmRestore", code);
 
 
-                public static void ChangeEmptyEmail(string nick, string email) =>conn.InvokeAsync("Accounts_ChangeEmptyEmail", nick, email);
+                public static void ChangeEmptyEmail(string nick, string email) => conn.InvokeAsync("Accounts_ChangeEmptyEmail", nick, email);
 
-                public static void ChangeEmail(string nick, string email) =>conn.InvokeAsync("Accounts_ChangeEmail", nick, email);
+                public static void ChangeEmail(string nick, string email) => conn.InvokeAsync("Accounts_ChangeEmail", nick, email);
 
-                public static void SendChangeEmailCode(string nick, string email) =>conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
+                public static void SendChangeEmailCode(string nick, string email) => conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
 
-                public static void SendReplay(string json)  => conn.InvokeAsync("Accounts_SendReplay", json);
+                public static void SendReplay(string json) => conn.InvokeAsync("Accounts_SendReplay", json);
 
-                public static void GetBestReplay(string nick, string trackname, string creatornick) =>conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+                public static void GetBestReplay(string nick, string trackname, string creatornick) => conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
 
                 public static void GetBestReplays(string nick, int count) => conn.InvokeAsync("Accounts_GetBestReplays", nick, count);
             }
 
             public static class Friends
             {
-                public static void GetFriends(string nick) =>conn.InvokeAsync("Friends_GetFriends", nick);
+                public static void GetFriends(string nick) => conn.InvokeAsync("Friends_GetFriends", nick);
                 
-                public static void InviteFriend(string addNick, string nick) =>conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
+                public static void InviteFriend(string addNick, string nick) => conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
                 
-                public static void RemoveFriend(string fromNick, string nick) =>conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
+                public static void RemoveFriend(string fromNick, string nick) => conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
             }
 
             public static class Notifications
@@ -398,14 +401,14 @@ namespace GameNet
             
             public static class Shop
             {
-                public static void SendCoins(string nick, int coins) =>conn.InvokeAsync("Shop_SendCoins", nick, coins);
+                public static void SendCoins(string nick, int coins) => conn.InvokeAsync("Shop_SendCoins", nick, coins);
 
                 public static void SyncCoins(string nick, int coins) => conn.InvokeAsync("Shop_SyncCoins", nick, coins);
             }
             public static class Chat
             {
-                public static void GetGroups() => NetCore.conn.InvokeAsync("Chat_GetGroups");
-                public static void JoinGroup(string nick, string group) => NetCore.conn.InvokeAsync("Chat_JoinGroup", nick, group);
+                public static void GetGroups() => conn.InvokeAsync("Chat_GetGroups");
+                public static void JoinGroup(string nick, string group) => conn.InvokeAsync("Chat_JoinGroup", nick, group);
             }
         }
 
@@ -449,10 +452,23 @@ namespace GameNet
 
         public class Invokes
         {
-            public Action Test;
             public Action<string> Log = (str) => SuperVoid("Log", str);
+
+           
             //public void Test(string nick, string password) {}
             //public void Test(string nick, string password) => NetCore.Invoke();
+        }
+
+        public abstract class ServerInvokes
+        {
+            public abstract void Test();
+            // conn.Invoke("Test");
+
+            public abstract void Test2(string arg);
+            // conn.Invoke("Test2", arg);
+
+
+            public void Test3() => SuperVoid("123");
         }
     }
 }

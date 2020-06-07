@@ -2,7 +2,9 @@
 using System.Collections;
 using System.IO;
 using System.Net;
+using BeatSlayer.Utils;
 using GameNet;
+using Multiplayer.Accounts;
 using Newtonsoft.Json;
 using ProjectManagement;
 using UnityEngine;
@@ -22,13 +24,23 @@ namespace Web
         public const string url_uploadBackground = "/WebAPI/UploadBackground?nick={0}";        
         public const string url_getBackground = "/WebAPI/GetBackground?nick={0}";
         public const string url_getTutorialGroup = "/Database/GetTutorialGroup";
+        public const string url_onGameLaunch = "/Account/OnGameLaunch";
+        public const string url_onGameLaunchAnonim = "/Account/OnGameLaunch?anonim=true";
+        public const string url_onMapPlayed = "/Account/OnMapPlayed?approved={0}";
 
         
 
 
         public static void UploadAvatar(string nick, Texture2D tex, Action<OperationMessage> callback)
         {
+
+            //tex.Resize(300, 300);
+            //tex.Apply();
+            TextureScale.Bilinear(tex, 300, 300);
+
             byte[] bytes = tex.EncodeToPNG();
+            
+
             string url = apibase + string.Format(url_uploadAvatar, nick);
             SendFile(nick, url, bytes, "avatar.png", callback);
         }
@@ -104,7 +116,7 @@ namespace Web
         // Load cached images of own account
         static byte[] LoadImage(string filepath, string nick)
         {
-            if (NetCorePayload.CurrentAccount.Nick == nick)
+            if (Payload.CurrentAccount.Nick == nick)
             {
                 if (File.Exists(filepath))
                 {
@@ -124,7 +136,28 @@ namespace Web
             return new WebClient().DownloadString(apibase + url_getTutorialGroup);
         }
 
+        public static void OnGameLaunch()
+        {
+            if (Application.internetReachability == NetworkReachability.NotReachable) return;
 
+            bool hasOldSessionFile = AccountUI.HasSession(true);
+            bool hasNewSessionFile = AccountUI.HasSession(false);
+
+            WebClient c = new WebClient();
+            Uri url;
+
+            if (hasOldSessionFile || hasNewSessionFile) url = new Uri(apibase + url_onGameLaunch);
+            else url = new Uri(apibase + url_onGameLaunchAnonim);
+
+            c.DownloadDataAsync(url);
+        }
+        public static void OnMapPlayed(bool approved)
+        {
+            WebClient c = new WebClient();
+            Uri url = new Uri(string.Format(apibase + url_onMapPlayed, approved));
+
+            c.DownloadDataAsync(url);
+        }
 
 
 

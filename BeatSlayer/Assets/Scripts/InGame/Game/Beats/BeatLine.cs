@@ -23,6 +23,8 @@ public class BeatLine : MonoBehaviour, IBeat
     public ParticleSystem psystem;
 
     public float maxDistance = -20;
+    float capMax;
+    float lineEndTime;
     public float secondCapRoadPos;
 
     bool useSoundEffect;
@@ -45,11 +47,16 @@ public class BeatLine : MonoBehaviour, IBeat
         if (cls.linePoints.Count == 0)
         {
             // Use new road positioning
+            // Fixing another road bug (When you set start road 4 and in game end cap goes far away from 4 road to 8 road xD)
             secondCapRoadPos = -3.5f + cls.lineEndRoad * 2.25f;
         }
 
         firstCapRotation = new Vector3(GetRandom(), GetRandom(), GetRandom());
         secondCapRotation = new Vector3(GetRandom(), GetRandom(), GetRandom());
+
+
+        lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
+        capMax = lineEndTime * (Speed / Time.deltaTime);
     }
 
     void Update()
@@ -76,8 +83,12 @@ public class BeatLine : MonoBehaviour, IBeat
     {
         // Cap speed in units/frame
         float capSpeed = Speed;
-        float lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
-        float capMax = lineEndTime * bm.fieldLength;
+        
+        ///Debug.Log("Line: bm.CubeSpeed * cls.speed: " + bm.CubeSpeed * cls.speed);
+        //float capMax = lineEndTime * bm.fieldLength; 
+        /// not field length because lines are more longer than should be due to
+        /// cube can pass field faster than one second and we can just multiplay seconds on field len
+        
 
         // Offset to selected road second cap at spawn
         float capRoadOffsetTime = capMax / capSpeed;
@@ -145,7 +156,7 @@ public class BeatLine : MonoBehaviour, IBeat
     public void OnPoint(Vector2 direction)
     {
         float lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
-        float capMax = lineEndTime * bm.fieldLength;
+        //float capMax = lineEndTime * bm.fieldLength;
 
         // Offset to selected road second cap at spawn
         float capRoadOffsetTime = capMax / Speed;

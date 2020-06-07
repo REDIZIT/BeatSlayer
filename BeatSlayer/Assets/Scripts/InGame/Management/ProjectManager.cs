@@ -128,7 +128,20 @@ namespace ProjectManagement
             string path = GetCoverPath(trackname, nick);
             if (path == "") return defaultTrackTexture;
 
-            return ProjectManager.LoadTexture(path);
+            return LoadTexture(path);
+        }
+        public static Texture2D LoadCoverOrNull(string trackname)
+        {
+            string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+            if (!Directory.Exists(groupFolder)) return null;
+
+            string[] mapsFolders = Directory.GetDirectories(groupFolder);
+            string mapNick = Path.GetDirectoryName(mapsFolders[0]);
+
+            string path = GetCoverPath(trackname, mapNick);
+            if (path == "") return null;
+
+            return LoadTexture(path);
         }
 
 
