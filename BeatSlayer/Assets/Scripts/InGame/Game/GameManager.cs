@@ -102,7 +102,17 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool paused;
     [HideInInspector] public bool noarrows;
     [HideInInspector] public bool nolines;
-    [HideInInspector] public bool gameCompleted, gameStarted, gameStarting;
+    [HideInInspector] public bool gameCompleted;
+
+    /// <summary>
+    /// Is game in period when asource isn't playing but cubes are spawning
+    /// </summary>
+    public bool IsGameStartingMap { get; set; }
+    public GameState State { get; set; }
+    public enum GameState
+    {
+        Starting, Started
+    }
     [HideInInspector] public string fullTrackName;
     [HideInInspector] public float maxCombo = 1;
 
@@ -142,7 +152,7 @@ public class GameManager : MonoBehaviour
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
             //float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime / replay.musicSpeed;
-            float beatAudioTime = gameStarting ? asReplacer : audioManager.asource.time + beatManager.fieldCrossTime;
+            float beatAudioTime = IsGameStartingMap ? asReplacer : audioManager.asource.time + beatManager.fieldCrossTime;
             if (beats.Count > 0 && beatAudioTime >= beats[0].time)
             {
                 beatManager.SpawnBeatCube(beats[0]);
@@ -331,8 +341,7 @@ public class GameManager : MonoBehaviour
 
         InitAudio();
 
-        gameStarting = true;
-        gameStarted = true;
+        IsGameStartingMap = true;
 
         StartCoroutine(beatManager.IOnStart());
         /*if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) { audioManager.PlaySpectrumSource(); }
@@ -392,24 +401,21 @@ public class GameManager : MonoBehaviour
             replay.score += rounded;
         }
 
-        if (gameStarted)
+        if (IsGameStartingMap)
         {
-            if (gameStarting)
-            {
-                asReplacer += Time.deltaTime;
-            }
-            if (paused)
-            {
-                if (audioManager.asource.isPlaying)
-                {
-                    audioManager.asource.Pause();
-                    if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
-                }
-                return;
-            }
-
-            ProcessBeatTime();
+            asReplacer += Time.deltaTime;
         }
+        if (paused)
+        {
+            if (audioManager.asource.isPlaying)
+            {
+                audioManager.asource.Pause();
+                if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
+            }
+            return;
+        }
+
+        ProcessBeatTime();
 
 
         if (trackTimeSlider.value >= 50)
@@ -434,11 +440,6 @@ public class GameManager : MonoBehaviour
             else Debug.LogError("asource clip is null");
         }
         else Debug.LogError("asource is null");
-
-
-        // =================================
-        //  Игровые процессы
-        if (!gameStarted) return;
 
         finishHandler.CheckLevelFinish();
         

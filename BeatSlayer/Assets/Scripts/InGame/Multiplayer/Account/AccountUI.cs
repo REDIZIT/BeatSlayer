@@ -31,7 +31,12 @@ namespace Multiplayer.Accounts
 
         public void Configuration()
         {
-            NetCore.Subs.Accounts_OnLogIn += OnLogIn;
+            Debug.Log("AccountUI.Configuration()");
+            NetCore.Subs.Accounts_OnLogIn += (op) =>
+            {
+                Debug.Log("OnLogIn event. Operation: \n" + JsonConvert.SerializeObject(op, Formatting.Indented));
+                OnLogIn(op);
+            };
             NetCore.Subs.Accounts_OnSignUp += OnSignUp;
             NetCore.Subs.Accounts_OnView += OnView;
             /*NetCore.Configurators += () =>
@@ -293,6 +298,18 @@ namespace Multiplayer.Accounts
         public void SyncCoins()
         {
             if (Payload.CurrentAccount == null) return;
+
+            if(menu.prefsManager == null)
+            {
+                Debug.LogError("SyncCoins: prefsmanager is null");
+                return;
+            }
+            if (menu.prefsManager.prefs == null)
+            {
+                Debug.LogError("SyncCoins: prefsmanager.prefs is null");
+                return;
+            }
+
 
             int coins = menu.prefsManager.prefs.coins;
 

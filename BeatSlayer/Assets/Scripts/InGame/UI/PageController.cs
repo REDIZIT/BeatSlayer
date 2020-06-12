@@ -10,7 +10,10 @@ public class PageController : MonoBehaviour
 
     public int itemsPerPage = 10;
 
+    public Transform PageButtonsContent =>
+        ui.showedListType == TrackListUI.ListType.Own ? pageButtonsOwnContent : pageButtonsContent;
     public Transform pageButtonsContent;
+    public Transform pageButtonsOwnContent;
 
 
     public GameObject approvedScrollView, authorScrollView, downloadedScrollView;
@@ -55,17 +58,17 @@ public class PageController : MonoBehaviour
     }
     void RefreshButton(int index, int page, bool isCurrent)
     {
-        pageButtonsContent.GetChild(index).gameObject.SetActive(true);
+        PageButtonsContent.GetChild(index).gameObject.SetActive(true);
         if (page == -1)
         {
-            pageButtonsContent.GetChild(index).gameObject.SetActive(false);
+            PageButtonsContent.GetChild(index).gameObject.SetActive(false);
             return;
         }
 
-        pageButtonsContent.GetChild(index).GetComponentInChildren<Text>().text = (page + 1).ToString();
+        PageButtonsContent.GetChild(index).GetComponentInChildren<Text>().text = (page + 1).ToString();
 
-        pageButtonsContent.GetChild(index).GetComponentInChildren<Text>().color = isCurrent ? Color.black : Color.white;
-        pageButtonsContent.GetChild(index).GetComponentInChildren<Image>().color = isCurrent ? new Color32(0, 145, 255, 255) : new Color32(0, 0, 0, 0);
+        PageButtonsContent.GetChild(index).GetComponentInChildren<Text>().color = isCurrent ? Color.black : Color.white;
+        PageButtonsContent.GetChild(index).GetComponentInChildren<Image>().color = isCurrent ? new Color32(0, 145, 255, 255) : new Color32(0, 0, 0, 0);
     }
     public void OnPageBtnClicked(Transform btn)
     {
@@ -87,8 +90,16 @@ public class PageController : MonoBehaviour
 
 
 
-
-    
+    /// <summary>
+    /// When play button clicked with Author page
+    /// </summary>
+    public void ShowAuthosViews()
+    {
+        // Ебучий костыль, ну да ладно ))
+        if (approvedScrollView.activeSelf) refreshListCallback = ui.RefreshApprovedList;
+        else if (authorScrollView.activeSelf) refreshListCallback = ui.RefreshAllMusicList;
+        else if (downloadedScrollView.activeSelf) refreshListCallback = ui.RefreshDownloadedList;
+    }
     public void ShowScrollViewApproved()
     {
         refreshListCallback = ui.RefreshApprovedList;
@@ -118,5 +129,14 @@ public class PageController : MonoBehaviour
         approvedScrollView.SetActive(false);
         authorScrollView.SetActive(false);
         downloadedScrollView.SetActive(true);
+    }
+
+    /// <summary>
+    /// When play button clicked with Own page
+    /// </summary>
+    public void ShowScrollViewOwn()
+    {
+        refreshListCallback = ui.RefreshOwnList;
+        refreshListCallback(0);
     }
 }

@@ -468,7 +468,7 @@ public class BeatmapUI : MonoBehaviour
         }
         else
         {
-            TestManager.DeleteRequest();
+            TestManager.DeleteRequest(true);
             overlay.SetActive(false);
         }
     }
@@ -487,7 +487,7 @@ public class BeatmapUI : MonoBehaviour
     {
         if (testRequest != null)
         {
-            TestManager.DeleteRequest();
+            TestManager.DeleteRequest(true);
         }
 
         //bmAudio.OnClose();

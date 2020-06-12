@@ -185,7 +185,7 @@ namespace Profile
                 bool isFriend = Payload.CurrentAccount != null
                                 && Payload.CurrentAccount.Friends.Any(c => c.Nick == data.Nick);
                 
-                writeBtn.gameObject.SetActive(!isOwnAccount);
+                //writeBtn.gameObject.SetActive(!isOwnAccount);
                 addFriendBtn.gameObject.SetActive(!isOwnAccount && !isFriend);
                 removeFriendBtn.gameObject.SetActive(!isOwnAccount && isFriend);
                 editBtn.gameObject.SetActive(isOwnAccount);
@@ -195,7 +195,7 @@ namespace Profile
             {
                 endEditBtn.gameObject.SetActive(true);
             
-                writeBtn.gameObject.SetActive(false);
+                //writeBtn.gameObject.SetActive(false);
                 addFriendBtn.gameObject.SetActive(false);
                 editBtn.gameObject.SetActive(false);
             }

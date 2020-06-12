@@ -23,6 +23,9 @@ using ProjectManagement;
 using Testing;
 using Debug = UnityEngine.Debug;
 using Web;
+using InGame.UI.Overlays;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -35,6 +38,9 @@ public class MenuScript_v2 : MonoBehaviour
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
     public TutorialManager tutorialManager;
+    public OwnMusicUI ownMusicUI;
+
+
 
     public GameObject debugConsole;
     public GameObject[] screens;
@@ -78,6 +84,7 @@ public class MenuScript_v2 : MonoBehaviour
             RefreshCoinsTexts();
         };
     }
+    private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors) { return true; }
     public void Awake()
     {
         Application.targetFrameRate = 60;
@@ -87,7 +94,9 @@ public class MenuScript_v2 : MonoBehaviour
             Time.timeScale = 1;
         }
         debugConsole.SetActive(true);
+
         
+
         /*#if UNITY_EDITOR
         UrlsChecker.IsGameWorkingWithLocalhost();
         #endif*/
@@ -99,7 +108,7 @@ public class MenuScript_v2 : MonoBehaviour
         
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
 
-        Database.Init();
+        Database.Init(ownMusicUI);
         ProjectManager.defaultTrackTexture = defaultTrackTexture;
 
 
@@ -934,13 +943,13 @@ public class MenuScript_v2 : MonoBehaviour
     public GameObject trackConfigScreen;
     void OnExitSwipe()
     {
-        if (trackConfigScreen.activeInHierarchy)
+        /*if (trackConfigScreen.activeInHierarchy)
         {
             trackConfigScreen.SetActive(false);
             allHss[1].gameObject.GetComponent<State>().ChangeState(allHss[1].gameObject);
             return;
-        }
-        foreach (HorizontalScrollSnap hss in allHss)
+        }*/
+        /*foreach (HorizontalScrollSnap hss in allHss)
         {
             if (hss.gameObject.activeInHierarchy)
             {
@@ -949,7 +958,7 @@ public class MenuScript_v2 : MonoBehaviour
                 if (currentPage > defaultPage) hss.PreviousScreen();
                 else if (currentPage < defaultPage) hss.NextScreen();
             }
-        }
+        }*/
     }
 
 

@@ -83,7 +83,7 @@ namespace InGame.Game.Spawn
 
             asource.Play();
             
-            gm.gameStarting = false;
+            gm.IsGameStartingMap = false;
             if (gm.paused)
             {
                 gm.audioManager.asource.Pause();

@@ -46,7 +46,7 @@ public class FinishHandler : MonoBehaviour
 
     public void CheckLevelFinish()
     {
-        if (!gm.gameStarting && gm.gameStarted && audioManager.asource.time == 0 && gm.beats.ToArray().Length == 0 && !audioManager.asource.isPlaying)
+        if (!gm.IsGameStartingMap && audioManager.asource.time == 0 && gm.beats.ToArray().Length == 0 && !audioManager.asource.isPlaying)
         {
             OnLevelFinished();
         }

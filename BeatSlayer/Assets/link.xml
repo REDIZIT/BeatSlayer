@@ -25,4 +25,8 @@
   <assembly fullname="System.Text.Json" preserve="all"/>
   <assembly fullname="System.Threading.Channels" preserve="all"/>
   <assembly fullname="System.Threading.Tasks.Extensions" preserve="all"/>
+  <assembly fullname="Assembly-CSharp.GameNet" preserve="all"/>
+  <assembly fullname="System.Core">
+    <assembly fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
+  </assembly>
 </linker>

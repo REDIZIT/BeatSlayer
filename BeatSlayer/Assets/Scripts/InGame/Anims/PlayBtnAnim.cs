@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using InGame.UI.Overlays;
 using Pixelplacement;
 using UnityEngine;
 using UnityEngine.UI.Extensions;
@@ -11,6 +12,8 @@ namespace InGame.Animations
         public Animator anim;
         public GameObject mainUI;
         public MusicFilesUI musicFilesUI;
+        public OwnMusicUI ownMusicUI;
+        public PageController pager;
         
         public GameObject authorPage, ownPage;
         public GameObject overlay;
@@ -31,6 +34,8 @@ namespace InGame.Animations
             
             authorPage.SetActive(true);
             ownPage.SetActive(false);
+
+            pager.ShowAuthosViews();
         }
 
         public void OnOwnBtnClick()
@@ -45,8 +50,11 @@ namespace InGame.Animations
             
             authorPage.SetActive(false);
             ownPage.SetActive(true);
-            
-            musicFilesUI.Refresh();
+
+            //musicFilesUI.Refresh();
+
+            //ownMusicUI.OnOwnBtnClicked(() => { });
+            pager.ShowScrollViewOwn();
         }
 
 

@@ -78,12 +78,19 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             Debug.Log("Reloading scene");
             SceneManager.LoadScene("Menu");
         }
-
+        */
         if (Input.GetKeyDown(KeyCode.D))
         {
             Debug.Log("Send test");
             NetCore.ServerActions.Test();
-        }*/
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            int i = 2;
+            Debug.Log("Send test with par " + i);
+            NetCore.ServerActions.TestPar(i);
+        }
+
         if (timeUntilClose > 0) timeUntilClose -= Time.deltaTime;
         else
         {

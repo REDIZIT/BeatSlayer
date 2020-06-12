@@ -31,7 +31,6 @@ public class SaberController : MonoBehaviour
 
         if (!transform.GetChild(saberSkinId).gameObject.activeSelf)
         {
-            Debug.Log("DontUseThisFrame");
             Trail.DontUseThisFrame = true;
         }
 

@@ -104,14 +104,16 @@ namespace Multiplayer.Notification
             Hide();
         }
 
-        public void Ok(NotificationInfo not)
+        public void Ok(NotificationInfo not, bool deleteAfterClick)
         {
             NetCore.ServerActions.Notifications.Ok(Payload.CurrentAccount.Nick, not.Id);
 
             Payload.CurrentAccount.Notifications.Remove(not);
             RefreshIcon();
             noNotificationsText.SetActive(Payload.CurrentAccount.Notifications.Count == 0);
-            Hide();
+
+            /// If popup
+            if(!deleteAfterClick) Hide();
         }
     }
 }
