@@ -160,9 +160,9 @@ namespace GameNet
         // (Internal usage)
         static void CreateConnection()
         {
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            /*ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             ServicePointManager.SecurityProtocol =
-                    SecurityProtocolType.Tls11;
+                    SecurityProtocolType.Tls11;*/
 
             BuildConnection();
             SubcribeOnServerCalls();
@@ -236,7 +236,7 @@ namespace GameNet
             //conn = new HubConnection(Url_Hub);
             conn = new HubConnectionBuilder()
                 .WithUrl(new Uri(Url_Hub), options => {
-                    options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
+                    options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets;
                     options.SkipNegotiation = false;
                 })
                 .WithAutomaticReconnect()
