@@ -1,37 +1,40 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
+using InGame.Leaderboard;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Notifications;
 using Ranking;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Scripting;
 
+[assembly: Preserve]
 namespace GameNet
 {
     /// <summary>
     /// This class is controlling SignalR connection and messaging between server and client
     /// </summary>
+    [Preserve]
     public static class NetCore
     {
         static HubConnection conn;
         public static HubConnectionState State => conn.State;
-        //public static ConnectionState State => conn.State;
         public static Subscriptions Subs { get; private set; }
-        public static Invokes Actions { get; private set; }
-
         public static string Url_Server
         {
             get
             {
                 return ConnType == ConnectionType.Local
                     ? "https://localhost:5011" : ConnType == ConnectionType.Development
-                        ? "http://www.bsserver.tk:5010"
-                            : "http://bsserver.tk";
+                        ? "http://bsserver.tk:5020"
+                            : "https://bsserver.tk";
             }
         }
         public static string Url_Hub
@@ -45,15 +48,13 @@ namespace GameNet
 
 
         public static Action OnConnect, OnDisconnect, OnReconnect, OnFullReady;
-        public static Action OnLogIn;
+        public static Action OnLogIn, OnLogOut;
 
         
         // There are delegates of NetCore config methods (Instead of Configure(Action config))
         // Subs here your config code. This is invoked when wrapper invoke NetCore.Configure
         public static Action Configurators;
 
-        
-        
         public static bool TryReconnect { get; set; }
         public static int ReconnectAttempt { get; private set; }
 
@@ -139,7 +140,7 @@ namespace GameNet
             {
                 if (conn == null)
                 {
-                    Debug.Log("CreateConnection via Dispatcher");
+                    Debug.Log("CreateConnection for IL2CPP");
                     CreateConnection();
                 }
                 else
@@ -153,8 +154,13 @@ namespace GameNet
         // (Internal usage)
         static void CreateConnection()
         {
+            /*ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            ServicePointManager.SecurityProtocol =
+                    SecurityProtocolType.Tls11;*/
+
             BuildConnection();
             SubcribeOnServerCalls();
+            SubcribeOnServerCallsManually();
             //SubcribeOnClientInvokes();
             Connect();
         }
@@ -171,17 +177,16 @@ namespace GameNet
             Debug.Log("> Connect");
             try
             {
-                //await conn.Start();
                 await conn.StartAsync();
                 if (conn.State == HubConnectionState.Connected)
                 {
-                    Debug.Log("[ Connected ]");
+                    Log("[ Connected ]");
                     OnConnect?.Invoke();
                     ReconnectAttempt = 0;
                 }
                 else
                 {
-                    Debug.Log("[ Reconnecting ]");
+                    Log("[ Reconnecting ]");
                     if (Application.isPlaying)
                     {
                         OnReconnect?.Invoke();
@@ -192,7 +197,7 @@ namespace GameNet
             catch (Exception err)
             {
                 Debug.Log("Connection failed: " + err);
-                Debug.Log("[ Reconnecting ]");
+                Log("[ Reconnecting ]");
                 if (Application.isPlaying)
                 {
                     OnReconnect?.Invoke();
@@ -202,8 +207,20 @@ namespace GameNet
             
         }
 
+        /// <summary>
+        /// Debug.Log if has internet access
+        /// </summary>
+        static void Log(string msg)
+        {
+            if (Application.internetReachability == NetworkReachability.NotReachable) return;
+
+            Debug.Log(msg);
+        }
+
         static async void Reconnect(bool force = false)
         {
+            Debug.Log(" > Reconnect. Force? " + force + " Try to reconnect? " + TryReconnect);
+
             if (!TryReconnect) return;
             
             if(!force) await Task.Delay(3000);
@@ -221,21 +238,44 @@ namespace GameNet
         static void BuildConnection()
         {
             Debug.Log("> Create HubConnection (autoreconnect = true) with " + Url_Hub);
-            //conn = new HubConnection(Url_Hub);
+
+            /// Not working il2cpp
+            /*conn = new HubConnectionBuilder()
+                 .WithUrl(new Uri(Url_Hub), options => {
+                     options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
+                     options.SkipNegotiation = false;
+                 })
+                 .WithAutomaticReconnect()
+                 .ConfigureLogging(logging =>
+                 {
+                     logging.ClearProviders();
+                     logging.SetMinimumLevel(LogLevel.Debug);
+                     logging.AddProvider(new UnityLogger());
+                 })
+                 .Build();
+             */
             conn = new HubConnectionBuilder()
-                .WithUrl(new Uri(Url_Hub))
-                .WithAutomaticReconnect()
-                .Build();
+                 .WithUrl(Url_Hub, (o) =>
+                 {
+                     o.SkipNegotiation = false;
+                     //o.Url = new Uri("https://bsserver.tk/GameHub");
+                     //o.Url = new Uri("https://localhost:5011/GameHub");
+                     o.CloseTimeout = TimeSpan.MaxValue;
+                     o.Transports = HttpTransportType.WebSockets;
+                 })
+                 .ConfigureLogging(logging =>
+                 {
+                     /*logging.ClearProviders();
+                     logging.SetMinimumLevel(LogLevel.Information);
+                     logging.AddProvider(new UnityLogger());*/
+                 })
+                 .Build();
 
-            conn.KeepAliveInterval = new TimeSpan(0, 0, 5);
-
-            var b = new HubConnectionBuilder();
-            
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed due to " + err.Message);
                 OnDisconnect?.Invoke();
-                BuildConnection();
+                //BuildConnection();
                 Reconnect(true);
                 return null;
             });
@@ -246,6 +286,7 @@ namespace GameNet
         // (Internal usage)
         static void SubcribeOnServerCalls()
         {
+            //return;
             Debug.Log("> Sub on server calls");
             Subs = new Subscriptions();
            
@@ -254,18 +295,98 @@ namespace GameNet
             foreach (var field in fields)
             {
                 Type t = field.FieldType;
+                //Debug.Log(" << " + field.Name);
                 conn.On(field.Name, t.GenericTypeArguments, (objects =>
                 {
+                    //Debug.Log("[CONNECTION ON] << " + field.Name);
                     FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
-                    object yourfield = info.GetValue(Subs);
-                    MethodInfo method = yourfield.GetType().GetMethod("Invoke");
-                    
-                    method.Invoke(yourfield, objects);
 
-                    return null;
+                    object yourfield = info.GetValue(Subs);
+
+                    MethodInfo method = yourfield.GetType().GetMethod("Invoke");
+
+                    //method.Invoke(yourfield, objects);
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => method.Invoke(yourfield, objects));
+                    
+                    return Task.Delay(0);
                 }));
             }
         }
+        static void SubcribeOnServerCallsManually()
+        {
+            return;
+            Debug.Log(" > Sub on server calls (manually)");
+            //HubConnectionBindExtensions.BindOnInterface<ISubs>(conn, Subs.OnTest, Subs.OnTest)
+            conn.On("OnTest2", () =>
+            {
+                Debug.Log(" << Manually on test2");
+                Subs.OnTest();
+            });
+            conn.On<int>("OnTestPar", (int i) =>
+            {
+                Debug.Log(" << Manually on OnTestPar with " + i);
+                Subs.OnTest();
+            });
+
+            conn.On<OperationMessage>(nameof(Subs.Accounts_OnLogIn), (op) =>
+            {
+                Debug.Log(" << Manualy on log in\n" + JsonConvert.SerializeObject(op, Formatting.Indented));
+                Subs.Accounts_OnLogIn(op);
+            });
+            conn.On<int>("OnOnlineChange", (i) =>
+            {
+                Debug.Log(" << Manually on online change\n" + i);
+                Subs.OnOnlineChange(i);
+            });
+            conn.On<string>(nameof(Subs.OnJoinGroup), (str) =>
+            {
+                Debug.Log(" << Manually on join group\n" + str);
+                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.OnJoinGroup(str));
+            });
+            conn.On<List<ChatGroupData>>(nameof(Subs.OnGetGroups), (ls) =>
+            {
+                Debug.Log(" << Manually on get groups\n" + ls.Count);
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    Subs.OnGetGroups(ls);
+                });
+                
+            });
+            conn.On<string>(nameof(Subs.OnSendChatMessage), (str) =>
+            {
+                Debug.Log(" << Manually OnSendChatMessage\n" + str);
+                Subs.OnSendChatMessage(str);
+            });
+            conn.On(nameof(Subs.Friends_OnGetFriends), (List<AccountData> ls) =>
+            {
+                Debug.Log(" << Manually Friends_OnGetFriends\n" + ls.Count);
+                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.Friends_OnGetFriends(ls));
+            });
+            conn.On(nameof(Subs.Accounts_OnGetAvatar), (byte[] bytes) =>
+            {
+                Debug.Log(" << Manually Accounts_OnGetAvatar\n");
+                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.Accounts_OnGetAvatar(bytes));
+            });
+        }
+
+        public class ConnectionMethodsWrapper
+        {
+            /*private readonly HubConnection _connection;
+
+            public ConnectionMethodsWrapper(HubConnection connection)
+                => _connection = connection;
+
+            public Task Test()
+                => _connection.InvokeAsync(nameof(IInvokes.Test));
+
+            public IDisposable RegisterOnFoo(Action onTest)
+                => _connection.BindOnInterface<ISubs>(x => x.OnTest, onTest);*/
+
+            /*public IDisposable RegisterOnBar(Action<string, BarData> onBar)
+                => _connection.BindOnInterface(x => x.OnBar, onBar);*/
+        }
+
+
 
         static void SubcribeOnClientInvokes()
         {
@@ -327,9 +448,11 @@ namespace GameNet
         // (Piece of 90 lines of code ._.) 
         // Блять, вот как убрать этот пиздец?
         // (External usage)
+        [Preserve]
         public static class ServerActions
         {
             public static void Test() => NetCore.conn.InvokeAsync("Test");
+            public static void TestPar(int i) => conn.InvokeAsync("TestPar", i);
             public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group)
                =>  NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 
@@ -374,11 +497,28 @@ namespace GameNet
 
                 public static void SendChangeEmailCode(string nick, string email) => conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
 
-                public static void SendReplay(string json) => conn.InvokeAsync("Accounts_SendReplay", json);
+                //public static void SendReplay(string json) => conn.InvokeAsync("Accounts_SendReplay", json);
+                public static async Task<ReplaySendData> SendReplay(ReplayData dto)
+                {
+                    return await conn.InvokeAsync<ReplaySendData>("SendReplay", dto);
+                }
 
-                public static void GetBestReplay(string nick, string trackname, string creatornick) => conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+                //public static void GetBestReplay(string ni!ck, string trackname, string creatornick) => conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
+                public static async Task<ReplayData> GetBestReplay(string nick, string trackname, string creatornick)
+                {
+                    return await conn.InvokeAsync<ReplayData>("GetBestReplay", nick, trackname, creatornick);
+                }
+
+                public static async Task<List<LeaderboardItem>> GetMapLeaderboard(string trackname, string nick) =>
+                    await conn.InvokeAsync<List<LeaderboardItem>>("GetMapLeaderboard", trackname, nick);
+
+                public static async Task<List<LeaderboardItem>> GetGlobalLeaderboard() =>
+                    await conn.InvokeAsync<List<LeaderboardItem>>("GetGlobalLeaderboard");
 
                 public static void GetBestReplays(string nick, int count) => conn.InvokeAsync("Accounts_GetBestReplays", nick, count);
+
+                public static async Task<bool> IsPassed(string nick, string author, string name) =>
+                    await conn.InvokeAsync<bool>("IsPassed", nick, author, name);
             }
 
             public static class Friends
@@ -409,28 +549,36 @@ namespace GameNet
             {
                 public static void GetGroups() => conn.InvokeAsync("Chat_GetGroups");
                 public static void JoinGroup(string nick, string group) => conn.InvokeAsync("Chat_JoinGroup", nick, group);
+                public static void LeaveGroup(string nick, string group) => conn.InvokeAsync("Chat_LeaveGroup", nick, group);
             }
         }
 
 
-        
-        
+
+
         // This class contains all methods which can invoke server on client-side
         // How server determine what should invoke? -Field name :D
         // Server: Client.Caller.SendAsync("MethodName", args)
         // There must be Action with name same as MethodName, else server won't be able to find it.
-        
+
         // Some rules to use SignalR (пиздец, а нормально можно было сделать?! Вот чтоб без ебли в жопу!)
         // 1) If you want to send class USE {GET;SET} !!!!
         // 2) Don't use ctors at all, data won't be sent
-        public class Subscriptions
+        [Preserve]
+        public class Subscriptions// : ISubs
         {
             public Action OnTest;
             public Action<OperationMessage> Accounts_OnLogIn;
             public Action<OperationMessage> Accounts_OnSignUp;
             public Action<List<AccountData>> Accounts_OnSearch;
             public Action<AccountData> Accounts_OnView;
-            
+
+            public Action<OperationMessage> Accounts_OnChangeEmail;
+            public Action<OperationMessage> Accounts_OnChangePassword;
+            public Action<bool> Accounts_OnConfirmRestore;
+
+
+
             public Action<int> OnOnlineChange;
             
             public Action<string> OnJoinGroup;
@@ -440,35 +588,69 @@ namespace GameNet
             public Action<byte[]> Accounts_OnGetAvatar;
             public Action<string, string, string> Accounts_ChangePassword;
             
-            public Action<ReplaySendData> Accounts_OnSendReplay;
+            //public Action<ReplaySendData> Accounts_OnSendReplay;
             public Action<List<ReplayData>> Accounts_OnGetBestReplays;
-            public Action<ReplayData> Accounts_OnGetBestReplay;
+            //public Action<ReplayData> Accounts_OnGetBestReplay;
 
             public Action<List<AccountData>> Friends_OnGetFriends;
 
 
             public Action<NotificationInfo> Notification_OnSend;
         }
+    }
+}
 
-        public class Invokes
+
+public class UnityLogger : ILoggerProvider
+{
+    public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
+    {
+        return new UnityLog();
+    }
+    public class UnityLog : Microsoft.Extensions.Logging.ILogger
+    {
+        public IDisposable BeginScope<TState>(TState state)
         {
-            public Action<string> Log = (str) => SuperVoid("Log", str);
+            var id = Guid.NewGuid();
+            Debug.Log($"BeginScope ({id}): {state}");
+            return new Scope<TState>(state, id);
+        }
+        struct Scope<TState> : IDisposable
+        {
+            public Scope(TState state, Guid id)
+            {
+                State = state;
+                Id = id;
+            }
 
-           
-            //public void Test(string nick, string password) {}
-            //public void Test(string nick, string password) => NetCore.Invoke();
+            public TState State { get; }
+            public Guid Id { get; }
+
+            public void Dispose() => Debug.Log($"EndScope ({Id}): {State}");
         }
 
-        public abstract class ServerInvokes
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            public abstract void Test();
-            // conn.Invoke("Test");
-
-            public abstract void Test2(string arg);
-            // conn.Invoke("Test2", arg);
-
-
-            public void Test3() => SuperVoid("123");
+            switch (logLevel)
+            {
+                case LogLevel.Trace:
+                case LogLevel.Debug:
+                case LogLevel.Information:
+                    Debug.Log($"{logLevel}, {eventId}, {state}, {exception}");
+                    break;
+                case LogLevel.Warning:
+                    Debug.LogWarning($"{logLevel}, {eventId}, {state}, {exception}");
+                    break;
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                    Debug.LogError($"{logLevel}, {eventId}, {state}, {exception}");
+                    break;
+                case LogLevel.None: break;
+            }
         }
     }
+
+    public void Dispose() { }
 }

@@ -49,7 +49,12 @@ Vibration|1
 KickVideo|True
 EnableFileLoad|0
 EnableConsole|0
-EnableFps|0";
+EnableFps|0
+GlowPowerSaberLeft|50
+GlowPowerSaberRight|50
+GlowPowerCubeLeft|50
+GlowPowerCubeRight|50
+TrailLength|50";
 
     public int score { get { return GetInt("score"); } set { SetInt("score", value); } }
 
@@ -63,6 +68,14 @@ EnableFps|0";
     public Color rightColor { get { return GetColor("rightCubeColor"); } set { SetColor("rightCubeColor", value.r, value.g, value.b); } }
     public Color leftDirColor { get { return GetColor("leftDirColor"); } set { SetColor("leftDirColor", value.r, value.g, value.b); } }
     public Color rightDirColor { get { return GetColor("rightDirColor"); } set { SetColor("rightDirColor", value.r, value.g, value.b); } }
+
+    public int GlowPowerSaberLeft { get { return GetInt("GlowPowerSaberLeft"); } set { SetInt("GlowPowerSaberLeft", value); } }
+    public int GlowPowerSaberRight { get { return GetInt("GlowPowerSaberRight"); } set { SetInt("GlowPowerSaberRight", value); } }
+    public int GlowPowerCubeLeft { get { return GetInt("GlowPowerCubeLeft"); } set { SetInt("GlowPowerCubeLeft", value); } }
+    public int GlowPowerCubeRight { get { return GetInt("GlowPowerCubeRight"); } set { SetInt("GlowPowerCubeRight", value); } }
+
+    public int TrailLength { get { return GetInt("TrailLength"); } set { SetInt("TrailLength", value); } }
+
 
     #endregion
 

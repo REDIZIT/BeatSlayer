@@ -1,10 +1,13 @@
 ﻿using InGame.Game.Spawn;
-using System.Collections;
-using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class BeatCube : MonoBehaviour, IBeat
 {
+    public Transform Transform { get { return transform == null ? null : transform; } }
+
+
     public BeatCubeClass cls;
     public BeatCubeClass GetClass() { return cls; }
 
@@ -17,22 +20,31 @@ public class BeatCube : MonoBehaviour, IBeat
     BeatManager bm;
     GameManager gm;
 
-    public float speed;
     public float maxDistance;
+
+    /// <summary>
+    /// Multiplier of cube calculated speed from 0 to 1
+    /// </summary>
+    public float SpeedMultiplier { get; set; }
+    public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
 
     bool useSoundEffect;
 
     float materialThreshold = 0.5f;
     float thresholdChange = -1;
 
+    Stopwatch w = new Stopwatch();
+
     bool isDead;
 
     public void Setup(GameManager gm, bool useSoundEffect, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
     {
+        w.Start();
+
         this.gm = gm;
         this.useSoundEffect = useSoundEffect;
         this.cls = cls;
-        speed *= cubesSpeed * cls.speed;
+        SpeedMultiplier = 1;
         this.bm = bm;
 
         if(cls.type == BeatCubeClass.Type.Point)
@@ -62,8 +74,31 @@ public class BeatCube : MonoBehaviour, IBeat
         {
             Color saberColor = cls.saberType == 1 ? bm.rightSaberColor : bm.leftSaberColor;
             Color arrowColor = cls.saberType == 1 ? bm.rightArrowColor : bm.leftArrowColor;
-            renderer.materials[1].SetColor("_Color", saberColor * 2);
-            renderer.materials[1].SetColor("_EmissionColor", saberColor * 2);
+
+            if(cls.saberType == 1)
+            {
+                //saberColor *= (1 + SSytem.instance.GlowPowerCubeRight / 15f);
+
+                //saberColor *= 1 + Mathf.Pow(2, SSytem.instance.GlowPowerCubeRight / 75f);
+
+                float intensity = (saberColor.r + saberColor.g + saberColor.b) / 3f;
+                float factor = (1 + SSytem.instance.GlowPowerCubeRight / 25f) / intensity;
+                saberColor *= new Color(saberColor.r * factor, saberColor.g * factor, saberColor.b * factor, saberColor.a);
+            }
+            else
+            {
+                //saberColor *= (1 + SSytem.instance.GlowPowerCubeLeft / 15f);
+
+                //saberColor *= 1 + Mathf.Pow(2, SSytem.instance.GlowPowerCubeLeft / 75f);
+
+                float intensity = (saberColor.r + saberColor.g + saberColor.b) / 3f;
+                //float factor = 1f / intensity;
+                float factor = (1 + SSytem.instance.GlowPowerCubeRight / 25f) / intensity;
+                saberColor *= new Color(saberColor.r * factor, saberColor.g * factor, saberColor.b * factor, saberColor.a);
+            }
+
+            renderer.materials[1].SetColor("_Color", saberColor);
+            renderer.materials[1].SetColor("_EmissionColor", saberColor);
             renderer.materials[2].SetColor("_Color", arrowColor * 2);
             renderer.materials[2].SetColor("_EmissionColor", arrowColor * 2);
         }
@@ -86,9 +121,16 @@ public class BeatCube : MonoBehaviour, IBeat
     }
 
 
-    public void OnPoint(Vector2 direction)
+    public void OnPoint(Vector2 direction, bool destroy = false)
     {
+        if (destroy)
+        {
+            Slice();
+            return;
+        }
+
         if (direction.normalized == Vector2.zero) return;
+
 
         if (cls.type == BeatCubeClass.Type.Point)
         {
@@ -128,12 +170,20 @@ public class BeatCube : MonoBehaviour, IBeat
         }
     }
 
+    public void Destroy()
+    {
+        Slice();
+    }
+
     void Slice()
     {
         if (isDead) return;
         isDead = true;
 
-        gm.BeatCubeSliced();
+        gm.BeatCubeSliced(this);
+
+        w.Stop();
+        Debug.Log("Life time " + w.ElapsedMilliseconds);
 
         OnSlice();
     }
@@ -160,10 +210,14 @@ public class BeatCube : MonoBehaviour, IBeat
         // 
         //
         //transform.position += new Vector3(0, 0, -1) * speed * Time.deltaTime;
-        transform.position += new Vector3(0, 0, -1) * bm.CubeSpeed * cls.speed;
+        transform.position += new Vector3(0, 0, -1) * CurrentSpeed * SpeedMultiplier;
         if (transform.position.z <= maxDistance && !isDead)
         {
-            gm.MissedBeatCube();
+            gm.MissedBeatCube(this);
+
+            w.Stop();
+            Debug.Log("Life time " + w.ElapsedMilliseconds);
+
             Destroy(gameObject);
         }
     }
@@ -187,7 +241,7 @@ public class BeatCube : MonoBehaviour, IBeat
 
     void SlicedUpdate()
     {
-        speed -= (speed - Time.deltaTime) / 8f;
+        SpeedMultiplier -= (SpeedMultiplier - Time.deltaTime) / 8f;
         if(materialThreshold >= 1)
         {
             Destroy(gameObject);
@@ -197,7 +251,14 @@ public class BeatCube : MonoBehaviour, IBeat
 
 public interface IBeat
 {
+    Transform Transform { get; }
     void Setup(GameManager gm, bool useSliceSound, BeatCubeClass cls, float cubesSpeed, BeatManager bm);
-    void OnPoint(Vector2 direction);
+    void OnPoint(Vector2 direction, bool destroy = false);
+    void Destroy();
     BeatCubeClass GetClass();
+
+    /// <summary>
+    /// Range from 0 to 1 preferred
+    /// </summary>
+    float SpeedMultiplier { get; set; }
 }

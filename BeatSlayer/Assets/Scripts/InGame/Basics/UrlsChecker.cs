@@ -40,9 +40,7 @@ public class UrlsChecker
         
         CheckClassForLocalhost(typeof(AccountManager), localhostUrls);
         CheckClassForLocalhost(typeof(DatabaseScript), localhostUrls);
-        CheckClassForLocalhost(typeof(Helpers), localhostUrls);
         CheckClassForLocalhost(typeof(CoversManager), localhostUrls);
-        //CheckClassForLocalhost(typeof(Web.WebAPI), localhostUrls);
 
         
         w.Stop();

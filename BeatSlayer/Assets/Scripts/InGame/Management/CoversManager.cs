@@ -74,27 +74,27 @@ namespace CoversManagement
 
             // file path for downloaded map cover
             Texture2D tex = ProjectManager.LoadCoverOrNull(requests[0].trackname);
-            Debug.Log("Cover: > Handling " + requests[0].trackname);
+            //Debug.Log("Cover: > Handling " + requests[0].trackname);
             if (tex != null)
             {
-                Debug.Log("Cover: << Load downloaded texture");
+                //Debug.Log("Cover: << Load downloaded texture");
                 requests[0].image.texture = tex;
                 requests.RemoveAt(0);
                 OnRequestsListUpdate();
             }
             else
             {
-                Debug.Log("Cover: << No downloaded texture");
+                //Debug.Log("Cover: << No downloaded texture");
                 if (Application.internetReachability != NetworkReachability.NotReachable)
                 {
-                    Debug.Log("Cover: >> Load downloaded texture");
+                    //Debug.Log("Cover: >> Download cover");
                     Uri uri = new Uri(url);
                     client.DownloadDataAsync(uri);
                     isDownloading = true;
                 }
                 else
                 {
-                    Debug.Log("Cover: >> No inet, set default");
+                    //Debug.Log("Cover: >> No inet, set default");
                     requests[0].image.texture = DefaultTexture;
                     requests.RemoveAt(0);
                     OnRequestsListUpdate();

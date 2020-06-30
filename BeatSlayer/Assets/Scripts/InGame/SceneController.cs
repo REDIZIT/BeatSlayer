@@ -147,6 +147,15 @@ public class SceneloadParameters
     public string AudioFilePath { get; private set; }
     public string ProjectFolderPath { get; private set; }
 
+    // Practice mode
+    public bool IsPracticeMode { get; set; }
+    public float StartTime { get; set; }
+    public float MusicSpeed { get; set; }
+    public float CubesSpeed { get; set; }
+
+
+
+
     private SceneloadParameters() { }
 
     public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo)
@@ -156,6 +165,23 @@ public class SceneloadParameters
             Type = LoadType.Author,
             Map = mapInfo,
             difficultyInfo = difficultyInfo
+        };
+        return parameters;
+    }
+    /// <summary>
+    /// Start author music with practice mode
+    /// </summary>
+    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo, float startTime, float musicSpeed, float cubesSpeed)
+    {
+        var parameters = new SceneloadParameters()
+        {
+            Type = LoadType.Author,
+            Map = mapInfo,
+            difficultyInfo = difficultyInfo,
+            IsPracticeMode = true,
+            StartTime = startTime,
+            MusicSpeed = musicSpeed,
+            CubesSpeed = cubesSpeed
         };
         return parameters;
     }
@@ -303,7 +329,7 @@ public class ProjectLoaderAudioFile : IProjectLoader
 {
     public IEnumerator LoadProject(SceneloadParameters parameters)
     {
-        Debug.Log("[LOADER] Loading from AudioFile");
+        Debug.Log("[LOADER] Loading from AudioFile " + parameters.AudioFilePath);
 
         string audioFilePath = parameters.AudioFilePath;
         string filename = Path.GetFileNameWithoutExtension(audioFilePath);

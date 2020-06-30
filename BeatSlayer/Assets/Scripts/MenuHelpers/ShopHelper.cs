@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.SimpleLocalization;
 using GameNet;
+using InGame.Helpers;
+using InGame.Shop;
+using InGame.ScriptableObjects;
+using InGame.Menu.Shop;
 
 public class ShopHelper : MonoBehaviour
 {
     public MenuScript_v2 menuscript;
     public GameObject tutorial;
+    public ColorPickerUI colorPicker;
     
 
     public Transform skillsScrollView, sabersView, effectsContent;
@@ -23,9 +27,19 @@ public class ShopHelper : MonoBehaviour
     public Sprite[] boostersSprites;
 
     public Image leftColorImg, rightColorImg, leftDirColorImg, rightArrowColorImg;
-    public FlexibleColorPicker colorpicker;
+    public Image leftSaberColorImg, rightSaberColorImg;
+    public Image leftCubeColorImg, rightCubeColorImg;
+
+    public Slider glowSaberLeftSlider, glowSaberRightSlider, glowCubeLeftSlider, glowCubeRightSlider;
+    public Slider trailLengthSlider;
+
 
     public Transform colorselect;
+
+    public SODB sodb;
+
+    [Header("Item contents")]
+    public Transform saberContent;
 
     private void Start()
     {
@@ -33,22 +47,89 @@ public class ShopHelper : MonoBehaviour
         skills = menuscript.prefsManager.prefs.skills;
         boosters = menuscript.prefsManager.prefs.boosters;
         UpdateSkillsView();
-        NetCore.OnLogIn += () =>
-        {
-            
 
-            
-        };
+        RefreshSabersList();
     }
 
-    void Update()
+
+
+
+    // Cool stuff (relative) here
+
+
+    public void RefreshSabersList()
     {
-        if (Input.GetKeyDown(KeyCode.K))
+        HelperUI.FillContent<SaberShopItem, SaberSO>(saberContent, sodb.sabers, (item, data) =>
         {
-            //NetCorePayload.CurrentAccount.Coins += 10;
-        }
+            item.Refresh(data, menuscript.prefsManager.prefs);
+        });
     }
-    
+    public void RefreshColorSection()
+    {
+        leftSaberColorImg.color = SSytem.instance.leftColor;
+        rightSaberColorImg.color = SSytem.instance.rightColor;
+
+        leftCubeColorImg.color = SSytem.instance.leftDirColor;
+        rightCubeColorImg.color = SSytem.instance.rightDirColor;
+
+        RefreshSliders();
+    }
+    private void RefreshSliders()
+    {
+        glowSaberLeftSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerSaberLeft);
+        glowSaberRightSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerSaberRight);
+        glowCubeLeftSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerCubeLeft);
+        glowCubeRightSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerCubeRight);
+        trailLengthSlider.SetValueWithoutNotify(SSytem.instance.TrailLength);
+    }
+
+
+    public async void OnSaberColorBtnClick(int hand)
+    {
+        Color color = await colorPicker.GetColorAsync(hand == -1 ? SSytem.instance.leftColor : SSytem.instance.rightColor);
+
+        if (hand == -1) SSytem.instance.leftColor = color;
+        else if (hand == 1) SSytem.instance.rightColor = color;
+
+        SSytem.instance.SaveFile();
+
+        RefreshColorSection();
+        RefreshSabersList();
+    }
+    public async void OnCubeColorBtnClick(int hand)
+    {
+        Color color = await colorPicker.GetColorAsync(hand == -1 ? SSytem.instance.leftDirColor : SSytem.instance.rightDirColor);
+
+        if (hand == -1) SSytem.instance.leftDirColor = color;
+        else if (hand == 1) SSytem.instance.rightDirColor = color;
+
+        SSytem.instance.SaveFile();
+
+        RefreshColorSection();
+        RefreshSabersList();
+    }
+
+    public void OnGlowPowerSliderChange()
+    {
+        SSytem.instance.GlowPowerSaberLeft = (int)glowSaberLeftSlider.value;
+        SSytem.instance.GlowPowerSaberRight = (int)glowSaberRightSlider.value;
+        SSytem.instance.GlowPowerCubeLeft = (int)glowCubeLeftSlider.value;
+        SSytem.instance.GlowPowerCubeRight = (int)glowCubeRightSlider.value;
+        SSytem.instance.TrailLength = (int)trailLengthSlider.value;
+
+        Debug.Log("On slider change");
+
+        SSytem.instance.SaveFile();
+    }
+
+
+    // Not so cool there
+
+
+
+
+
+
 
     int selectedPage = 0;
     public void OnWindowChange(int id)
@@ -102,29 +183,33 @@ public class ShopHelper : MonoBehaviour
     }
     void UpdateSabersView()
     {
-        Transform sabersContent = sabersView.GetChild(0);
-        for (int i = 0; i < sabersContent.childCount; i++)
-        {
-            Transform item = sabersContent.GetChild(i).GetChild(0);
-            item.GetChild(4).gameObject.SetActive(!menuscript.prefsManager.prefs.boughtSabers[i]);
-            if (!menuscript.prefsManager.prefs.boughtSabers[i])
-            {
-                item.GetChild(4).GetChild(1).GetComponent<Text>().text = LocalizationManager.Localize("Cost") + ": " + menuscript.prefsManager.prefs.sabersCosts[i];
-            }
-            else
-            {
-                Color32 imageColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(12, 12, 12, 232) : new Color32(255, 128, 0, 232);
-                item.GetComponent<Image>().color = imageColor;
-                Color32 btnColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(255, 128, 0, 255) : new Color32(34, 34, 34, 255);
-                item.GetChild(3).GetComponent<Image>().color = btnColor;
-                Color32 textColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(34, 34, 34, 255) : new Color32(255,255,255,255);
-                string textStr = i != menuscript.prefsManager.prefs.selectedSaber ? LocalizationManager.Localize("Select") : LocalizationManager.Localize("Selected");
-                item.GetChild(3).GetChild(0).GetComponent<Text>().color = textColor;
-                item.GetChild(3).GetChild(0).GetComponent<Text>().text = textStr;
-            }
-        }
-
+        RefreshSabersList();
         UpdateColors();
+
+        return;
+        //Transform sabersContent = sabersView.GetChild(0);
+        //for (int i = 0; i < sabersContent.childCount; i++)
+        //{
+        //    Transform item = sabersContent.GetChild(i).GetChild(0);
+        //    item.GetChild(4).gameObject.SetActive(!menuscript.prefsManager.prefs.boughtSabers[i]);
+        //    if (!menuscript.prefsManager.prefs.boughtSabers[i])
+        //    {
+        //        item.GetChild(4).GetChild(1).GetComponent<Text>().text = LocalizationManager.Localize("Cost") + ": " + menuscript.prefsManager.prefs.sabersCosts[i];
+        //    }
+        //    else
+        //    {
+        //        Color32 imageColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(12, 12, 12, 232) : new Color32(255, 128, 0, 232);
+        //        item.GetComponent<Image>().color = imageColor;
+        //        Color32 btnColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(255, 128, 0, 255) : new Color32(34, 34, 34, 255);
+        //        item.GetChild(3).GetComponent<Image>().color = btnColor;
+        //        Color32 textColor = i != menuscript.prefsManager.prefs.selectedSaber ? new Color32(34, 34, 34, 255) : new Color32(255,255,255,255);
+        //        string textStr = i != menuscript.prefsManager.prefs.selectedSaber ? LocalizationManager.Localize("Select") : LocalizationManager.Localize("Selected");
+        //        item.GetChild(3).GetChild(0).GetComponent<Text>().color = textColor;
+        //        item.GetChild(3).GetChild(0).GetComponent<Text>().text = textStr;
+        //    }
+        //}
+
+        
     }
     void UpdateEffectsView()
     {
@@ -180,6 +265,8 @@ public class ShopHelper : MonoBehaviour
 
     public void BuyBtnClick(Text text)
     {
+        if (Payload.CurrentAccount == null) return;
+
         if(text.text == LocalizationManager.Localize("Time travel"))
         {
             skills[0].count++;
@@ -213,6 +300,7 @@ public class ShopHelper : MonoBehaviour
 
         menuscript.CheckAchievement();
     }
+    
 
     public void SelectBtnClick(Text text)
     {
@@ -234,15 +322,21 @@ public class ShopHelper : MonoBehaviour
         OnWindowChange(selectedPage);
     }
 
-    public void ButSaberClick(int id)
+    public void BuySaber(int id)
     {
+        if (Payload.CurrentAccount == null) return;
+
+        SaberSO saberSO = sodb.sabers.Find(c => c.id == id);
+
         if (!menuscript.prefsManager.prefs.boughtSabers[id])
         {
-            if (Payload.CurrentAccount.Coins >= menuscript.prefsManager.prefs.sabersCosts[id])
+            if (Payload.CurrentAccount.Coins >= saberSO.cost)
             {
                 menuscript.prefsManager.prefs.boughtSabers[id] = true;
-                Payload.CurrentAccount.Coins -= menuscript.prefsManager.prefs.sabersCosts[id];
-                NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -menuscript.prefsManager.prefs.sabersCosts[id]);
+                menuscript.prefsManager.prefs.sabers[id].isBought = true;
+
+                Payload.CurrentAccount.Coins -= saberSO.cost;
+                NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -saberSO.cost);
 
                 menuscript.prefsManager.Save();
                 UpdateSabersView();
@@ -254,9 +348,33 @@ public class ShopHelper : MonoBehaviour
         }
     }
 
-    public void SelectSaberClick(int id)
+
+
+    public void SelectSaber(int id, SaberHand hand)
     {
-        menuscript.prefsManager.prefs.selectedSaber = id;
+        //menuscript.prefsManager.prefs.selectedSaber = id;
+        if (hand == SaberHand.Both)
+        {
+            menuscript.prefsManager.prefs.selectedLeftSaberId = id;
+            menuscript.prefsManager.prefs.selectedRightSaberId = id;
+        }
+        else if (hand == SaberHand.Left)
+        {
+            menuscript.prefsManager.prefs.selectedLeftSaberId = id;
+
+            // If both -> left
+            if (menuscript.prefsManager.prefs.selectedRightSaberId == id)
+            {
+                menuscript.prefsManager.prefs.selectedRightSaberId = 0;
+            }
+        }
+        else
+        {
+            //menuscript.prefsManager.prefs.selectedLeftSaberId = -1;
+            if (menuscript.prefsManager.prefs.selectedLeftSaberId == id) menuscript.prefsManager.prefs.selectedLeftSaberId = 0;
+            menuscript.prefsManager.prefs.selectedRightSaberId = id;
+        }
+
         menuscript.prefsManager.Save();
         UpdateSabersView();
     }
@@ -317,11 +435,11 @@ public class ShopHelper : MonoBehaviour
     int colorpickingForId;
     public void OpenColorPicker(int colorId)
     {
-        colorpicker.transform.parent.gameObject.SetActive(true);
-        colorpicker.color = colorId == -1 ? leftColorImg.color : rightColorImg.color;
-        colorpicker.startingColor = colorpicker.color;
-        colorpickingForId = colorId;
-        colorpicker.callback = OnColorpicked;
+        //colorpicker.transform.parent.gameObject.SetActive(true);
+        //colorpicker.color = colorId == -1 ? leftColorImg.color : rightColorImg.color;
+        //colorpicker.startingColor = colorpicker.color;
+        //colorpickingForId = colorId;
+        //colorpicker.callback = OnColorpicked;
     }
     public void OnColorpicked(Color clr)
     {
@@ -367,6 +485,7 @@ public class ShopHelper : MonoBehaviour
     }
 }
 
+
 [Serializable]
 public class Skill
 {
@@ -381,4 +500,11 @@ public class Booster
     public string name, description;
     public int count;
     public int cost;
+}
+
+[Serializable]
+public class Saber
+{
+    public int id;
+    public bool isBought;
 }

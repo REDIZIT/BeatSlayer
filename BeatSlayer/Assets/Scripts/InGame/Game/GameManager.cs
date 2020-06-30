@@ -1,18 +1,10 @@
-﻿using Assets.SimpleLocalization;
-using InGame.Game;
+﻿using InGame.Game;
 using InGame.Game.Spawn;
 using InGame.SceneManagement;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using DatabaseManagement;
-using GameNet;
-using Newtonsoft.Json;
 using ProjectManagement;
-using Ranking;
 using Testing;
 using TMPro;
 using UnityEngine;
@@ -20,6 +12,7 @@ using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
+using InGame.Animations;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -27,6 +20,7 @@ using UnityEditor;
 public class GameManager : MonoBehaviour
 {
     #region Unity components
+
     public SettingsManager settingsManager { get { return GetComponent<SettingsManager>(); } }
     public AccountManager accountManager;
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
@@ -34,14 +28,21 @@ public class GameManager : MonoBehaviour
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public GameUIManager UIManager { get { return GetComponent<GameUIManager>(); } }
     public BeatManager beatManager { get { return GetComponent<BeatManager>(); } }
+
+    public ScoringManager scoringManager;
+    public MissAnim missAnim;
+    public CheatEngine cheatEngine;
+
     #endregion
 
 
-    [HideInInspector] public Replay replay;
+
     [HideInInspector] public Project project;
     [HideInInspector] public DifficultyInfo difficultyInfo;
     [HideInInspector] public Difficulty difficulty;
     [HideInInspector] public TestRequest testRequest;
+
+    private float Pitch { get; set; }
 
 
 
@@ -52,8 +53,6 @@ public class GameManager : MonoBehaviour
 
     public GameObject[] scenes;
 
-    [Header("Text Mesh Pro")]
-    public Text missedTextMsg;
     public TextMeshPro scoreText, missedText, perText, comboText, comboMultiplierText;
     public Text trackText;
 
@@ -62,12 +61,7 @@ public class GameManager : MonoBehaviour
     [Header("Beat cubes stuff")]
     public bool displayColor;
     public SpawnPointScript[] spawnPoints;
-    [HideInInspector] public List<BeatCubeClass> beats = new List<BeatCubeClass>();
-
-    [HideInInspector] public float comboValue = 0, comboValueMax = 16, comboMultiplierAnimValue;
-    [HideInInspector] public float comboMultiplier = 1;
-    [HideInInspector] public float earnedScore;
-    [HideInInspector] public float scoreMultiplier;
+    [HideInInspector] public float comboMultiplierAnimValue;
 
     
     public GameObject BeatCubePrefab, BeatLinePrefab;
@@ -85,7 +79,6 @@ public class GameManager : MonoBehaviour
     public GameObject pausePanel;
     public GameObject lvlfinishPanel, pauseButton;
     public Text coinsText;
-    public Animator missEffectAnimator;
     public Text fpsText;
     public Slider trackTimeSlider;
     public Text trackTextSliderText, timeInSecondsText;
@@ -102,17 +95,27 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool paused;
     [HideInInspector] public bool noarrows;
     [HideInInspector] public bool nolines;
-    [HideInInspector] public bool gameCompleted, gameStarted, gameStarting;
+    [HideInInspector] public bool gameCompleted;
+
+    /// <summary>
+    /// Is game in period when asource isn't playing but cubes are spawning
+    /// </summary>
+    public bool IsGameStartingMap { get; set; }
+    public GameState State { get; set; }
+    public enum GameState
+    {
+        Starting, Started
+    }
     [HideInInspector] public string fullTrackName;
-    [HideInInspector] public float maxCombo = 1;
 
     // Settings
     float sliceeffectVolume = 0.8f;
-    
-    float bitCubeEndTime = 0; // Изначально 0.7 т.к. позиция спавнера 42, а куб доходит до 0 координаты (скорость куба 60) за 0.7 сек (получили из 42/60)
-    // 70 - Нормальная дистанция для разрезания
-    // 60 - Скорость куба
-    // bitCubeEndTime = 70 / 60 = ~1.16
+
+
+
+
+
+
 
 
     public void InitProject()
@@ -128,27 +131,29 @@ public class GameManager : MonoBehaviour
         
         difficulty = project.difficulties.Find(c => c.id == difficultyInfo.id);
         Debug.Log("Id: " + difficultyInfo.id + "\nIs DIFF null? " + (difficulty == null) + "\nCount is: " + project.difficulties.Count);
-        foreach (var d in project.difficulties)
-        {
-            Debug.Log(d.name + " with id " + d.id);
-        }
         
-        var ls = difficulty.beatCubeList.OrderBy(c => c.time);
+        IEnumerable<BeatCubeClass> ls = difficulty == null ? project.beatCubeList.OrderBy(c => c.time) : difficulty.beatCubeList.OrderBy(c => c.time);
 
-        beats.AddRange(ls);
+        if (LoadingData.loadparams.IsPracticeMode)
+        {
+            ls = ls.Where(c => c.time >= LoadingData.loadparams.StartTime);
+        }
+
+
+        beatManager.beats.AddRange(ls);
     }
     public void ProcessBeatTime()
     {
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
-            //float asTime = gameStarting ? asReplacer : audioManager.asource.time + bitCubeEndTime / replay.musicSpeed;
-            float beatAudioTime = gameStarting ? asReplacer : audioManager.asource.time + beatManager.fieldCrossTime;
-            if (beats.Count > 0 && beatAudioTime >= beats[0].time)
-            {
-                beatManager.SpawnBeatCube(beats[0]);
-                beats.RemoveAt(0);
-                ProcessBeatTime();
-            }
+            beatManager.ProcessSpawnCycle();
+            //float beatAudioTime = IsGameStartingMap ? asReplacer : audioManager.asource.time + beatManager.fieldCrossTime;
+            //if (beats.Count > 0 && beatAudioTime >= beats[0].time)
+            //{
+            //    beatManager.SpawnBeatCube(beats[0]);
+            //    beats.RemoveAt(0);
+            //    ProcessBeatTime();
+            //}
         }
         else
         {
@@ -183,7 +188,7 @@ public class GameManager : MonoBehaviour
 
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
 
-        scoreMultiplier = SettingsManager.GetScoreMultiplier();
+        scoringManager.scoreMultiplier = SettingsManager.GetScoreMultiplier();
 
         accountManager = GetComponent<AccountManager>();
 
@@ -198,41 +203,37 @@ public class GameManager : MonoBehaviour
             InitProject();
         }
 
-        replay = new Replay();
-        replay.author = project.author;
-        replay.name = project.name;
-        replay.nick = project.creatorNick;
-        
-        Debug.Log("Is difficultyInfo null? " + (difficultyInfo == null));
-        replay.difficulty = difficultyInfo.stars;
-        replay.diffucltyName = difficultyInfo.name;
-        
-        // Deprecated coz of Difficulty system
-        //replay.cubesSpeed = Mathf.Clamp(SSytem.instance.GetFloat("CubesSpeed") / 10f, 0.5f, 1.5f);
-        //replay.musicSpeed = Mathf.Clamp(SSytem.instance.GetFloat("MusicSpeed") / 10f, 0.5f, 1.5f);
-        replay.cubesSpeed = difficulty.speed;
-        replay.musicSpeed = 1;
+        scoringManager.OnGameStart(LoadingData.loadparams.Map, LoadingData.loadparams.difficultyInfo, difficulty);
+
 
         InitSettings();
 
-        beatManager.Setup(this, noarrows, nolines, replay);
+        beatManager.Setup(this, noarrows, nolines, difficulty.speed);
 
 
         InitGraphics();
 
         StartForUI(); 
-        
-        /*NetCore.Configure(() =>
-        {
-            finishHandler.Configure();
-        });*/
     }
     void InitAudio()
     {
         audioManager.asource.clip = LoadingData.aclip;
 
-        audioManager.asource.pitch = replay.musicSpeed;
-        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch =replay.musicSpeed;
+        Pitch = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.MusicSpeed : 1;
+        float time = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.StartTime : 0;
+
+
+        audioManager.asource.pitch = Pitch;
+        audioManager.asource.time = time;
+
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile)
+        {
+            audioManager.spectrumAsource.pitch = Pitch;
+            audioManager.spectrumAsource.time = time;
+        }
+
+
+
 
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile)
         {
@@ -262,12 +263,17 @@ public class GameManager : MonoBehaviour
         fpsText.gameObject.SetActive(false);
 
         likeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
-        //likeBtnImg.gameObject.SetActive(true);
         dislikeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
-        //dislikeBtnImg.gameObject.SetActive(true);
 
-        rightSaber.Init(SSytem.instance.rightColor, prefsManager.prefs.selectedSaber, prefsManager.prefs.selectedSaberEffect);
-        leftSaber.Init(SSytem.instance.leftColor, prefsManager.prefs.selectedSaber, prefsManager.prefs.selectedSaberEffect);
+
+
+        Color leftSaberColor = SSytem.instance.leftColor * (1 + SSytem.instance.GlowPowerSaberLeft / 25f);
+        Color rightSaberColor = SSytem.instance.rightColor * (1 + SSytem.instance.GlowPowerSaberRight / 25f);
+
+        float trailLifeTime = SSytem.instance.TrailLength / 100f * 0.4f;
+
+        leftSaber.Init(leftSaberColor, prefsManager.prefs.selectedLeftSaberId, prefsManager.prefs.selectedSaberEffect, trailLifeTime);
+        rightSaber.Init(rightSaberColor, prefsManager.prefs.selectedRightSaberId, prefsManager.prefs.selectedSaberEffect, trailLifeTime);
     }
     void InitSettings()
     {
@@ -279,11 +285,6 @@ public class GameManager : MonoBehaviour
             noarrows = SSytem.instance.GetBool("NoArrows");
             nolines = SSytem.instance.GetBool("NoLines");
         }
-
-
-        float distanceToSpawn = spawnPoints[0].transform.position.z;
-        float localOffset = 10;
-        bitCubeEndTime = (distanceToSpawn + localOffset) / (replay.cubesSpeed * 60) *replay.musicSpeed;
     }
 
 
@@ -308,41 +309,32 @@ public class GameManager : MonoBehaviour
         {
             trackText.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0);
             trackText.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0);
-            trackText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 36);
+            trackText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 170);
         }
         else if (side == 2)
         {
             trackText.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0);
             trackText.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0);
-            trackText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 22);
+            trackText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 90);
 
-            trackText.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 10f);
+            trackText.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 110);
 
-            trackText.transform.GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 8.3f);
-            trackText.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition =
-                new Vector2(trackText.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition.x, 8.3f);
+            //trackText.transform.GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 8.3f);
+            //trackText.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition =
+            //    new Vector2(trackText.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>().anchoredPosition.x, 8.3f);
         }
     }
     void Start()
     {
-        trackText.text = fullTrackName + (replay.musicSpeed == 1 ? "" : " x" +replay.musicSpeed);
+        trackText.text = fullTrackName;
 
         AlignToSide();
 
         InitAudio();
 
-        gameStarting = true;
-        gameStarted = true;
+        IsGameStartingMap = true;
 
         StartCoroutine(beatManager.IOnStart());
-        /*if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) { audioManager.PlaySpectrumSource(); }
-        //yield return new WaitForSeconds(bitCubeEndTime /replay.musicSpeed / replay.cubesSpeed);
-
-        for (int i = 0; i < 60; i++)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-*/
     }
 
     //ScreenOrientation screenOrientation = ScreenOrientation.Landscape;
@@ -385,40 +377,24 @@ public class GameManager : MonoBehaviour
         if (paused) return;
 
 
-        if (earnedScore >= 1)
+        
+
+        if (IsGameStartingMap)
         {
-            float rounded = Mathf.FloorToInt(earnedScore) * scoreMultiplier;
-            earnedScore -= rounded;
-            replay.score += rounded;
+            asReplacer += Time.deltaTime;
+        }
+        if (paused)
+        {
+            if (audioManager.asource.isPlaying)
+            {
+                audioManager.asource.Pause();
+                if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
+            }
+            return;
         }
 
-        if (gameStarted)
-        {
-            if (gameStarting)
-            {
-                asReplacer += Time.deltaTime;
-            }
-            if (paused)
-            {
-                if (audioManager.asource.isPlaying)
-                {
-                    audioManager.asource.Pause();
-                    if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
-                }
-                return;
-            }
+        ProcessBeatTime();
 
-            ProcessBeatTime();
-        }
-
-
-        if (trackTimeSlider.value >= 50)
-        {
-            if (trackTextSliderText.transform.parent != trackTimeSlider.transform)
-            {
-                trackTextSliderText.transform.SetParent(trackTimeSlider.transform);
-            }
-        }
         fpsText.text = 1f / Time.smoothDeltaTime + " FPS";
 
         
@@ -435,46 +411,19 @@ public class GameManager : MonoBehaviour
         }
         else Debug.LogError("asource is null");
 
-
-        // =================================
-        //  Игровые процессы
-        if (!gameStarted) return;
-
         finishHandler.CheckLevelFinish();
         
         #region Score and combo
 
         if (!gameCompleted)
         {
-            scoreText.text = Mathf.RoundToInt(replay.score * 10f) / 10f + "";
-            missedText.text = replay.missed.ToString();
-            perText.text = Mathf.RoundToInt(replay.Accuracy * 1000f) / 10f + "%";
-            if (comboValue >= comboValueMax && comboMultiplier < 16)
-            {
-                comboValue = 2;
-                comboMultiplier *= 2;
-                comboValueMax = 8 * comboMultiplier;
-                StartCoroutine(comboMultiplierAnim());
-            }
-            else if (comboValue <= 0)
-            {
-                if (comboMultiplier != 1)
-                {
-                    comboMultiplier /= 2;
-                    comboValue = comboValueMax - 5;
-                }
-                else
-                {
-                    comboValue = 0;
-                }
-            }
-            if (comboValue > 0)
-            {
-                //comboValue -= Time.deltaTime * comboMultiplier * 0.4f;
-            }
-            comboValueImg.fillAmount = comboValue / comboValueMax;
-            comboMultiplierText.text = "x" + comboMultiplier;
-            if (comboMultiplier > maxCombo) maxCombo = comboMultiplier;
+            scoreText.text = Mathf.RoundToInt(scoringManager.Replay.Score * 10f) / 10f + "";
+            missedText.text = scoringManager.Replay.Missed.ToString();
+            perText.text = Mathf.RoundToInt(scoringManager.Replay.Accuracy * 1000f) / 10f + "%";
+           
+            comboValueImg.fillAmount = scoringManager.comboValue / scoringManager.comboValueMax;
+            comboMultiplierText.text = "x" + scoringManager.comboMultiplier;
+            
             comboMultiplierText.transform.localScale += new Vector3(comboMultiplierAnimValue, comboMultiplierAnimValue, comboMultiplierAnimValue);
         }
 
@@ -588,10 +537,11 @@ public class GameManager : MonoBehaviour
             {
                 timespeed = 1;
             }
-            
-            audioManager.asource.pitch = timespeed * replay.musicSpeed;
-            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * replay.musicSpeed;
-            
+
+            audioManager.asource.pitch = timespeed * Pitch;
+
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * Pitch;
+
             Time.timeScale = timespeed;
             yield return new WaitForEndOfFrame();
         }
@@ -616,39 +566,13 @@ public class GameManager : MonoBehaviour
 
     #region Beat cubes voids
 
-    public List<GameObject> activeCubes = new List<GameObject>();
+    public List<IBeat> activeCubes = new List<IBeat>();
     
-    string missedBeatCubeMsg = "";
-    public void MissedBeatCube()
+    public void MissedBeatCube(IBeat beat)
     {
-        if (missedBeatCubeMsg == "") missedBeatCubeMsg = LocalizationManager.Localize("Miss");
+        scoringManager.OnCubeMiss();
 
-        int alreadyMissed = 0;
-        missEffectAnimator.Play("MissEffectAnim");
-        if (missedTextMsg.color.a == 0)
-        {
-            missedTextMsg.text = missedBeatCubeMsg;
-        }
-        else
-        {
-            if (missedTextMsg.text == missedBeatCubeMsg)
-            {
-                alreadyMissed = 2;
-                missedTextMsg.text = missedBeatCubeMsg + " x2";
-            }
-            else if (missedTextMsg.text.Contains(missedBeatCubeMsg + " x"))
-            {
-                alreadyMissed = int.Parse(missedTextMsg.text.Replace(missedBeatCubeMsg + " x", ""));
-                alreadyMissed++;
-                missedTextMsg.text = missedBeatCubeMsg + " x" + alreadyMissed;
-            }
-        }
-
-        missedTextMsg.transform.GetComponent<Animator>().Play(0);
-        comboValue -= 10;
-        replay.score -= 5 * scoreMultiplier;
-        if (replay.score < 0) replay.score = 0;
-        replay.missed++;
+        missAnim.OnMiss();
 
         if (!prefsManager.prefs.hasAchiv_Blinked)
         {
@@ -664,10 +588,11 @@ public class GameManager : MonoBehaviour
         }
 
         UseSkill();
+        cheatEngine.RemoveCube(beat);
     }
 
-    int[] audio_hitsSoundId = new int[10];
-    public void BeatCubeSliced()
+
+    public void BeatCubeSliced(IBeat beat)
     {
         try
         {
@@ -681,15 +606,17 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Slice sound err: " + err);
         }
 
-        replay.score += comboMultiplier * scoreMultiplier;
-        replay.sliced++;
-        comboValue += 1;
+        scoringManager.OnCubeHit();
+        cheatEngine.RemoveCube(beat);
     }
-    public void BeatLineSliced()
+    public void BeatLineSliced(IBeat beat)
     {
-        replay.score += comboMultiplier * scoreMultiplier * 0.1f;
-        replay.sliced++;
-        comboValue += 1;
+        scoringManager.OnLineHit();
+        cheatEngine.RemoveCube(beat);
+    }
+    public void BeatLineHold()
+    {
+        scoringManager.OnLineHold();
     }
 
     
@@ -731,14 +658,14 @@ public class GameManager : MonoBehaviour
         audioManager.PauseSource();
         for (int i = 0; i < activeCubes.Count; i++)
         {
-            activeCubes[i].GetComponent<Bit>().speed = 0;
+            activeCubes[i].SpeedMultiplier = 0;
         }
         yield return new WaitForSeconds(0.5f);
 
 
         for (int i = 0; i < activeCubes.Count; i++)
         {
-            activeCubes[i].GetComponent<Bit>().speed = -activeCubes[i].GetComponent<Bit>()._speed;
+            activeCubes[i].SpeedMultiplier = -1;
         }
         while (currentTime > timeToTravel)
         {
@@ -748,23 +675,23 @@ public class GameManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        for (int i = 0; i < activeCubes.Count; i++) activeCubes[i].GetComponent<Bit>().speed = 0;
+        for (int i = 0; i < activeCubes.Count; i++) activeCubes[i].SpeedMultiplier = 0;
         //timeTravelImg.transform.GetChild(1).GetComponent<Image>().fillAmount = 0;
         skillImg.transform.GetChild(1).gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
 
         audioManager.PlaySource();
-        for (int i = 0; i < activeCubes.Count; i++) activeCubes[i].GetComponent<Bit>().speed = activeCubes[i].GetComponent<Bit>()._speed;
+        for (int i = 0; i < activeCubes.Count; i++) activeCubes[i].SpeedMultiplier = 1;
 
         timeTravelPanel.gameObject.SetActive(false);
     }
 
     void Explode()
     {
-        foreach (GameObject cube in activeCubes)
+        foreach (IBeat cube in activeCubes)
         {
-            cube.GetComponent<Bit>().SendBitSliced(Vector2.zero);
+            cube.Destroy();
         }
         prefsManager.prefs.skills[prefsManager.prefs.skillSelected].count--;
         prefsManager.Save();

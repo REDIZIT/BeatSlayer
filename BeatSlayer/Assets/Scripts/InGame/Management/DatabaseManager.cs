@@ -1,4 +1,5 @@
-﻿using MusicFilesManagement;
+﻿using InGame.UI.Overlays;
+using MusicFilesManagement;
 using Newtonsoft.Json;
 using ProjectManagement;
 using System;
@@ -15,6 +16,7 @@ namespace DatabaseManagement
     public static class Database
     {
         public static DatabaseContainer container;
+        public static OwnMusicUI ownMusicUI;
 
         public static string url_approved = "http://176.107.160.146/Moderation/GetApprovedGroups";
         public static string url_groups = "http://176.107.160.146/Database/GetGroupsExtended";
@@ -23,9 +25,10 @@ namespace DatabaseManagement
         public static Action onApprovedLoadedCallback, onAllMusicLoadedCallback, onDownloadedMusicCallback;
 
 
-        public static void Init()
+        public static void Init(OwnMusicUI ui)
         {
             container = new DatabaseContainer();
+            ownMusicUI = ui;
         }
         public static void LoadApproved(Action callback)
         {
@@ -67,9 +70,13 @@ namespace DatabaseManagement
 
                 groups.Add(info);
             }
-            container.downloadedGroups = groups;
+            container.DownloadedGroups = groups;
 
             callback();
+        }
+        public static void LoadOwnGroups(Action callback)
+        {
+            ownMusicUI.OnOwnBtnClicked(callback);
         }
 
 
@@ -112,6 +119,7 @@ namespace DatabaseManagement
     {
         public List<GroupInfoExtended> approvedGroups = new List<GroupInfoExtended>();
         public List<GroupInfoExtended> allGroups = new List<GroupInfoExtended>();
-        public List<GroupInfoExtended> downloadedGroups = new List<GroupInfoExtended>();
+        public List<GroupInfoExtended> DownloadedGroups { get; set; } = new List<GroupInfoExtended>();
+        public List<GroupInfoExtended> OwnGroups { get; set; } = new List<GroupInfoExtended>();
     }
 }

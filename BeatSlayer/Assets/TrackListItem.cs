@@ -1,7 +1,5 @@
-﻿using ProjectManagement;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using GameNet;
+using ProjectManagement;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +25,7 @@ public class TrackListItem : MonoBehaviour
     public Color32 defaultColor, downloadedColor, newColor;
 
     
-    public void Setup(GroupInfoExtended groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
+    public async void Setup(GroupInfoExtended groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
     {
         //this.group = group;
         this.groupInfo = groupInfo;
@@ -54,7 +52,12 @@ public class TrackListItem : MonoBehaviour
             : Directory.Exists(folderPath) && Directory.GetDirectories(folderPath).Length > 0 ? downloadedColor 
             : defaultColor;
 
-        isPassedImage.SetActive(AccountManager.IsPassed(groupInfo.author, groupInfo.name));
+
+        if(Payload.CurrentAccount != null)
+        {
+            bool isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.CurrentAccount.Nick, groupInfo.author, groupInfo.name);
+            isPassedImage.SetActive(isPassed);
+        }
     }
 
     public void OnClick()

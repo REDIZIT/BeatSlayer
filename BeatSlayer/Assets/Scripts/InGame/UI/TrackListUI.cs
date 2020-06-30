@@ -32,21 +32,26 @@ public class TrackListUI : MonoBehaviour
         {
             return showedListType == ListType.Downloaded ? content_downloaded :
                 showedListType == ListType.AllMusic ? content_allMusic :
+                showedListType == ListType.Own ? content_own :
                 content_approved;
         }
     }
     public Transform content_downloaded;
     public Transform content_allMusic;
     public Transform content_approved;
+    public Transform content_own;
 
 
+    public Text StateText =>
+        showedListType == ListType.Own ? stateOwnText : stateText;
     public Text stateText;
+    public Text stateOwnText;
 
 
     public ListType showedListType;
     public enum ListType
     {
-        Downloaded, AllMusic, Approved
+        Downloaded, AllMusic, Approved, Own
     }
 
 
@@ -73,6 +78,12 @@ public class TrackListUI : MonoBehaviour
         pageController.SetCurrentPage(showedListType, page == -1 ? pageController.GetCurrentPage(showedListType) : page);
         StartCoroutine(ILoadAndRefresh());
     }
+    public void RefreshOwnList(int page = -1)
+    {
+        showedListType = ListType.Own;
+        pageController.SetCurrentPage(showedListType, page == -1 ? pageController.GetCurrentPage(showedListType) : page);
+        StartCoroutine(ILoadAndRefresh());
+    }
     public void Refresh()
     {
         StartCoroutine(ILoadAndRefresh());
@@ -81,7 +92,7 @@ public class TrackListUI : MonoBehaviour
     public void ReloadDownloadedList()
     {
         showedListType = ListType.Downloaded;
-        Database.container.downloadedGroups.Clear();
+        Database.container.DownloadedGroups.Clear();
         Refresh();
     }
 
@@ -89,20 +100,20 @@ public class TrackListUI : MonoBehaviour
 
     IEnumerator ILoadAndRefresh()
     {
-        stateText.text = "";
+        StateText.text = "";
 
         // If maps aren't loaded
         if (GetData().Count == 0)
         {
             bool reachable = Application.internetReachability != NetworkReachability.NotReachable;
-            if (!reachable && showedListType != ListType.Downloaded)
+            if (!reachable && (showedListType != ListType.Downloaded && showedListType != ListType.Own))
             {
-                stateText.text = "No internet connection >﹏<";
+                StateText.text = "No internet connection >﹏<";
             }
-            else if (reachable || showedListType == ListType.Downloaded)
+            else if (reachable/* || showedListType == ListType.Downloaded*/)
             {
                 bool isApprovedLoaded = false;
-                stateText.text = "Loading..";
+                StateText.text = "Loading..";
                 try
                 {
                     LoadData(() => { isApprovedLoaded = true; });
@@ -110,7 +121,7 @@ public class TrackListUI : MonoBehaviour
                 catch(Exception err)
                 {
                     isApprovedLoaded = false;
-                    stateText.text = $"Sorry, I can't load maps ╯︿╰\n<color=#333>{err.Message}</color>";
+                    StateText.text = $"Sorry, I can't load maps ╯︿╰\n<color=#333>{err.Message}</color>";
                 }
                 
                 while (!isApprovedLoaded)
@@ -119,11 +130,11 @@ public class TrackListUI : MonoBehaviour
                 }
                 if(GetData().Count == 0)
                 {
-                    stateText.text = "There no music yet";
+                    StateText.text = "There no music yet";
                 }
                 else
                 {
-                    stateText.text = "";
+                    StateText.text = "";
                 }
             }
         }
@@ -158,7 +169,6 @@ public class TrackListUI : MonoBehaviour
 
 
         // Creating items and cover requests
-        //listController.displayedApprovedGroup = new List<TrackGroupPair>();
         List<CoverRequestPackage> coverPackages = new List<CoverRequestPackage>();
 
         for (int i = 0; i < groups.Count; i++)
@@ -178,7 +188,9 @@ public class TrackListUI : MonoBehaviour
         content.GetComponent<RectTransform>().sizeDelta = new Vector2(0, contentSize + 15);
 
 
-        CoversManager.AddPackages(coverPackages);
+        // Start downloading covers images for showed groups
+        if(showedListType != ListType.Own) CoversManager.AddPackages(coverPackages);
+
 
         pageController.RefreshPageButtons(data.Count);
     }
@@ -195,9 +207,13 @@ public class TrackListUI : MonoBehaviour
         {
             Database.LoadAllGroups(callback);
         }
-        else
+        else if (showedListType == ListType.Downloaded)
         {
             Database.LoadDownloadedGroups(callback);
+        }
+        else
+        {
+            Database.LoadOwnGroups(callback);
         }
     }
     public List<GroupInfoExtended> GetData()
@@ -211,9 +227,13 @@ public class TrackListUI : MonoBehaviour
         {
             ls.AddRange(Database.container.allGroups);
         }
+        else if (showedListType == ListType.Downloaded)
+        {
+            ls.AddRange(Database.container.DownloadedGroups);
+        }
         else
         {
-            ls.AddRange(Database.container.downloadedGroups);
+            ls.AddRange(Database.container.OwnGroups);
         }
 
         return ls;

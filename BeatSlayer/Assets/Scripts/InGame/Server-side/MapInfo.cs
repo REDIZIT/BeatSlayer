@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BeatSlayerServer.Dtos.Mapping;
+using System.Collections.Generic;
 
 namespace BeatSlayerServer.Multiplayer.Accounts
 {
@@ -14,6 +15,7 @@ namespace BeatSlayerServer.Multiplayer.Accounts
     public class MapData
     {
         public GroupData Group { get; set; }
+        public string Trackname { get { return Group.Author + "-" + Group.Name; } }
 
         public string Nick { get; set; }
 

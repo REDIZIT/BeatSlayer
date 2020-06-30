@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Michsky.UI.ModernUIPack;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
@@ -1915,8 +1916,8 @@ namespace UnityEditor.UI
             slidrImage.color = Color.red;
             slidrImage.fillAmount = 0;
             RadialSlider slider = SliderControl.AddComponent<RadialSlider>();
-            slider.StartColor = Color.green;
-            slider.EndColor = Color.red;
+            //slider.StartColor = Color.green;
+            //slider.EndColor = Color.red;
 
             RectTransform sliderRectTransform = SliderControl.GetComponent<RectTransform>();
             sliderRectTransform.anchorMin = Vector2.zero;

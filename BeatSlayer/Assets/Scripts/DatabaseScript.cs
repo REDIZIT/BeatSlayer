@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GameNet;
+using Newtonsoft.Json;
 using ProjectManagement;
 using System;
 using System.Collections;
@@ -6,13 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class DatabaseScript : MonoBehaviour
 {
@@ -22,17 +18,17 @@ public class DatabaseScript : MonoBehaviour
     public TracksDatabase data;
     
     #region urls
-    public const string url_database = "http://176.107.160.146/Home/Database";
-    public const string url_getGroups = "http://176.107.160.146/Database/GetGroups";
-    public const string url_getMaps = "http://176.107.160.146/Database/GetMaps";
-    public const string url_getMapsWithResult = "http://176.107.160.146/Database/GetMapsWithResult?trackname={0}";
-    public const string url_getMap = "http://176.107.160.146/Database/GetMap?trackname={0}&nick={1}";
-    public const string url_doesMapExist = "http://176.107.160.146/Database/DoesMapExist?trackname={0}&nick={1}";
-    public const string url_hasMapUpdate = "http://176.107.160.146/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
-    public const string url_setStatistics = "http://176.107.160.146/Database/SetStatistics?trackname={0}&nick={1}&key={2}&value=1";
-    public const string url_setDifficultyStatistics = "http://176.107.160.146/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
-    public const string url_getPrelistenFile = "http://176.107.160.146/Maps/GetPrelistenFile?trackname={0}";
-    public const string url_hasPrelistenFile = "http://176.107.160.146/Maps/HasPrelistenFile?trackname={0}";
+    public static string url_database => NetCore.Url_Server + "/Home/Database";
+    public static string url_getGroups => NetCore.Url_Server + "/Database/GetGroupsExtended";
+    public static string url_getMaps => NetCore.Url_Server + "/Database/GetMaps";
+    public static string url_getMapsWithResult => NetCore.Url_Server + "/Database/GetMapsWithResult?trackname={0}";
+    public static string url_getMap => NetCore.Url_Server + "/Database/GetMap?trackname={0}&nick={1}";
+    public static string url_doesMapExist => NetCore.Url_Server + "/Database/DoesMapExist?trackname={0}&nick={1}";
+    public static string url_hasMapUpdate => NetCore.Url_Server + "/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
+    public static string url_setStatistics => NetCore.Url_Server + "/Database/SetStatistics?trackname={0}&nick={1}&key={2}&value=1";
+    public static string url_setDifficultyStatistics => NetCore.Url_Server + "/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
+    public static string url_getPrelistenFile => NetCore.Url_Server + "/Maps/GetPrelistenFile?trackname={0}";
+    public static string url_hasPrelistenFile => NetCore.Url_Server + "/Maps/HasPrelistenFile?trackname={0}";
     #endregion
     
 
@@ -400,6 +396,9 @@ public class DatabaseScript : MonoBehaviour
     public static void SendStatistics(string trackname, string nick, int difficultyId, StatisticsKeyType key)
     {
         string keyStr = key.ToString().ToLower();
+
+        trackname = trackname.Replace("&", "%amp%");
+
         string url = string.Format(url_setDifficultyStatistics, trackname, nick, difficultyId, keyStr);
         
         WebClient c = new WebClient();

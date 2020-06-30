@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Assets.SimpleLocalization;
+using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using InGame.Helpers;
-using Newtonsoft.Json;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,6 +46,10 @@ namespace Profile
         public Text publishedMapsText, publishedPlayText, publishedLikesText;
         public Transform bestReplaysContent;
         public GameObject noBestResultsText;
+
+        [Header("Grades")]
+        public Text GradeTextSS;
+        public Text GradeTextS, GradeTextA, GradeTextB, GradeTextC, GradeTextD;
 
 
 
@@ -121,6 +125,7 @@ namespace Profile
             scoreText.text = data.AllScore + "";
             hitText.text = data.Hits + "";
             maxComboText.text = data.MaxCombo >= 0 ? data.MaxCombo + "" : "-";
+
             
             placeText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             inGameText.transform.parent.GetComponent<TextContainer>().UpdateThis();
@@ -129,7 +134,12 @@ namespace Profile
             scoreText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             hitText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             maxComboText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            
+
+
+            ShowGradesText(data);
+
+
+
             shortStatLayout.CalculateLayoutInputHorizontal();
             shortStatLayout.SetLayoutHorizontal();
             
@@ -139,6 +149,27 @@ namespace Profile
 
             LoadBestReplays();
         }
+
+
+        private void ShowGradesText(AccountData account)
+        {
+            GradeTextSS.text = account.SS.ToString();
+            GradeTextS.text = account.S.ToString();
+            GradeTextA.text = account.A.ToString();
+            //GradeTextB.text = account.B.ToString();
+            //GradeTextC.text = account.C.ToString();
+            //GradeTextD.text = account.D.ToString();
+
+            //GradeTextSS.transform.parent.GetComponent<TextContainer>().UpdateThis();
+            //GradeTextS.transform.parent.GetComponent<TextContainer>().UpdateThis();
+            //GradeTextA.transform.parent.GetComponent<TextContainer>().UpdateThis();
+            //GradeTextB.transform.parent.GetComponent<TextContainer>().UpdateThis();
+            //GradeTextC.transform.parent.GetComponent<TextContainer>().UpdateThis();
+            //GradeTextD.transform.parent.GetComponent<TextContainer>().UpdateThis();
+        }
+
+
+
 
         public void OnAddFriendBtnClick()
         {
@@ -185,7 +216,7 @@ namespace Profile
                 bool isFriend = Payload.CurrentAccount != null
                                 && Payload.CurrentAccount.Friends.Any(c => c.Nick == data.Nick);
                 
-                writeBtn.gameObject.SetActive(!isOwnAccount);
+                //writeBtn.gameObject.SetActive(!isOwnAccount);
                 addFriendBtn.gameObject.SetActive(!isOwnAccount && !isFriend);
                 removeFriendBtn.gameObject.SetActive(!isOwnAccount && isFriend);
                 editBtn.gameObject.SetActive(isOwnAccount);
@@ -195,7 +226,7 @@ namespace Profile
             {
                 endEditBtn.gameObject.SetActive(true);
             
-                writeBtn.gameObject.SetActive(false);
+                //writeBtn.gameObject.SetActive(false);
                 addFriendBtn.gameObject.SetActive(false);
                 editBtn.gameObject.SetActive(false);
             }
@@ -284,7 +315,8 @@ namespace Profile
                 {
                     return LocalizationManager.Localize("yesterday") + " " + dt.ToLongTimeString();
                 }
-                return dt.ToLongDateString() + " " + dt.ToLongTimeString();
+                //return dt.ToLongDateString() + " " + dt.ToLongTimeString();
+                return dt.ToString("d/MM/yyyy HH:mm:ss");
             }
         }
     }

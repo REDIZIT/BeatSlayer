@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 684de8d8c50e2d540976f8816d635aef, type: 3}
+  m_Name: SODB
+  m_EditorClassIdentifier: 
+  sabers:
+  - {fileID: 11400000, guid: 5b6e10ac21a3f8648a80bc0ba6773f7d, type: 2}
+  - {fileID: 11400000, guid: 3e617e9959a5d844098b3fe9eb1dd112, type: 2}
+  - {fileID: 11400000, guid: 747ae21a2b3506948be06f7cbe1a2ca5, type: 2}
+  - {fileID: 11400000, guid: ab4f578db8d27cc488a11d551e991a03, type: 2}
+  - {fileID: 11400000, guid: 49ec518a33a29e248aa282d357501f9b, type: 2}
+  - {fileID: 11400000, guid: 4329c3ccccbfdab4cb2f9da92179b7ab, type: 2}
+  - {fileID: 11400000, guid: 1797436069af8454887a1cbbfa4c73db, type: 2}

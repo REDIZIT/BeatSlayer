@@ -31,7 +31,6 @@ public class SaberController : MonoBehaviour
 
         if (!transform.GetChild(saberSkinId).gameObject.activeSelf)
         {
-            Debug.Log("DontUseThisFrame");
             Trail.DontUseThisFrame = true;
         }
 
@@ -49,11 +48,12 @@ public class SaberController : MonoBehaviour
         return Math.Atan2(yDiff, xDiff) * 180.0 / Math.PI;
     }
 
-    public void Init(Color clr, int skinId, int swooshEffectId)
+    public void Init(Color clr, int skinId, int swooshEffectId, float lifetime = 0.2f)
     {
         saberSkinId = skinId;
         GetComponent<MeleeWeaponTrail>()._colors[0] = clr;
         GetComponent<MeleeWeaponTrail>()._material = swooshes[swooshEffectId];
+        Trail._lifeTime = lifetime;
 
 
         foreach (Transform child in transform) child.gameObject.SetActive(false);

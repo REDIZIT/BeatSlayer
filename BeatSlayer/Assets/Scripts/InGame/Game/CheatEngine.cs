@@ -1,4 +1,5 @@
 ﻿using InGame.Game.Spawn;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -16,9 +17,11 @@ public class CheatEngine : MonoBehaviour
     {
         get { return GetComponent<GameManager>(); }
     }
+    public BeatManager bm;
     
     public AudioSource asource;
-    List<Bit> cubes = new List<Bit>();
+    //List<BeatCube> cubes = new List<BeatCube>();
+    List<IBeat> beats = new List<IBeat>();
 
     public Image[] keys;
 
@@ -27,6 +30,10 @@ public class CheatEngine : MonoBehaviour
     public float time;
     public bool doWind, doSkipToEnd;
     public bool keyboardControl;
+
+    [Header("Auto passing")]
+    public bool autoSaber;
+    public int makeMisses;
 
     private void Update()
     {
@@ -44,38 +51,76 @@ public class CheatEngine : MonoBehaviour
             asource.pitch = pitch;
         }
 
-        if(cubes.Count > 0)
+        if(beats.Count > 0)
         {
-            List<Bit> cubesToSlice = cubes.Where(c => c != null && Mathf.Abs(c.transform.position.z - transform.position.z) < 30).ToList();
-            if (Input.GetKeyDown(KeyCode.E))
+            //List<BeatCube> cubesToSlice = cubes.Where(c => c != null && Mathf.Abs(c.transform.position.z - transform.position.z) < 30).ToList();
+            //if (Input.GetKeyDown(KeyCode.E))
+            //{
+            //    keys[2].color = new Color(1f, 0.6f, 0, 0.8f);
+            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == 1.25f);
+            //    if(cube != null) cube.OnPoint(Vector2.zero);
+            //}
+            //if (Input.GetKeyDown(KeyCode.W))
+            //{
+            //    keys[1].color = new Color(1f, 0.6f, 0, 0.8f);
+            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == -1.25f);
+            //    if (cube != null) cube.OnPoint(Vector2.zero);
+            //}
+            //if (Input.GetKeyDown(KeyCode.Q))
+            //{
+            //    keys[0].color = new Color(1f, 0.6f, 0, 0.8f);
+            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == -3.5f);
+            //    if (cube != null) cube.OnPoint(Vector2.zero);
+            //}
+            //if (Input.GetKeyDown(KeyCode.R))
+            //{
+            //    keys[3].color = new Color(1f, 0.6f, 0, 0.8f);
+            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == 3.5f);
+            //    if (cube != null) cube.OnPoint(Vector2.zero);
+            //}
+
+
+            if (autoSaber)
             {
-                keys[2].color = new Color(1f, 0.6f, 0, 0.8f);
-                Bit cube = cubesToSlice.Find(c => c.transform.position.x == 1.25f);
-                if(cube != null) cube.SendBitSliced(Vector2.zero);
-            }
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                keys[1].color = new Color(1f, 0.6f, 0, 0.8f);
-                Bit cube = cubesToSlice.Find(c => c.transform.position.x == -1.25f);
-                if (cube != null) cube.SendBitSliced(Vector2.zero);
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                keys[0].color = new Color(1f, 0.6f, 0, 0.8f);
-                Bit cube = cubesToSlice.Find(c => c.transform.position.x == -3.5f);
-                if (cube != null) cube.SendBitSliced(Vector2.zero);
-            }
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                keys[3].color = new Color(1f, 0.6f, 0, 0.8f);
-                Bit cube = cubesToSlice.Find(c => c.transform.position.x == 3.5f);
-                if (cube != null) cube.SendBitSliced(Vector2.zero);
+
+                //List<IBeat> toPing = beats.Where(c => c != null && c.Transform != null && c.Transform.position.z - transform.position.z < 30).ToList();
+                List<IBeat> toPing = new List<IBeat>();
+
+                foreach (IBeat beat in beats)
+                {
+                    if (beat == null) continue;
+                    if (beat.GetClass() == null) continue;
+
+                    try
+                    {
+                        if (beat.Transform == null) continue;
+                    }
+                    catch(Exception err)
+                    {
+                        continue;
+                    }
+
+                    if (beat.Transform.position.z - transform.position.z < 24)
+                    {
+                        toPing.Add(beat);
+                    }
+                }
+
+                foreach (IBeat cube in toPing)
+                {
+                    if(cube.GetClass().type != BeatCubeClass.Type.Line)
+                    {
+                        if (makeMisses > 0) continue;
+                    }
+
+                    cube.OnPoint(Vector2.zero, true);
+                }
             }
         }
 
         if(doWind)
         {
-            GetComponent<GameManager>().beats = GetComponent<GameManager>().beats.SkipWhile(c => c.time < time).ToList();
+            bm.beats = bm.beats.SkipWhile(c => c.time < time).ToList();
             asource.time = time;
             doWind = false;
         }
@@ -84,7 +129,7 @@ public class CheatEngine : MonoBehaviour
         {
             doSkipToEnd = false;
             float endTime = asource.clip.length - 5;
-            GetComponent<GameManager>().beats = GetComponent<GameManager>().beats.SkipWhile(c => c.time < endTime).ToList();
+            bm.beats = bm.beats.SkipWhile(c => c.time < endTime).ToList();
             asource.time = endTime;
         }
     }
@@ -98,10 +143,18 @@ public class CheatEngine : MonoBehaviour
         }
     }
 
-    public void AddCube(Bit cube)
+    public void AddCube(IBeat cube)
     {
         if (!Application.isEditor) return;
 
-        cubes.Add(cube);
+        //cubes.Add(cube);
+        beats.Add(cube);
+    }
+    public void RemoveCube(IBeat beat)
+    {
+        if (!Application.isEditor) return;
+        beats.Remove(beat);
+
+        if (makeMisses > 0) makeMisses--;
     }
 }

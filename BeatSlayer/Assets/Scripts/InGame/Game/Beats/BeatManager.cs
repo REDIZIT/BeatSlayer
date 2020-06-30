@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using Ranking;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
 using Debug = UnityEngine.Debug;
 
 namespace InGame.Game.Spawn
@@ -12,56 +14,94 @@ namespace InGame.Game.Spawn
     public class BeatManager : MonoBehaviour
     {
         public GameManager gm;
+
+        [HideInInspector] public List<BeatCubeClass> beats = new List<BeatCubeClass>();
+
+
         public GameObject cubePrefab, linePrefab;
         public Camera cam;
         public AudioSource asource, spectrumAsource;
 
+
         public List<SpawnPointScript> spawnPoints;
 
         [HideInInspector] public Color32 leftSaberColor, rightSaberColor;
-        [HideInInspector] public Color32 leftArrowColor, rightArrowColor;
+        public Color32 leftArrowColor, rightArrowColor;
         [HideInInspector] public int vibrationTime;
 
         // Beat field stuff
         public float fieldLength;
         public float fieldCrossTime;
-        
-        /*
-#if UNITY_ANDROID
-        bool isEditor = false;
-#else
-        bool isEditor = true;
-#endif*/
-        bool isEditor = Application.isEditor;
+
+        public RectTransform[] saberKeys;
 
         public float CubeSpeed
         {
             get
             {
-                return (fieldLength * Time.deltaTime * (gm.paused ? 0 : 1) * gm.difficulty.speed) / fieldCrossTime;
+                //float distance = fieldLength * Time.deltaTime * (gm.paused ? 0 : 1) * gm.difficulty.speed;
+                //distance *= LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.CubesSpeed : 1;
+
+                float dspeed = gm.difficulty.speed;
+
+                float distance = fieldLength;
+                float time = fieldCrossTime;
+
+                float speed = distance / time;
+                speed *= dspeed;
+
+                return speed * Time.deltaTime;
+
+                // speed = distance / time
+                //return distance / fieldCrossTime;
             }
         }
-        public float playAreaZ;
 
-        bool noArrows, noLines, useSliceSound;
-        Replay replay;
+        //[SerializeField] private AnimationCurve spawnCycleTimeChart;
+        public UILineRenderer lineRenderer;
+        public UILineRenderer algLineRenderer;
+        private float maxDelay, maxAlgDelay;
+        public Text mexDelayText, maxAlgDelayText;
 
-        Dictionary<int, Vector3> inputTouchesStartPoses = new Dictionary<int, Vector3>();
-        Dictionary<int, Vector3> inputTouchesPrevPoses = new Dictionary<int, Vector3>();
 
-
-        public RectTransform[] saberKeys;
-        Vector3 prevMousePos;
+        private float playAreaZ;
 
 
 
-        public void Setup(GameManager gm, bool noArrows, bool noLines, Replay replay)
+        private bool noArrows, noLines, useSliceSound;
+        private float cubesSpeed;
+
+        private Dictionary<int, Vector3> inputTouchesStartPoses = new Dictionary<int, Vector3>();
+        private Dictionary<int, Vector3> inputTouchesPrevPoses = new Dictionary<int, Vector3>();
+
+        private bool isEditor = Application.isEditor;
+
+        private Vector3 prevMousePos;
+
+
+        private void Start()
+        {
+            lineRenderer.Points = new Vector2[400];
+            for (int i = 0; i < lineRenderer.Points.Length; i++)
+            {
+                lineRenderer.Points[i] = new Vector2(i * 2, 0);
+            }
+
+            algLineRenderer.Points = new Vector2[400];
+            for (int i = 0; i < algLineRenderer.Points.Length; i++)
+            {
+                algLineRenderer.Points[i] = new Vector2(i * 2, 0);
+            }
+        }
+
+        public void Setup(GameManager gm, bool noArrows, bool noLines, float cubesSpeed)
         {
             this.gm = gm;
             this.noArrows = noArrows;
             this.noLines = noLines;
             useSliceSound = SSytem.instance.GetBool("SliceSound");
-            this.replay = replay;
+            //this.replay = replay;
+            this.cubesSpeed = cubesSpeed;
 
             leftSaberColor = SSytem.instance.leftColor * gm.prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
             rightSaberColor = SSytem.instance.rightColor * gm.prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
@@ -83,7 +123,7 @@ namespace InGame.Game.Spawn
 
             asource.Play();
             
-            gm.gameStarting = false;
+            gm.IsGameStartingMap = false;
             if (gm.paused)
             {
                 gm.audioManager.asource.Pause();
@@ -91,17 +131,88 @@ namespace InGame.Game.Spawn
             }
         }
 
-        private void Update()
+        /// <summary>
+        /// Spawning cubes based on asource.time. Execute every frame
+        /// </summary>
+        public void ProcessSpawnCycle()
         {
-            if (Input.GetKeyDown(KeyCode.S))
+            Stopwatch w = new Stopwatch();
+            Stopwatch algw = new Stopwatch();
+            algw.Start();
+            w.Start();
+
+            // Beat spawning cycle
+            List<BeatCubeClass> toRemove = new List<BeatCubeClass>();
+
+            foreach (BeatCubeClass cls in beats)
             {
-                Time.timeScale = 0.2f;
+                if(asource.time >= GetNormalizedTime(cls))
+                {
+                    algw.Stop();
+                    SpawnBeatCube(cls);
+                    algw.Start();
+
+                    Debug.Log("Spawn cube with time: " + cls.time + " and normal time " + GetNormalizedTime(cls));
+
+                    toRemove.Add(cls);
+                }
             }
-            else if (Input.GetKeyDown(KeyCode.W))
+
+            beats.RemoveAll(c => toRemove.Contains(c));
+
+            w.Stop();
+            algw.Stop();
+
+            AddPointToChart(w.ElapsedMilliseconds, algw.ElapsedMilliseconds);
+        }
+        private float GetNormalizedTime(BeatCubeClass cls)
+        {
+            // Offset to sync cubes which faster than 1x
+            // If faster, make a delay before spawning
+            // Delay = timeOffset
+
+            //float timeOffset = fieldCrossTime * (cls.speed - 1);
+            //timeOffset /= cls.speed * gm.difficulty.speed;
+
+            float dspeed = gm.difficulty.speed;
+
+            float offset = fieldCrossTime / dspeed / cls.speed;
+
+            return cls.time - offset;
+            // Return absolute time
+            //return cls.time + timeOffset;
+        }
+        private void AddPointToChart(float value, float algTime)
+        {
+            AddPointToArray(lineRenderer, value * 30);
+            lineRenderer.SetAllDirty();
+
+            AddPointToArray(algLineRenderer, algTime * 30);
+            algLineRenderer.SetAllDirty();
+
+            if(value > maxDelay && asource.time > 5)
             {
-                Time.timeScale = 1f;
+                maxDelay = value;
+                mexDelayText.text = "Max: " + maxDelay + "ms";
+            }
+            if (value > maxAlgDelay && asource.time > 5)
+            {
+                maxAlgDelay = value;
+                maxAlgDelayText.text = "Only alg time. Max: " + maxAlgDelay + "ms";
             }
         }
+        private void AddPointToArray(UILineRenderer renderer, float value)
+        {
+            for (int i = 1; i < renderer.Points.Length; i++)
+            {
+                renderer.Points[i - 1] = new Vector2(renderer.Points[i - 1].x, renderer.Points[i].y); 
+            }
+
+            Vector2 lastPoint = renderer.Points[renderer.Points.Length - 1];
+
+            renderer.Points[renderer.Points.Length - 1] = new Vector2(lastPoint.x, value);
+        }
+
 
 
         public void SabersUpdate()
@@ -244,12 +355,15 @@ namespace InGame.Game.Spawn
             fieldCrossTime = 1.5f; // Время за которое куб должен преодолеть поле (в секундах)
 
             //float mult = replay.cubesSpeed / replay.musicSpeed; 
-            float mult = 1;
+            //float mult = 1;
             // scale для поля
             // Чем больше игрок поставил скорость кубам, тем .... в жопу, потом разберусь с модами
 
             //cubeSpeed = fieldLength * Time.deltaTime * mult; // Скорость куба (логично)
         }
+
+
+
 
         public void SpawnBeatCube(BeatCubeClass beat)
         {
@@ -267,13 +381,16 @@ namespace InGame.Game.Spawn
 
             IBeat cube = c.GetComponent<IBeat>();
 
-            cube.Setup(gm, useSliceSound, beat, replay.cubesSpeed, this);
+            cube.Setup(gm, useSliceSound, beat, cubesSpeed, this);
 
 
             int road = beat.road == -1 ? GetBestSpawnPoint(beat) : beat.road;
             spawnPoints[road].Spawn(beat.type);
 
-            GetComponent<CheatEngine>().AddCube(c.GetComponent<Bit>());
+
+            GetComponent<CheatEngine>().AddCube(cube);
+
+            gm.activeCubes.Add(cube);
         }
 
         public int GetBestSpawnPoint(BeatCubeClass beat)

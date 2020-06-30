@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using GameNet;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,7 +19,7 @@ public class BeatmapUIItem : MonoBehaviour
 
     public GameObject downloadIndicator, approvedImage, passedImage;
 
-    public void Setup(MapInfo info, bool isOnlyOneElement)
+    public async void Setup(MapInfo info, bool isOnlyOneElement)
     {
         mapInfo = info;
         
@@ -34,7 +35,14 @@ public class BeatmapUIItem : MonoBehaviour
         
         downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.author, mapInfo.name, mapInfo.nick));
         approvedImage.SetActive(mapInfo.approved);
-        passedImage.SetActive(AccountManager.IsPassed(mapInfo.author, mapInfo.name));
+
+        bool isPassed = false;
+        if(Payload.CurrentAccount != null)
+        {
+            isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.CurrentAccount.Nick, mapInfo.author, mapInfo.name);
+        }
+
+        passedImage.SetActive(isPassed);
 
         GetComponent<Toggle>().isOn = isOnlyOneElement;
         if(isOnlyOneElement)

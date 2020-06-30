@@ -1,20 +1,19 @@
-﻿using LeaderboardManagement;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Ranking;
+﻿using System;
+using InGame.Leaderboard;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 
+/// <summary>
+/// Used in player leaderboard and controlled by <see cref="PlayerLeaderboardUI"/>
+/// </summary>
 public class LeaderboardUIItem : MonoBehaviour
 {
-    //public LeaderboardRecord record;
+    public LeaderboardItem item;
 
     public Text placeText, nickText, accuracyText, missedText, playedTimesText, RPText, totalRPText;
     public Text scoreText;
-    public Replay replay;
-    public LeaderboardItem leaderboardItem;
+    public UICornerCut cornerCut;
 
     [Header("Colors")]
     public Color32 defaultBodyColor;
@@ -26,34 +25,35 @@ public class LeaderboardUIItem : MonoBehaviour
 
 
 
-    public void Refresh(int place, bool isCurrentPlayer)
+    public void Refresh(LeaderboardItem item, int place, bool isCurrentPlayer)
     {
+        //Debug.Log(JsonConvert.SerializeObject(item, Formatting.Indented));
+
+        this.item = item;
         placeText.text = "#" + place;
-        nickText.text = replay.player;
+        nickText.text = item.Nick;
 
-        float roundedAccuray = Mathf.FloorToInt(replay.Accuracy * 1000f) / 10f;
+        float roundedAccuray = Mathf.FloorToInt(item.Accuracy * 1000f) / 10f;
         accuracyText.text = roundedAccuray + "%";
-        accuracyText.color = isCurrentPlayer ? selectedTextColor : defaultTextColor;
+        ColorizeText(accuracyText, isCurrentPlayer);
 
-        missedText.text = replay.missed.ToString();
-        missedText.color = isCurrentPlayer ? selectedTextColor : defaultTextColor;
+        //missedText.text = item.MissedCount.ToString();
+        //missedText.color = isCurrentPlayer ? selectedTextColor : defaultTextColor;
 
-        float RP = Mathf.FloorToInt((float)replay.RP * 10f) / 10f;
+        float RP = Mathf.FloorToInt((float)item.RP * 10f) / 10f;
         RPText.text = RP.ToString();
 
-        scoreText.text = Mathf.FloorToInt(replay.score).ToString();
+        scoreText.text = Mathf.FloorToInt((float)item.Score).ToString();
 
-        GetComponent<UICornerCut>().color = isCurrentPlayer ? selectedBodyColor : defaultBodyColor;
-        GetComponent<UICornerCut>().ColorDown = isCurrentPlayer ? selectedBorderColor : defaultBorderColor;
+        playedTimesText.text = item.PlayCount + "";
+        ColorizeText(playedTimesText, isCurrentPlayer);
+
+        cornerCut.color = isCurrentPlayer ? selectedBodyColor : defaultBodyColor;
+        cornerCut.ColorDown = isCurrentPlayer ? selectedBorderColor : defaultBorderColor;
     }
-    public void RefreshLeaderboardItem()
-    {
-        nickText.text = leaderboardItem.nick;
-        placeText.text = "#" + leaderboardItem.place;
 
-        accuracyText.text = Mathf.FloorToInt(leaderboardItem.Accuracy * 1000f) / 10f + "%";
-        playedTimesText.text = leaderboardItem.playCount + "";
-        RPText.text = Math.Floor(leaderboardItem.RP * 10) / 10f + "";
-        scoreText.text = Math.Floor(leaderboardItem.score * 10) / 10f + "";
+    private void ColorizeText(Text text, bool isCurrentPlayer)
+    {
+        text.color = isCurrentPlayer ? selectedTextColor : defaultTextColor;
     }
 }

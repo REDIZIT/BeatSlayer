@@ -9,6 +9,7 @@ using Assets.SimpleLocalization;
 using BeatSlayerServer.Multiplayer.Accounts;
 using CoversManagement;
 using InGame.Helpers;
+using InGame.Menu;
 using InGame.SceneManagement;
 using InGame.UI;
 using Newtonsoft.Json;
@@ -17,6 +18,7 @@ using ProjectManagement;
 using Testing;
 using UnityEngine;
 using UnityEngine.UI;
+using Web;
 using GroupInfo = ProjectManagement.GroupInfo;
 using MapInfo = ProjectManagement.MapInfo;
 
@@ -25,6 +27,7 @@ public class BeatmapUI : MonoBehaviour
     public DatabaseScript database;
     public MenuScript_v2 menu;
     public MenuAudioManager menuAudioManager;
+    public PracticeModeUI practiceModeUI;
     //public BeatmapAudio bmAudio;
     
     public GameObject overlay;
@@ -368,12 +371,12 @@ public class BeatmapUI : MonoBehaviour
 
                     leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
 
-                    AccountManager.GetMapLeaderboardPlace(AccountManager.LegacyAccount.nick,
+                    /*AccountManager.GetMapLeaderboardPlace(AccountManager.LegacyAccount.nick,
                         currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick,
                         (place =>
                         {
                             leaderboardPlaceText.text = $"#{place} " + LocalizationManager.Localize("InMapLeaderboard");
-                        }));
+                        }));*/
                 }
             });
         }
@@ -408,6 +411,10 @@ public class BeatmapUI : MonoBehaviour
 
         SceneController.instance.LoadScene(parameters);
     }
+    public void OnPracticeBtnClick()
+    {
+        practiceModeUI.ShowWindow(currentMapInfo, currentDifficultyInfo);
+    }
 
     public void OnDownloadBtnClicked()
     {
@@ -423,7 +430,7 @@ public class BeatmapUI : MonoBehaviour
         
         backBtn.interactable = false;
 
-        Helpers.DownloadMap(currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, args =>
+        WebAPI.DownloadMap(currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, args =>
         {
             progressBar.value = args.ProgressPercentage;
             progressText.text = args.ProgressPercentage + "%";
@@ -453,7 +460,7 @@ public class BeatmapUI : MonoBehaviour
 
     public void OnCancelBtnClicked()
     {
-        Helpers.CancelDownloading();
+        WebAPI.CancelMapDownloading();
     }
     
     public void OnDeleteBtnClicked()
@@ -468,7 +475,7 @@ public class BeatmapUI : MonoBehaviour
         }
         else
         {
-            TestManager.DeleteRequest();
+            TestManager.DeleteRequest(true);
             overlay.SetActive(false);
         }
     }
@@ -487,7 +494,7 @@ public class BeatmapUI : MonoBehaviour
     {
         if (testRequest != null)
         {
-            TestManager.DeleteRequest();
+            TestManager.DeleteRequest(true);
         }
 
         //bmAudio.OnClose();

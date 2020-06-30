@@ -30,7 +30,7 @@ namespace Ranking
         [JsonIgnore]
         public float Accuracy
         {
-            get { return AllCubes == 0 ? 0 : sliced / AllCubes; }
+            get { return AllCubes == 0 ? 0 : (float)sliced / (float)AllCubes; }
         }
 
         public float cubesSpeed = 1, musicSpeed = 1;
@@ -69,7 +69,16 @@ namespace Ranking
     // Used when player finished map
     public class ReplaySendData
     {
+        public Grade Grade { get; set; }
         public float RP { get; set; }
         public int Coins { get; set; }
+    }
+
+    /// <summary>
+    /// Replay grade (SS,S,A,B,C,D)
+    /// </summary>
+    public enum Grade
+    {
+        SS, S, A, B, C, D, Unknown
     }
 }

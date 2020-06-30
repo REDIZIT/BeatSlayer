@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using BeatSlayerServer.Multiplayer.Accounts;
-using GameNet;
+﻿using GameNet;
+using Microsoft.AspNetCore.SignalR.Client;
 using Multiplayer.Accounts;
 using Multiplayer.Chat;
 using Multiplayer.Notification;
@@ -25,8 +22,10 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     [Header("UI")] 
     public Animator serverStateAnim;
+    public Animator bottomButtonsAnim;
     public Text serverStateText;
     private float timeUntilClose;
+    private bool isNoInternetShowed; // False when message wasn't showed yet, and true if yes
     
 
     private void Awake()
@@ -39,12 +38,9 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Start()
     {
-        /*NetCore.Configurators += () =>
-        {
-            
-        };
-        */
-
+        //Debug.Log("Using dev NetCore_v2!");
+        /*NetCore_v2.Initialize();
+        NetCore_v2.Connect();*/
         NetCore.Configure(() =>
         {
             NetCore.OnFullReady += () =>
@@ -56,9 +52,11 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             NetCore.OnConnect += OnConnect;
             NetCore.OnReconnect += OnReconnecting;
             NetCore.OnDisconnect += OnDisconnected;
+            NetCore.OnLogIn += OnLogIn;
+            NetCore.OnLogOut += OnLogOut;
 
             // Subscribe/Resubscribe all
-            NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
+            //NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
 
             accountUI.Configuration();
             chatUI.Configuration();
@@ -68,22 +66,15 @@ public class MultiplayerMenuWrapper : MonoBehaviour
         });
 
 
-        Debug.Log("Url is " + NetCore.Url_Hub);
+        // Hide bottom buttons if no logged
+        if(Payload.CurrentAccount != null)
+        {
+            bottomButtonsAnim.Play("Show");
+        }
     }
 
     private void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.S))
-        {
-            Debug.Log("Reloading scene");
-            SceneManager.LoadScene("Menu");
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            Debug.Log("Send test");
-            NetCore.ServerActions.Test();
-        }*/
         if (timeUntilClose > 0) timeUntilClose -= Time.deltaTime;
         else
         {
@@ -98,30 +89,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     {
         if(NetCore.ReconnectAttempt != 0) ShowState("Connected", 3); 
         accountUI.OnConnect(this);
+        isNoInternetShowed = false;
     }
-
-
-
-
-    void OnDisconnected()
-    {
-        UnityMainThreadDispatcher.Instance().Enqueue(() =>
-        {
-            ShowState("Connection lost", 120);
-            chatUI.OnConnectionLost();
-            //if (err != null)
-            //{
-                //Debug.LogError("Disconnected due to " + err);
-            //}
-        });
-    }
-
-    void OnReconnecting()
-    {
-        ShowState("Reconnecting.. attempt " + (NetCore.ReconnectAttempt), 30);
-    }
-    
-    
     public void ShowState(string state, float time)
     {
         timeUntilClose = time;
@@ -132,5 +101,48 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public void HideState()
     {
         serverStateAnim.Play("Hide");
+    }
+
+
+
+
+
+
+    void OnDisconnected()
+    {
+        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+        {
+            ShowState("Connection lost", 5);
+            chatUI.OnConnectionLost();
+            //if (err != null)
+            //{
+                //Debug.LogError("Disconnected due to " + err);
+            //}
+        });
+    }
+
+    void OnReconnecting()
+    {
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            if(!isNoInternetShowed)
+            {
+                ShowState("No internet connection", 5);
+                isNoInternetShowed = true;
+            }
+        }
+        else
+        {
+            ShowState("Reconnecting.. attempt " + (NetCore.ReconnectAttempt), 30);
+        }
+    }
+    
+    void OnLogIn()
+    {
+        bottomButtonsAnim.Play("Show");
+    }
+    void OnLogOut()
+    {
+        bottomButtonsAnim.Play("Hide");
     }
 }

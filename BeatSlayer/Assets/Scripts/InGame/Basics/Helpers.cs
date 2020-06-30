@@ -11,59 +11,6 @@ using UnityEngine.UI;
 
 namespace InGame.Helpers
 {
-    public static class Helpers
-    {
-        private static WebClient c = new WebClient();
-        
-        public const string url_downloadMap = "http://176.107.160.146/Home/DownloadProject?trackname={0}&nickname={1}";
-        
-        public static void DownloadMap(string trackname, string nick, Action<DownloadProgressChangedEventArgs> progressCallback, Action<AsyncCompletedEventArgs> completeCallback)
-        {
-            string url = string.Format(url_downloadMap, trackname.Replace("&", "%amp%"), nick.Replace("&", "%amp%"));
-            
-            if (!Directory.Exists(Application.persistentDataPath + "/temp")) Directory.CreateDirectory(Application.persistentDataPath + "/temp");
-            string tempPath = Application.persistentDataPath + "/temp/" + trackname + ".bsz";
-            
-            c = new WebClient();
-            c.DownloadProgressChanged += (sender, args) =>
-            {
-                progressCallback(args);
-            };
-            c.DownloadFileCompleted += (sender, args) =>
-            {
-                bool doUnpack = false;
-                
-                if(args.Cancelled) Debug.Log("Download cancelled");
-                else if (args.Error != null) Debug.LogError("Download error\n" + args.Error);
-                else
-                {
-                    doUnpack = true;
-                }
-
-                if (doUnpack)
-                {
-                    ProjectManager.UnpackBspFile(tempPath);
-                }
-                else
-                {
-                    File.Delete(tempPath);
-                }
-                
-                completeCallback(args);
-                
-                // -1 coz of Difficulty has no Downloads field 
-                DatabaseScript.SendStatistics(trackname, nick, -1, DatabaseScript.StatisticsKeyType.Download);
-            };
-            
-            c.DownloadFileAsync(new Uri(url), tempPath);
-        }
-
-        public static void CancelDownloading()
-        {
-            c.CancelAsync();
-        }
-    }
-
     public class HelperUI : MonoBehaviour
     {
         /// <summary>
@@ -72,16 +19,16 @@ namespace InGame.Helpers
         /// <param name="content">Content transform</param>
         /// <param name="list">List of classes</param>
         /// <param name="implementation"></param>
-        /// <typeparam name="T">Content child UI class</typeparam>
-        /// <typeparam name="T2">Info class which needs to implement into UI</typeparam>
-        public static void FillContent<T, T2>(Transform content, IEnumerable<T2> list, Action<T, T2> implementation)
+        /// <typeparam name="TItem">Content child UI class</typeparam>
+        /// <typeparam name="TData">Info class which needs to implement into UI</typeparam>
+        public static void FillContent<TItem, TData>(Transform content, IEnumerable<TData> list, Action<TItem, TData> implementation)
         {
             GameObject prefab = ClearContent(content);
             prefab.SetActive(true);
 
-            foreach (T2 infoClass in list)
+            foreach (TData infoClass in list)
             {
-                T itemUI = Instantiate(prefab, content).GetComponent<T>();
+                TItem itemUI = Instantiate(prefab, content).GetComponent<TItem>();
                 implementation(itemUI, infoClass);
             }
         

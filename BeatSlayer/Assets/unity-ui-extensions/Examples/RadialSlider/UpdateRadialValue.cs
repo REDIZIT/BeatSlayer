@@ -1,4 +1,6 @@
-﻿namespace UnityEngine.UI.Extensions.Examples
+﻿using Michsky.UI.ModernUIPack;
+
+namespace UnityEngine.UI.Extensions.Examples
 {
     public class UpdateRadialValue : MonoBehaviour
     {
@@ -16,14 +18,14 @@
         {
             float value;
             float.TryParse(input.text, out value);
-            slider.Value = value;
+            slider.currentValue = value;
         }
 
         public void UpdateSliderAndle()
         {
             int value;
             int.TryParse(input.text, out value);
-            slider.Angle = value;
+            slider.currentValue = value;
         }
     }
 }

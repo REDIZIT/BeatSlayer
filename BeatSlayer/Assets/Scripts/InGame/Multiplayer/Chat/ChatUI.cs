@@ -17,6 +17,10 @@ namespace Multiplayer.Chat
     public class ChatUI : MonoBehaviour
     {
         public ChatAvatarLoader avatarLoader;
+        /// <summary>
+        /// Count of message player didn't check
+        /// </summary>
+        public static int UnviewedMessagesCount;
 
         // Hub methods
         public const string method_leaveGroup = "Chat_LeaveGroup";
@@ -32,35 +36,54 @@ namespace Multiplayer.Chat
         public CustomInputField field;
         public Text onlineText, groupText;
 
+        public GameObject newMessagesCount;
+        public Text newMessagesCountText;
+
         public Transform groupContent;
 
         
         public void Configuration()
         {
-            /*NetCore.Configurators += () =>
-            {
-                
-            };*/
             NetCore.Subs.OnSendChatMessage += OnSendChatMessage;
             NetCore.Subs.OnJoinGroup += OnJoinGroup;
             NetCore.Subs.OnGetGroups += OnGetGroups;
-            NetCore.OnFullReady += () =>
+
+
+            // On connected or logged in
+            // If not logged => return and show message "Not logged in"
+            // Get groups
+            // Set default group if not set
+            // Get selected group chat history
+            // Set text "Connected"
+            // Unlock inputfield
+            // Resubscribe if needed
+
+
+            // On connection lost
+            // Set text "connection lost"
+            // Lock inputfield
+
+
+
+            NetCore.OnConnect += () =>
             {
-                if (Payload.CurrentAccount != null)
-                {
-                    Debug.Log("NetCore.ServerActions.Chat.GetGroups();");
-                    NetCore.ServerActions.Chat.GetGroups();
-                }
+                OnConnectedOrLoggedIn();
             };
             NetCore.OnLogIn += () =>
             {
-                Debug.Log(" >>> ChatUI.GetGroups");
-                NetCore.ServerActions.Chat.GetGroups();
+                OnConnectedOrLoggedIn();
             };
+            NetCore.OnFullReady += () =>
+            {
+                OnConnectedOrLoggedIn();
+            };
+
             NetCore.Subs.OnOnlineChange += (int online) =>
             {
-                onlineText.text = LocalizationManager.Localize("Online") + ": " + online;
+                if(onlineText != null) onlineText.text = LocalizationManager.Localize("Online") + ": " + online;
             };
+
+            onlineText.text = "";
 
             avatarLoader.Configure();
         }
@@ -71,8 +94,31 @@ namespace Multiplayer.Chat
             prefab.SetActive(false);
             field.onEndEdit = OnSendBtnClicked;
             avatarLoader = new ChatAvatarLoader();
+
+            SetUnreadMessagesCount(UnviewedMessagesCount);
+        }
+
+
+
+
+
+
+        private void OnConnectedOrLoggedIn()
+        {
+            Debug.Log("OnConnectedOrLoggedIn");
+
+            if (Payload.CurrentAccount == null)
+            {
+                onlineText.text = "You should be logged in";
+                return;
+            }
+
+            NetCore.ServerActions.Chat.GetGroups();
+            onlineText.text = "Connected";
         }
         
+
+
         public void OnConnectionLost()
         {
             onlineText.text = "Connection lost";
@@ -91,6 +137,7 @@ namespace Multiplayer.Chat
         {
             if (Payload.CurrentAccount == null) return;
             
+            NetCore.ServerActions.Chat.LeaveGroup(Payload.CurrentAccount.Nick, selectedGroupName);
             NetCore.ServerActions.Chat.JoinGroup(Payload.CurrentAccount.Nick, data.Name);
             selectedGroupName = data.Name;
             groupText.text = data.Name;
@@ -103,22 +150,38 @@ namespace Multiplayer.Chat
         
         public void OnSendChatMessage(string json)
         {
+            Debug.Log("Got message");
+
             ChatMessage msg = JsonConvert.DeserializeObject<ChatMessage>(json);
-            
-            HelperUI.AddContent<ChatMessageItem>(content, prefab, item =>
+
+            if(content == null || !content.gameObject.activeInHierarchy)
             {
-                item.message = msg;
-                item.Refresh();
- 
-                avatarLoader.Request(item.image, item.message.nick);
-            });
+                UnviewedMessagesCount++;
+                SetUnreadMessagesCount(UnviewedMessagesCount);
+            }
+
+            if(content != null)
+            {
+                HelperUI.AddContent<ChatMessageItem>(content, prefab, item =>
+                {
+                    item.message = msg;
+                    item.Refresh();
+
+                    avatarLoader.Request(item.image, item.message.nick);
+                });
+            }
             
             chatMessages.Add(msg);
         }
 
         public void OnGetGroups(List<ChatGroupData> groups)
         {
-            selectedGroupName = groups[0].Name;
+            Debug.Log("Got groups");
+
+            if(selectedGroupName == "")
+            {
+                selectedGroupName = groups[0].Name;
+            }
             groupText.text = selectedGroupName;
 
             NetCore.ServerActions.Chat.JoinGroup(Payload.CurrentAccount.Nick, selectedGroupName);
@@ -131,6 +194,8 @@ namespace Multiplayer.Chat
 
         public void OnJoinGroup(string json)
         {
+            Debug.Log("OnJoinGroup");
+
             List<ChatMessage> msgs = JsonConvert.DeserializeObject<List<ChatMessage>>(json);
             
             HelperUI.FillContent<ChatMessageItem, ChatMessage>(content, msgs, (item, message) =>
@@ -151,6 +216,23 @@ namespace Multiplayer.Chat
         public void OnOnlineChange(int count)
         {
             onlineText.text = "Online: " + count;
+        }
+
+
+
+        public void OnShowChatBtnClick()
+        {
+            UnviewedMessagesCount = 0;
+            SetUnreadMessagesCount(0);
+        }
+
+
+        private void SetUnreadMessagesCount(int count)
+        {
+            if (newMessagesCount == null) return;
+
+            newMessagesCount.SetActive(count != 0);
+            newMessagesCountText.text = count.ToString();
         }
     }
     

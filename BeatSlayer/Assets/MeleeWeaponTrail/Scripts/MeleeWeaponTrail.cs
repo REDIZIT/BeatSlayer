@@ -29,7 +29,7 @@ public class MeleeWeaponTrail : MonoBehaviour
 	public Material _material;
 
 	[SerializeField]
-	float _lifeTime = 1.0f;
+	public float _lifeTime = 1.0f;
 
 	[SerializeField]
 	public Color[] _colors;

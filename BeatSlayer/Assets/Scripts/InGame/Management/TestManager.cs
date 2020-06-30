@@ -77,7 +77,7 @@ namespace Testing
                 }
                 
                 menu.beatmapUI.OpenModeration(request, proj);
-                DeleteRequest();
+                DeleteRequest(false);
             }
         }
 
@@ -88,15 +88,19 @@ namespace Testing
             return request;
         }
 
-        public static void DeleteRequest()
+        public static void DeleteRequest(bool withmap)
         {
             string requestPath = Application.persistentDataPath + "/data/moderation/request.json";
             string mapFolder = Application.persistentDataPath + "/data/moderation/map";
             
             File.Delete(requestPath);
-            foreach (var filepath in Directory.GetFiles(mapFolder))
+
+            if (withmap)
             {
-                File.Delete(filepath);
+                foreach (var filepath in Directory.GetFiles(mapFolder))
+                {
+                    File.Delete(filepath);
+                }
             }
         }
 

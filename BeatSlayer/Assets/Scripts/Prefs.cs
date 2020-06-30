@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine;
 
+/// <summary>
+/// Один и ооочень большой костыль размером с игру
+/// </summary>
 [Serializable]
 public class Prefs
 {
@@ -40,16 +39,36 @@ public class Prefs
     public bool mapUnlocked0, mapUnlocked1, mapUnlocked2, mapUnlocked3;
     public int coins = 0;
     Dictionary<string, int> _records = new Dictionary<string, int>();
+
+
+
+
+    public Prefs()
+    {
+        if (sabers == null || sabers.Count == 0)
+        {
+            // Upgrade
+            sabers = new List<Saber>();
+            for (int i = 0; i < boughtSabers.Length; i++)
+            {
+                sabers.Add(new Saber() { id = i, isBought = boughtSabers[i] });
+            }
+        }
+    }
+
+
+
+    [Obsolete]
     public int GetRecord(string trackname)
     {
         if (_records != null && _records.ContainsKey(trackname)) return _records[trackname];
         return 0;
     }
-    public void SetRecord(string trackname, int value)
-    {
-        if (_records != null && _records.ContainsKey(trackname)) _records[trackname] = value;
-        else _records.Add(trackname, value);
-    }
+    //public void SetRecord(string trackname, int value)
+    //{
+    //    if (_records != null && _records.ContainsKey(trackname)) _records[trackname] = value;
+    //    else _records.Add(trackname, value);
+    //}
     public Dictionary<string, int> _states = new Dictionary<string, int>();
     public int GetRateState(string trackname)
     {
@@ -93,10 +112,13 @@ public class Prefs
 
     // Sabers
     public int selectedSaber;
-    public bool[] boughtSabers = new bool[6] { true, false, false, false, false, false };
-    public int[] sabersCosts = new int[6] { 0, 2500, 8999, 12000, 15000, 180000 };
-    //public SerializableColor leftColor = new SerializableColor(0, 0.5f, 1), rightColor = new SerializableColor(1, 0.5f, 0);
-    //public SerializableColor leftDirColor = new SerializableColor(1, 1, 1), rightDirColor = new SerializableColor(1, 1, 1);
+
+    public int selectedLeftSaberId, selectedRightSaberId;
+
+    public bool[] boughtSabers = new bool[7] { true, false, false, false, false, false, false };
+    public List<Saber> sabers;
+    //public int[] sabersCosts = new int[7] { 0, 2500, 8999, 12000, 15000, 180000, 40000 };
+
     public float colorPower = 2;
 
     // Sabers effects

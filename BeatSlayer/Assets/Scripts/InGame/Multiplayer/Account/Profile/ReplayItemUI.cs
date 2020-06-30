@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using BeatSlayerServer.Multiplayer.Accounts;
+﻿using BeatSlayerServer.Dtos.Mapping;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +15,7 @@ public class ReplayItemUI : MonoBehaviour
         nickText.text = "by " + data.Map.Nick + " <color=#e80>" + data.DifficultyName + "</color>";
         scoreText.text = data.Score + "";
         missedText.text = data.Missed + "";
-        rpText.text = data.RP + "";
+        rpText.text = Mathf.FloorToInt((float)data.RP * 10) / 10f + "";
         accuracyText.text = (Mathf.FloorToInt(data.Accuracy * 10000) / 100f) + "";
     }
 }

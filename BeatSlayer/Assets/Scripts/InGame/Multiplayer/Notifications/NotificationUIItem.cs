@@ -57,12 +57,12 @@ namespace Multiplayer.Notification
                     break;
                 case NotificationType.FriendInviteAccept:
                     header = Local("FriendInviteAccept");
-                    body = string.Format(Local("FriendInviteAcceptBody"), notification.RequesterNick);
+                    body = string.Format(Local("FriendInviteAcceptBody"), notification.TargetNick);
                     btn_ok = true;
                     break;
                 case NotificationType.FriendInviteReject:
                     header = Local("FriendInviteReject");
-                    body = string.Format(Local("FriendInviteRejectBody"), notification.RequesterNick);
+                    body = string.Format(Local("FriendInviteRejectBody"), notification.TargetNick);
                     btn_ok = true;
                     break;
                 case NotificationType.MapModeration:
@@ -112,7 +112,7 @@ namespace Multiplayer.Notification
         
         public void OnOkBtnClick()
         {
-            ui.Ok(notification);
+            ui.Ok(notification, deleteAfterClick);
             if (deleteAfterClick) Destroy(gameObject);
         }
         

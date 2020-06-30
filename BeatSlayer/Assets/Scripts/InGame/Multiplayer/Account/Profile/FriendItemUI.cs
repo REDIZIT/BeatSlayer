@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using Assets.SimpleLocalization;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
-using Multiplayer.Chat;
 using UnityEngine;
 using UnityEngine.UI;
 using Web;
@@ -23,7 +21,9 @@ public class FriendItemUI : MonoBehaviour
         this.data = data;
         //avatarImage =
         nickText.text = data.Nick;
-        activeText.text = data.IsOnline ? "Online" : "Was online " + data.LastActiveTimeUtc.ToLocalTime().ToShortTimeString();
+        //activeText.text = data.IsOnline ? LocalizationManager.Localize("Online") : string.Format(LocalizationManager.Localize("WasOnline"), data.LastActiveTimeUtc.ToLocalTime().ToShortTimeString());
+        activeText.text = data.IsOnline ? LocalizationManager.Localize("Online") : 
+            string.Format(LocalizationManager.Localize("WasOnline"), data.LastActiveTimeUtc.ToLocalTime().ToString("d/M/yyyy HH:mm"));
 
         WebAPI.GetAvatar(data.Nick, (Texture2D tex) =>
         {

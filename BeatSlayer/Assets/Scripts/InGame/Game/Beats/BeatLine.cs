@@ -1,16 +1,10 @@
 ﻿using InGame.Game.Spawn;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 public class BeatLine : MonoBehaviour, IBeat
 {
+    public Transform Transform { get { return transform; } }
     public BeatCubeClass cls;
-    float Speed
-    {
-        get { return bm.CubeSpeed * cls.speed; }
-    }
     
     public BeatCubeClass GetClass() { return cls; }
 
@@ -26,6 +20,11 @@ public class BeatLine : MonoBehaviour, IBeat
     float capMax;
     float lineEndTime;
     public float secondCapRoadPos;
+
+
+    public float SpeedMultiplier { get; set; }
+    public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
+
 
     bool useSoundEffect;
 
@@ -56,7 +55,7 @@ public class BeatLine : MonoBehaviour, IBeat
 
 
         lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
-        capMax = lineEndTime * (Speed / Time.deltaTime);
+        capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
     }
 
     void Update()
@@ -71,18 +70,18 @@ public class BeatLine : MonoBehaviour, IBeat
     public float totalDist;
     void Movement()
     {
-        transform.position += new Vector3(0, 0, -Speed);
-        totalDist += bm.CubeSpeed * cls.speed;
+        transform.position += new Vector3(0, 0, -CurrentSpeed);
+        totalDist += CurrentSpeed * SpeedMultiplier;
         if (firstCap.position.z <= maxDistance)
         {
-            gm.MissedBeatCube();
+            gm.MissedBeatCube(this);
             Destroy(gameObject);
         }
     }
     void CapMovement()
     {
         // Cap speed in units/frame
-        float capSpeed = Speed;
+        float capSpeed = CurrentSpeed;
         
         ///Debug.Log("Line: bm.CubeSpeed * cls.speed: " + bm.CubeSpeed * cls.speed);
         //float capMax = lineEndTime * bm.fieldLength; 
@@ -153,25 +152,37 @@ public class BeatLine : MonoBehaviour, IBeat
     }
 
 
-    public void OnPoint(Vector2 direction)
+    public void OnPoint(Vector2 direction, bool destroy = false)
     {
         float lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
         //float capMax = lineEndTime * bm.fieldLength;
 
         // Offset to selected road second cap at spawn
-        float capRoadOffsetTime = capMax / Speed;
+        float capRoadOffsetTime = capMax / CurrentSpeed;
         float capRoadOffsetDistance = secondCapRoadPos - transform.position.x;
         float capRoadOffsetSpeed = capRoadOffsetDistance / capRoadOffsetTime;
 
-        gm.BeatLineSliced();
+        gm.BeatLineHold();
         psystem.Play();
 
-        firstCap.transform.localPosition += new Vector3(capRoadOffsetSpeed, 0, Speed);
+        firstCap.transform.localPosition += new Vector3(capRoadOffsetSpeed, 0, CurrentSpeed);
         if(firstCap.transform.localPosition.z >= capMax)
         {
-            psystem.transform.parent = null;
-            psystem.Stop();
-            Destroy(gameObject);
+            OnLineSliced();
         }
     }
+
+    void OnLineSliced()
+    {
+        psystem.transform.parent = null;
+        psystem.Stop();
+        gm.BeatLineSliced(this);
+        Destroy(gameObject);
+    }
+
+    public void Destroy()
+    {
+        OnLineSliced();
+    }
+    
 }

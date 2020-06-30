@@ -41,7 +41,30 @@ namespace Profile
 
         public void OnAvatarBtnClick()
         {
-            //string path = Application.persistentDataPath + "/newavatar.jpg";
+#if UNITY_EDITOR
+            string path = Application.persistentDataPath + "/newavatar.jpg";
+
+
+            Texture2D tex = ProjectManager.LoadTexture(path);
+            ImageCropper.Instance.Show(tex, (result, image, croppedImage) =>
+            {
+                if (result)
+                {
+                    ui.profileUI.avatarImage.texture = croppedImage;
+                    Web.WebAPI.UploadAvatar(Payload.CurrentAccount.Nick, croppedImage, message =>
+                    {
+                        ui.SaveAvatarToCache(true);
+                    });
+                }
+            }, new ImageCropper.Settings()
+            {
+                markTextureNonReadable = false,
+                ovalSelection = false,
+                selectionMaxAspectRatio = 1,
+                selectionMinAspectRatio = 1
+            });
+
+#else
 
             NativeGallery.GetImageFromGallery(new NativeGallery.MediaPickCallback(path =>
             {
@@ -61,6 +84,8 @@ namespace Profile
                     markTextureNonReadable = false, ovalSelection = false, selectionMaxAspectRatio = 1, selectionMinAspectRatio = 1
                 });
             }), LocalizationManager.Localize("SelectAvatar"));
+
+#endif
         }
 
 

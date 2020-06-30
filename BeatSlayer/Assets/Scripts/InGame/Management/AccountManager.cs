@@ -17,6 +17,7 @@ using GooglePlayGames.BasicApi.Multiplayer;
 using ProjectManagement;
 using Ranking;
 using UnityEngine.Serialization;
+using BeatSlayerServer.Dtos.Mapping;
 
 public class AccountManager : MonoBehaviour
 {
@@ -48,19 +49,19 @@ public class AccountManager : MonoBehaviour
     public Transform actionContnet;
 
     #region urls
-    public const string url_sendReplay = "http://www.bsserver.tk/Account/AddReplay?nick={0}&json={1}";
-    public const string url_getBestReplay = "http://www.bsserver.tk/Account/GetBestReplay?player={0}&trackname={1}&nick={2}";
-    public const string url_playTime = "http://www.bsserver.tk/Account/UpdateInGameTime?nick={0}&seconds={1}";
-    public const string url_getMapLeaderboardPlace = "http://www.bsserver.tk/Account/GetMapLeaderboardPlace?player={0}&trackname={1}&nick={2}";
-    public const string url_leaderboard = "http://www.bsserver.tk/Account/GetMapGlobalLeaderboard?trackname={0}&nick={1}";
-    public const string url_login = "http://176.107.160.146/Account/Login?";
-    public const string url_signup = "http://176.107.160.146/Account/Register?";
-    public const string url_upload = "http://176.107.160.146/Account/Update";
-    public const string url_viewAccount = "http://176.107.160.146/Account/ViewAccount?nick=";
-    public const string url_getshortleaderboard = "http://176.107.160.146/Account/getshortleaderboard?";
-    public const string url_getLeaderboard = "http://176.107.160.146/Account/GetLeaderboard";
-    public const string url_setAvatar = "http://176.107.160.146/Account/SetAvatar";
-    public const string url_getAvatar = "http://176.107.160.146/Account/GetAvatar?nick=";
+    [HideInInspector] string url_sendReplay = NetCore.Url_Server + "/Account/AddReplay?nick={0}&json={1}";
+    [HideInInspector] string url_getBestReplay = NetCore.Url_Server + "/Account/GetBestReplay?player={0}&trackname={1}&nick={2}";
+    [HideInInspector] string url_playTime = NetCore.Url_Server + "/Account/UpdateInGameTime?nick={0}&seconds={1}";
+    [HideInInspector] string url_getMapLeaderboardPlace = NetCore.Url_Server + "/Account/GetMapLeaderboardPlace?player={0}&trackname={1}&nick={2}";
+    [NonSerialized] public string url_leaderboard = "/Account/GetMapGlobalLeaderboard?trackname={0}&nick={1}";
+    [HideInInspector] string url_login = NetCore.Url_Server + "/Account/Login?";
+    [HideInInspector] string url_signup = NetCore.Url_Server + "/Account/Register?";
+    [HideInInspector] string url_upload = NetCore.Url_Server + "/Account/Update";
+    [HideInInspector] string url_viewAccount = NetCore.Url_Server + "/Account/ViewAccount?nick=";
+    [HideInInspector] string url_getshortleaderboard = NetCore.Url_Server + "/Account/getshortleaderboard?";
+    [HideInInspector] string url_getLeaderboard = NetCore.Url_Server + "/Account/GetLeaderboard";
+    [HideInInspector] string url_setAvatar = NetCore.Url_Server + "/Account/SetAvatar";
+    [HideInInspector] string url_getAvatar = NetCore.Url_Server + "/Account/GetAvatar?nick=";
     #endregion
 
     
@@ -418,12 +419,12 @@ public class AccountManager : MonoBehaviour
 
         return LegacyAccount.playedMaps.Exists(c => c.author == author && c.name == name && c.nick == nick);
     }
-    public static bool IsPassed(string author, string name)
-    {
-        if (LegacyAccount == null) return false;
+    //public static bool IsPassed(string author, string name)
+    //{
+    //    if (Payload.CurrentAccount == null) return false;
 
-        return LegacyAccount.playedMaps.Exists(c => c.author == author && c.name == name);
-    }
+    //    return Payload.playedMaps.Exists(c => c.author == author && c.name == name);
+    //}
 
     #endregion
 
@@ -621,23 +622,46 @@ public class AccountManager : MonoBehaviour
     
     
     
-    public static void SendReplay(Replay replay, Action<ReplaySendData> callback)
+    public static Task<ReplaySendData> SendReplay(Replay replay)
     {
         replay.player = Payload.CurrentAccount.Nick;
-        string json = JsonConvert.SerializeObject(replay);
 
-        NetCore.Subs.Accounts_OnSendReplay += data =>
+        ReplayData dto = new ReplayData()
         {
-            Debug.Log("Accounts_OnSendReplay " + data.Coins);
-            callback(data);
+            Nick = replay.player,
+            Map = new MapData()
+            {
+                Group = new GroupData()
+                {
+                    Author = replay.author,
+                    Name = replay.name
+                },
+                Nick = replay.nick
+            },
+            Difficulty = new DifficultyData()
+            {
+                CubesSpeed = 1,
+                Name = replay.diffucltyName,
+                Stars = replay.difficulty
+            },
+            CubesSliced = replay.sliced,
+            Missed = replay.missed,
+            RP = (float)replay.RP,
+            Score = replay.score
         };
+
+        //NetCore.Subs.Accounts_OnSendReplay += data =>
+        //{
+        //    callback(data);
+        //};
         
-        NetCore.ServerActions.Account.SendReplay(json);
+        return NetCore.ServerActions.Account.SendReplay(dto);
     }
-    public static void GetBestReplay(string player, string trackname, string nick, Action<ReplayData> callback)
+    public static async void GetBestReplay(string player, string trackname, string nick, Action<ReplayData> callback)
     {
-        NetCore.Subs.Accounts_OnGetBestReplay += callback;
-        NetCore.ServerActions.Account.GetBestReplay(player, trackname, nick);
+        //NetCore.Subs.Accounts_OnGetBestReplay += callback;
+        var data = await NetCore.ServerActions.Account.GetBestReplay(player, trackname, nick);
+        callback(data);
     }
 
     
@@ -645,7 +669,7 @@ public class AccountManager : MonoBehaviour
     
     
     
-    public static void GetMapLeaderboardPlace(string player, string trackname, string nick, Action<int> callback)
+    public void GetMapLeaderboardPlace(string player, string trackname, string nick, Action<int> callback)
     {
         string url = string.Format(url_getMapLeaderboardPlace, player, trackname, nick);
         

@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GameNet;
 using Notifications;
 
 namespace BeatSlayerServer.Multiplayer.Accounts
@@ -73,10 +69,17 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         /// <summary>
         /// Accuracy from 0 to 1 (Hits / AllCubes)
         /// </summary>
-        public float Accuracy { get { return (Hits + Misses) > 0 ? Hits / (Hits + Misses) : -1; } }
+        public float Accuracy { get { return (Hits + Misses) > 0 ? (float)Hits / (float)(Hits + Misses) : -1; } }
         public int MaxCombo { get; set; }
         public int Hits { get; set; }
         public int Misses { get; set; }
+        // Count of replays grades
+        public int SS { get; set; }
+        public int S { get; set; }
+        public int A { get; set; }
+        public int B { get; set; }
+        public int C { get; set; }
+        public int D { get; set; }
 
 
         // Map creator stuff
