@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
-using InGame.Leaderboard;
-using Microsoft.AspNetCore.Http.Connections;
+using GameNet.Invokes;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -26,14 +27,17 @@ namespace GameNet
     {
         static HubConnection conn;
         public static HubConnectionState State => conn.State;
+        //public static ConnectionState State => conn.State;
         public static Subscriptions Subs { get; private set; }
+        public static Invokes Actions { get; private set; }
+
         public static string Url_Server
         {
             get
             {
                 return ConnType == ConnectionType.Local
                     ? "https://localhost:5011" : ConnType == ConnectionType.Development
-                        ? "http://bsserver.tk:5020"
+                        ? "http://www.bsserver.tk:5010"
                             : "https://bsserver.tk";
             }
         }
@@ -48,13 +52,15 @@ namespace GameNet
 
 
         public static Action OnConnect, OnDisconnect, OnReconnect, OnFullReady;
-        public static Action OnLogIn, OnLogOut;
+        public static Action OnLogIn;
 
         
         // There are delegates of NetCore config methods (Instead of Configure(Action config))
         // Subs here your config code. This is invoked when wrapper invoke NetCore.Configure
         public static Action Configurators;
 
+        
+        
         public static bool TryReconnect { get; set; }
         public static int ReconnectAttempt { get; private set; }
 
@@ -140,7 +146,7 @@ namespace GameNet
             {
                 if (conn == null)
                 {
-                    Debug.Log("CreateConnection for IL2CPP");
+                    Debug.Log("CreateConnection via Dispatcher");
                     CreateConnection();
                 }
                 else
@@ -177,16 +183,17 @@ namespace GameNet
             Debug.Log("> Connect");
             try
             {
+                //await conn.Start();
                 await conn.StartAsync();
                 if (conn.State == HubConnectionState.Connected)
                 {
-                    Log("[ Connected ]");
+                    Debug.Log("[ Connected ]");
                     OnConnect?.Invoke();
                     ReconnectAttempt = 0;
                 }
                 else
                 {
-                    Log("[ Reconnecting ]");
+                    Debug.Log("[ Reconnecting ]");
                     if (Application.isPlaying)
                     {
                         OnReconnect?.Invoke();
@@ -197,7 +204,7 @@ namespace GameNet
             catch (Exception err)
             {
                 Debug.Log("Connection failed: " + err);
-                Log("[ Reconnecting ]");
+                Debug.Log("[ Reconnecting ]");
                 if (Application.isPlaying)
                 {
                     OnReconnect?.Invoke();
@@ -207,20 +214,8 @@ namespace GameNet
             
         }
 
-        /// <summary>
-        /// Debug.Log if has internet access
-        /// </summary>
-        static void Log(string msg)
-        {
-            if (Application.internetReachability == NetworkReachability.NotReachable) return;
-
-            Debug.Log(msg);
-        }
-
         static async void Reconnect(bool force = false)
         {
-            Debug.Log(" > Reconnect. Force? " + force + " Try to reconnect? " + TryReconnect);
-
             if (!TryReconnect) return;
             
             if(!force) await Task.Delay(3000);
@@ -238,44 +233,28 @@ namespace GameNet
         static void BuildConnection()
         {
             Debug.Log("> Create HubConnection (autoreconnect = true) with " + Url_Hub);
-
-            /// Not working il2cpp
-            /*conn = new HubConnectionBuilder()
-                 .WithUrl(new Uri(Url_Hub), options => {
-                     options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
-                     options.SkipNegotiation = false;
-                 })
-                 .WithAutomaticReconnect()
-                 .ConfigureLogging(logging =>
-                 {
-                     logging.ClearProviders();
-                     logging.SetMinimumLevel(LogLevel.Debug);
-                     logging.AddProvider(new UnityLogger());
-                 })
-                 .Build();
-             */
+            //conn = new HubConnection(Url_Hub);
             conn = new HubConnectionBuilder()
-                 .WithUrl(Url_Hub, (o) =>
-                 {
-                     o.SkipNegotiation = false;
-                     //o.Url = new Uri("https://bsserver.tk/GameHub");
-                     //o.Url = new Uri("https://localhost:5011/GameHub");
-                     o.CloseTimeout = TimeSpan.MaxValue;
-                     o.Transports = HttpTransportType.WebSockets;
-                 })
-                 .ConfigureLogging(logging =>
-                 {
-                     /*logging.ClearProviders();
-                     logging.SetMinimumLevel(LogLevel.Information);
-                     logging.AddProvider(new UnityLogger());*/
-                 })
-                 .Build();
+                .WithUrl(new Uri(Url_Hub), options => {
+                    options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets;
+                    options.SkipNegotiation = false;
+                })
+                .WithAutomaticReconnect()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Debug);
+                    logging.AddProvider(new UnityLogger());
+                })
+                .Build();
+
+            //conn.KeepAliveInterval = new TimeSpan(0, 0, 5);
 
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed due to " + err.Message);
                 OnDisconnect?.Invoke();
-                //BuildConnection();
+                BuildConnection();
                 Reconnect(true);
                 return null;
             });
@@ -286,7 +265,6 @@ namespace GameNet
         // (Internal usage)
         static void SubcribeOnServerCalls()
         {
-            //return;
             Debug.Log("> Sub on server calls");
             Subs = new Subscriptions();
            
@@ -295,20 +273,17 @@ namespace GameNet
             foreach (var field in fields)
             {
                 Type t = field.FieldType;
-                //Debug.Log(" << " + field.Name);
+                Debug.Log(" << " + field.Name);
                 conn.On(field.Name, t.GenericTypeArguments, (objects =>
                 {
-                    //Debug.Log("[CONNECTION ON] << " + field.Name);
+                    Debug.Log("[CONNECTION ON] << " + field.Name);
                     FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
-
                     object yourfield = info.GetValue(Subs);
-
                     MethodInfo method = yourfield.GetType().GetMethod("Invoke");
-
-                    //method.Invoke(yourfield, objects);
-                    UnityMainThreadDispatcher.Instance().Enqueue(() => method.Invoke(yourfield, objects));
                     
-                    return Task.Delay(0);
+                    method.Invoke(yourfield, objects);
+
+                    return null;
                 }));
             }
         }
@@ -341,31 +316,17 @@ namespace GameNet
             conn.On<string>(nameof(Subs.OnJoinGroup), (str) =>
             {
                 Debug.Log(" << Manually on join group\n" + str);
-                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.OnJoinGroup(str));
+                Subs.OnJoinGroup(str);
             });
             conn.On<List<ChatGroupData>>(nameof(Subs.OnGetGroups), (ls) =>
             {
                 Debug.Log(" << Manually on get groups\n" + ls.Count);
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    Subs.OnGetGroups(ls);
-                });
-                
+                Subs.OnGetGroups(ls);
             });
             conn.On<string>(nameof(Subs.OnSendChatMessage), (str) =>
             {
                 Debug.Log(" << Manually OnSendChatMessage\n" + str);
                 Subs.OnSendChatMessage(str);
-            });
-            conn.On(nameof(Subs.Friends_OnGetFriends), (List<AccountData> ls) =>
-            {
-                Debug.Log(" << Manually Friends_OnGetFriends\n" + ls.Count);
-                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.Friends_OnGetFriends(ls));
-            });
-            conn.On(nameof(Subs.Accounts_OnGetAvatar), (byte[] bytes) =>
-            {
-                Debug.Log(" << Manually Accounts_OnGetAvatar\n");
-                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.Accounts_OnGetAvatar(bytes));
             });
         }
 
@@ -497,28 +458,11 @@ namespace GameNet
 
                 public static void SendChangeEmailCode(string nick, string email) => conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
 
-                //public static void SendReplay(string json) => conn.InvokeAsync("Accounts_SendReplay", json);
-                public static async Task<ReplaySendData> SendReplay(ReplayData dto)
-                {
-                    return await conn.InvokeAsync<ReplaySendData>("SendReplay", dto);
-                }
+                public static void SendReplay(string json) => conn.InvokeAsync("Accounts_SendReplay", json);
 
-                //public static void GetBestReplay(string ni!ck, string trackname, string creatornick) => conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
-                public static async Task<ReplayData> GetBestReplay(string nick, string trackname, string creatornick)
-                {
-                    return await conn.InvokeAsync<ReplayData>("GetBestReplay", nick, trackname, creatornick);
-                }
-
-                public static async Task<List<LeaderboardItem>> GetMapLeaderboard(string trackname, string nick) =>
-                    await conn.InvokeAsync<List<LeaderboardItem>>("GetMapLeaderboard", trackname, nick);
-
-                public static async Task<List<LeaderboardItem>> GetGlobalLeaderboard() =>
-                    await conn.InvokeAsync<List<LeaderboardItem>>("GetGlobalLeaderboard");
+                public static void GetBestReplay(string nick, string trackname, string creatornick) => conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
 
                 public static void GetBestReplays(string nick, int count) => conn.InvokeAsync("Accounts_GetBestReplays", nick, count);
-
-                public static async Task<bool> IsPassed(string nick, string author, string name) =>
-                    await conn.InvokeAsync<bool>("IsPassed", nick, author, name);
             }
 
             public static class Friends
@@ -549,7 +493,6 @@ namespace GameNet
             {
                 public static void GetGroups() => conn.InvokeAsync("Chat_GetGroups");
                 public static void JoinGroup(string nick, string group) => conn.InvokeAsync("Chat_JoinGroup", nick, group);
-                public static void LeaveGroup(string nick, string group) => conn.InvokeAsync("Chat_LeaveGroup", nick, group);
             }
         }
 
@@ -572,13 +515,7 @@ namespace GameNet
             public Action<OperationMessage> Accounts_OnSignUp;
             public Action<List<AccountData>> Accounts_OnSearch;
             public Action<AccountData> Accounts_OnView;
-
-            public Action<OperationMessage> Accounts_OnChangeEmail;
-            public Action<OperationMessage> Accounts_OnChangePassword;
-            public Action<bool> Accounts_OnConfirmRestore;
-
-
-
+            
             public Action<int> OnOnlineChange;
             
             public Action<string> OnJoinGroup;
@@ -588,14 +525,35 @@ namespace GameNet
             public Action<byte[]> Accounts_OnGetAvatar;
             public Action<string, string, string> Accounts_ChangePassword;
             
-            //public Action<ReplaySendData> Accounts_OnSendReplay;
+            public Action<ReplaySendData> Accounts_OnSendReplay;
             public Action<List<ReplayData>> Accounts_OnGetBestReplays;
-            //public Action<ReplayData> Accounts_OnGetBestReplay;
+            public Action<ReplayData> Accounts_OnGetBestReplay;
 
             public Action<List<AccountData>> Friends_OnGetFriends;
 
 
             public Action<NotificationInfo> Notification_OnSend;
+        }
+
+        public class Invokes
+        {
+            public Action<string> Log = (str) => SuperVoid("Log", str);
+
+           
+            //public void Test(string nick, string password) {}
+            //public void Test(string nick, string password) => NetCore.Invoke();
+        }
+
+        public abstract class ServerInvokes
+        {
+            public abstract void Test();
+            // conn.Invoke("Test");
+
+            public abstract void Test2(string arg);
+            // conn.Invoke("Test2", arg);
+
+
+            public void Test3() => SuperVoid("123");
         }
     }
 }

@@ -1,28 +1,23 @@
 ﻿using Assets.SimpleLocalization;
 using InGame.Game;
+using Newtonsoft.Json;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using ProjectManagement;
 using Ranking;
 using UnityEngine;
 using UnityEngine.UI;
 using Web;
-using BeatSlayerServer.Dtos.Mapping;
-using InGame.Leaderboard;
-using InGame.Animations;
-using InGame.Game.Spawn;
 
 public class FinishHandler : MonoBehaviour
 {
     public GameManager gm { get { return GetComponent<GameManager>(); } }
-    public BeatManager bm;
-
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
-    public AccountManager accountManager;
-    public CompactLeaderboard leaderboard;
-    public FireworksSystem fireworksSystem;
-
 
 
     [Header("UI")]
@@ -33,13 +28,6 @@ public class FinishHandler : MonoBehaviour
     public GameObject uploadingText, recordText;
     public GameObject heartIcon;
     public GameObject goToEditorBtn;
-    public GameObject RPTextsContainer;
-    
-
-    [Header("Grade")]
-    public Animator rankAnimator; // Anitmator for ranks (SS,S,A,B,C,D)
-    public Text rankText;
-    public Color[] gradeColors;
 
     [Header("Difficulties")]
     public Text cubesSpeedText;
@@ -52,28 +40,15 @@ public class FinishHandler : MonoBehaviour
     public Transform leaderboardContent;
     public Text leaderboardLoadingText;
 
-    [Header("Finish conditions")]
-    public bool isNotStarting;
-    public bool isAudioTimeZero;
-    public bool isArrayEmpty;
-    public bool isAudioStopped;
 
-    public float audioTime;
+    
+    
 
     public void CheckLevelFinish()
     {
-        // Debuggin' finish end
-        isNotStarting = !gm.IsGameStartingMap;
-        isAudioTimeZero = audioManager.asource.time == 0;
-        isArrayEmpty = bm.beats.ToArray().Length == 0;
-        isAudioStopped = !audioManager.asource.isPlaying;
-
-        audioTime = audioManager.asource.time;
-
-
-        if (FinishConditions())
+        if (!gm.IsGameStartingMap && audioManager.asource.time == 0 && gm.beats.ToArray().Length == 0 && !audioManager.asource.isPlaying)
         {
-            OnLevelFinished(gm.scoringManager.Replay);
+            OnLevelFinished();
         }
         else
         {
@@ -84,39 +59,25 @@ public class FinishHandler : MonoBehaviour
             gm.trackTextSliderText.text = trackPer + "%";
         }
     }
-
-
-    private bool FinishConditions()
-    {
-        return
-            !gm.IsGameStartingMap
-            && audioManager.asource.time == 0
-            //&& gm.beats.ToArray().Length == 0
-            && !audioManager.asource.isPlaying;
-    }
-
-
-
-
-    void OnLevelFinished(ReplayData replay)
+    void OnLevelFinished()
     {
         if (!gm.gameCompleted)
         {
             gm.gameCompleted = true;
 
-            FinishServerActions(replay);
+            FinishServerActions();
 
             if(Payload.CurrentAccount != null)
             {
                 int coins = Payload.CurrentAccount.Coins;
-                int addCoins = Mathf.RoundToInt(replay.Score / 16f * gm.scoringManager.maxCombo / 2f * gm.scoringManager.scoreMultiplier);
+                int addCoins = Mathf.RoundToInt(gm.replay.score / 16f * gm.maxCombo / 2f * gm.scoreMultiplier);
 
                 Payload.CurrentAccount.Coins = coins + addCoins;
                 prefsManager.Save();
             }
 
 
-            HandleFinishUI(replay);
+            HandleFinishUI();
 
             gm.RateBtnUpdate();
 
@@ -131,7 +92,7 @@ public class FinishHandler : MonoBehaviour
 
 
 
-    void HandleFinishUI(ReplayData replay)
+    void HandleFinishUI()
     {
         finishOverlay.SetActive(true);
         gm.trackText.gameObject.SetActive(false);
@@ -145,11 +106,12 @@ public class FinishHandler : MonoBehaviour
         nameText.text = LoadingData.loadparams.Map.name;
         creatorText.text = LocalizationManager.Localize("by") + " " + LoadingData.loadparams.Map.nick;
 
-        ShowScoring(replay.Score, replay.Missed, replay.Accuracy);
+        scoreText.text = Mathf.RoundToInt(gm.replay.score * 10f) / 10f + "";
+        missedText.text = gm.replay.missed.ToString();
+        accuracyText.text = Mathf.RoundToInt(gm.replay.Accuracy * 1000) / 10f + "%";
 
-
-        cubesSpeedText.text = replay.Difficulty.CubesSpeed == 1 ? "1.0x" : replay.Difficulty.CubesSpeed.ToString().Replace(",", ".") + "x";
-        //musicSpeedText.text = (.replay.musicSpeed == 1 ? "1.0x" : gm.replay.musicSpeed.ToString().Replace(",", ".") + "x");
+        cubesSpeedText.text = (gm.replay.cubesSpeed == 1 ? "1.0x" : gm.replay.cubesSpeed.ToString().Replace(",", ".") + "x");
+        musicSpeedText.text = (gm.replay.musicSpeed == 1 ? "1.0x" : gm.replay.musicSpeed.ToString().Replace(",", ".") + "x");
         noLinesToggle.isOn = gm.nolines;
         noArrowsToggle.isOn = gm.noarrows;
 
@@ -186,121 +148,167 @@ public class FinishHandler : MonoBehaviour
         difficultyContent.GetComponent<RectTransform>().anchoredPosition = new Vector2(xOffset, 0);
     }
 
-    private async void FinishServerActions(ReplayData replay)
+    void FinishAchievements()
+    {/*
+        (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.youArePlayer, 1, (bool s) => { });
+        (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.dj, 1, (bool s) => { });
+        (Social.Active as GooglePlayGames.PlayGamesPlatform).IncrementAchievement(GPGamesManager.musicKing, 1, (bool s) => { });*/
+
+        if (!prefsManager.prefs.hasAchiv_Uff)
+        {
+            Social.ReportProgress(GPGamesManager.achievement_UffEnded, 100, (bool success) =>
+            {
+                if (!success) Debug.LogError("Achiv error");
+                if (success)
+                {
+                    prefsManager.prefs.hasAchiv_Uff = true;
+                    prefsManager.Save();
+                }
+            });
+        }
+
+        if (gm.replay.missed == 0 && gm.replay.score >= 4000 && gm.replay.cubesSpeed == 1.5f && !gm.nolines && !gm.noarrows)
+        {
+            if (!prefsManager.prefs.hasAchiv_Hardcore)
+            {
+                Social.ReportProgress(GPGamesManager.achievement_Hardcore, 100, (bool success) =>
+                {
+                    if (!success) Debug.LogError("Achiv error");
+                    if (success)
+                    {
+                        prefsManager.prefs.hasAchiv_ThatsMy = true;
+                        prefsManager.Save();
+                    }
+                });
+            }
+        }
+
+        if (gm.replay.missed == gm.replay.AllCubes && gm.replay.AllCubes >= 10 && !prefsManager.prefs.hasAchiv_Terrible) // 10 is random value :D
+        {
+            Social.ReportProgress(GPGamesManager.terrible, 100, (bool success) => { if (!success) Debug.LogError("Achiv error: terrible"); });
+            prefsManager.prefs.hasAchiv_Terrible = true;
+            prefsManager.Save();
+        }
+    }
+    void FinishServerActions()
     {
-        if (Application.internetReachability == NetworkReachability.NotReachable) return;
-
-
+        StartCoroutine(IEFinishServerActions());
+    }
+    IEnumerator IEFinishServerActions()
+    {
         string trackname = gm.project.author.Trim() + "-" + gm.project.name.Trim();
 
         DatabaseScript.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, DatabaseScript.StatisticsKeyType.Play);
         WebAPI.OnMapPlayed(LoadingData.loadparams.Map.approved);
 
-
         if (Payload.CurrentAccount == null)
         {
-            leaderboard.SetStatus(LocalizationManager.Localize("NotLoggedIn"));
-            return;
+            leaderboardLoadingText.text = LocalizationManager.Localize("NotLoggedIn");
         }
-
-        if (LoadingData.loadparams.IsPracticeMode)
-        {
-            leaderboard.SetStatus(LocalizationManager.Localize("PracticeMode"));
-            return;
-        }
-
-        if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.Author)
-        {
-            leaderboard.SetStatus(LocalizationManager.Localize("NotAuthorMap"));
-            return;
-        }
-
-        if (!DatabaseScript.DoesMapExist(trackname, gm.project.creatorNick))
-        {
-            leaderboard.SetStatus(LocalizationManager.Localize("MapHasBeenDeleted"));
-            return;
-        }
-
-
-
-        // Show or hide rp container
-        if (LoadingData.loadparams.Map.approved) ShowRPLoading();
-        else HideRP();
-
-
-        uploadingText.SetActive(true);
-        ReplayData bestReplay = await NetCore.ServerActions.Account.GetBestReplay(Payload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
-
-
-        if (bestReplay != null && replay.Score > bestReplay.Score)
-        {
-            fireworksSystem.StartEmitting();
-            recordText.SetActive(true);
-        }
-
-
-        ReplaySendData data = await NetCore.ServerActions.Account.SendReplay(replay);
-        uploadingText.SetActive(false);
-
-
-        coinsText.text = "+" + data.Coins;
-        Payload.CurrentAccount.Coins += data.Coins;
-
-        if (LoadingData.loadparams.Map.approved)
-        {
-            ShowRP(data.RP);
-        }
-
-        ShowGrade(data.Grade);
-
-        if(data.Grade == Grade.SS || data.Grade == Grade.S)
-        {
-            fireworksSystem.StartEmitting();
-        }
-
-        
-
-        gm.accountManager.UpdateSessionTime();
-
-       
-
-        // Load map leaderboard validation
 
         if (!LoadingData.loadparams.Map.approved)
         {
-            leaderboard.SetStatus(LocalizationManager.Localize("NotApprovedMap"));
-            return;
+            leaderboardLoadingText.text = LocalizationManager.Localize("NotApprovedMap");
+            yield break;
         }
 
-        await leaderboard.LoadLeaderboard(replay.Map.Trackname, replay.Map.Nick);
+        if (Application.internetReachability == NetworkReachability.NotReachable) yield break;
+        if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.Author) yield break;
 
+        if (!DatabaseScript.DoesMapExist(trackname, gm.project.creatorNick))
+        {
+            leaderboardLoadingText.text = LocalizationManager.Localize("MapHasBeenDeleted");
+            yield break;
+        }
+       
+        if (Payload.CurrentAccount == null) yield break;
+
+        uploadingText.SetActive(true);
+
+        RPText.text = ".";
+
+        ReplayData bestReplay = null;
+        bool bestReplayGot = false;
+        /*AccountManager.GetBestReplay(NetCorePayload.CurrentAccount.Nick, trackname, gm.project.creatorNick, (ReplayInfo replay) =>
+        {
+            bestReplay = replay;
+            bestReplayGot = true;
+            Debug.Log("Best replay got");
+        });*/
+
+        NetCore.Subs.Accounts_OnGetBestReplay += info =>
+        {
+            Debug.Log("Best replay got!");
+            if (bestReplay != null && bestReplay.Score > gm.replay.score)
+            {
+                recordText.SetActive(true);
+            }
+
+
+            AccountManager.SendReplay(gm.replay, (ReplaySendData data) =>
+            {
+                Debug.Log("OnSendReplay");
+                
+                RPText.text = Mathf.RoundToInt((float) 1).ToString();
+                coinsText.text = "+" + data.Coins;
+                Payload.CurrentAccount.Coins += data.Coins;
+                
+                LoadLeaderboard();
+                uploadingText.SetActive(false);
+            });
+
+            gm.accountManager.UpdateSessionTime();
+        };
+        //Debug.Log("Before getbestreplay: " + NetCore.State);
+        NetCore.ServerActions.Account.GetBestReplay(Payload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
+        //Debug.Log("After getbestreplay: " + NetCore.State);
     }
 
 
-    private void ShowGrade(Grade grade)
+    void LoadLeaderboard()
     {
-        rankAnimator.Play("Show");
-        rankText.text = grade.ToString();
-        rankText.color = grade == Grade.Unknown ? gradeColors[0] : gradeColors[(int)grade];
+        leaderboardLoadingText.text = "Loading..";
+        WebClient c = new WebClient();
+
+        string url = string.Format(AccountManager.url_leaderboard, gm.project.author + "-" + gm.project.name, gm.project.creatorNick);
+
+        string response = c.DownloadString(url);
+        OnLeaderboardLoaded(response);
     }
-    private void ShowScoring(float score, int missed, float accuracy)
+
+    void OnLeaderboardLoaded(/*object sender, DownloadStringCompletedEventArgs e*/string response)
     {
-        scoreText.text = Mathf.RoundToInt(score * 10f) / 10f + "";
-        missedText.text = missed.ToString();
-        accuracyText.text = Mathf.FloorToInt(accuracy * 1000) / 10f + "%";
+        //if (e.Cancelled) { leaderboardLoadingText.text = "Canceled"; return; }
+        //if (e.Error != null) { leaderboardLoadingText.text = "Error: " + e.Error.Message; return; }
+
+
+        List<Replay> leaderboardReplays = JsonConvert.DeserializeObject<List<Replay>>(response);
+
+
+
+        foreach (Transform child in leaderboardContent) if (child.name != "Item") Destroy(child.gameObject);
+        GameObject prefab = leaderboardContent.GetChild(0).gameObject;
+        prefab.SetActive(true);
+
+        float height = 0;
+        int place = 0;
+        foreach (var item in leaderboardReplays)
+        {
+            place++;
+            CreateLeaderboardItem(item, prefab, place, item.player == Payload.CurrentAccount.Nick);
+            height += 80 + 4;
+        }
+
+        leaderboardContent.GetComponent<RectTransform>().sizeDelta = new Vector2(leaderboardContent.GetComponent<RectTransform>().sizeDelta.x, height);
+        prefab.SetActive(false);
     }
-    private void ShowRP(float RP)
+
+
+    void CreateLeaderboardItem(Replay replay, GameObject prefab, int place, bool isCurrentPlayer)
     {
-        RPTextsContainer.SetActive(true);
-        RPText.text = Mathf.FloorToInt(RP * 10) / 10f + "";
-    }
-    private void ShowRPLoading()
-    {
-        RPTextsContainer.SetActive(true);
-        RPText.text = "";
-    }
-    private void HideRP()
-    {
-        RPTextsContainer.SetActive(false);
+        Transform itemgo = Instantiate(prefab, leaderboardContent).transform;
+        LeaderboardUIItem item = itemgo.GetComponent<LeaderboardUIItem>();
+        item.replay = replay;
+        item.Refresh(place, isCurrentPlayer);
     }
 }

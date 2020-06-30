@@ -26,7 +26,6 @@ using Web;
 using InGame.UI.Overlays;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
-using InGame.ScriptableObjects;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -40,6 +39,7 @@ public class MenuScript_v2 : MonoBehaviour
     public AccountManager accountManager;
     public TutorialManager tutorialManager;
     public OwnMusicUI ownMusicUI;
+
 
 
     public GameObject debugConsole;

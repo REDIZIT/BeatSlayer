@@ -1,5 +1,8 @@
-﻿using GameNet;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using BeatSlayerServer.Multiplayer.Accounts;
+using GameNet;
 using Multiplayer.Accounts;
 using Multiplayer.Chat;
 using Multiplayer.Notification;
@@ -22,10 +25,8 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     [Header("UI")] 
     public Animator serverStateAnim;
-    public Animator bottomButtonsAnim;
     public Text serverStateText;
     private float timeUntilClose;
-    private bool isNoInternetShowed; // False when message wasn't showed yet, and true if yes
     
 
     private void Awake()
@@ -38,9 +39,12 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Start()
     {
-        //Debug.Log("Using dev NetCore_v2!");
-        /*NetCore_v2.Initialize();
-        NetCore_v2.Connect();*/
+        /*NetCore.Configurators += () =>
+        {
+            
+        };
+        */
+
         NetCore.Configure(() =>
         {
             NetCore.OnFullReady += () =>
@@ -52,11 +56,9 @@ public class MultiplayerMenuWrapper : MonoBehaviour
             NetCore.OnConnect += OnConnect;
             NetCore.OnReconnect += OnReconnecting;
             NetCore.OnDisconnect += OnDisconnected;
-            NetCore.OnLogIn += OnLogIn;
-            NetCore.OnLogOut += OnLogOut;
 
             // Subscribe/Resubscribe all
-            //NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
+            NetCore.Subs.OnTest += (() => accountUI.ShowMessage("Got test"));
 
             accountUI.Configuration();
             chatUI.Configuration();
@@ -66,15 +68,29 @@ public class MultiplayerMenuWrapper : MonoBehaviour
         });
 
 
-        // Hide bottom buttons if no logged
-        if(Payload.CurrentAccount != null)
-        {
-            bottomButtonsAnim.Play("Show");
-        }
+        Debug.Log("Url is " + NetCore.Url_Hub);
     }
 
     private void Update()
     {
+        /*if (Input.GetKeyDown(KeyCode.S))
+        {
+            Debug.Log("Reloading scene");
+            SceneManager.LoadScene("Menu");
+        }
+        */
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            Debug.Log("Send test");
+            NetCore.ServerActions.Test();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            int i = 2;
+            Debug.Log("Send test with par " + i);
+            NetCore.ServerActions.TestPar(i);
+        }
+
         if (timeUntilClose > 0) timeUntilClose -= Time.deltaTime;
         else
         {
@@ -89,21 +105,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     {
         if(NetCore.ReconnectAttempt != 0) ShowState("Connected", 3); 
         accountUI.OnConnect(this);
-        isNoInternetShowed = false;
     }
-    public void ShowState(string state, float time)
-    {
-        timeUntilClose = time;
-        serverStateAnim.Play("Show");
-        serverStateText.text = state;
-    }
-
-    public void HideState()
-    {
-        serverStateAnim.Play("Hide");
-    }
-
-
 
 
 
@@ -112,7 +114,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            ShowState("Connection lost", 5);
+            ShowState("Connection lost", 120);
             chatUI.OnConnectionLost();
             //if (err != null)
             //{
@@ -123,26 +125,19 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     void OnReconnecting()
     {
-        if (Application.internetReachability == NetworkReachability.NotReachable)
-        {
-            if(!isNoInternetShowed)
-            {
-                ShowState("No internet connection", 5);
-                isNoInternetShowed = true;
-            }
-        }
-        else
-        {
-            ShowState("Reconnecting.. attempt " + (NetCore.ReconnectAttempt), 30);
-        }
+        ShowState("Reconnecting.. attempt " + (NetCore.ReconnectAttempt), 30);
     }
     
-    void OnLogIn()
+    
+    public void ShowState(string state, float time)
     {
-        bottomButtonsAnim.Play("Show");
+        timeUntilClose = time;
+        serverStateAnim.Play("Show");
+        serverStateText.text = state;
     }
-    void OnLogOut()
+
+    public void HideState()
     {
-        bottomButtonsAnim.Play("Hide");
+        serverStateAnim.Play("Hide");
     }
 }
