@@ -33,13 +33,13 @@ public class BeatCube : MonoBehaviour, IBeat
     float materialThreshold = 0.5f;
     float thresholdChange = -1;
 
-    Stopwatch w = new Stopwatch();
+    //Stopwatch w = new Stopwatch();
 
     bool isDead;
 
     public void Setup(GameManager gm, bool useSoundEffect, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
     {
-        w.Start();
+        //w.Start();
 
         this.gm = gm;
         this.useSoundEffect = useSoundEffect;
@@ -107,7 +107,7 @@ public class BeatCube : MonoBehaviour, IBeat
         if (cls.road == -1) cls.road = Random.Range(0, 3);
 
 
-        float y = cls.level == 0 ? 0.8f : 4.6f;
+        float y = cls.level == 0 ? 0.8f : bm.secondHeight;
         Vector3 pos = new Vector3(-3.5f + cls.road * 2.25f, y, 100);
         transform.position = pos;
     }
@@ -125,67 +125,62 @@ public class BeatCube : MonoBehaviour, IBeat
     {
         if (destroy)
         {
-            Slice();
+            Slice(0);
             return;
         }
 
         if (direction.normalized == Vector2.zero) return;
 
 
+        direction = new Vector3(-direction.x, direction.y);
+
+
+        float angle = Mathf.Atan2(direction.x, direction.y);
+        float degrees = Mathf.Rad2Deg * angle;
+        if (degrees < 0) degrees = 360 + degrees;
+
+
+        float i = Mathf.Repeat((int)cls.subType + 4, 8);
+        float targetDeg = i * 45;
+        //float targetDeg = (int) cls.subType * 45;
+        float anglediff = (degrees - targetDeg + 180 + 360) % 360 - 180;
+
+
         if (cls.type == BeatCubeClass.Type.Point)
         {
-            Slice();
+            Slice(degrees);
         }
-        else
+        else if (anglediff <= 45 && anglediff >= -45)
         {
-            direction = new Vector3(-direction.x, direction.y);
-            
-            
-            float angle = Mathf.Atan2(direction.x, direction.y);
-            float degrees = Mathf.Rad2Deg * angle;
-            if (degrees < 0) degrees = 360 + degrees;
-
-            
-            float i = Mathf.Repeat((int) cls.subType + 4, 8);
-            float targetDeg = i * 45;
-            //float targetDeg = (int) cls.subType * 45;
-            float anglediff = (degrees - targetDeg + 180 + 360) % 360 - 180;
-            
-            if (anglediff <= 45 && anglediff >= -45)
-            {
-                Slice();
-            }
-            /*float angle = Mathf.Atan2(direction.x, direction.y);
-            float degrees = 180 - (angle * 180f / Mathf.PI);
-            //if (degrees < 0) degrees = 360 + degrees;
-
-            float targetDeg = (int) cls.subType * 45;
-            //if (targetDeg < 0) targetDeg = 360 + targetDeg;
-
-            Debug.Log(targetDeg - degrees);
-            if (Mathf.Abs(targetDeg - degrees) <= 45)
-            {
-                Slice();
-            }*/
+            Slice(degrees);
         }
+
+        //    if (cls.type == BeatCubeClass.Type.Point)
+        //    {
+        //        Slice();
+        //    }
+        //    else
+        //    {
+        // code here
+        //    }
     }
 
     public void Destroy()
     {
-        Slice();
+        Slice(Random.Range(0, 360));
     }
 
-    void Slice()
+    void Slice(float angle)
     {
         if (isDead) return;
         isDead = true;
 
         gm.BeatCubeSliced(this);
 
-        w.Stop();
-        Debug.Log("Life time " + w.ElapsedMilliseconds);
+        //w.Stop();
+        //Debug.Log("Life time " + w.ElapsedMilliseconds);
 
-        OnSlice();
+        OnSlice(angle);
     }
 
 
@@ -215,17 +210,18 @@ public class BeatCube : MonoBehaviour, IBeat
         {
             gm.MissedBeatCube(this);
 
-            w.Stop();
-            Debug.Log("Life time " + w.ElapsedMilliseconds);
+            //w.Stop();
+            //Debug.Log("Life time " + w.ElapsedMilliseconds);
 
             Destroy(gameObject);
         }
     }
 
-    void OnSlice()
+    void OnSlice(float angle)
     {
         psystem.gameObject.SetActive(true);
         psystem.transform.parent = null;
+        psystem.transform.eulerAngles = new Vector3(0, 0, angle);
 
         thresholdChange = 4;
         foreach (Material mat in renderer.materials)

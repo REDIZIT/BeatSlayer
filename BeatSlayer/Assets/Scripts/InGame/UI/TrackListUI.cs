@@ -116,7 +116,7 @@ public class TrackListUI : MonoBehaviour
                 StateText.text = "Loading..";
                 try
                 {
-                    LoadData(() => { Debug.Log("On data got!"); isApprovedLoaded = true; });
+                    LoadData(() => { isApprovedLoaded = true; });
                 }
                 catch(Exception err)
                 {
@@ -145,7 +145,6 @@ public class TrackListUI : MonoBehaviour
     }
     void RefreshList(List<GroupInfoExtended> ls)
     {
-        Debug.Log("Refresh list");
         // Clear cover downloading queue and content
         //CoversManager.ClearPackages(content.GetComponentsInChildren<RawImage>());
         CoversManager.ClearAll();

@@ -1,26 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using InGame.Settings.Old;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Dropdown))]
-public class CustomDropdown : MonoBehaviour
+namespace InGame.CustomUI
 {
-    SettingsManager manager;
-    Dropdown dropdown;
-
-    private void Awake()
+    [RequireComponent(typeof(Dropdown))]
+    public class CustomDropdown : MonoBehaviour
     {
-        manager = Camera.main.GetComponent<SettingsManager>();
-        dropdown = GetComponent<Dropdown>();
+        SettingsManager manager;
+        Dropdown dropdown;
 
-        dropdown.value = manager.RequestSettingInt(dropdown.name);
+        private void Awake()
+        {
+            manager = Camera.main.GetComponent<SettingsManager>();
+            dropdown = GetComponent<Dropdown>();
 
-        dropdown.onValueChanged.AddListener(OnChange);
-    }
+            dropdown.value = manager.RequestSettingInt(dropdown.name);
 
-    public void OnChange(int value)
-    {
-        manager.SetSetting(dropdown.name, dropdown.value);
+            dropdown.onValueChanged.AddListener(OnChange);
+        }
+
+        public void OnChange(int value)
+        {
+            manager.SetSetting(dropdown.name, dropdown.value);
+        }
     }
 }

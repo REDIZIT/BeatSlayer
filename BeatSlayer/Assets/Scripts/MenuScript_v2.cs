@@ -26,6 +26,7 @@ using Web;
 using InGame.UI.Overlays;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using InGame.Settings;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -39,7 +40,6 @@ public class MenuScript_v2 : MonoBehaviour
     public AccountManager accountManager;
     public TutorialManager tutorialManager;
     public OwnMusicUI ownMusicUI;
-
 
 
     public GameObject debugConsole;
@@ -204,8 +204,9 @@ public class MenuScript_v2 : MonoBehaviour
     {
         if(debugConsole != null)
         {
-            debugConsole.SetActive(SSytem.instance.GetInt("EnableConsole") == 1);
-            debugConsole.transform.GetChild(3).gameObject.SetActive(SSytem.instance.GetInt("EnableFps") == 1);
+            //debugConsole.SetActive(SSytem.instance.GetInt("EnableConsole") == 1);
+            debugConsole.SetActive(SettingsManager.Settings.Dev.ConsoleEnabled);
+            debugConsole.transform.GetChild(3).gameObject.SetActive(SettingsManager.Settings.Dev.ShowFpsEnabled);
         }
         
 
@@ -458,14 +459,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     #endregion
 
-    #region UI (Base)
 
-    public void OnDifficultChange()
-    {
-        scoreMultiplyText.text = LocalizationManager.Localize("Score") + ": <color=#F80>x" + GetComponent<SettingsManager>().CalculateScoreMultiplier() + "</color>";
-    }
-
-    #endregion
 
 
     // == Rescale

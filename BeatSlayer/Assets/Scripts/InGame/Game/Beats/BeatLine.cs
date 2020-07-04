@@ -38,7 +38,7 @@ public class BeatLine : MonoBehaviour, IBeat
         this.cls = cls;
         this.bm = bm;
 
-        float y = cls.level == 0 ? 0.8f : 4.6f;
+        float y = cls.level == 0 ? 0.8f : bm.secondHeight;
         Vector3 pos = new Vector3(-3.5f + cls.road * 2.25f, y, 100);
         transform.position = pos;
 

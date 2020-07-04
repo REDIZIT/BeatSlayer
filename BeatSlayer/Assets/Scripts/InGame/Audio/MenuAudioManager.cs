@@ -1,6 +1,6 @@
-﻿using ProjectManagement;
+﻿using InGame.Settings;
+using ProjectManagement;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,13 +24,36 @@ public class MenuAudioManager : MonoBehaviour
         OnSceneLoaded();
     }
 
+    private void Update()
+    {
+        if(ThemeSongEnabled != SettingsManager.Settings.Sound.MenuMusicEnabled)
+        {
+            ThemeSongEnabled = SettingsManager.Settings.Sound.MenuMusicEnabled;
+            if (SettingsManager.Settings.Sound.MenuMusicEnabled)
+            {
+                OnSetOn();
+            }
+            else
+            {
+                OnSetOff();
+            }
+        }
 
+        float volumeFromSettings = SettingsManager.Settings.Sound.MenuMusicVolume / 500f;
+        if (Volume != volumeFromSettings)
+        {
+            Volume = volumeFromSettings;
+            asource.volume = Volume;
+        }
+    }
 
 
     public void OnSceneLoaded()
     {
-        ThemeSongEnabled = SSytem.instance.GetBool("MenuMusic");
-        asource.volume = SSytem.instance.GetFloat("MenuMusicVolume") * 0.2f;
+        //ThemeSongEnabled = SSytem.instance.GetBool("MenuMusic");
+        ThemeSongEnabled = SettingsManager.Settings.Sound.MenuMusicEnabled;
+        Volume = SettingsManager.Settings.Sound.MenuMusicVolume / 100f * 0.2f;
+        asource.volume = Volume;
 
         if (ThemeSongEnabled)
         {
@@ -39,6 +62,10 @@ public class MenuAudioManager : MonoBehaviour
             spectrum.Init();
         }
     }
+
+
+
+
 
     // Invoked when player select group.
     public void OnMapSelected(GroupInfoExtended group)

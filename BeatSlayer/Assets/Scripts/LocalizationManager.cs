@@ -34,8 +34,6 @@ namespace Assets.SimpleLocalization
 		/// </summary>
 		public static void Read()
         {
-            Debug.Log("Read with " + Language);
-
             if (Dictionary.Count > 0) return;
 
             var textAssets = Resources.LoadAll<TextAsset>(folderPath);
@@ -92,8 +90,8 @@ namespace Assets.SimpleLocalization
                 Read();
             }
 
-            if (!Dictionary.ContainsKey(Language)) { Debug.LogError("Language not found: " + Language); return "[ERR Lang]"; }
-            if (!Dictionary[Language].ContainsKey(localizationKey)) { Debug.LogError("Translation not found: " + localizationKey); return "[ERR Tkey]"; }
+            if (!Dictionary.ContainsKey(Language)) { Debug.LogError("Language not found: " + Language); return localizationKey; }
+            if (!Dictionary[Language].ContainsKey(localizationKey)) { Debug.LogError("Translation not found: " + localizationKey); return localizationKey; }
 
             return Dictionary[Language][localizationKey];
         }

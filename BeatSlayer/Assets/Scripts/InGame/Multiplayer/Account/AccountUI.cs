@@ -31,14 +31,16 @@ namespace Multiplayer.Accounts
 
         public void Configuration()
         {
-            Debug.Log("AccountUI.Configuration()");
             NetCore.Subs.Accounts_OnLogIn += (op) =>
             {
-                Debug.Log("OnLogIn event. Operation: \n" + JsonConvert.SerializeObject(op, Formatting.Indented));
+                //Debug.Log("OnLogIn event. Operation: \n" + JsonConvert.SerializeObject(op, Formatting.Indented));
                 OnLogIn(op);
             };
             NetCore.Subs.Accounts_OnSignUp += OnSignUp;
             NetCore.Subs.Accounts_OnView += OnView;
+            NetCore.Subs.Accounts_OnChangeEmail += OnChangeEmail;
+            NetCore.Subs.Accounts_OnChangePassword += OnChangePassword;
+            NetCore.Subs.Accounts_OnConfirmRestore += OnConfirmRestore;
             /*NetCore.Configurators += () =>
             {
                 NetCore.Subs.Accounts_OnLogIn += OnLogIn;
@@ -83,6 +85,7 @@ namespace Multiplayer.Accounts
         
         void LogInBySession()
         {
+            Debug.Log("LogInBySession");
             // This is old session code (for compatibility
             if(File.Exists(Application.persistentDataPath + "/session.txt"))
             {
@@ -172,7 +175,8 @@ namespace Multiplayer.Accounts
         {
             DeleteSession();
             Payload.CurrentAccount = null;
-            
+
+            NetCore.OnLogOut?.Invoke();
         }
 
         public void UpdateInGameTime()
@@ -246,9 +250,9 @@ namespace Multiplayer.Accounts
         
         public void OnLogIn(OperationMessage op)
         {
-            Debug.Log(" << OnLogIn");
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            /*UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
+                Debug.Log(" << OnLogIn dispatched");
                 if (!isLoginBySession)
                 {
                     Debug.Log(" << OnLogInResult");
@@ -265,7 +269,32 @@ namespace Multiplayer.Accounts
 
                     NetCore.OnLogIn();
                 }
-            });
+            });*/
+            
+            Debug.Log(" << OnLogIn dispatched with result " + op.Type.ToString());
+            if (!isLoginBySession)
+            {
+                Debug.Log(" << OnLogInResult");
+                signUI.OnLogInResult(op);
+            }
+            if (op.Type == OperationMessage.OperationType.Success)
+            {
+                Payload.CurrentAccount = op.Account;
+
+                if(profileUI.data == null)
+                {
+                    SaveAvatarToCache();
+                    SaveBackgroundToCache();
+                }
+
+                CreateSession();
+
+                SyncCoins();
+
+                NetCore.OnLogIn();
+            }
+
+            isLoginBySession = false;
         }
 
         public void OnSceneLoad()

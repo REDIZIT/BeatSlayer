@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using InGame.Settings;
 using Ranking;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,11 +17,14 @@ namespace InGame.Game.Spawn
         public GameManager gm;
 
         [HideInInspector] public List<BeatCubeClass> beats = new List<BeatCubeClass>();
+        private float firstCubeTime;
 
 
         public GameObject cubePrefab, linePrefab;
         public Camera cam;
         public AudioSource asource, spectrumAsource;
+
+        public float secondHeight;
 
 
         public List<SpawnPointScript> spawnPoints;
@@ -79,6 +83,9 @@ namespace InGame.Game.Spawn
         private Vector3 prevMousePos;
 
 
+
+
+
         private void Start()
         {
             lineRenderer.Points = new Vector2[400];
@@ -109,7 +116,10 @@ namespace InGame.Game.Spawn
             rightArrowColor = SSytem.instance.rightDirColor * gm.prefsManager.prefs.colorPower;
 
             vibrationTime = SSytem.instance.GetInt("Vibration") * 50;
-            
+
+            secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
+
+            firstCubeTime = beats[0].time;
         }
 
 
@@ -152,7 +162,7 @@ namespace InGame.Game.Spawn
                     SpawnBeatCube(cls);
                     algw.Start();
 
-                    Debug.Log("Spawn cube with time: " + cls.time + " and normal time " + GetNormalizedTime(cls));
+                    //Debug.Log("Spawn cube with time: " + cls.time + " and normal time " + GetNormalizedTime(cls));
 
                     toRemove.Add(cls);
                 }
@@ -450,6 +460,24 @@ namespace InGame.Game.Spawn
             //    // Если есть полностью свободные точки, то вернуть одну из них
             //    return freePoints[Random.Range(0, freePoints.ToArray().Length)];
             //}
+        }
+
+        public bool CanSkip()
+        {
+            if (beats.Count == 0) return false;
+            return GetSkipTime() > asource.time;
+        }
+
+        private float GetSkipTime()
+        {
+            return firstCubeTime - 3;
+        }
+
+        public void Skip()
+        {
+            if (!CanSkip()) return;
+
+            asource.time = GetSkipTime();
         }
     }
 

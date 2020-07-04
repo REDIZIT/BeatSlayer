@@ -1,6 +1,4 @@
-﻿using InGame.SceneManagement;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.IO;
 using Assets.SimpleLocalization;
 using UnityEngine;
@@ -53,8 +51,6 @@ public class SceneControllerUI : MonoBehaviour
             }
         }
 
-
-
         float volumeDecrease = 0.05f;
         float volume = asource == null ? 0 : asource.volume;
         while (ao.progress < 0.9f || volume > 0.01f)
@@ -77,6 +73,7 @@ public class SceneControllerUI : MonoBehaviour
                 asource.volume -= asource.volume * volumeDecrease;
                 volume = asource.volume;
             }
+
 
             yield return new WaitForEndOfFrame();
         }
