@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TMPro;
+using System;
 
 namespace Michsky.UI.ModernUIPack
 {
@@ -20,6 +21,7 @@ namespace Michsky.UI.ModernUIPack
         private VerticalLayoutGroup itemList;
         private Transform currentListParent;
         public Transform listParent;
+        public RectTransform itemListContent;
 
         [Header("SETTINGS")]
         public bool enableIcon = true;
@@ -35,6 +37,11 @@ namespace Michsky.UI.ModernUIPack
         [SerializeField]
         [Header("CONTENT")]
         public List<Item> dropdownItems = new List<Item>();
+
+
+        public Action<int> OnValueChanged;
+
+
 
         private Animator dropdownAnimator;
         private TextMeshProUGUI setItemText;
@@ -62,6 +69,10 @@ namespace Michsky.UI.ModernUIPack
 
         void Start()
         {
+            Refresh();
+        }
+        public void Refresh()
+        {
             dropdownAnimator = gameObject.GetComponent<Animator>();
             itemList = itemParent.GetComponent<VerticalLayoutGroup>();
 
@@ -83,10 +94,12 @@ namespace Michsky.UI.ModernUIPack
                 setItemImage = goImage.GetComponent<Image>();
                 imageHelper = dropdownItems[i].itemIcon;
                 setItemImage.sprite = imageHelper;
+                setItemImage.gameObject.SetActive(imageHelper != null);
 
                 Button itemButton;
                 itemButton = go.GetComponent<Button>();
-                itemButton.onClick.AddListener(dropdownItems[i].OnItemSelection.Invoke);
+
+                if(dropdownItems[i].OnItemSelection != null) itemButton.onClick.AddListener(dropdownItems[i].OnItemSelection.Invoke);
                 itemButton.onClick.AddListener(Animate);
                 itemButton.onClick.AddListener(delegate
                 {
@@ -97,8 +110,14 @@ namespace Michsky.UI.ModernUIPack
                     dropdownItems[i].OnItemSelection.Invoke();
             }
 
-            selectedText.text = dropdownItems[selectedItemIndex].itemName;
-            selectedImage.sprite = dropdownItems[selectedItemIndex].itemIcon;
+            if(dropdownItems.Count > 0)
+            {
+                selectedText.text = dropdownItems[selectedItemIndex].itemName;
+                selectedImage.sprite = dropdownItems[selectedItemIndex].itemIcon;
+                selectedImage.gameObject.SetActive(dropdownItems[selectedItemIndex].itemIcon != null);
+            }
+
+            //itemList.GetComponent<RectTransform>().sizeDelta = new Vector2(itemList.GetComponent<RectTransform>().sizeDelta.x, dropdownItems.Count * itemObject.GetComponent<RectTransform>().sizeDelta.y);
 
             if (enableScrollbar == true)
             {
@@ -112,10 +131,10 @@ namespace Michsky.UI.ModernUIPack
                 scrollbar.SetActive(false);
             }
 
-            if (enableIcon == false)
-                selectedImage.gameObject.SetActive(false);
-            else
-                selectedImage.gameObject.SetActive(true);
+            //if (enableIcon == false)
+            //    selectedImage.gameObject.SetActive(false);
+            //else
+            //    selectedImage.gameObject.SetActive(true);
 
             currentListParent = transform.parent;
         }
@@ -123,6 +142,12 @@ namespace Michsky.UI.ModernUIPack
         public void ChangeDropdownInfo(int itemIndex)
         {
             selectedImage.sprite = dropdownItems[itemIndex].itemIcon;
+            selectedImage.gameObject.SetActive(dropdownItems[itemIndex].itemIcon != null);
+
+            Debug.Log("On dropdown value changed ");
+
+            OnValueChanged?.Invoke(itemIndex);
+
             selectedText.text = dropdownItems[itemIndex].itemName;
             selectedItemIndex = itemIndex;
             // dropdownItems[itemIndex].OnItemSelection.Invoke();

@@ -31,10 +31,10 @@ MonoBehaviour:
   dropdownThemeType: 0
   dropdownAnimationType: 1
   dropdownFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
-  dropdownColor: {r: 0.37254903, g: 0.40784314, b: 0.4509804, a: 1}
+  dropdownColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
   dropdownTextColor: {r: 1, g: 1, b: 1, a: 1}
   dropdownIconColor: {r: 1, g: 1, b: 1, a: 1}
-  dropdownItemColor: {r: 0.30588236, g: 0.3372549, b: 0.36862746, a: 1}
+  dropdownItemColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
   dropdownItemTextColor: {r: 1, g: 1, b: 1, a: 1}
   dropdownItemIconColor: {r: 255, g: 255, b: 255, a: 1}
   selectorFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
@@ -69,8 +69,8 @@ MonoBehaviour:
   progressBarBackgroundColor: {r: 0.37254903, g: 0.40784314, b: 0.4509804, a: 0.29411766}
   progressBarLoopBackgroundColor: {r: 0.37254903, g: 0.40784314, b: 0.4509804, a: 1}
   progressBarLabelColor: {r: 0.37254903, g: 0.40784317, b: 0.45098042, a: 1}
-  scrollbarColor: {r: 0.37254903, g: 0.40784314, b: 0.4509804, a: 1}
-  scrollbarBackgroundColor: {r: 0.37254903, g: 0.40784314, b: 0.4509804, a: 0.19607843}
+  scrollbarColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
+  scrollbarBackgroundColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 0.19607843}
   sliderLabelFont: {fileID: 11400000, guid: 84dd14695854bbc43a5faa24fcf93d0d, type: 2}
   sliderThemeType: 0
   sliderColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
@@ -78,16 +78,16 @@ MonoBehaviour:
   sliderLabelColor: {r: 0.7058824, g: 0.7058824, b: 0.7058824, a: 1}
   sliderPopupLabelColor: {r: 1, g: 1, b: 1, a: 1}
   sliderHandleColor: {r: 0.37254903, g: 0.40784317, b: 0.45098042, a: 1}
-  switchBorderColor: {r: 0.37254903, g: 0.41176474, b: 0.45098042, a: 1}
-  switchBackgroundColor: {r: 0.37254903, g: 0.41176474, b: 0.45098042, a: 1}
+  switchBorderColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
+  switchBackgroundColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
   switchHandleOnColor: {r: 1, g: 1, b: 1, a: 1}
-  switchHandleOffColor: {r: 0.37254903, g: 0.41176474, b: 0.45098042, a: 1}
+  switchHandleOffColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
   toggleFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
   toggleThemeType: 0
-  toggleTextColor: {r: 0.37254903, g: 0.4117647, b: 0.4509804, a: 1}
-  toggleBorderColor: {r: 0.37254903, g: 0.4117647, b: 0.4509804, a: 1}
-  toggleBackgroundColor: {r: 0.37254903, g: 0.4117647, b: 0.4509804, a: 1}
-  toggleCheckColor: {r: 0.37254903, g: 0.4117647, b: 0.4509804, a: 1}
+  toggleTextColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
+  toggleBorderColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
+  toggleBackgroundColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
+  toggleCheckColor: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
   tooltipFont: {fileID: 11400000, guid: 84dd14695854bbc43a5faa24fcf93d0d, type: 2}
   tooltipTextColor: {r: 1, g: 1, b: 1, a: 1}
   tooltipBackgroundColor: {r: 0.37254903, g: 0.4117647, b: 0.4509804, a: 1}
