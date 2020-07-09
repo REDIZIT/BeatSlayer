@@ -61,6 +61,9 @@ namespace InGame.Settings
         [Option("Finger pause", "Finger pause description")]
         public bool FingerPauseEnabled { get; set; } = true;
 
+        [Option("Show SS,S,A grades while playing")]
+        public bool ShowGrade { get; set; } = true;
+
         [Option("FOV")]
         [Range(45, 90)]
         public int FOV { get; set; } = 60;
@@ -81,6 +84,10 @@ namespace InGame.Settings
         [Option("Top cubes height")]
         [Range(3.3f, 5.8f)]
         public float SecondCubeHeight { get; set; } = 4.6f;
+
+        [Option("Distance between cube roads")]
+        [Range(2.5f, 4)]
+        public float RoadsDistance { get; set; } = 2.5f;
     }
 
 

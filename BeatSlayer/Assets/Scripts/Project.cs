@@ -55,7 +55,7 @@ public class BeatCubeClass
     public int level; // 0-1 include
     public float speed = 1; // 1 - default
 
-    public enum Type { Point, Dir, Line }
+    public enum Type { Point, Dir, Line, Bomb }
     public Type type;
 
     public enum SubType { Down = 0, DownRight = 1, Right = 2, UpRight = 3, Up = 4, UpLeft = 5, Left = 6, DownLeft = 7, Random = 8}

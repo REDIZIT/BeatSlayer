@@ -15,6 +15,8 @@ using Debug = UnityEngine.Debug;
 using InGame.Animations;
 using InGame.Settings;
 using Ranking;
+using GameNet;
+using InGame.Game.Tutorial;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -34,6 +36,7 @@ public class GameManager : MonoBehaviour
     public ScoringManager scoringManager;
     public MissAnim missAnim;
     public CheatEngine cheatEngine;
+    public MapTutorial tutorial;
 
     #endregion
 
@@ -213,8 +216,9 @@ public class GameManager : MonoBehaviour
         {
             InitProject();
         }
+        tutorial.IsEnabled = LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial;
 
-        scoringManager.OnGameStart(LoadingData.loadparams.Map, LoadingData.loadparams.difficultyInfo, difficulty);
+        scoringManager.OnGameStart(LoadingData.loadparams.Map, LoadingData.loadparams.difficultyInfo, difficulty, LoadingData.loadparams.Type);
 
 
         InitSettings();
@@ -291,6 +295,7 @@ public class GameManager : MonoBehaviour
         likeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
         dislikeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
 
+        gradeText.gameObject.SetActive(Settings.Gameplay.ShowGrade);
 
 
         Color leftSaberColor = SSytem.instance.leftColor * (1 + SSytem.instance.GlowPowerSaberLeft / 25f);
@@ -459,7 +464,10 @@ public class GameManager : MonoBehaviour
 
         // Runtime grade calculation
         // Using server conditions (might be legacy, needed to update)
-        gradeText.text = GetRuntimeGrade(scoringManager.Replay.Accuracy, scoringManager.Replay.Missed).ToString();
+        if (gradeText.gameObject.activeSelf)
+        {
+            gradeText.text = GetRuntimeGrade(scoringManager.Replay.Accuracy, scoringManager.Replay.Missed).ToString();
+        }
 
         #endregion
 
@@ -604,43 +612,31 @@ public class GameManager : MonoBehaviour
     
     public void MissedBeatCube(IBeat beat)
     {
-        scoringManager.OnCubeMiss();
+        scoringManager.OnCubeMiss(beat);
 
-        missAnim.OnMiss();
-
-        if (!prefsManager.prefs.hasAchiv_Blinked)
+        if(beat.GetClass().type != BeatCubeClass.Type.Bomb)
         {
-            /*Social.ReportProgress(GPGamesManager.achievement_Blinked, 100, (bool success) =>
-            {
-                if (!success) Debug.LogError("Blinked error");
-                if (success)
-                {
-                    prefsManager.prefs.hasAchiv_Blinked = true;
-                    prefsManager.Save();
-                }
-            });*/
+            missAnim.OnMiss();
+            UseSkill();
         }
 
-        UseSkill();
         cheatEngine.RemoveCube(beat);
     }
 
 
     public void BeatCubeSliced(IBeat beat)
     {
-        try
+        if (Settings.Sound.SliceEffectEnabled)
         {
-            if (SettingsManager.Settings.Sound.SliceEffectEnabled)
-            {
-                AndroidNativeAudio.play(LCData.hitsIds[Random.Range(0, LCData.hitsIds.Length - 1)], sliceeffectVolume, sliceeffectVolume, 1, 0, 1.2f);
-            }
-        }
-        catch (System.Exception err)
-        {
-            Debug.LogWarning("Slice sound err: " + err);
+            AndroidNativeAudio.play(Payload.HitSoundIds[Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 100f);
         }
 
-        scoringManager.OnCubeHit();
+        if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
+        {
+            missAnim.OnMiss();
+        }
+
+        scoringManager.OnCubeHit(beat);
         cheatEngine.RemoveCube(beat);
     }
     public void BeatLineSliced(IBeat beat)

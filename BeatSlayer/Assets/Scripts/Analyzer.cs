@@ -158,7 +158,7 @@ public class Analyzer : MonoBehaviour
                     //if (highTier > 0) c = Color.magenta;
 
                     BeatCubeClass.Type t = BeatCubeClass.Type.Point;
-                    if (timeLeftAfterSpawn > 1f) { t = BeatCubeClass.Type.Dir; }
+                    if (timeLeftAfterSpawn > 1f) { t = BeatCubeClass.Type.Bomb; }
                     BeatCubeClass cl = new BeatCubeClass(-1, -1, t);
                     if(t == BeatCubeClass.Type.Dir)
                     {
@@ -281,6 +281,8 @@ public class Analyzer : MonoBehaviour
                 //Color c = Color.white;
 
                 BeatCubeClass.Type t = ta_timeFromLastSpawn <= 0.14f ? BeatCubeClass.Type.Point : BeatCubeClass.Type.Dir;
+
+                if (ta_timeFromLastSpawn >= 0.14f && Random.value >= 0.92f) t = BeatCubeClass.Type.Bomb;
 
                 int road = Random.Range(0, 4);
                 int saberType = road <= 1 ? -1 : 1;

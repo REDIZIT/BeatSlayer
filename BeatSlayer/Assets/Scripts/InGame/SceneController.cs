@@ -1,4 +1,5 @@
-﻿using ProjectManagement;
+﻿using GameNet;
+using ProjectManagement;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -62,9 +63,31 @@ namespace InGame.SceneManagement
 
         public static void LoadHitSounds()
         {
-            if(LCData.hitsIds != null && LCData.hitsIds.Length > 0)
+            //if(LCData.hitSoundIds != null && LCData.hitSoundIds.Length > 0)
+            //{
+            //    foreach (int id in LCData.hitSoundIds)
+            //    {
+            //        AndroidNativeAudio.unload(id);
+            //    }
+            //    AndroidNativeAudio.releasePool();
+            //}
+
+            //int streamsCount = 20;
+            //if (File.Exists(Application.persistentDataPath + "/streamcount.txt"))
+            //{
+            //    streamsCount = int.Parse(File.ReadAllText(Application.persistentDataPath + "/streamcount.txt"));
+            //}
+
+            //AndroidNativeAudio.makePool(streamsCount);
+            //LCData.hitSoundIds = new int[10];
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    LCData.hitSoundIds[i] = AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg");
+            //}
+
+            if (Payload.HitSoundIds != null && Payload.HitSoundIds.Count > 0)
             {
-                foreach (int id in LCData.hitsIds)
+                foreach (int id in Payload.HitSoundIds)
                 {
                     AndroidNativeAudio.unload(id);
                 }
@@ -78,10 +101,11 @@ namespace InGame.SceneManagement
             }
 
             AndroidNativeAudio.makePool(streamsCount);
-            LCData.hitsIds = new int[10];
+            Payload.HitSoundIds.Clear();
             for (int i = 0; i < 10; i++)
             {
-                LCData.hitsIds[i] = AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg");
+                Payload.HitSoundIds.Add(AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg"));
+                Payload.HitSoundIds.Add(AndroidNativeAudio.load("ShortHits/HitShort" + (i + 1) + ".ogg"));
             }
         }
     }
@@ -135,7 +159,11 @@ public class SceneloadParameters
         /// <summary>
         /// Executed from editor when player want to test map in game
         /// </summary>
-        EditorTest = 5
+        EditorTest = 5,
+        /// <summary>
+        /// If loading map is tutorial
+        /// </summary>
+        Tutorial = 6
     }
 
     public LoadType Type { get; private set; }
@@ -163,6 +191,16 @@ public class SceneloadParameters
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
+            Map = mapInfo,
+            difficultyInfo = difficultyInfo
+        };
+        return parameters;
+    }
+    public static SceneloadParameters TutorialPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo)
+    {
+        var parameters = new SceneloadParameters()
+        {
+            Type = LoadType.Tutorial,
             Map = mapInfo,
             difficultyInfo = difficultyInfo
         };

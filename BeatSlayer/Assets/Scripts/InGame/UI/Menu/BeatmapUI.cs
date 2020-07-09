@@ -408,6 +408,10 @@ public class BeatmapUI : MonoBehaviour
         {
             parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo);
         }
+        else if (currentMapInfo.group.groupType == GroupInfo.GroupType.Tutorial)
+        {
+            parameters = SceneloadParameters.TutorialPreset(currentMapInfo, currentDifficultyInfo);
+        }
 
         SceneController.instance.LoadScene(parameters);
     }

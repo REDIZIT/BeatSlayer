@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BeatSlayerServer.Multiplayer.Accounts;
 using InGame.Mods;
 
@@ -13,6 +11,7 @@ namespace GameNet
         
         // Previous time sent to server
         public static float PrevInGameTimeUpdate { get; set; }
+        public static List<int> HitSoundIds { get; set; } = new List<int>();
 
 
         public static List<Mod> GameMods = new List<Mod>()

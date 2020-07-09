@@ -19,7 +19,7 @@ public class TutorialManager : MonoBehaviour
         string json = WebAPI.GetTutorialGroup();
         GroupInfoExtended group = JsonConvert.DeserializeObject<GroupInfoExtended>(json);
 
-        group.groupType = GroupInfo.GroupType.Author;
+        group.groupType = GroupInfo.GroupType.Tutorial;
 
         ui.Open(group);
     }

@@ -14,6 +14,7 @@ namespace InGame.Game
         /// ReplayData is used for sending to server
         /// </summary>
         public ReplayData Replay { get; set; }
+        public SceneloadParameters.LoadType Loadtype { get; private set; }
 
 
         public float comboValue = 0, comboValueMax = 16;
@@ -78,8 +79,9 @@ namespace InGame.Game
 
 
         // Ну вот блять, куча разных классов, которые делают одно и тоже, но ска разными буквами
-        public void OnGameStart(ProjectManagement.MapInfo map, DifficultyInfo difficulty, Difficulty projectDifficulty)
+        public void OnGameStart(ProjectManagement.MapInfo map, DifficultyInfo difficulty, Difficulty projectDifficulty, SceneloadParameters.LoadType loadtype)
         {
+            Loadtype = loadtype;
             Replay = new ReplayData()
             {
                 Map = new MapData()
@@ -107,13 +109,39 @@ namespace InGame.Game
             };
         }
 
-        public void OnCubeHit()
+        public void OnCubeHit(IBeat beat)
+        {
+            if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
+            {
+                CubeMissRemoveScore();
+                gm.tutorial.OnBombHit();
+            }
+            else
+            {
+                CubeHitAddScore();
+                //gm.tutorial.OnCubeHit();
+            }
+        }
+        private void CubeHitAddScore()
         {
             Replay.Score += comboMultiplier * scoreMultiplier;
             Replay.CubesSliced++;
             comboValue += 1;
         }
-        public void OnCubeMiss()
+        public void OnCubeMiss(IBeat beat)
+        {
+            if (beat.GetClass().type == BeatCubeClass.Type.Bomb)
+            {
+                CubeHitAddScore();
+                //gm.tutorial.OnBombMiss();
+            }
+            else
+            {
+                CubeMissRemoveScore();
+                //gm.tutorial.OnCubeMiss();
+            }
+        }
+        private void CubeMissRemoveScore()
         {
             comboValue -= 10;
             Replay.Score -= 5 * scoreMultiplier;

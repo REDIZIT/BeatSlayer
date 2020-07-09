@@ -20,7 +20,10 @@ namespace InGame.Game.Spawn
         private float firstCubeTime;
 
 
-        public GameObject cubePrefab, linePrefab;
+        [Header("Prefabs")]
+        [SerializeField] private GameObject cubePrefab;
+        [SerializeField] private GameObject linePrefab, bombPrefab;
+        
         public Camera cam;
         public AudioSource asource, spectrumAsource;
 
@@ -99,6 +102,11 @@ namespace InGame.Game.Spawn
             {
                 algLineRenderer.Points[i] = new Vector2(i * 2, 0);
             }
+
+            for (int i = 0; i < spawnPoints.Count; i++)
+            {
+                spawnPoints[i].transform.position = new Vector3(GetPositionByRoad(i), spawnPoints[i].transform.position.y, spawnPoints[i].transform.position.z);
+            }
         }
 
         public void Setup(GameManager gm, bool noArrows, bool noLines, float cubesSpeed)
@@ -119,7 +127,7 @@ namespace InGame.Game.Spawn
 
             secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
 
-            firstCubeTime = beats[0].time;
+            if(beats.Count > 0) firstCubeTime = beats[0].time;
         }
 
 
@@ -322,7 +330,16 @@ namespace InGame.Game.Spawn
                 int sampleXOffset = xOffset * i;
 
                 Ray ray = cam.ScreenPointToRay(screenPos + new Vector3(sampleXOffset, sampleOffset));
-                hits.AddRange(Physics.RaycastAll(ray, 100));
+
+                List<RaycastHit> raycasted = new List<RaycastHit>();
+                raycasted.AddRange(Physics.RaycastAll(ray, 100));
+
+                if (i == samples - 1)
+                {
+                    raycasted.RemoveAll(c => GetComponent<IBeat>()?.GetClass().type == BeatCubeClass.Type.Bomb);
+                }
+
+                hits.AddRange(raycasted);
 
                 saberKeys[i].position = screenPos + new Vector3(sampleXOffset, sampleOffset);
             }
@@ -340,9 +357,14 @@ namespace InGame.Game.Spawn
 
                 if (beat != null)
                 {
-                    cubesToPing.Add(beat);
+                    if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
+                    {
+                        if(hit.point.z <= playAreaZ) cubesToPing.Add(beat);
+                    }
+                    else cubesToPing.Add(beat);
                 }
             }
+
 
             foreach (IBeat beat in cubesToPing.Distinct())
             {
@@ -386,12 +408,28 @@ namespace InGame.Game.Spawn
                 return;
             }
 
-            GameObject c = Instantiate(beat.type == BeatCubeClass.Type.Line ? linePrefab : cubePrefab);
-            c.transform.name = "BeatCube";
+            GameObject prefab;
+            switch (beat.type)
+            {
+                case BeatCubeClass.Type.Dir:
+                case BeatCubeClass.Type.Point:
+                    prefab = cubePrefab; break;
+
+                case BeatCubeClass.Type.Line:
+                    prefab = linePrefab; break;
+
+                case BeatCubeClass.Type.Bomb:
+                    prefab = bombPrefab; break;
+
+                default:
+                    prefab = null; break;
+            }
+            GameObject c = Instantiate(prefab);
+            c.transform.name = prefab.name;
 
             IBeat cube = c.GetComponent<IBeat>();
 
-            cube.Setup(gm, useSliceSound, beat, cubesSpeed, this);
+            cube.Setup(gm, beat, cubesSpeed, this);
 
 
             int road = beat.road == -1 ? GetBestSpawnPoint(beat) : beat.road;
@@ -460,6 +498,16 @@ namespace InGame.Game.Spawn
             //    // Если есть полностью свободные точки, то вернуть одну из них
             //    return freePoints[Random.Range(0, freePoints.ToArray().Length)];
             //}
+        }
+
+        public float GetPositionByRoad(int road)
+        {
+            float dist = SettingsManager.Settings.Gameplay.RoadsDistance;
+
+            float leftPos = -dist * 2 + dist / 2f;
+            float roadPos = leftPos + dist * road;
+
+            return roadPos;
         }
 
         public bool CanSkip()

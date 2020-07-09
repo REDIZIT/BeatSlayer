@@ -218,7 +218,7 @@ namespace ProjectManagement
         public GroupType groupType;
         public enum GroupType
         {
-            Author, Own
+            Author, Own, Tutorial
         }
     }
     public class GroupInfoExtended : GroupInfo

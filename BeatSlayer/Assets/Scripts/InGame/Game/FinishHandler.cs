@@ -209,6 +209,11 @@ public class FinishHandler : MonoBehaviour
             return;
         }
 
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial)
+        {
+            leaderboard.SetStatus(LocalizationManager.Localize("TutorialMap"));
+            return;
+        }
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.Author)
         {
             leaderboard.SetStatus(LocalizationManager.Localize("NotAuthorMap"));
