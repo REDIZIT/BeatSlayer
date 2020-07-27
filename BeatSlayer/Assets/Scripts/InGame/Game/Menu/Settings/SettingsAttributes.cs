@@ -1,3 +1,4 @@
+using Boo.Lang;
 using System;
 using UnityEngine;
 
@@ -45,6 +46,16 @@ namespace InGame.Settings
         public EnabledAttribute(string BaseName)
         {
             this.BaseName = BaseName;
+        }
+    }
+
+    public class MediaAttribute : Attribute
+    {
+        public string[] Images { get; set; }
+
+        public MediaAttribute(params string[] mediaName)
+        {
+            Images = mediaName;
         }
     }
 }

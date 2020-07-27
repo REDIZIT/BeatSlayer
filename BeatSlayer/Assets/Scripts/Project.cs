@@ -6,6 +6,7 @@ using UnityEngine;
 public class Project
 {
     public string author, name;
+    public string Trackname => author + "-" + name;
     public int mins, secs;
     public string source, creatorNick;
     

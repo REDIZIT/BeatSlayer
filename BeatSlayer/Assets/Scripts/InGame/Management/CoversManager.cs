@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using GameNet;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +18,8 @@ namespace CoversManagement
         static bool isInited;
         static bool isDownloading;
 
-        public const string url_cover = "http://176.107.160.146/Database/GetCover?trackname={0}&nick={1}";
+        public static string apibase = NetCore.Url_Server;
+        public static string url_cover => apibase + "/Database/GetCover?trackname={0}&nick={1}";
         static WebClient client = new WebClient();
 
         static Texture2D DefaultTexture { get { return TrackListUI.defaultIcon; } }

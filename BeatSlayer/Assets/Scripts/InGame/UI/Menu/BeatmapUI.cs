@@ -28,8 +28,7 @@ public class BeatmapUI : MonoBehaviour
     public MenuScript_v2 menu;
     public MenuAudioManager menuAudioManager;
     public PracticeModeUI practiceModeUI;
-    //public BeatmapAudio bmAudio;
-    
+
     public GameObject overlay;
 
     private MapInfo currentMapInfo;

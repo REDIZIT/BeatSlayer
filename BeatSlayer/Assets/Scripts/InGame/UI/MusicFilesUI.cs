@@ -6,10 +6,13 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+
+/// <summary>
+/// Legacy shit
+/// </summary>
 public class MusicFilesUI : MonoBehaviour
 {
     public MenuScript_v2 menu { get { return GetComponent<MenuScript_v2>(); } }
-    public DownloadHelper downloadHelper { get { return GetComponent<DownloadHelper>(); } }
 
     public Transform foldersContent;
 
@@ -63,7 +66,7 @@ public class MusicFilesUI : MonoBehaviour
             TrackListItem item = Instantiate(trackItemPrefab, ownMusicList).GetComponent<TrackListItem>();
             item.Setup(groupInfo, menu, false, true);
 
-            item.coverImage.texture = downloadHelper.defaultIcon;
+            //item.coverImage.texture = downloadHelper.defaultIcon;
         }
 
         stateText.gameObject.SetActive(false);

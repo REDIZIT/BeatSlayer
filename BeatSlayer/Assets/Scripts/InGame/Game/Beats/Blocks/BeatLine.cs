@@ -16,7 +16,6 @@ public class BeatLine : MonoBehaviour, IBeat
     public Transform cylinder;
     public ParticleSystem psystem;
 
-    public float maxDistance = -20;
     float capMax;
     float lineEndTime;
     public float secondCapRoadPos;
@@ -69,7 +68,7 @@ public class BeatLine : MonoBehaviour, IBeat
     {
         transform.position += new Vector3(0, 0, -CurrentSpeed);
         totalDist += CurrentSpeed * SpeedMultiplier;
-        if (firstCap.position.z <= maxDistance)
+        if (firstCap.position.z <= bm.maxDistance)
         {
             gm.MissedBeatCube(this);
             Destroy(gameObject);

@@ -41,7 +41,8 @@ namespace Profile
         [Header("Statistics")] 
         public Text placeText;
         public Text inGameText, RPText, accuracyText, scoreText, hitText, maxComboText;
-        public HorizontalLayoutGroup shortStatLayout;
+        //public HorizontalLayoutGroup shortStatLayout;
+        public GridLayoutGroup shortStatLayout;
         public GameObject publishedMapsContent;
         public Text publishedMapsText, publishedPlayText, publishedLikesText;
         public Transform bestReplaysContent;
@@ -124,7 +125,7 @@ namespace Profile
             accuracyText.text = data.Accuracy == -1 ? "-" : Mathf.Floor(data.Accuracy * 10000) / 100f + "%";
             scoreText.text = data.AllScore + "";
             hitText.text = data.Hits + "";
-            maxComboText.text = data.MaxCombo >= 0 ? data.MaxCombo + "" : "-";
+            //maxComboText.text = data.MaxCombo >= 0 ? data.MaxCombo + "" : "-";
 
             
             placeText.transform.parent.GetComponent<TextContainer>().UpdateThis();
@@ -133,7 +134,7 @@ namespace Profile
             accuracyText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             scoreText.transform.parent.GetComponent<TextContainer>().UpdateThis();
             hitText.transform.parent.GetComponent<TextContainer>().UpdateThis();
-            maxComboText.transform.parent.GetComponent<TextContainer>().UpdateThis();
+            //maxComboText.transform.parent.GetComponent<TextContainer>().UpdateThis();
 
 
             ShowGradesText(data);

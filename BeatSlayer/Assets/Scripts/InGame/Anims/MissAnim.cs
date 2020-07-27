@@ -1,6 +1,5 @@
 ﻿using Assets.SimpleLocalization;
-using System.Collections;
-using System.Collections.Generic;
+using InGame.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +26,8 @@ namespace InGame.Animations
         }
         public void OnMiss()
         {
+            if (SettingsManager.Settings.Gameplay.HideMissedText) return;
+
             animator.Play("Missed", -1, 0f);
 
             consistentMisses++;

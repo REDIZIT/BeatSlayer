@@ -16,5 +16,5 @@ MonoBehaviour:
   description: Saber-4-Descript
   cost: 10000
   id: 4
-  image: {fileID: 21300000, guid: 32d8a73dbfb641e45aca233af8bf5ddd, type: 3}
-  model: {fileID: 0}
+  image: {fileID: 21300000, guid: e5b6bde2f2edcc240ac8f725f3bc0116, type: 3}
+  model: {fileID: 8650614168544879672, guid: e9493a7964075c74eab52bee481aa7ee, type: 3}

@@ -1,4 +1,5 @@
-﻿using InGame.UI.Overlays;
+﻿using GameNet;
+using InGame.UI.Overlays;
 using MusicFilesManagement;
 using Newtonsoft.Json;
 using ProjectManagement;
@@ -18,8 +19,9 @@ namespace DatabaseManagement
         public static DatabaseContainer container;
         public static OwnMusicUI ownMusicUI;
 
-        public static string url_approved = "http://176.107.160.146/Moderation/GetApprovedGroups";
-        public static string url_groups = "http://176.107.160.146/Database/GetGroupsExtended";
+        public static string apibase => NetCore.Url_Server;
+        public static string url_approved = apibase + "/Moderation/GetApprovedGroups";
+        public static string url_groups = apibase + "/Database/GetGroupsExtended";
 
 
         public static Action onApprovedLoadedCallback, onAllMusicLoadedCallback, onDownloadedMusicCallback;

@@ -88,8 +88,8 @@ namespace Michsky.UI.ModernUIPack
 
             if (hSelector != null)
             {
-                hSelector.invertAnimation = UIManagerAsset.hSelectorInvertAnimation;
-                hSelector.loopSelection = UIManagerAsset.hSelectorLoopSelection;
+                //hSelector.invertAnimation = UIManagerAsset.hSelectorInvertAnimation;
+                //hSelector.loopSelection = UIManagerAsset.hSelectorLoopSelection;
             }
         }
     }

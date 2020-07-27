@@ -299,29 +299,16 @@ public class DatabaseScript : MonoBehaviour
     {
         if (Application.internetReachability == NetworkReachability.NotReachable) return false;
     
-        trackname = trackname.Replace("&", "%amp%");
-        nick = nick.Replace("&", "%amp%");
-
         string path = Application.persistentDataPath + "/maps/" + trackname + "/" + nick + "/" + trackname + ".bsu";
         long utcTicks = new FileInfo(path).LastWriteTimeUtc.Ticks;
+
+        trackname = trackname.Replace("&", "%amp%");
+        nick = nick.Replace("&", "%amp%");
 
         string url = string.Format(url_hasMapUpdate, trackname, nick, utcTicks);
         string response = new WebClient().DownloadString(url);
 
         return bool.Parse(response);
-    }
-    public bool HasUpdateForMap(MapInfo info)
-    {
-        if (Application.internetReachability == NetworkReachability.NotReachable) return false;
-        
-        string trackname = info.author + "-" + info.name;
-        string nick = info.nick;
-
-        string path = Application.persistentDataPath + "/maps/" + trackname + "/" + nick + "/" + trackname + ".bsu";
-        if (!File.Exists(path)) return false;
-        long utcTicks = new FileInfo(path).LastWriteTimeUtc.Ticks;
-
-        return info.publishTime.Ticks > utcTicks;
     }
 
 

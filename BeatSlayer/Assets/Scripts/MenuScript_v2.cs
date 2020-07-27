@@ -8,15 +8,10 @@ using UnityEngine;
 using System.ComponentModel;
 using UnityEngine.UI;
 using Pixelplacement;
-//using UnityEngine.SceneManagement;
 using UnityEngine.UI.Extensions;
 using Assets.SimpleLocalization;
-//using GooglePlayGames;
-//using GooglePlayGames.BasicApi;
 using UnityEngine.Video;
-//using System.Runtime.Serialization.Formatters.Binary;
 using InGame.SceneManagement;
-//using SaveManagement;
 using DatabaseManagement;
 using GameNet;
 using ProjectManagement;
@@ -24,9 +19,9 @@ using Testing;
 using Debug = UnityEngine.Debug;
 using Web;
 using InGame.UI.Overlays;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
 using InGame.Settings;
+using InGame.Game.Menu;
+using InGame.UI.Menu;
 
 public class MenuScript_v2 : MonoBehaviour
 {
@@ -34,12 +29,18 @@ public class MenuScript_v2 : MonoBehaviour
     public DailyRewarder dailyRewarder;
     public BeatmapUI beatmapUI;
     
-    public DownloadHelper downloadHelper { get { return GetComponent<DownloadHelper>(); } }
     public TrackListUI TrackListUI { get { return GetComponent<TrackListUI>(); } }
-    public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
+    public AdvancedSaveManager PrefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
     public TutorialManager tutorialManager;
     public OwnMusicUI ownMusicUI;
+    public SettingsUI settingsUI;
+
+    public Language language;
+    public enum Language
+    {
+        English, Russian, French
+    }
 
 
     public GameObject debugConsole;
@@ -68,14 +69,13 @@ public class MenuScript_v2 : MonoBehaviour
     public Text versionText, newVersionText;
     public Text scoreMultiplyText;
 
+    [Header("Settings")]
+    public ColumnGridLayout[] twoColumnGrids;
+
     [Header("Misc")]
     public GameObject newTracksImg;
 
-    public Language language;
-    public enum Language
-    {
-        English, Russian, French
-    }
+    
 
     public void Configuration()
     {
@@ -84,7 +84,7 @@ public class MenuScript_v2 : MonoBehaviour
             RefreshCoinsTexts();
         };
     }
-    private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors) { return true; }
+    //private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors) { return true; }
     public void Awake()
     {
         Application.targetFrameRate = 60;
@@ -94,15 +94,6 @@ public class MenuScript_v2 : MonoBehaviour
             Time.timeScale = 1;
         }
         debugConsole.SetActive(true);
-
-        
-
-        /*#if UNITY_EDITOR
-        UrlsChecker.IsGameWorkingWithLocalhost();
-        #endif*/
-
-        m_currentOrientation = Screen.orientation;
-        nextOrientationCheckTime = Time.realtimeSinceStartup + 1f;
 
         TranslateStart();
         
@@ -120,14 +111,8 @@ public class MenuScript_v2 : MonoBehaviour
 
     private void Start()
     {
-        versionText.text = Application.version.ToString() + " by " + Application.installerName + " in " + Application.installMode.ToString() + " mode";
+        versionText.text = Application.version.ToString() + " in " + Application.installMode.ToString() + " mode";
 
-        // Google Play Services Auth
-        /*PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder().Build();
-        PlayGamesPlatform.InitializeInstance(config);
-        PlayGamesPlatform.Activate();
-        Social.localUser.Authenticate(LoadGPSUser);*/
-        
         UnlockMapsTranslate();
 
         CheckFolders();
@@ -140,16 +125,16 @@ public class MenuScript_v2 : MonoBehaviour
         #region Loading prefs
 
 
-        mapHss.StartingScreen = prefsManager.prefs.selectedMapId;
-        mapLockers[0].SetActive(!prefsManager.prefs.mapUnlocked0);
-        mapLockers[1].SetActive(!prefsManager.prefs.mapUnlocked1);
-        mapLockers[2].SetActive(!prefsManager.prefs.mapUnlocked2);
-        mapLockers[3].SetActive(!prefsManager.prefs.mapUnlocked3);
+        mapHss.StartingScreen = PrefsManager.prefs.selectedMapId;
+        mapLockers[0].SetActive(!PrefsManager.prefs.mapUnlocked0);
+        mapLockers[1].SetActive(!PrefsManager.prefs.mapUnlocked1);
+        mapLockers[2].SetActive(!PrefsManager.prefs.mapUnlocked2);
+        mapLockers[3].SetActive(!PrefsManager.prefs.mapUnlocked3);
 
         if(File.Exists(Application.persistentDataPath + "/Money.txt"))
         {
-            prefsManager.prefs.coins = 9999999;
-            prefsManager.Save();
+            PrefsManager.prefs.coins = 9999999;
+            PrefsManager.Save();
         }
 
         if(Payload.CurrentAccount != null) RefreshCoinsTexts();
@@ -169,16 +154,10 @@ public class MenuScript_v2 : MonoBehaviour
             CheckServerMessage();
         }
 
-        //dailyRewarder.Calculate();
         CheckAchievement();
 
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += delegate { videoPlayer.Play(); };
-        canvasRect = GameObject.Find("Canvas").GetComponent<RectTransform>().rect.size;
-
-        // Та нахуй воно мэне нада xD
-        /*if (Screen.height > Screen.width) canvasRect = new Vector2(canvasRect.y, canvasRect.x);
-        UpdateOrientationHanlder(true);*/
 
         if(LoadingData.sceneLoadCount == 0)
         {
@@ -191,9 +170,12 @@ public class MenuScript_v2 : MonoBehaviour
     {
         WebHandlers_Handle();
 
-        //UpdateOrientationHanlder();
-
-        if (Input.GetKeyDown(KeyCode.Escape)) OnExitSwipe();
+        //if (Input.GetKeyDown(KeyCode.Escape)) OnExitSwipe();
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            var parameters = SceneloadParameters.TutorialPreset();
+            SceneController.instance.LoadScene(parameters);
+        }
 
         TestManager.CheckUpdates();
         TestManager.CheckModerationUpdates();
@@ -204,108 +186,20 @@ public class MenuScript_v2 : MonoBehaviour
     {
         if(debugConsole != null)
         {
-            //debugConsole.SetActive(SSytem.instance.GetInt("EnableConsole") == 1);
             debugConsole.SetActive(SettingsManager.Settings.Dev.ConsoleEnabled);
             debugConsole.transform.GetChild(3).gameObject.SetActive(SettingsManager.Settings.Dev.ShowFpsEnabled);
         }
-        
 
-        //playCustomBtn.SetActive(SSytem.instance.GetInt("EnableFileLoad") == 1);
-
-        //GetComponent<MenuSpectrum>().useMenuMusic = SSytem.instance.GetBool("MenuMusic");
-        //GetComponent<MenuSpectrum>().useKickVideo = SSytem.instance.GetBool("KickVideo");
-    }
-
-
-
-
-
-
-    private const float ORIENTATION_CHECK_INTERVAL = 0.2f;
-
-    private float nextOrientationCheckTime;
-
-    private static ScreenOrientation m_currentOrientation;
-    public static ScreenOrientation CurrentOrientation
-    {
-        get
+        settingsUI.Subscribe("TwoColumnList", () =>
         {
-            return m_currentOrientation;
-        }
-        private set
-        {
-            if (m_currentOrientation != value)
+            foreach (var grid in twoColumnGrids)
             {
-                m_currentOrientation = value;
-                Screen.orientation = value;
-
-                if (OnScreenOrientationChanged != null)
-                    OnScreenOrientationChanged(value);
+                grid.allowTwoColumns = SettingsManager.Settings.Menu.TwoColumnList;
+                grid.Build();
             }
-        }
+        });
     }
-    public static bool AutoRotateScreen = true;
-    public static event System.Action<ScreenOrientation> OnScreenOrientationChanged = null;
 
-    bool isVertical;
-    Vector2 canvasRect;
-    void UpdateOrientationHanlder(bool force = false)
-    {
-        //if (Screen.height > Screen.width) isPortrait = true;\
-        bool onChange = false;
-
-        if (Screen.height > Screen.width)
-        {
-            if (!isVertical)
-            {
-                isVertical = true;
-                foreach (CustomUI item in resizableUI) item.OnOrientationChange(isVertical);
-                onChange = true;
-            }
-        }
-        else
-        {
-            if (isVertical)
-            {
-                isVertical = false;
-                foreach (CustomUI item in resizableUI) item.OnOrientationChange(isVertical);
-                onChange = true;
-            }
-        }
-
-        if (!onChange && !force) return;
-
-        SettingsRescale(isVertical);
-        //ListRescale(isVertical);
-
-
-        // Background video
-
-        float videoNativeHeight = 1440;
-        float videoNativeWidth = 2960;
-
-        var canvas = GameObject.Find("Canvas").GetComponent<RectTransform>();
-
-        float canvasHeight = isVertical ? canvasRect.x : canvasRect.y;
-
-        float heightDifference = canvasHeight - videoNativeHeight;
-        float widthRatio = videoNativeWidth / videoNativeHeight;
-
-        float rectHeight = canvasHeight;
-        float rectWidth = canvasHeight * widthRatio;
-
-        bgVideo.sizeDelta = new Vector2(rectWidth, rectHeight);
-    }
-    public static void ForceOrientation(ScreenOrientation orientation)
-    {
-        if (orientation == ScreenOrientation.AutoRotation)
-            AutoRotateScreen = true;
-        else if (orientation != ScreenOrientation.Unknown)
-        {
-            AutoRotateScreen = false;
-            CurrentOrientation = orientation;
-        }
-    }
     void TranslateStart()
     {
         if(Application.isEditor)
@@ -320,22 +214,6 @@ public class MenuScript_v2 : MonoBehaviour
         
         LocalizationManager.Read();
     }
-
-    public void ShowAchivements()
-    {
-        Social.ShowAchievementsUI();
-    }
-    public void ShowLeader()
-    {
-        if (prefsManager.prefs.showLeaderboardTip)
-        {
-            rankingTipLocker.SetActive(true);
-            prefsManager.prefs.showLeaderboardTip = false;
-        }
-        else Social.ShowLeaderboardUI();
-    }
-
-    
 
     void CheckFolders()
     {
@@ -364,7 +242,6 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void OnRefreshAuthorBtnClick()
     {
-        //StartCoroutine(database.LoadTracksDataBaseAsyncLegacy(true));
         StartCoroutine(database.LoadDatabaseAsync(true));
     }
     
@@ -387,7 +264,7 @@ public class MenuScript_v2 : MonoBehaviour
         trackAuthor.text = btn.author;
 
 
-        trackRecordText.text = LocalizationManager.Localize("Your record is") + " " + (prefsManager.prefs.GetRecord(selectedTrack.fullname) != 0 ? prefsManager.prefs.GetRecord(selectedTrack.fullname).ToString() : LocalizationManager.Localize("NotSetYet"));
+        trackRecordText.text = LocalizationManager.Localize("Your record is") + " " + (PrefsManager.prefs.GetRecord(selectedTrack.fullname) != 0 ? PrefsManager.prefs.GetRecord(selectedTrack.fullname).ToString() : LocalizationManager.Localize("NotSetYet"));
 
         sourceText.text = selectedTrack.source != "" ? "Source" + ": " + selectedTrack.source : "";
 
@@ -413,42 +290,6 @@ public class MenuScript_v2 : MonoBehaviour
     public void OnTrackItemClicked(TrackListItem listItem)
     {
         beatmapUI.Open(listItem);
-        return;
-        trackInfoLocker.GetComponent<Animator>().Play("TrackWindow-Open");
-        trackInfoAuthorText.text = listItem.groupInfo.author;
-        trackInfoNameText.text = listItem.groupInfo.name;
-        trackInfoMapsCountText.text = LocalizationManager.Localize("MapsCount") + ": " + listItem.groupInfo.mapsCount;
-        trackInfoCoverImage.texture = listItem.coverImage.texture;
-
-        foreach (Transform child in trackInfoMapContent) Destroy(child.gameObject);
-
-        // Refresh list of player's maps
-        List<MapInfo> mapInfos;
-//        TrackRecordGroup records = TheGreat.GetRecords();
-
-        if (listItem.isCustomMusic) mapInfos = database.GetCustomMaps(listItem.groupInfo);
-        else if (listItem.isLocalItem) mapInfos = database.GetDownloadedMaps(listItem.groupInfo);
-        else mapInfos = database.GetMapsByTrack(listItem.groupInfo);
-
-        float contentHeight = -10;
-        for (int i = 0; i < mapInfos.Count; i++)
-        {
-            MapListItem mapItem = Instantiate(trackInfoMapPrefab, trackInfoMapContent).GetComponent<MapListItem>();
-
-            bool isPassed = accountManager.IsPassed(mapInfos[i].group.author, mapInfos[i].group.name, mapInfos[i].nick);
-
-            if (listItem.isCustomMusic)
-            {
-                mapItem.SetupForLocalFile(this, mapInfos[i]);
-            }
-            else mapItem.Setup(this, isPassed, mapInfos[i]);
-
-            //TrackRecord record = TheGreat.GetRecord(records, mapInfos[i].group.author, mapInfos[i].group.name, mapInfos[i].nick);
-            //mapItem.recordText.text = record == null ? "" : LocalizationManager.Localize("Record") + ": " + record.score;
-
-            contentHeight += 191.3f + 10;
-        }
-        trackInfoMapContent.GetComponent<RectTransform>().sizeDelta = new Vector2(trackInfoMapContent.GetComponent<RectTransform>().sizeDelta.x, contentHeight);
     }
    
     public void OnExtendSearchClicked(Animator anim)
@@ -466,147 +307,25 @@ public class MenuScript_v2 : MonoBehaviour
     // ============================================================================================================================
     public Transform[] settingsRescalingObjs;
     public float settingsRescaleOffset;
-    bool settingsShowedPortrait;
-    public void SettingsRescale(bool isPortrait)
-    {
-        return;
-        if (isPortrait)
-        {
-            if (!settingsShowedPortrait)
-            {
-                settingsShowedPortrait = true;
-                for (int i = 0; i < settingsRescalingObjs.Length; i++)
-                {
-                    settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition.x, settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition.y - settingsRescaleOffset);
-                }
 
-                foreach (RectTransform btn in btnsToRepos)
-                {
-                    Vector2 min = btn.offsetMin;
-                    Vector2 max = btn.offsetMax;
-
-                    Vector2 pos = btn.anchoredPosition;
-
-                    btn.anchorMin = new Vector2(btn.anchorMin.x, 0);
-                    btn.anchorMax = new Vector2(btn.anchorMax.x, 0);
-
-                    btn.offsetMin = min;
-                    btn.offsetMax = max;
-                    btn.anchoredPosition = new Vector2(pos.x, -pos.y);
-                }
-            }
-        }
-        else
-        {
-            if (settingsShowedPortrait)
-            {
-                settingsShowedPortrait = false;
-                for (int i = 0; i < settingsRescalingObjs.Length; i++)
-                {
-                    //settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition = settingsRescalingDefaultPoses[i];
-                    settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition.x, settingsRescalingObjs[i].GetComponent<RectTransform>().anchoredPosition.y + settingsRescaleOffset);
-                }
-
-                foreach (RectTransform btn in btnsToRepos)
-                {
-                    Vector2 min = btn.offsetMin;
-                    Vector2 max = btn.offsetMax;
-
-                    Vector2 pos = btn.anchoredPosition;
-
-                    btn.anchorMin = new Vector2(btn.anchorMin.x, 1);
-                    btn.anchorMax = new Vector2(btn.anchorMax.x, 1);
-
-                    btn.offsetMin = min;
-                    btn.offsetMax = max;
-                    btn.anchoredPosition = new Vector2(pos.x, -pos.y);
-                }
-            }
-        }
-    }
-
-    bool isPortraitHandled;
     public StateMachine Main_UI;
     public RectTransform selectMapRect;
     public GameObject achievementBtn, leaderboardBtn;
-    //public void ListRescale(bool isPortrait)
-    //{
-    //    if (isPortrait)
-    //    {
-    //        if (!isPortraitHandled)
-    //        {
-    //            isPortraitHandled = true;
-    //            foreach (Transform child in listController.authorMusicList)
-    //            {
-    //                if (child.name == "MusicLoadingText") continue;
-    //                else if (child.GetComponent<MenuTrackButton>() != null) child.GetComponent<MenuTrackButton>().Rescale(true);
 
-    //            }
-    //            foreach (Transform child in listController.ownMusicList)
-    //            {
-    //                //child.GetComponent<MenuTrackButton>().Rescale(true);
-    //            }
-
-    //            selectMapRect.offsetMin = new Vector2(0, selectMapRect.offsetMin.y);
-    //            selectMapRect.offsetMax = new Vector2(0, selectMapRect.offsetMax.y);
-
-    //            RectTransform mapScreen = selectMapRect.GetChild(0).GetChild(0).GetComponent<RectTransform>();
-    //            mapScreen.offsetMin = new Vector2(0, mapScreen.offsetMin.y);
-    //            mapScreen.offsetMax = new Vector2(0, mapScreen.offsetMax.y);
-
-    //            achievementBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(-300, -35);
-    //            leaderboardBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(300, -35);
-
-    //            // Refresh Main_UI. IMPORTANT! Allow Reentry must be TRUE!!
-    //            selectMapRect.GetComponent<StateMachine>().ChangeState(0);
-    //            Main_UI.ChangeState(Main_UI.currentState);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        if (isPortraitHandled)
-    //        {
-    //            isPortraitHandled = false;
-    //            foreach (Transform child in listController.ownMusicList)
-    //            {
-    //                //child.GetComponent<MenuTrackButton>().Rescale(false);
-    //            }
-    //            foreach (Transform child in listController.authorMusicList)
-    //            {
-    //                if (child.GetComponent<MenuTrackButton>() != null) child.GetComponent<MenuTrackButton>().Rescale(false);
-    //            }
-
-    //            selectMapRect.offsetMin = new Vector2(250, selectMapRect.offsetMin.y);
-    //            selectMapRect.offsetMax = new Vector2(-250, selectMapRect.offsetMax.y);
-    //            //Debug.Log("Landscape");
-
-    //            RectTransform mapScreen = selectMapRect.GetChild(0).GetChild(0).GetComponent<RectTransform>();
-    //            mapScreen.offsetMin = new Vector2(162.8f, mapScreen.offsetMin.y);
-    //            mapScreen.offsetMax = new Vector2(-162.8f, mapScreen.offsetMax.y);
-
-    //            achievementBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600, 150);
-    //            leaderboardBtn.GetComponent<RectTransform>().anchoredPosition = new Vector3(600, 150);
-
-    //            // Refresh Main_UI. IMPORTANT! Allow Reentry must be TRUE!!
-    //            selectMapRect.GetComponent<StateMachine>().ChangeState(selectMapRect.GetComponent<StateMachine>().currentState);
-    //            Main_UI.ChangeState(Main_UI.currentState);
-    //        }
-    //    }
-    //}
 
 
     public HorizontalScrollSnap mapHss;
     public void SelectMap()
     {
-        prefsManager.prefs.selectedMapId = mapHss._currentPage;
-        prefsManager.Save();
+        PrefsManager.prefs.selectedMapId = mapHss._currentPage;
+        PrefsManager.Save();
     }
     public void ScrollMap(int dir)
     {
         if (mapHss._currentPage + dir != 0)
         {
             int mapIndex = mapHss._currentPage + dir;
-            selectMapBtn.interactable = mapIndex == 0 ? true : mapIndex == 1 ? prefsManager.prefs.mapUnlocked0 : mapIndex == 2 ? prefsManager.prefs.mapUnlocked1 : mapIndex == 3 ? prefsManager.prefs.mapUnlocked2 : mapIndex == 4 ? prefsManager.prefs.mapUnlocked3 : false;
+            selectMapBtn.interactable = mapIndex == 0 ? true : mapIndex == 1 ? PrefsManager.prefs.mapUnlocked0 : mapIndex == 2 ? PrefsManager.prefs.mapUnlocked1 : mapIndex == 3 ? PrefsManager.prefs.mapUnlocked2 : mapIndex == 4 ? PrefsManager.prefs.mapUnlocked3 : false;
         }
         else
         {
@@ -656,8 +375,6 @@ public class MenuScript_v2 : MonoBehaviour
                 downloadingTimeout = 10;
                 errorDownloadText.text = "Timeout. Check the internet connection";
                 errorDownloadText.gameObject.SetActive(true);
-                //trackPlayPanel.SetActive(true);
-                //downloadTrackCancelButton.SetActive(false);
                 trackDownloadBtn.SetActive(true);
             }
         }
@@ -668,7 +385,6 @@ public class MenuScript_v2 : MonoBehaviour
         trackPlayBtn.SetActive(playable);
         trackDeleteBtn.SetActive(playable);
         trackDownloadBtn.SetActive(!playable);
-        //trackPitchSlider.gameObject.SetActive(playable);
         difficultPanel.SetActive(playable);
         trackRecordText.gameObject.SetActive(playable);
     }
@@ -820,7 +536,7 @@ public class MenuScript_v2 : MonoBehaviour
         TimeSpan t = DateTime.Now.TimeOfDay;
         if (Application.internetReachability != NetworkReachability.NotReachable)
         {
-            WWW www = new WWW("http://176.107.160.146/Builds/GetGameVersion");
+            WWW www = new WWW(NetCore.Url_Server + "/Builds/GetGameVersion");
 
             yield return www;
 
@@ -855,8 +571,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void OpenPrivatePolicy()
     {
-        //Application.OpenURL("https://tooproprogramms.000webhostapp.com/BeatSlayer/Policy.html");
-        Application.OpenURL("https://beats-slayer-tracks.herokuapp.com/Policy.html");
+        Application.OpenURL("https://docs.google.com/document/d/1EF1LaPpdGQ5a73chgJB1caqIRbaX6rjObgWdXeBux7Y/edit?usp=sharing");
     }
 
     public void OpenPlayMarket()
@@ -882,10 +597,10 @@ public class MenuScript_v2 : MonoBehaviour
         {
             Payload.CurrentAccount.Coins -= cost;
             NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -cost);
-            if (mapIndex == 0) prefsManager.prefs.mapUnlocked0 = true;
-            else if (mapIndex == 1) prefsManager.prefs.mapUnlocked1 = true;
-            else if (mapIndex == 2) prefsManager.prefs.mapUnlocked2 = true;
-            else if (mapIndex == 3) prefsManager.prefs.mapUnlocked3 = true;
+            if (mapIndex == 0) PrefsManager.prefs.mapUnlocked0 = true;
+            else if (mapIndex == 1) PrefsManager.prefs.mapUnlocked1 = true;
+            else if (mapIndex == 2) PrefsManager.prefs.mapUnlocked2 = true;
+            else if (mapIndex == 3) PrefsManager.prefs.mapUnlocked3 = true;
             //btn.gameObject.SetActive(false);
             RefreshCoinsTexts();
             selectMapBtn.interactable = true;
@@ -899,7 +614,7 @@ public class MenuScript_v2 : MonoBehaviour
                 if (!success) Debug.LogError("Achiv error");
                 if (success)
                 {
-                    prefsManager.prefs.hasAchiv_NewMapNewLife = true;
+                    PrefsManager.prefs.hasAchiv_NewMapNewLife = true;
                 }
             });
 
@@ -907,7 +622,7 @@ public class MenuScript_v2 : MonoBehaviour
 
             // Animation
             StartCoroutine(UnlockMapAnimator(btn.gameObject, cost));
-            prefsManager.Save();
+            PrefsManager.Save();
         }
     }
     IEnumerator UnlockMapAnimator(GameObject locker, float cost)
@@ -935,46 +650,6 @@ public class MenuScript_v2 : MonoBehaviour
 
     public HorizontalScrollSnap[] allHss;
     public GameObject trackConfigScreen;
-    void OnExitSwipe()
-    {
-        /*if (trackConfigScreen.activeInHierarchy)
-        {
-            trackConfigScreen.SetActive(false);
-            allHss[1].gameObject.GetComponent<State>().ChangeState(allHss[1].gameObject);
-            return;
-        }*/
-        /*foreach (HorizontalScrollSnap hss in allHss)
-        {
-            if (hss.gameObject.activeInHierarchy)
-            {
-                int defaultPage = hss.StartingScreen;
-                int currentPage = hss._currentPage;
-                if (currentPage > defaultPage) hss.PreviousScreen();
-                else if (currentPage < defaultPage) hss.NextScreen();
-            }
-        }*/
-    }
-
-
-    public string gpsId;
-    void LoadGPSUser(bool auth)
-    {
-        /*//Debug.Log("PlayGames auth result is " + auth);
-        //return;
-        //string username = PlayGamesPlatform.Instance.RealTime.GetSelf().Player.userName;
-        string username = PlayGamesPlatform.Instance.GetUserDisplayName();
-        string id = PlayGamesPlatform.Instance.GetUserId();
-        gpsId = id;
-        if (Application.isEditor) gpsId = "g123";
-        //bool isFiened = PlayGamesPlatform.Instance.RealTime.GetSelf().Player.isFriend;
-        bool isFiened = false;
-        //string state = PlayGamesPlatform.Instance.RealTime.GetSelf().Player.state.ToString();
-        string state = PlayGamesPlatform.Instance.GetUserEmail();
-        //string displayName = PlayGamesPlatform.Instance.RealTime.GetSelf().DisplayName;
-        string displayName = PlayGamesPlatform.Instance.GetIdToken();
-
-        Debug.LogWarning(string.Format("GPS Info: {0}\n{1}\n{2}\n{3}\n{4}", username, id, isFiened, state, displayName));*/
-    }
 
     public void RefreshCoinsTexts()
     {
@@ -983,12 +658,12 @@ public class MenuScript_v2 : MonoBehaviour
     
     public void CloseEditorAvailableForever()
     {
-        prefsManager.prefs.showedEditorAvailableWindow = true;
-        prefsManager.Save();
+        PrefsManager.prefs.showedEditorAvailableWindow = true;
+        PrefsManager.Save();
     }
     public void OpenWebsite()
     {
-        Application.OpenURL("https://beat-slayer.glitch.me/editor");
+        Application.OpenURL("https://bsserver.tk/Builds");
     }
     public void OpenUrl(string url)
     {
@@ -1000,14 +675,14 @@ public class MenuScript_v2 : MonoBehaviour
     {
         //if (!prefsManager.prefs.hasAchiv_ShoppingSpree) return;
         // Если открыты все карты
-        if (prefsManager.prefs.mapUnlocked0 && prefsManager.prefs.mapUnlocked1 && prefsManager.prefs.mapUnlocked2 && prefsManager.prefs.mapUnlocked3)
+        if (PrefsManager.prefs.mapUnlocked0 && PrefsManager.prefs.mapUnlocked1 && PrefsManager.prefs.mapUnlocked2 && PrefsManager.prefs.mapUnlocked3)
         {
-            int len = prefsManager.prefs.boughtSabers.Length;
+            int len = PrefsManager.prefs.boughtSabers.Length;
             bool allSabersBought = true;
 
             for (int i = 0; i < len; i++)
             {
-                if (!prefsManager.prefs.boughtSabers[i])
+                if (!PrefsManager.prefs.boughtSabers[i])
                 {
                     allSabersBought = false;
                 }
@@ -1017,18 +692,18 @@ public class MenuScript_v2 : MonoBehaviour
             if (allSabersBought)
             {
                 // Если куплены все ускорители
-                if (prefsManager.prefs.boosters.Where(c => c.count > 0).ToList().Count == prefsManager.prefs.boosters.Count)
+                if (PrefsManager.prefs.boosters.Where(c => c.count > 0).ToList().Count == PrefsManager.prefs.boosters.Count)
                 {
                     // Если куплены все скилы
-                    if (prefsManager.prefs.skills.Where(c => c.count > 0).ToList().Count == prefsManager.prefs.skills.Count)
+                    if (PrefsManager.prefs.skills.Where(c => c.count > 0).ToList().Count == PrefsManager.prefs.skills.Count)
                     {
                         Social.ReportProgress(GPGamesManager.achiv_shoppingSpree, 100, (bool success) =>
                         {
                             if (!success) Debug.Log("Cant give shopping spree achiv");
                             else
                             {
-                                prefsManager.prefs.hasAchiv_ShoppingSpree = true;
-                                prefsManager.Save();
+                                PrefsManager.prefs.hasAchiv_ShoppingSpree = true;
+                                PrefsManager.Save();
                             }
                         });
                     }
@@ -1073,7 +748,7 @@ public class MenuScript_v2 : MonoBehaviour
                 serverMsgAnim.SetActive(false);
             }
         };
-        client.DownloadStringAsync(new Uri("http://176.107.160.146/Database/GetMessage"));
+        client.DownloadStringAsync(new Uri(NetCore.Url_Server + "/Database/GetMessage"));
     }
 
     public void OnServerMsgClicked()

@@ -61,7 +61,7 @@ namespace InGame.Shop
             SaberHand hand = (SaberHand)handIndex;
 
             shopHelper.SelectSaber(item.id, hand);
-            Refresh();
+            //Refresh();
         }
 
 

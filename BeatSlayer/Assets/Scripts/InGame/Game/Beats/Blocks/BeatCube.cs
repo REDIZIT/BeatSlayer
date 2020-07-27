@@ -22,8 +22,6 @@ public class BeatCube : MonoBehaviour, IBeat
     BeatManager bm;
     GameManager gm;
 
-    public float maxDistance;
-
     /// <summary>
     /// Multiplier of cube calculated speed from 0 to 1
     /// </summary>
@@ -205,7 +203,7 @@ public class BeatCube : MonoBehaviour, IBeat
         //
         //transform.position += new Vector3(0, 0, -1) * speed * Time.deltaTime;
         transform.position += new Vector3(0, 0, -1) * CurrentSpeed * SpeedMultiplier;
-        if (transform.position.z <= maxDistance && !isDead)
+        if (transform.position.z <= bm.maxDistance && !isDead)
         {
             gm.MissedBeatCube(this);
 

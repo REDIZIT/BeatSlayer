@@ -11,6 +11,7 @@ namespace InGame.Settings
         public string NameWithoutLocalization { get; set; }
         public string NameInFile { get; set; }
         public string Description { get; set; }
+        public string[] Media { get; set; }
 
         /// <summary>
         /// Item type

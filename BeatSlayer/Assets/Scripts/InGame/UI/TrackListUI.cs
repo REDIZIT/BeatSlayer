@@ -110,7 +110,7 @@ public class TrackListUI : MonoBehaviour
             {
                 StateText.text = "No internet connection >﹏<";
             }
-            else if (reachable/* || showedListType == ListType.Downloaded*/)
+            else
             {
                 bool isApprovedLoaded = false;
                 StateText.text = "Loading..";

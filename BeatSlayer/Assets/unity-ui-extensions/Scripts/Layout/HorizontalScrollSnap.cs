@@ -11,6 +11,12 @@ namespace UnityEngine.UI.Extensions
     [AddComponentMenu("Layout/Extensions/Horizontal Scroll Snap")]
     public class HorizontalScrollSnap : ScrollSnapBase, IEndDragHandler
     {
+        public bool useResizeOnResolutionChange;
+
+        private Vector2 layoutedResolution;
+
+
+
         void Start()
         {
             _isVertical = false;
@@ -22,6 +28,14 @@ namespace UnityEngine.UI.Extensions
 
         void Update()
         {
+            if (useResizeOnResolutionChange && (layoutedResolution.x != Screen.width || layoutedResolution.y != Screen.height))
+            {
+                layoutedResolution = new Vector2(Screen.width, Screen.height);
+                UpdateLayout();
+                return;
+            }
+
+
             if (!_lerp && _scroll_rect.velocity == Vector2.zero)
             {
                 if (!_settled && !_pointerDown)
@@ -213,13 +227,16 @@ namespace UnityEngine.UI.Extensions
             OnCurrentScreenChange(_currentPage);
         }
 
-        private void OnRectTransformDimensionsChange()
-        {
-            if (_childAnchorPoint != Vector2.zero)
-            {
-                UpdateLayout();
-            }
-        }
+        /// <summary>
+        /// Removed for supporting screen resolution change updating layout (<see cref="useResizeOnResolutionChange"/>)
+        /// </summary>
+        //private void OnRectTransformDimensionsChange()
+        //{
+        //    if (_childAnchorPoint != Vector2.zero)
+        //    {
+        //        //UpdateLayout();
+        //    }
+        //}
 
         private void OnEnable()
         {

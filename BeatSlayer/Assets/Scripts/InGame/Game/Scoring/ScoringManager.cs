@@ -23,7 +23,7 @@ namespace InGame.Game
         /// <summary>
         /// Value from mods
         /// </summary>
-        public float scoreMultiplier;
+        public float scoreMultiplier = 1;
 
         /// <summary>
         /// Value for smooth earning score on line slices

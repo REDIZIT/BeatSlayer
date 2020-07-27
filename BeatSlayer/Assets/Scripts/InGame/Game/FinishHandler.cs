@@ -65,7 +65,7 @@ public class FinishHandler : MonoBehaviour
         // Debuggin' finish end
         isNotStarting = !gm.IsGameStartingMap;
         isAudioTimeZero = audioManager.asource.time == 0;
-        isArrayEmpty = bm.beats.ToArray().Length == 0;
+        isArrayEmpty = bm.Beats.ToArray().Length == 0;
         isAudioStopped = !audioManager.asource.isPlaying;
 
         audioTime = audioManager.asource.time;

@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using InGame.Settings;
-using Ranking;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
-using Debug = UnityEngine.Debug;
 
 namespace InGame.Game.Spawn
 {
@@ -16,7 +14,8 @@ namespace InGame.Game.Spawn
     {
         public GameManager gm;
 
-        [HideInInspector] public List<BeatCubeClass> beats = new List<BeatCubeClass>();
+        public List<BeatCubeClass> Beats { get; private set; }
+
         private float firstCubeTime;
 
 
@@ -42,13 +41,17 @@ namespace InGame.Game.Spawn
 
         public RectTransform[] saberKeys;
 
+
+
+        public UILineRenderer lineRenderer;
+        public UILineRenderer algLineRenderer;
+        private float maxDelay, maxAlgDelay;
+        public Text mexDelayText, maxAlgDelayText;
+
         public float CubeSpeed
         {
             get
             {
-                //float distance = fieldLength * Time.deltaTime * (gm.paused ? 0 : 1) * gm.difficulty.speed;
-                //distance *= LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.CubesSpeed : 1;
-
                 float dspeed = gm.difficulty.speed;
 
                 float distance = fieldLength;
@@ -57,25 +60,18 @@ namespace InGame.Game.Spawn
                 float speed = distance / time;
                 speed *= dspeed;
 
-                return speed * Time.deltaTime;
-
-                // speed = distance / time
-                //return distance / fieldCrossTime;
+                return speed * Time.deltaTime * asource.pitch;
             }
         }
+        public float maxDistance;
 
-        //[SerializeField] private AnimationCurve spawnCycleTimeChart;
-        public UILineRenderer lineRenderer;
-        public UILineRenderer algLineRenderer;
-        private float maxDelay, maxAlgDelay;
-        public Text mexDelayText, maxAlgDelayText;
 
 
         private float playAreaZ;
 
 
 
-        private bool noArrows, noLines, useSliceSound;
+        private bool noArrows, noLines;
         private float cubesSpeed;
 
         private Dictionary<int, Vector3> inputTouchesStartPoses = new Dictionary<int, Vector3>();
@@ -114,8 +110,7 @@ namespace InGame.Game.Spawn
             this.gm = gm;
             this.noArrows = noArrows;
             this.noLines = noLines;
-            useSliceSound = SSytem.instance.GetBool("SliceSound");
-            //this.replay = replay;
+
             this.cubesSpeed = cubesSpeed;
 
             leftSaberColor = SSytem.instance.leftColor * gm.prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
@@ -127,7 +122,13 @@ namespace InGame.Game.Spawn
 
             secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
 
-            if(beats.Count > 0) firstCubeTime = beats[0].time;
+            if(Beats.Count > 0) firstCubeTime = Beats[0].time;
+        }
+
+        public void SetBeats(IEnumerable<BeatCubeClass> ls)
+        {
+            Beats = new List<BeatCubeClass>();
+            Beats.AddRange(ls.OrderBy(c => c.time));
         }
 
 
@@ -162,7 +163,7 @@ namespace InGame.Game.Spawn
             // Beat spawning cycle
             List<BeatCubeClass> toRemove = new List<BeatCubeClass>();
 
-            foreach (BeatCubeClass cls in beats)
+            foreach (BeatCubeClass cls in Beats)
             {
                 if(asource.time >= GetNormalizedTime(cls))
                 {
@@ -170,13 +171,11 @@ namespace InGame.Game.Spawn
                     SpawnBeatCube(cls);
                     algw.Start();
 
-                    //Debug.Log("Spawn cube with time: " + cls.time + " and normal time " + GetNormalizedTime(cls));
-
                     toRemove.Add(cls);
                 }
             }
 
-            beats.RemoveAll(c => toRemove.Contains(c));
+            Beats.RemoveAll(c => toRemove.Contains(c));
 
             w.Stop();
             algw.Stop();
@@ -512,7 +511,7 @@ namespace InGame.Game.Spawn
 
         public bool CanSkip()
         {
-            if (beats.Count == 0) return false;
+            if (Beats.Count == 0) return false;
             return GetSkipTime() > asource.time;
         }
 

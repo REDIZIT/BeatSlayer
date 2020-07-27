@@ -15,5 +15,6 @@ MonoBehaviour:
   name: Saber-1
   description: Saber-1-Descript
   cost: 0
-  image: {fileID: 21300000, guid: 05df91217142f36458aeefbed864a250, type: 3}
-  model: {fileID: 0}
+  id: 0
+  image: {fileID: 21300000, guid: 8e9590f0fbfce9847a0d9a5f57366a18, type: 3}
+  model: {fileID: 2681241204347130629, guid: a7c2924046f25c149a3122ba1d70aecc, type: 3}

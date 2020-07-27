@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
 using InGame.Leaderboard;
+using InGame.Multiplayer;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
@@ -27,23 +28,15 @@ namespace GameNet
         static HubConnection conn;
         public static HubConnectionState State => conn.State;
         public static Subscriptions Subs { get; private set; }
-        public static string Url_Server
-        {
-            get
-            {
-                return ConnType == ConnectionType.Local
-                    ? "https://localhost:5011" : ConnType == ConnectionType.Development
-                        ? "http://bsserver.tk:5020"
-                            : "https://bsserver.tk";
-            }
-        }
+        public static string Url_Server => Config.ServerUrl;
         public static string Url_Hub
         {
             get { return Url_Server + "/GameHub"; }
         }
         public enum ConnectionType { Production, Local, Development }
 
-        public static ConnectionType ConnType = ConnectionType.Development;
+        public static ConnectionType ConnType => Config.ServerType;
+        public static NetConfigurationModel Config { get; set; } = new NetConfigurationModel();
 
 
 
@@ -115,7 +108,6 @@ namespace GameNet
 
             OnSceneLoad();
 
-            Debug.Log(" > Configure()");
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
                 config();
@@ -140,10 +132,6 @@ namespace GameNet
                 if (conn == null)
                 {
                     CreateConnection();
-                }
-                else
-                {
-                     Debug.Log("Dont create connection via Dispatcher (" + conn.State + ")");
                 }
             });
         }
@@ -217,14 +205,11 @@ namespace GameNet
 
         static async void Reconnect(bool force = false)
         {
-            Debug.Log(" > Reconnect. Force? " + force + " Try to reconnect? " + TryReconnect);
-
             if (!TryReconnect) return;
             
-            if(!force) await Task.Delay(3000);
+            if(!force) await Task.Delay(2000);
 
             ReconnectAttempt++;
-            Debug.Log("Try to reconnect. Attempt " + ReconnectAttempt);
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
                 Connect();

@@ -1,8 +1,12 @@
 ﻿using GameNet;
+using InGame.Multiplayer;
 using Microsoft.AspNetCore.SignalR.Client;
 using Multiplayer.Accounts;
 using Multiplayer.Chat;
 using Multiplayer.Notification;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,11 +18,9 @@ public class MultiplayerMenuWrapper : MonoBehaviour
     public FriendsUI friendsUI;
     public NotificationUI notificationUI;
     public MenuScript_v2 menu;
-    
-    
-    [Header("Server connection override")]
-    public NetCore.ConnectionType connType;
-    public bool forceChangeConnType;
+
+    public NetConfigurationModel config;
+   
 
     [Header("UI")] 
     public Animator serverStateAnim;
@@ -30,10 +32,25 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
     private void Awake()
     {
-        if (Application.isEditor && forceChangeConnType)
+        try
         {
-            NetCore.ConnType = connType;
+            string filepath = Application.persistentDataPath + "/netconfig.json";
+            if (File.Exists(filepath))
+            {
+                config = JsonConvert.DeserializeObject<NetConfigurationModel>(File.ReadAllText(filepath));
+            }
+            else
+            {
+                config = new NetConfigurationModel();
+            }
         }
+        catch(Exception err)
+        {
+            Debug.LogError("Error on reading netconfig\n" + err.Message);
+            config = new NetConfigurationModel();
+        }
+
+        NetCore.Config = config;
     }
 
     private void Start()

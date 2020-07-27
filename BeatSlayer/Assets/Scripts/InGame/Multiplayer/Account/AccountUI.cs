@@ -85,7 +85,6 @@ namespace Multiplayer.Accounts
         
         void LogInBySession()
         {
-            Debug.Log("LogInBySession");
             // This is old session code (for compatibility
             if(File.Exists(Application.persistentDataPath + "/session.txt"))
             {
@@ -328,19 +327,19 @@ namespace Multiplayer.Accounts
         {
             if (Payload.CurrentAccount == null) return;
 
-            if(menu.prefsManager == null)
+            if(menu.PrefsManager == null)
             {
                 Debug.LogError("SyncCoins: prefsmanager is null");
                 return;
             }
-            if (menu.prefsManager.prefs == null)
+            if (menu.PrefsManager.prefs == null)
             {
                 Debug.LogError("SyncCoins: prefsmanager.prefs is null");
                 return;
             }
 
 
-            int coins = menu.prefsManager.prefs.coins;
+            int coins = menu.PrefsManager.prefs.coins;
 
             if (Payload.CurrentAccount.Coins == -1)
             {

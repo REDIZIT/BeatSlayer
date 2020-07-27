@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 namespace InGame.Shop
 {
+    /// <summary>
+    /// Deprecated?
+    /// </summary>
     public class ShopManager : MonoBehaviour
     {
         public Transform sabersContent;

@@ -120,7 +120,7 @@ public class CheatEngine : MonoBehaviour
 
         if(doWind)
         {
-            bm.beats = bm.beats.SkipWhile(c => c.time < time).ToList();
+            bm.SetBeats(bm.Beats.SkipWhile(c => c.time < time).ToList());
             asource.time = time;
             doWind = false;
         }
@@ -129,7 +129,7 @@ public class CheatEngine : MonoBehaviour
         {
             doSkipToEnd = false;
             float endTime = asource.clip.length - 5;
-            bm.beats = bm.beats.SkipWhile(c => c.time < endTime).ToList();
+            bm.SetBeats(bm.Beats.SkipWhile(c => c.time < endTime).ToList());
             asource.time = endTime;
         }
     }

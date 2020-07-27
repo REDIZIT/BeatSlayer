@@ -39,11 +39,6 @@ public class TrackListItem : MonoBehaviour
         }
         else mapsCountText.text = Assets.SimpleLocalization.LocalizationManager.Localize("MapsCount") + ": " + groupInfo.mapsCount;
         
-        if (getSpriteFromServer)
-        {
-            menu.transform.GetComponent<DownloadHelper>().trackListItems.Add(this);
-        }
-
         isLocalItem = !getSpriteFromServer;
 
         string folderPath = Application.persistentDataPath + "/maps/" + groupInfo.author + "-" + groupInfo.name;
@@ -56,7 +51,7 @@ public class TrackListItem : MonoBehaviour
         if(Payload.CurrentAccount != null && groupInfo.groupType == GroupInfo.GroupType.Author)
         {
             bool isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.CurrentAccount.Nick, groupInfo.author, groupInfo.name);
-            isPassedImage.SetActive(isPassed);
+            if (isPassedImage != null) isPassedImage.SetActive(isPassed);
         }
     }
 

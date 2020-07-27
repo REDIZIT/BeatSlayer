@@ -1,5 +1,6 @@
 using Assets.SimpleLocalization;
 using InGame.Game.Menu;
+using InGame.Menu.Settings;
 using Michsky.UI.ModernUIPack;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +9,12 @@ namespace InGame.Settings
 {
     public class SettingsUIItem : MonoBehaviour
     {
-        public SettingsUI ui;
+        protected SettingsUI ui;
         public SettingsUIItemModel model;
 
+        public GameObject questionBtn;
         public Text nameText;
         public Image backgroundImage;
-
-        public TooltipManager tooltip;
 
         [Header("Value controllers")]
         public CustomDropdown dropdown;
@@ -52,6 +52,11 @@ namespace InGame.Settings
             }
 
 
+            bool hasMedia = model.Media != null && model.Media.Length > 0;
+            questionBtn.SetActive(hasMedia);
+            nameText.GetComponent<RectTransform>().offsetMin = new Vector2(hasMedia ? 120 : 45, 0);
+
+
             ResetValueContainers();
             switch (model.Type)
             {
@@ -60,6 +65,12 @@ namespace InGame.Settings
                 case SettingsUIItemType.Toggle: RefreshSwitch(); break;
             }
         }
+
+        public void OnHintBtnClick()
+        {
+            SettingsMediaViewer.instance.Show(model.Media);
+        }
+
 
         private void ResetValueContainers()
         {

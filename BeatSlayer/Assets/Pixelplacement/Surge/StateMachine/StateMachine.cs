@@ -38,6 +38,10 @@ namespace Pixelplacement
         [Tooltip("Can States within this StateMachine be reentered?")]
         public bool allowReentry = false;
 
+
+        [Tooltip("Refresh current state when screen resoultion changes")]
+        public bool reactivateOnRotation = true;
+
         /// <summary>
         /// Return to default state on disable?
         /// </summary>
@@ -113,6 +117,26 @@ namespace Pixelplacement
         bool _atFirst;
         bool _atLast;
 
+        /// <summary>
+        /// Resolution when state was changed. Used with <see cref="reactivateOnRotation"/>
+        /// </summary>
+        private Vector2 layoutedResoultion;
+
+
+
+
+
+        // Unity Methods:
+        private void Update()
+        {
+            if (reactivateOnRotation && (Screen.width != layoutedResoultion.x || Screen.height != layoutedResoultion.y))
+            {
+                //Debug.Log("Rebuild");
+                ChangeState(currentState, true);
+            }
+        }
+
+
         //Public Methods:
         /// <summary>
         /// Change to the next state if possible.
@@ -147,7 +171,7 @@ namespace Pixelplacement
         /// <summary>
         /// Exit the current state.
         /// </summary>
-        public void Exit ()
+        public void Exit (bool useSetActive = true)
         {
             if (currentState == null) return;
             Log ("(-) " + name + " EXITED state: " + currentState.name);
@@ -160,7 +184,8 @@ namespace Pixelplacement
             if (currentIndex == transform.childCount - 1) AtLast = false;	
 
             if (OnStateExited != null) OnStateExited.Invoke (currentState);
-            currentState.SetActive (false);
+            
+            if (useSetActive) currentState.SetActive (false);
             currentState = null;
         }
 
@@ -174,13 +199,14 @@ namespace Pixelplacement
                 Log("Index is greater than the amount of states in the StateMachine \"" + gameObject.name + "\" please verify the index you are trying to change to.");
                 return null;
             }
+
             return ChangeState(transform.GetChild(childIndex).gameObject);
         }
 
         /// <summary>
         /// Changes the state.
         /// </summary>
-        public GameObject ChangeState (GameObject state)
+        public GameObject ChangeState (GameObject state, bool refresh = false)
         {
             if (currentState != null)
             {
@@ -197,8 +223,10 @@ namespace Pixelplacement
                 return null;
             }
 
-            Exit();
-            Enter(state);
+            Exit(!refresh);
+            Enter(state, !refresh);
+
+            layoutedResoultion = new Vector2(Screen.width, Screen.height);
 
             return currentState;
         }
@@ -239,8 +267,10 @@ namespace Pixelplacement
             if (Application.isPlaying && defaultState != null) ChangeState (defaultState.name);
         }
 
+
+
         //Private Methods:
-        void Enter (GameObject state)
+        void Enter (GameObject state, bool useSetActive = true)
         {
             currentState = state;
             int index = currentState.transform.GetSiblingIndex ();
@@ -259,7 +289,8 @@ namespace Pixelplacement
 
             Log( "(+) " + name + " ENTERED state: " + state.name);
             if (OnStateEntered != null) OnStateEntered.Invoke (currentState);
-            currentState.SetActive (true);
+            
+            if (useSetActive) currentState.SetActive (true);
         }
 
         void Log (string message)

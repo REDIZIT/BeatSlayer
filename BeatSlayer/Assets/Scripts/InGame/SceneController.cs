@@ -206,6 +206,14 @@ public class SceneloadParameters
         };
         return parameters;
     }
+    public static SceneloadParameters TutorialPreset()
+    {
+        var parameters = new SceneloadParameters()
+        {
+            Type = LoadType.Tutorial
+        };
+        return parameters;
+    }
     /// <summary>
     /// Start author music with practice mode
     /// </summary>

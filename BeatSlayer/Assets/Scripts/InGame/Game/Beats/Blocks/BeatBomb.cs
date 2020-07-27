@@ -16,7 +16,6 @@ namespace InGame.Game.Beats.Blocks
         /// </summary>
         public float SpeedMultiplier { get; set; }
         public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
-        private float maxDistance = -20;
 
 
         [SerializeField] private ParticleSystem bombParticleSystem;
@@ -80,7 +79,7 @@ namespace InGame.Game.Beats.Blocks
         void Movement()
         {
             transform.position += new Vector3(0, 0, -1) * CurrentSpeed * SpeedMultiplier;
-            if (transform.position.z <= maxDistance && !isDead)
+            if (transform.position.z <= bm.maxDistance && !isDead)
             {
                 gm.MissedBeatCube(this);
 
@@ -95,7 +94,6 @@ namespace InGame.Game.Beats.Blocks
             bombParticleSystem.transform.eulerAngles = new Vector3(0, 0, angle);
             bombParticleSystem.Play();
 
-            //GetComponent<BoxCollider>().enabled = false;
             Destroy(gameObject);
         }
     }

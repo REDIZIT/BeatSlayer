@@ -2,7 +2,6 @@ using InGame.Settings;
 using System.Reflection;
 using System;
 using InGame.Helpers;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,21 +19,15 @@ namespace InGame.Game.Menu
 
         private SettingsModel Settings => SettingsManager.Settings;
 
+        private List<OptionChangeSubscription> Subscriptions { get; set; } = new List<OptionChangeSubscription>();
+
 
 
         private void Start()
         {
             ShowSettingsPage();
         }
-        //private void DescribeClass(/*Type classType*/PropertyInfo subField, object target)
-        //{
-        //    object subValue = subField.GetValue(target);
-        //    foreach (PropertyInfo property in subField.PropertyType.GetProperties())
-        //    {
-        //        string strName = property.Name;
-        //        Debug.Log(strName + " = " + property.GetValue(subValue, null).ToString());
-        //    }
-        //}
+
         public void OnResetBtnClick()
         {
             SettingsManager.Reset();
@@ -59,7 +52,59 @@ namespace InGame.Game.Menu
                 }
             }
         }
-        public void ShowItemsGroup(PropertyInfo parentprop, object parentObject, Transform currentContent)
+
+        public void Subscribe(string optionName, Action callback)
+        {
+            Subscriptions.Add(new OptionChangeSubscription(optionName, callback));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        public void SaveSetting(PropertyInfo prop, SettingsUIItemModel model, object value)
+        {
+            object casted;
+            if (prop.PropertyType.IsEnum)
+            {
+                casted = Enum.Parse(prop.PropertyType, value.ToString());
+            }
+            else
+            {
+                casted = Convert.ChangeType(value, prop.PropertyType);
+            }
+
+
+            prop.SetValue(model.PropertyTarget, casted);
+
+            SettingsManager.Save();
+
+            if (model.Type == SettingsUIItemType.Toggle || model.Type == SettingsUIItemType.Dropdown)
+            {
+                ShowSettingsPage();
+                OnOptionChange(model.NameInFile);
+            }
+        }
+
+        private void OnOptionChange(string optionName)
+        {
+            foreach (var sub in Subscriptions.Where(c => c.OptionName == optionName))
+            {
+                sub.Callback?.Invoke();
+            } 
+        }
+
+
+
+
+        private void ShowItemsGroup(PropertyInfo parentprop, object parentObject, Transform currentContent)
         {
             SettingsUIGroup group = AddOptionsGroup(parentprop, currentContent);
 
@@ -80,7 +125,6 @@ namespace InGame.Game.Menu
 
             group.FitContent();
         }
-
         private SettingsUIGroup AddOptionsGroup(PropertyInfo prop, Transform content)
         {
             SettingsUIGroup group = null;
@@ -138,6 +182,13 @@ namespace InGame.Game.Menu
             }
 
 
+            MediaAttribute mediaAttribute = prop.GetCustomAttribute<MediaAttribute>();
+            string[] mediaArray = null;
+            if(mediaAttribute != null)
+            {
+                mediaArray = mediaAttribute.Images;
+            }
+
 
 
 
@@ -147,6 +198,7 @@ namespace InGame.Game.Menu
             model.NameInFile = prop.Name;
             model.NameWithoutLocalization = attribute.DisplayName;
             model.Description = attribute.Description ?? "";
+            model.Media = mediaArray;
             model.Type = type;
             model.PropertyInfo = prop;
             model.PropertyTarget = subValue;
@@ -169,7 +221,7 @@ namespace InGame.Game.Menu
         }
 
 
-        public SettingsUIItemModel GetItemValue(PropertyInfo property, object parentClass, SettingsUIItemType type)
+        private SettingsUIItemModel GetItemValue(PropertyInfo property, object parentClass, SettingsUIItemType type)
         {
             object propertyValue = property.GetValue(parentClass);
 
@@ -206,37 +258,23 @@ namespace InGame.Game.Menu
                 default: return null;
             }
         }
+    }
 
 
-        public void SaveSetting(PropertyInfo prop, SettingsUIItemModel model, object value)
+
+    
+
+
+
+    public class OptionChangeSubscription
+    {
+        public string OptionName { get; set; }
+        public Action Callback { get; set; }
+
+        public OptionChangeSubscription(string optionName, Action callback)
         {
-            //PropertyInfo prop = modelType.GetProperties().FirstOrDefault(c => c.Name == name);
-            //if(prop == null)
-            //{
-            //    throw new Exception($"Can't save setting with name '{name}' due to can't find it in model class");
-            //}
-
-
-
-            object casted;
-            if (prop.PropertyType.IsEnum)
-            {
-                casted = Enum.Parse(prop.PropertyType, value.ToString());
-            }
-            else
-            {
-                casted = Convert.ChangeType(value, prop.PropertyType);
-            }
-
-
-            prop.SetValue(model.PropertyTarget, casted);
-
-            SettingsManager.Save();
-
-            if(model.Type == SettingsUIItemType.Toggle || model.Type == SettingsUIItemType.Dropdown)
-            {
-                ShowSettingsPage();
-            }
+            OptionName = optionName;
+            Callback = callback;
         }
     }
 }

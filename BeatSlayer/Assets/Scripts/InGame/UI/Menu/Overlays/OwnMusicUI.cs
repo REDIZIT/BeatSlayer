@@ -75,8 +75,8 @@ namespace InGame.UI.Overlays
         void SearchAllMusic(Action callback, bool forceupdate = false)
         {
             // For example
-            //string folder = @"C:\Users\REDIZIT\AppData\LocalLow\REDIZIT\Beat Slayer Editor";
-            string folder = @"C:\# Data #\GitHub Projects\BeatSlayer";
+            string folder = @"C:\Users\REDIZIT\AppData\LocalLow\REDIZIT\Beat Slayer\test";
+            //string folder = @"C:\# Data #\GitHub Projects\BeatSlayer";
 
             Stopwatch w = new Stopwatch();
             w.Start();
@@ -124,7 +124,7 @@ namespace InGame.UI.Overlays
             string mainFolder = "/storage/emulated/0";
             if (Application.isEditor)
             {
-                mainFolder = @"C:\Users\REDIZIT\Desktop";
+                mainFolder = @"C:\Users\REDIZIT\AppData\LocalLow\REDIZIT\Beat Slayer\test";
                 //mainFolder = @"C:\# Data #\GitHub Projects";
             }
 

@@ -1,23 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class ColumnGridLayout : MonoBehaviour
 {
+    public bool allowTwoColumns;
+
     public bool fixHeight;
     public float height;
 
+    [Tooltip("Min cell width, when grid can be splitted for 2 columns")]
+    public float widthForDivide;
+
+    private RectTransform rect;
+    private GridLayoutGroup group;
+
+    private float layoutedGridWidth = -1;
+
     private void Start()
     {
-        float width = this.gameObject.GetComponent<RectTransform>().rect.width;
-        Vector2 newSize = new Vector2(width / 2, width / 2);
-        Vector2 spacing = GetComponent<GridLayoutGroup>().spacing;
+        Build();
+    }
 
-        //float defaultHeight = GetComponent<GridLayoutGroup>().cellSize.y;
+    private void Update()
+    {
+        if(layoutedGridWidth != rect.rect.width)
+        {
+            Build();
+        }
+    }
 
-        Vector2 size = new Vector2(newSize.x - spacing.x, fixHeight ? height : newSize.y - spacing.y);
+    public void Build()
+    {
+        rect = GetComponent<RectTransform>();
+        group = GetComponent<GridLayoutGroup>();
 
-        GetComponent<GridLayoutGroup>().cellSize = size;
+        float gridWidth = rect.rect.width;
+        Vector2 cellSize = new Vector2(gridWidth, gridWidth);
+
+        if (allowTwoColumns && gridWidth / 2f >= widthForDivide)
+        {
+            cellSize = new Vector2(gridWidth / 2, gridWidth / 2);
+        }
+
+
+        Vector2 spacing = group.spacing;
+
+        Vector2 size = new Vector2(cellSize.x - spacing.x, fixHeight ? height : cellSize.y - spacing.y);
+
+        group.cellSize = size;
+
+        layoutedGridWidth = gridWidth;
     }
 }
