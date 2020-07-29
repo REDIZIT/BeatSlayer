@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using BeatSlayerServer.Dtos.Mapping;
+using BeatSlayerServer.Models.Database;
 using BeatSlayerServer.Multiplayer.Accounts;
+using InGame.Game.Tutorial;
 using InGame.Leaderboard;
 using InGame.Multiplayer;
 using Microsoft.AspNetCore.Http.Connections;
@@ -351,73 +353,6 @@ namespace GameNet
             });
         }
 
-        public class ConnectionMethodsWrapper
-        {
-            /*private readonly HubConnection _connection;
-
-            public ConnectionMethodsWrapper(HubConnection connection)
-                => _connection = connection;
-
-            public Task Test()
-                => _connection.InvokeAsync(nameof(IInvokes.Test));
-
-            public IDisposable RegisterOnFoo(Action onTest)
-                => _connection.BindOnInterface<ISubs>(x => x.OnTest, onTest);*/
-
-            /*public IDisposable RegisterOnBar(Action<string, BarData> onBar)
-                => _connection.BindOnInterface(x => x.OnBar, onBar);*/
-        }
-
-
-
-        static void SubcribeOnClientInvokes()
-        {
-            /*Actions = new Invokes();
-
-            
-            //MethodInfo mi = Actions.GetType().GetMethod("Invoke");
-            //Action del = (Action)Delegate.CreateDelegate(typeof(Action), mi);
-
-            
-            //Actions.Test = del;
-            //Actions.Test();
-            
-            
-            var fields = typeof(Invokes).GetFields();
-            foreach (var field in fields)
-            {
-                Type t = field.FieldType;
-                FieldInfo info = typeof(Invokes).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
-
-                var act = info.GetValue(Actions);
-
-                var del = (Action)act;
-                
-                
-                info.SetValue(Actions, act);
-                
-                conn.On(field.Name, t.GenericTypeArguments, (objects =>
-                {
-                    FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
-                    object yourfield = info.GetValue(Subs);
-                    MethodInfo method = yourfield.GetType().GetMethod("Invoke");
-                    
-                    method.Invoke(yourfield, objects);
-
-                    return null;
-                }));
-            }
-
-            Actions.Log("Suka but no blyat");*/
-        }
-        //static void DoInvoke(MethodInfo)
-        static void SuperVoid(string name, params object[] objs)
-        {
-            Debug.Log("> Invoke " + name);
-        }
-
-
-
 
         #endregion
 
@@ -433,35 +368,32 @@ namespace GameNet
         [Preserve]
         public static class ServerActions
         {
-            public static void Test() => NetCore.conn.InvokeAsync("Test");
+            public static void Test() => conn.InvokeAsync("Test");
             public static void TestPar(int i) => conn.InvokeAsync("TestPar", i);
-            public static void SendChatMessage(string nick, string msg, BeatSlayerServer.Multiplayer.Accounts.AccountRole role, string group)
-               =>  NetCore.conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
+            public static void SendChatMessage(string nick, string msg, AccountRole role, string group)
+               =>  conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 
             public static void UpdateInGameTime()
             {
-                if (Payload.CurrentAccount == null) return;
+                if (Payload.Account == null) return;
                 if (Payload.PrevInGameTimeUpdate == 0) Payload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
                 int seconds = Mathf.RoundToInt(Time.realtimeSinceStartup - Payload.PrevInGameTimeUpdate);
                 if (seconds < 30) return;
                 Payload.PrevInGameTimeUpdate = Time.realtimeSinceStartup;
-                NetCore.conn.InvokeAsync("Accounts_UpdateInGameTime", Payload.CurrentAccount.Nick, seconds);
+                conn.InvokeAsync("Accounts_UpdateInGameTime", Payload.Account.Nick, seconds);
             }
 
             public static class Account
             {
                 public static void LogIn(string nick, string password)
                 {
-                    NetCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
+                    conn.InvokeAsync("Accounts_LogIn", nick, password);
                     UpdateInGameTime();
                 }
-                    
-                
-                
-                public static void SignUp(string nick, string password, string country, string email) =>NetCore.conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
+                public static void SignUp(string nick, string password, string country, string email) => conn.InvokeAsync("Accounts_SignUp", nick, password, country, email);
 
-                public static void Search(string nick) =>NetCore.conn.InvokeAsync("Accounts_Search", nick);
-                public static void View(string nick) =>NetCore.conn.InvokeAsync("Accounts_View", nick);
+                public static void Search(string nick) => conn.InvokeAsync("Accounts_Search", nick);
+                public static void View(string nick) => conn.InvokeAsync("Accounts_View", nick);
 
 
 
@@ -479,13 +411,11 @@ namespace GameNet
 
                 public static void SendChangeEmailCode(string nick, string email) => conn.InvokeAsync("Accounts_SendChangeEmailCode", nick, email);
 
-                //public static void SendReplay(string json) => conn.InvokeAsync("Accounts_SendReplay", json);
                 public static async Task<ReplaySendData> SendReplay(ReplayData dto)
                 {
                     return await conn.InvokeAsync<ReplaySendData>("SendReplay", dto);
                 }
 
-                //public static void GetBestReplay(string ni!ck, string trackname, string creatornick) => conn.InvokeAsync("Accounts_GetBestReplay", nick, trackname, creatornick);
                 public static async Task<ReplayData> GetBestReplay(string nick, string trackname, string creatornick)
                 {
                     return await conn.InvokeAsync<ReplayData>("GetBestReplay", nick, trackname, creatornick);
@@ -524,14 +454,23 @@ namespace GameNet
             public static class Shop
             {
                 public static void SendCoins(string nick, int coins) => conn.InvokeAsync("Shop_SendCoins", nick, coins);
-
                 public static void SyncCoins(string nick, int coins) => conn.InvokeAsync("Shop_SyncCoins", nick, coins);
+
+                public static async Task<List<PurchaseModel>> UpgradePurchases(string nick, bool[] boughtSabers, bool[] boughtTails, bool[] boughtMaps) =>
+                    await conn.InvokeAsync<List<PurchaseModel>>("Shop_UpgradePurchases", nick, boughtSabers, boughtTails, boughtMaps);
+                public static async Task<bool> IsPurchaseBought(string nick, int coins) => await conn.InvokeAsync<bool>("Shop_IsPurchaseBought", nick, coins);
+                public static async Task<PurchaseModel> TryBuyPurchase(string nick, int purchaseId) => await conn.InvokeAsync<PurchaseModel>("Shop_TryBuy", nick, purchaseId);
             }
             public static class Chat
             {
                 public static void GetGroups() => conn.InvokeAsync("Chat_GetGroups");
                 public static void JoinGroup(string nick, string group) => conn.InvokeAsync("Chat_JoinGroup", nick, group);
                 public static void LeaveGroup(string nick, string group) => conn.InvokeAsync("Chat_LeaveGroup", nick, group);
+            }
+
+            public static class Tutorial
+            {
+                public static void TutorialPlayed(TutorialResult result) => conn.InvokeAsync("Tutorial_Played", JsonConvert.SerializeObject(result));
             }
         }
 

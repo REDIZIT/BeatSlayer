@@ -35,8 +35,8 @@ public class FriendItemUI : MonoBehaviour
 
     void RefreshButtons()
     {
-        bool isFriend = Payload.CurrentAccount != null && Payload.CurrentAccount.Friends.Any(c => c.Nick == data.Nick);
-        bool isMe = Payload.CurrentAccount != null && Payload.CurrentAccount.Nick == data.Nick;
+        bool isFriend = Payload.Account != null && Payload.Account.Friends.Any(c => c.Nick == data.Nick);
+        bool isMe = Payload.Account != null && Payload.Account.Nick == data.Nick;
         
         removeBtn.SetActive(!isMe && isFriend);
         addBtn.SetActive(!isMe && !isFriend);
@@ -46,14 +46,14 @@ public class FriendItemUI : MonoBehaviour
     public void OnRemoveBtnClick()
     {
         ui.RemoveFriend(data.Nick);
-        Payload.CurrentAccount.Friends.RemoveAll(c => c.Nick == data.Nick);
+        Payload.Account.Friends.RemoveAll(c => c.Nick == data.Nick);
         RefreshButtons();
         //Destroy(gameObject);
     }
 
     public void OnAddBtnClick()
     {
-        Payload.CurrentAccount.Friends.Add(data);
+        Payload.Account.Friends.Add(data);
         ui.AddFriend(data.Nick);
         RefreshButtons();
     }

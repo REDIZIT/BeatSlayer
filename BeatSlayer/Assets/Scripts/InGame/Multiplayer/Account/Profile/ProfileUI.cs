@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Assets.SimpleLocalization;
 using BeatSlayerServer.Dtos.Mapping;
@@ -41,7 +38,6 @@ namespace Profile
         [Header("Statistics")] 
         public Text placeText;
         public Text inGameText, RPText, accuracyText, scoreText, hitText, maxComboText;
-        //public HorizontalLayoutGroup shortStatLayout;
         public GridLayoutGroup shortStatLayout;
         public GameObject publishedMapsContent;
         public Text publishedMapsText, publishedPlayText, publishedLikesText;
@@ -58,21 +54,21 @@ namespace Profile
 
         private void Update()
         {
-            if (Payload.CurrentAccount == null || data == null) return;
-            if (data.Nick == Payload.CurrentAccount.Nick) inGameText.text = GetTimeString(Payload.CurrentAccount.InGameTime);
+            if (Payload.Account == null || data == null) return;
+            if (data.Nick == Payload.Account.Nick) inGameText.text = GetTimeString(Payload.Account.InGameTime);
         }
 
         public void OnEditBtnClick()
         {
             editui.Open();
 
-            ShowButtons(false, Payload.CurrentAccount);
+            ShowButtons(false, Payload.Account);
         }
 
         public void OnEndEditBtnClick()
         {
             Open();
-            ShowButtons(true, Payload.CurrentAccount);
+            ShowButtons(true, Payload.Account);
         }
         
         
@@ -85,8 +81,8 @@ namespace Profile
         }
         public void ShowOwnAccount()
         {
-            if (Payload.CurrentAccount == null) return;
-            ShowAccount(Payload.CurrentAccount);
+            if (Payload.Account == null) return;
+            ShowAccount(Payload.Account);
         }
 
         public void ShowAccount(AccountData data)
@@ -109,7 +105,7 @@ namespace Profile
             nickText.text = data.Nick;
             devIcon.SetActive(data.Nick == "REDIZIT");
 
-            bool isOnline = data.Nick == Payload.CurrentAccount.Nick ? true : data.IsOnline;
+            bool isOnline = data.Nick == Payload.Account.Nick ? true : data.IsOnline;
             onlineCircle.SetActive(isOnline);
             onlineText.text = isOnline
                 ? LocalizationManager.Localize("Online")
@@ -183,7 +179,7 @@ namespace Profile
         public void OnRemoveFriendBtnClick()
         {
             //NetCore.ServerActions.Friends.RemoveFriend(data.Nick, NetCorePayload.CurrentAccount.Nick);
-            Payload.CurrentAccount.Friends.RemoveAll(c => c.Nick == data.Nick);
+            Payload.Account.Friends.RemoveAll(c => c.Nick == data.Nick);
             friendsUI.RemoveFriend(data.Nick);
             ShowButtons(true, data);
         }
@@ -210,12 +206,12 @@ namespace Profile
 
         void ShowButtons(bool isViewPage, AccountData data)
         {
-            bool isOwnAccount = Payload.CurrentAccount != null && Payload.CurrentAccount.Nick == data.Nick;
+            bool isOwnAccount = Payload.Account != null && Payload.Account.Nick == data.Nick;
 
             if (isViewPage)
             {
-                bool isFriend = Payload.CurrentAccount != null
-                                && Payload.CurrentAccount.Friends.Any(c => c.Nick == data.Nick);
+                bool isFriend = Payload.Account != null
+                                && Payload.Account.Friends.Any(c => c.Nick == data.Nick);
                 
                 //writeBtn.gameObject.SetActive(!isOwnAccount);
                 addFriendBtn.gameObject.SetActive(!isOwnAccount && !isFriend);

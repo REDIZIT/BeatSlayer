@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeatSlayerServer.Models.Database;
 using Notifications;
 
 namespace BeatSlayerServer.Multiplayer.Accounts
@@ -90,5 +91,6 @@ namespace BeatSlayerServer.Multiplayer.Accounts
 
         // Shop stuff
         public int Coins { get; set; }
+        public List<PurchaseModel> Purchases { get; set; }
     }
 }

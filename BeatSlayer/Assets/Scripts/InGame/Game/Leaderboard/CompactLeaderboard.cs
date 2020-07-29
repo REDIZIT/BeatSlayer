@@ -42,7 +42,7 @@ namespace InGame.Leaderboard
                 place++;
                 CompactLeaderboardItem.PlayerType type = CompactLeaderboardItem.PlayerType.Player;
 
-                if(Payload.CurrentAccount != null && Payload.CurrentAccount.Nick == leaderboardItem.Nick)
+                if(Payload.Account != null && Payload.Account.Nick == leaderboardItem.Nick)
                 {
                     type = CompactLeaderboardItem.PlayerType.CurrentPlayer;
                 }

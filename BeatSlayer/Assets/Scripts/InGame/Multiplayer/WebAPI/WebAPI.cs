@@ -178,7 +178,7 @@ namespace Web
         // Load cached images of own account
         static byte[] LoadImage(string filepath, string nick)
         {
-            if (Payload.CurrentAccount.Nick == nick)
+            if (Payload.Account.Nick == nick)
             {
                 if (File.Exists(filepath))
                 {

@@ -7,7 +7,7 @@ namespace GameNet
     // This is container for InGame vars
     public static class Payload
     {
-        public static AccountData CurrentAccount { get; set; }
+        public static AccountData Account { get; set; }
         
         // Previous time sent to server
         public static float PrevInGameTimeUpdate { get; set; }

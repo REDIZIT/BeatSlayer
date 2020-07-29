@@ -94,7 +94,6 @@ public class BeatmapUI : MonoBehaviour
         if(!async) RefreshBeatmapsList(mapInfos);
 
 
-        Debug.Log("Open");
         menuAudioManager.OnMapSelected(listItem.groupInfo);
     }
     public void Open(GroupInfoExtended group)
@@ -191,7 +190,7 @@ public class BeatmapUI : MonoBehaviour
         alertPan.SetActive(false);
         
         playBtn.SetActive(true);
-        locationBtn.SetActive(true);
+        //locationBtn.SetActive(true);
         deleteBtn.SetActive(true);
         
         
@@ -296,7 +295,6 @@ public class BeatmapUI : MonoBehaviour
         BeatmapUIItem item = toggleGroup.ActiveToggles().First().GetComponent<BeatmapUIItem>();
 
         currentDifficultyInfo = item.difficulty;
-        Debug.Log("Clicked id " + item.difficulty.id);
         string trackname = currentMapInfo.author + "-" + currentMapInfo.name;
 
 
@@ -333,7 +331,7 @@ public class BeatmapUI : MonoBehaviour
 
             footer.SetActive(isDownloaded);
             playBtn.SetActive(!isGroupDeleted && !hasUpdate);
-            locationBtn.SetActive(!isGroupDeleted);
+            //locationBtn.SetActive(!isGroupDeleted);
             deleteBtn.SetActive(true);
 
         }

@@ -59,7 +59,7 @@ namespace InGame.UI.Menu.Shop
             SSytem.instance.SaveFile();
 
             Refresh();
-            shop.RefreshSabersList();
+            shop.FillSabersView();
         }
         public async void OnCubeColorBtnClick(int hand)
         {
@@ -71,7 +71,7 @@ namespace InGame.UI.Menu.Shop
             SSytem.instance.SaveFile();
 
             Refresh();
-            shop.RefreshSabersList();
+            shop.FillSabersView();
         }
 
         public void OnColorpicked(Color clr)

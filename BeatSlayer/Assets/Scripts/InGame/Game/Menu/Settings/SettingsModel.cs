@@ -77,7 +77,7 @@ namespace InGame.Settings
 
         [Option("Camera height")]
         [Range(-2, 4)]
-        public float CameraHeight { get; set; } = 0;
+        public float CameraHeight { get; set; } = 2;
 
         [Option("Camera offset")]
         [Range(-4, 4)]

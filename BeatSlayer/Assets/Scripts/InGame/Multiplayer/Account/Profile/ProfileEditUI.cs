@@ -34,8 +34,8 @@ namespace Profile
         {
             body.SetActive(true);
             viewBody.SetActive(false);
-            currentEmailText.text = (string.IsNullOrWhiteSpace(Payload.CurrentAccount.Email)) ? "-" : Payload.CurrentAccount.Email;
-            newEmailCodeLine.SetActive(!string.IsNullOrWhiteSpace(Payload.CurrentAccount.Email));
+            currentEmailText.text = (string.IsNullOrWhiteSpace(Payload.Account.Email)) ? "-" : Payload.Account.Email;
+            newEmailCodeLine.SetActive(!string.IsNullOrWhiteSpace(Payload.Account.Email));
         }
 
 
@@ -51,7 +51,7 @@ namespace Profile
                 if (result)
                 {
                     ui.profileUI.avatarImage.texture = croppedImage;
-                    Web.WebAPI.UploadAvatar(Payload.CurrentAccount.Nick, croppedImage, message =>
+                    Web.WebAPI.UploadAvatar(Payload.Account.Nick, croppedImage, message =>
                     {
                         ui.SaveAvatarToCache(true);
                     });
@@ -74,7 +74,7 @@ namespace Profile
                     if (result)
                     {
                         ui.profileUI.avatarImage.texture = croppedImage;
-                        Web.WebAPI.UploadAvatar(Payload.CurrentAccount.Nick, croppedImage, message =>
+                        Web.WebAPI.UploadAvatar(Payload.Account.Nick, croppedImage, message =>
                         {
                             ui.SaveAvatarToCache(true);
                         });   
@@ -99,7 +99,7 @@ namespace Profile
                     if (result)
                     {
                         ui.profileUI.backgroundImage.texture = croppedImage;
-                        Web.WebAPI.UploadBackground(Payload.CurrentAccount.Nick, croppedImage, message =>
+                        Web.WebAPI.UploadBackground(Payload.Account.Nick, croppedImage, message =>
                         {
                             ui.SaveBackgroundToCache(true);
                         });   
@@ -133,13 +133,13 @@ namespace Profile
             if (canContinue)
             {
                 newpassword = password1Field.text;
-                NetCore.ServerActions.Account.ChangePassword(Payload.CurrentAccount.Nick, currentPasswordField.text, newpassword);
+                NetCore.ServerActions.Account.ChangePassword(Payload.Account.Nick, currentPasswordField.text, newpassword);
             }
         }
         public void OnEmailChangeBtnClick()
         {
             bool canContinue = true;
-            bool isEmptyEmail = string.IsNullOrWhiteSpace(Payload.CurrentAccount.Email);
+            bool isEmptyEmail = string.IsNullOrWhiteSpace(Payload.Account.Email);
             
             HelperUI.ColorInputField(newEmailField, true);
             HelperUI.ColorInputField(codeField, true);
@@ -162,9 +162,9 @@ namespace Profile
                 if (isEmptyEmail)
                 {
                     newEmail = newEmailField.text;
-                    NetCore.ServerActions.Account.ChangeEmptyEmail(Payload.CurrentAccount.Nick, newEmailField.text);
+                    NetCore.ServerActions.Account.ChangeEmptyEmail(Payload.Account.Nick, newEmailField.text);
                 }
-                else NetCore.ServerActions.Account.ChangeEmail(Payload.CurrentAccount.Nick, codeField.text);
+                else NetCore.ServerActions.Account.ChangeEmail(Payload.Account.Nick, codeField.text);
             }
         }
         public void OnEmailChangeCodeBtnClick()
@@ -179,7 +179,7 @@ namespace Profile
             if (canContinue)
             {
                 newEmail = newEmailField.text;
-                NetCore.ServerActions.Account.SendChangeEmailCode(Payload.CurrentAccount.Nick, newEmail);   
+                NetCore.ServerActions.Account.SendChangeEmailCode(Payload.Account.Nick, newEmail);   
             }
         }
         
@@ -203,7 +203,7 @@ namespace Profile
             if (msg.Type == OperationMessage.OperationType.Success)
             {
                 currentEmailText.text = newEmail;
-                Payload.CurrentAccount.Email = newEmail;
+                Payload.Account.Email = newEmail;
                 newEmailCodeLine.SetActive(true);
                 ui.ShowMessage(LocalizationManager.Localize("EmailChangeOk"));
             }

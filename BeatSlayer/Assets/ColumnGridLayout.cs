@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using InGame.Settings;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ColumnGridLayout : MonoBehaviour
@@ -16,6 +17,11 @@ public class ColumnGridLayout : MonoBehaviour
 
     private float layoutedGridWidth = -1;
 
+
+    private void Awake()
+    {
+        allowTwoColumns = SettingsManager.Settings.Menu.TwoColumnList;
+    }
     private void Start()
     {
         Build();

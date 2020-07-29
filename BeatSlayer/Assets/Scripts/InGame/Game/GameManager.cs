@@ -132,6 +132,9 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
+        bool isTutorial = LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial || LoadingData.project.Trackname == "Beat Slayer-Tutorial";
+
+
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
         cam = GetComponent<Camera>();
 
@@ -141,7 +144,6 @@ public class GameManager : MonoBehaviour
         {
             InitProject();
         }
-        tutorial.IsEnabled = LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial;
 
         scoringManager.OnGameStart(LoadingData.loadparams.Map, LoadingData.loadparams.difficultyInfo, difficulty, LoadingData.loadparams.Type);
 
@@ -153,22 +155,24 @@ public class GameManager : MonoBehaviour
 
         InitGraphics();
 
-        StartForUI(); 
-    }
-    void Start()
-    {
+        StartForUI();
+
         trackText.text = project.Trackname;
 
         AlignToSide();
 
-        InitAudio();
+        InitAudio(isTutorial);
 
         IsGameStartingMap = true;
 
-        StartCoroutine(beatManager.IOnStart());
+        StartCoroutine(beatManager.IOnStart(isTutorial));
 
         skipBtnAnimator.gameObject.SetActive(beatManager.CanSkip());
 
+        if (isTutorial)
+        {
+            tutorial.StartTutorial();
+        }
     }
     void Update()
     {
@@ -269,16 +273,24 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void InitAudio()
+    void InitAudio(bool isTutorial)
     {
         audioManager.asource.clip = LoadingData.aclip;
 
         Pitch = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.MusicSpeed : 1;
         float time = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.StartTime : 0;
 
+        if (isTutorial)
+        {
+            audioManager.asource.Play();
+            audioManager.asource.Pause();
+            time = 0.01f;
+        }
+            
 
-        audioManager.asource.pitch = Pitch;
+        audioManager.asource.pitch = 0;
         audioManager.asource.time = time;
+
 
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile)
         {

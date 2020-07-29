@@ -117,14 +117,13 @@ public class Prefs
 
     public bool[] boughtSabers = new bool[7] { true, false, false, false, false, false, false };
     public List<Saber> sabers;
-    //public int[] sabersCosts = new int[7] { 0, 2500, 8999, 12000, 15000, 180000, 40000 };
 
     public float colorPower = 2;
 
     // Sabers effects
     public int selectedSaberEffect;
-    public bool[] boughtSaberEffects = new bool[2] { true, false };
-    public int[] saberEffectsCosts = new int[2] { 0, 200000 };
+    public bool[] boughtSaberEffects = new bool[3] { true, false, false };
+    public int[] saberEffectsCosts = new int[3] { 0, 200000, 15999 };
 
     // Editor link
     public bool showedEditorAvailableWindow = false;

@@ -37,7 +37,7 @@ public class FriendsUI : MonoBehaviour
     {
         NetCore.Subs.Friends_OnGetFriends += list =>
         {
-            Payload.CurrentAccount.Friends = list;
+            Payload.Account.Friends = list;
             ShowList(list, true);
         };
         NetCore.Subs.Accounts_OnSearch += list =>
@@ -47,9 +47,9 @@ public class FriendsUI : MonoBehaviour
 
         NetCore.OnLogIn += () =>
         {
-            if (Payload.CurrentAccount != null)
+            if (Payload.Account != null)
             {
-                NetCore.ServerActions.Friends.GetFriends(Payload.CurrentAccount.Nick);
+                NetCore.ServerActions.Friends.GetFriends(Payload.Account.Nick);
             }
         };
 
@@ -58,7 +58,7 @@ public class FriendsUI : MonoBehaviour
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
                 Debug.Log(JsonConvert.SerializeObject(info));
-                Payload.CurrentAccount.Notifications.Add(info);
+                Payload.Account.Notifications.Add(info);
                 notificationUI.ShowNotification(info);
                 notificationUI.RefreshIcon();
             });
@@ -70,7 +70,7 @@ public class FriendsUI : MonoBehaviour
         label.text = LocalizationManager.Localize("Friends");
         searchField.gameObject.SetActive(false);
         scrollview.offsetMax = new Vector2(scrollview.offsetMax.x, 0);
-        NetCore.ServerActions.Friends.GetFriends(Payload.CurrentAccount.Nick);
+        NetCore.ServerActions.Friends.GetFriends(Payload.Account.Nick);
     }
     
     
@@ -78,11 +78,11 @@ public class FriendsUI : MonoBehaviour
     
     public void RemoveFriend(string fromNick)
     {
-        NetCore.ServerActions.Friends.RemoveFriend(fromNick, Payload.CurrentAccount.Nick);
+        NetCore.ServerActions.Friends.RemoveFriend(fromNick, Payload.Account.Nick);
     }
     public void AddFriend(string addNick)
     {
-        NetCore.ServerActions.Friends.InviteFriend(addNick, Payload.CurrentAccount.Nick);
+        NetCore.ServerActions.Friends.InviteFriend(addNick, Payload.Account.Nick);
     }
 
 
@@ -113,7 +113,7 @@ public class FriendsUI : MonoBehaviour
             label.text = LocalizationManager.Localize("Friends");
             searchField.gameObject.SetActive(false);
             scrollview.offsetMax = new Vector2(scrollview.offsetMax.x, 0);
-            NetCore.ServerActions.Friends.GetFriends(Payload.CurrentAccount.Nick);
+            NetCore.ServerActions.Friends.GetFriends(Payload.Account.Nick);
         }
         else
         {

@@ -84,7 +84,7 @@ public class MultiplayerMenuWrapper : MonoBehaviour
 
 
         // Hide bottom buttons if no logged
-        if(Payload.CurrentAccount != null)
+        if(Payload.Account != null)
         {
             bottomButtonsAnim.Play("Show");
         }

@@ -624,7 +624,7 @@ public class AccountManager : MonoBehaviour
     
     public static Task<ReplaySendData> SendReplay(Replay replay)
     {
-        replay.player = Payload.CurrentAccount.Nick;
+        replay.player = Payload.Account.Nick;
 
         ReplayData dto = new ReplayData()
         {

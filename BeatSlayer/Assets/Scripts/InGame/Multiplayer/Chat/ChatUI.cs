@@ -107,7 +107,7 @@ namespace Multiplayer.Chat
         {
             Debug.Log("OnConnectedOrLoggedIn");
 
-            if (Payload.CurrentAccount == null)
+            if (Payload.Account == null)
             {
                 onlineText.text = "You should be logged in";
                 return;
@@ -129,16 +129,16 @@ namespace Multiplayer.Chat
         {
             if (field.text.Trim() == "") return;
 
-            NetCore.ServerActions.SendChatMessage(Payload.CurrentAccount.Nick, field.text, Payload.CurrentAccount.Role, selectedGroupName);
+            NetCore.ServerActions.SendChatMessage(Payload.Account.Nick, field.text, Payload.Account.Role, selectedGroupName);
             field.text = "";
         }
 
         public void JoinGroup(ChatGroupData data)
         {
-            if (Payload.CurrentAccount == null) return;
+            if (Payload.Account == null) return;
             
-            NetCore.ServerActions.Chat.LeaveGroup(Payload.CurrentAccount.Nick, selectedGroupName);
-            NetCore.ServerActions.Chat.JoinGroup(Payload.CurrentAccount.Nick, data.Name);
+            NetCore.ServerActions.Chat.LeaveGroup(Payload.Account.Nick, selectedGroupName);
+            NetCore.ServerActions.Chat.JoinGroup(Payload.Account.Nick, data.Name);
             selectedGroupName = data.Name;
             groupText.text = data.Name;
         }
@@ -184,7 +184,7 @@ namespace Multiplayer.Chat
             }
             groupText.text = selectedGroupName;
 
-            NetCore.ServerActions.Chat.JoinGroup(Payload.CurrentAccount.Nick, selectedGroupName);
+            NetCore.ServerActions.Chat.JoinGroup(Payload.Account.Nick, selectedGroupName);
             
             HelperUI.FillContent<ChatGroupItemUI, ChatGroupData>(groupContent, groups, (ui, data) =>
             {

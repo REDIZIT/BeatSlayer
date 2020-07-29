@@ -134,7 +134,6 @@ namespace BeatSlayerServer.Multiplayer.Accounts
             Debug.Log("OnLogInResult: " + op.Type.ToString() + " " + op.Message);
             signUpBtn.interactable = true;
             logInBtn.interactable = true;
-            Debug.Log(signUpBtn.interactable);
             
             HelperUI.ColorInputField(nickField, defaultColor);   
             HelperUI.ColorInputField(passwordField, defaultColor);   

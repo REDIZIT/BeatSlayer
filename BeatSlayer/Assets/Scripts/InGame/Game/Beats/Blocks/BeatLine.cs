@@ -39,7 +39,7 @@ public class BeatLine : MonoBehaviour, IBeat
         transform.position = pos;
 
         secondCapRoadPos = bm.GetPositionByRoad(cls.road);
-        if (cls.linePoints.Count == 0)
+        if (cls.linePoints == null || cls.linePoints.Count == 0)
         {
             // Use new road positioning
             // Fixing another road bug (When you set start road 4 and in game end cap goes far away from 4 road to 8 road xD)
@@ -50,7 +50,7 @@ public class BeatLine : MonoBehaviour, IBeat
         secondCapRotation = new Vector3(GetRandom(), GetRandom(), GetRandom());
 
 
-        lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
+        lineEndTime = cls.linePoints == null || cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
         capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
     }
 
@@ -90,7 +90,7 @@ public class BeatLine : MonoBehaviour, IBeat
         float capRoadOffsetDistance = secondCapRoadPos - transform.position.x;
         float capRoadOffsetSpeed = capRoadOffsetDistance / capRoadOffsetTime;
 
-        
+
         secondCap.position += new Vector3(capRoadOffsetSpeed, 0, capSpeed);
         if(secondCap.localPosition.z > capMax)
         {

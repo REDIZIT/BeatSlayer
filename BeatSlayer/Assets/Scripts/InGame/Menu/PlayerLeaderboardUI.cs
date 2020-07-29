@@ -22,7 +22,7 @@ namespace InGame.Leaderboard
             HelperUI.FillContent<LeaderboardUIItem, LeaderboardItem>(content, leaderboardItems, (item, leaderboardItem) =>
             {
                 place++;
-                item.Refresh(leaderboardItem, place, leaderboardItem.Nick == Payload.CurrentAccount?.Nick);
+                item.Refresh(leaderboardItem, place, leaderboardItem.Nick == Payload.Account?.Nick);
             });
         }
 

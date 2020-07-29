@@ -52,7 +52,6 @@ public class AdvancedSaveManager : MonoBehaviour
         {
             msg += "\n" + fields[i].Name + " = " + fields[i].GetValue(prefs);
         }
-        //Debug.Log(msg);
     }
 
     public void SaveDefault()

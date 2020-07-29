@@ -12,5 +12,11 @@ namespace InGame.Shop
 
         [Tooltip("Coins to buy")]
         public int cost;
+
+        [Tooltip("Purchase id in server database")]
+        public int purchaseId = -1;
+
+        [Tooltip("Purchase name in server database")]
+        public string purchaseName;
     }
 }

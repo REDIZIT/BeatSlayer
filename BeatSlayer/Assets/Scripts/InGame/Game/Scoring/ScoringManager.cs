@@ -100,7 +100,7 @@ namespace InGame.Game
                     Stars = difficulty.stars,
                     CubesSpeed = projectDifficulty.speed
                 },
-                Nick = Payload.CurrentAccount?.Nick,
+                Nick = Payload.Account?.Nick,
                 DifficultyName = difficulty.name,
                 Score = 0,
                 CubesSliced = 0,

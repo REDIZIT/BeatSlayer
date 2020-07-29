@@ -65,6 +65,7 @@ namespace Multiplayer.Chat
             {
                 Texture2D tex = ProjectManager.LoadTexture(bytes);
                 if(currentRequest == null) Debug.LogError("WTF UNITY THREADS!?");
+                if (currentRequest.img == null) return;
                 
                 try
                 {

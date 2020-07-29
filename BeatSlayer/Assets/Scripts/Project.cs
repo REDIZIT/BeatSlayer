@@ -68,7 +68,8 @@ public class BeatCubeClass
     public float lineLenght = 0; // Time in seconds
     public int lineEndRoad = 0; // Second point road (If linePoints.Count != 0, then use legacy way - linePoints)
     public int lineEndLevel = 0;
-    public List<SerializableVector3> linePoints;
+    [Obsolete]
+    public List<SerializableVector3> linePoints = new List<SerializableVector3>();
 
     public BeatCubeClass() { }
 

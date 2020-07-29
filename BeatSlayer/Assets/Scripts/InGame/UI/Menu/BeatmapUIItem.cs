@@ -37,9 +37,9 @@ public class BeatmapUIItem : MonoBehaviour
         approvedImage.SetActive(mapInfo.approved);
 
         bool isPassed = false;
-        if(Payload.CurrentAccount != null)
+        if(Payload.Account != null)
         {
-            isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.CurrentAccount.Nick, mapInfo.author, mapInfo.name);
+            isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, mapInfo.author, mapInfo.name);
         }
 
         passedImage.SetActive(isPassed);

@@ -101,12 +101,6 @@ public class MenuScript_v2 : MonoBehaviour
 
         Database.Init(ownMusicUI);
         ProjectManager.defaultTrackTexture = defaultTrackTexture;
-
-
-        if (!Directory.Exists(Application.persistentDataPath + "/maps")) Directory.CreateDirectory(Application.persistentDataPath + "/maps");
-
-        if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
-        if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
     }
 
     private void Start()
@@ -137,7 +131,7 @@ public class MenuScript_v2 : MonoBehaviour
             PrefsManager.Save();
         }
 
-        if(Payload.CurrentAccount != null) RefreshCoinsTexts();
+        if(Payload.Account != null) RefreshCoinsTexts();
        
         
 
@@ -169,13 +163,6 @@ public class MenuScript_v2 : MonoBehaviour
     private void Update()
     {
         WebHandlers_Handle();
-
-        //if (Input.GetKeyDown(KeyCode.Escape)) OnExitSwipe();
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            var parameters = SceneloadParameters.TutorialPreset();
-            SceneController.instance.LoadScene(parameters);
-        }
 
         TestManager.CheckUpdates();
         TestManager.CheckModerationUpdates();
@@ -220,16 +207,14 @@ public class MenuScript_v2 : MonoBehaviour
         bool showTutorial = false;
 
 
-        if (!Directory.Exists(Application.persistentDataPath + "/saved"))
+        if (!Directory.Exists(Application.persistentDataPath + "/maps"))
         {
-            Directory.CreateDirectory(Application.persistentDataPath + "/saved");
             showTutorial = true;
+            Directory.CreateDirectory(Application.persistentDataPath + "/maps");
         }
-        if (!Directory.Exists(Application.persistentDataPath + "/custom"))
-        {
-            Directory.CreateDirectory(Application.persistentDataPath + "/custom");
-            showTutorial = true;
-        }
+
+        if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
+        if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
 
         if (showTutorial) tutorialManager.ShowOverlay();
     }
@@ -590,13 +575,13 @@ public class MenuScript_v2 : MonoBehaviour
     }
     public void UnlockMap(Button btn)
     {
-        int coins = Payload.CurrentAccount.Coins;
+        int coins = Payload.Account.Coins;
         int mapIndex = int.Parse(btn.name.Replace("Locker", ""));
         int cost = mapsCosts[mapIndex];
         if (coins >= cost)
         {
-            Payload.CurrentAccount.Coins -= cost;
-            NetCore.ServerActions.Shop.SendCoins(Payload.CurrentAccount.Nick, -cost);
+            Payload.Account.Coins -= cost;
+            NetCore.ServerActions.Shop.SendCoins(Payload.Account.Nick, -cost);
             if (mapIndex == 0) PrefsManager.prefs.mapUnlocked0 = true;
             else if (mapIndex == 1) PrefsManager.prefs.mapUnlocked1 = true;
             else if (mapIndex == 2) PrefsManager.prefs.mapUnlocked2 = true;
@@ -653,7 +638,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void RefreshCoinsTexts()
     {
-        foreach (var t in coinsTexts) t.text = Payload.CurrentAccount.Coins.ToString();
+        foreach (var t in coinsTexts) t.text = Payload.Account.Coins.ToString();
     }
     
     public void CloseEditorAvailableForever()

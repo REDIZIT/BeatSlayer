@@ -80,21 +80,21 @@ namespace Michsky.UI.ModernUIPack
             ROUNDED_OUTLINE,
         }
 
-        void OnEnable()
-        {
-            if (UIManagerAsset == null)
-            {
-                try
-                {
-                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
-                }
+        //void OnEnable()
+        //{
+        //    if (UIManagerAsset == null)
+        //    {
+        //        try
+        //        {
+        //            UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
+        //        }
 
-                catch
-                {
-                    Debug.Log("No UI Manager found. Assign it manually, otherwise you'll get errors about it.");
-                }
-            }
-        }
+        //        catch
+        //        {
+        //            Debug.Log("No UI Manager found. Assign it manually, otherwise you'll get errors about it.");
+        //        }
+        //    }
+        //}
 
         void Awake()
         {
@@ -315,7 +315,7 @@ namespace Michsky.UI.ModernUIPack
 
             catch
             {
-                Debug.Log("Some public variables are missing. Assign a variable, otherwise the features won't work properly.");
+
             }
         }
     }

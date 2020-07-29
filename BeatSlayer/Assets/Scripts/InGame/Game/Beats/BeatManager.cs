@@ -122,7 +122,7 @@ namespace InGame.Game.Spawn
 
             secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
 
-            if(Beats.Count > 0) firstCubeTime = Beats[0].time;
+            if(Beats != null && Beats.Count > 0) firstCubeTime = Beats[0].time;
         }
 
         public void SetBeats(IEnumerable<BeatCubeClass> ls)
@@ -132,7 +132,7 @@ namespace InGame.Game.Spawn
         }
 
 
-        public IEnumerator IOnStart()
+        public IEnumerator IOnStart(bool isTutorial)
         {
             CalculateField();
 
@@ -140,7 +140,8 @@ namespace InGame.Game.Spawn
             
             yield return new WaitForSeconds(fieldCrossTime);
 
-            asource.Play();
+            if (!isTutorial)
+                asource.Play();
             
             gm.IsGameStartingMap = false;
             if (gm.paused)

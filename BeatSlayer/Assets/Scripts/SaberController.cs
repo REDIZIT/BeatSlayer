@@ -76,7 +76,7 @@ public class SaberController : MonoBehaviour
     {
         saberSkinId = skinId;
         trail._colors[0] = clr;
-        trail._material = swooshes[swooshEffectId];
+        trail._material = sodb.tails[swooshEffectId].swooshMaterial;
         trail._lifeTime = lifetime;
 
 

@@ -88,10 +88,11 @@ public class FinishHandler : MonoBehaviour
 
     private bool FinishConditions()
     {
+        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial) return false;
+
         return
             !gm.IsGameStartingMap
             && audioManager.asource.time == 0
-            //&& gm.beats.ToArray().Length == 0
             && !audioManager.asource.isPlaying;
     }
 
@@ -106,12 +107,12 @@ public class FinishHandler : MonoBehaviour
 
             FinishServerActions(replay);
 
-            if(Payload.CurrentAccount != null)
+            if(Payload.Account != null)
             {
-                int coins = Payload.CurrentAccount.Coins;
+                int coins = Payload.Account.Coins;
                 int addCoins = Mathf.RoundToInt(replay.Score / 16f * gm.scoringManager.maxCombo / 2f * gm.scoringManager.scoreMultiplier);
 
-                Payload.CurrentAccount.Coins = coins + addCoins;
+                Payload.Account.Coins = coins + addCoins;
                 prefsManager.Save();
             }
 
@@ -197,7 +198,7 @@ public class FinishHandler : MonoBehaviour
         WebAPI.OnMapPlayed(LoadingData.loadparams.Map.approved);
 
 
-        if (Payload.CurrentAccount == null)
+        if (Payload.Account == null)
         {
             leaderboard.SetStatus(LocalizationManager.Localize("NotLoggedIn"));
             return;
@@ -234,7 +235,7 @@ public class FinishHandler : MonoBehaviour
 
 
         uploadingText.SetActive(true);
-        ReplayData bestReplay = await NetCore.ServerActions.Account.GetBestReplay(Payload.CurrentAccount.Nick, trackname, gm.project.creatorNick);
+        ReplayData bestReplay = await NetCore.ServerActions.Account.GetBestReplay(Payload.Account.Nick, trackname, gm.project.creatorNick);
 
 
         if (bestReplay != null && replay.Score > bestReplay.Score)
@@ -249,7 +250,7 @@ public class FinishHandler : MonoBehaviour
 
 
         coinsText.text = "+" + data.Coins;
-        Payload.CurrentAccount.Coins += data.Coins;
+        Payload.Account.Coins += data.Coins;
 
         if (LoadingData.loadparams.Map.approved)
         {

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 using BeatSlayerServer.Multiplayer.Accounts;
@@ -33,7 +29,6 @@ namespace Multiplayer.Accounts
         {
             NetCore.Subs.Accounts_OnLogIn += (op) =>
             {
-                //Debug.Log("OnLogIn event. Operation: \n" + JsonConvert.SerializeObject(op, Formatting.Indented));
                 OnLogIn(op);
             };
             NetCore.Subs.Accounts_OnSignUp += OnSignUp;
@@ -41,12 +36,6 @@ namespace Multiplayer.Accounts
             NetCore.Subs.Accounts_OnChangeEmail += OnChangeEmail;
             NetCore.Subs.Accounts_OnChangePassword += OnChangePassword;
             NetCore.Subs.Accounts_OnConfirmRestore += OnConfirmRestore;
-            /*NetCore.Configurators += () =>
-            {
-                NetCore.Subs.Accounts_OnLogIn += OnLogIn;
-                NetCore.Subs.Accounts_OnSignUp += OnSignUp;
-                NetCore.Subs.Accounts_OnView += OnView;
-            };*/
         }
 
         public void OnConnect(MultiplayerMenuWrapper wrapper)
@@ -57,15 +46,15 @@ namespace Multiplayer.Accounts
 
         private void Update()
         {
-            if (wrapper == null || Payload.CurrentAccount == null) return;
-            Payload.CurrentAccount.InGameTimeTicks += TimeSpan.FromSeconds(Time.unscaledDeltaTime).Ticks;
+            if (wrapper == null || Payload.Account == null) return;
+            Payload.Account.InGameTimeTicks += TimeSpan.FromSeconds(Time.unscaledDeltaTime).Ticks;
             if(Time.realtimeSinceStartup - inGameTimeSent > 30) UpdateInGameTime();
         }
 
 
         public void OnProfileBtnClick()
         {
-            if (Payload.CurrentAccount == null)
+            if (Payload.Account == null)
             {
                 signUI.ShowLogIn();
             }
@@ -136,7 +125,7 @@ namespace Multiplayer.Accounts
 
         public void RefreshSession(string password)
         {
-            sessionToWrite = Payload.CurrentAccount.Nick + "|" + password;
+            sessionToWrite = Payload.Account.Nick + "|" + password;
             DeleteSession();
             CreateSession();
         }
@@ -173,18 +162,16 @@ namespace Multiplayer.Accounts
         public void LogOut()
         {
             DeleteSession();
-            Payload.CurrentAccount = null;
+            Payload.Account = null;
 
             NetCore.OnLogOut?.Invoke();
         }
 
         public void UpdateInGameTime()
         {
-            if (Payload.CurrentAccount == null) return;
+            if (Payload.Account == null) return;
             float toSend = Time.realtimeSinceStartup - inGameTimeSent;
             inGameTimeSent = Time.realtimeSinceStartup;
-
-            //MultiplayerCore.conn.InvokeAsync("Accounts_UpdateInGameTime", NetCorePayload.CurrentAccount.Nick, Mathf.Round(toSend));
         }
         
         public void Restore(string nick, string password)
@@ -210,7 +197,7 @@ namespace Multiplayer.Accounts
 
         public void SaveAvatarToCache(bool force = false)
         {
-            if (Payload.CurrentAccount== null) return;
+            if (Payload.Account== null) return;
             
             string filepath = Application.persistentDataPath + "/data/account/avatar.pic";
             /*if (!force && File.Exists(filepath))
@@ -220,7 +207,7 @@ namespace Multiplayer.Accounts
                 return;
             }
             */
-            Web.WebAPI.GetAvatar(Payload.CurrentAccount.Nick, bytes =>
+            Web.WebAPI.GetAvatar(Payload.Account.Nick, bytes =>
             {
                 profileUI.OnGetAvatar(bytes);
             }, true);
@@ -228,7 +215,7 @@ namespace Multiplayer.Accounts
 
         public void SaveBackgroundToCache(bool force = false)
         {
-            if (Payload.CurrentAccount== null) return;
+            if (Payload.Account== null) return;
             
             string filepath = Application.persistentDataPath + "/data/account/background.pic";
             /*if (!force && File.Exists(filepath))
@@ -238,7 +225,7 @@ namespace Multiplayer.Accounts
                 return;
             }
             */
-            Web.WebAPI.GetBackground(Payload.CurrentAccount.Nick, bytes =>
+            Web.WebAPI.GetBackground(Payload.Account.Nick, bytes =>
             {
                 profileUI.OnGetBackground(bytes);
             }, true);
@@ -278,7 +265,7 @@ namespace Multiplayer.Accounts
             }
             if (op.Type == OperationMessage.OperationType.Success)
             {
-                Payload.CurrentAccount = op.Account;
+                Payload.Account = op.Account;
 
                 if(profileUI.data == null)
                 {
@@ -325,7 +312,7 @@ namespace Multiplayer.Accounts
 
         public void SyncCoins()
         {
-            if (Payload.CurrentAccount == null) return;
+            if (Payload.Account == null) return;
 
             if(menu.PrefsManager == null)
             {
@@ -341,11 +328,11 @@ namespace Multiplayer.Accounts
 
             int coins = menu.PrefsManager.prefs.coins;
 
-            if (Payload.CurrentAccount.Coins == -1)
+            if (Payload.Account.Coins == -1)
             {
-                Debug.Log("Sync coins: " + coins + " / " + Payload.CurrentAccount.Coins);
-                Payload.CurrentAccount.Coins = coins;
-                NetCore.ServerActions.Shop.SyncCoins(Payload.CurrentAccount.Nick, coins);
+                Debug.Log("Sync coins: " + coins + " / " + Payload.Account.Coins);
+                Payload.Account.Coins = coins;
+                NetCore.ServerActions.Shop.SyncCoins(Payload.Account.Nick, coins);
             }
         }
     }
