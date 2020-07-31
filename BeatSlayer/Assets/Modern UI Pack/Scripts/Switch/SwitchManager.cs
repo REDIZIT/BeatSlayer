@@ -10,7 +10,7 @@ namespace Michsky.UI.ModernUIPack
         [Header("SETTINGS")]
         [Tooltip("IMPORTANT! EVERY SWITCH MUST HAVE A DIFFERENT TAG")]
         public string switchTag = "Switch";
-        public bool IsOn { get; private set; }
+        public bool isOn;
         public bool saveValue = true;
         public bool invokeAtStart = true;
 
@@ -32,17 +32,17 @@ namespace Michsky.UI.ModernUIPack
             {
                 if (PlayerPrefs.GetString(switchTag + "Switch") == "")
                 {
-                    if (IsOn == true)
+                    if (isOn == true)
                     {
                         switchAnimator.Play("Switch On");
-                        IsOn = true;
+                        isOn = true;
                         PlayerPrefs.SetString(switchTag + "Switch", "true");
                     }
 
                     else
                     {
                         switchAnimator.Play("Switch Off");
-                        IsOn = false;
+                        isOn = false;
                         PlayerPrefs.SetString(switchTag + "Switch", "false");
                     }
                 }
@@ -50,40 +50,40 @@ namespace Michsky.UI.ModernUIPack
                 else if (PlayerPrefs.GetString(switchTag + "Switch") == "true")
                 {
                     switchAnimator.Play("Switch On");
-                    IsOn = true;
+                    isOn = true;
                 }
 
                 else if (PlayerPrefs.GetString(switchTag + "Switch") == "false")
                 {
                     switchAnimator.Play("Switch Off");
-                    IsOn = false;
+                    isOn = false;
                 }
             }
 
             else
             {
-                if (IsOn == true)
+                if (isOn == true)
                 {
                     switchAnimator.Play("Switch On");
-                    IsOn = true;
+                    isOn = true;
                 }
 
                 else
                 {
                     switchAnimator.Play("Switch Off");
-                    IsOn = false;
+                    isOn = false;
                 }
             }
 
-            if (invokeAtStart == true && IsOn == true)
+            if (invokeAtStart == true && isOn == true)
                 OnEvents.Invoke();
-            if (invokeAtStart == true && IsOn == false)
+            if (invokeAtStart == true && isOn == false)
                 OffEvents.Invoke();
         }
 
         public void AnimateSwitch()
         {
-            if (IsOn == true)
+            if (isOn == true)
             {
                 SetOff(false);
             }
@@ -92,12 +92,12 @@ namespace Michsky.UI.ModernUIPack
                 SetOn(false);
             }
 
-            OnValueChange?.Invoke(IsOn);
+            OnValueChange?.Invoke(isOn);
         }
         private void SetOff(bool force)
         {
             switchAnimator.Play(force ? "ForceSwitchOff" : "Switch Off");
-            IsOn = false;
+            isOn = false;
             OffEvents.Invoke();
 
             if (saveValue == true)
@@ -106,7 +106,7 @@ namespace Michsky.UI.ModernUIPack
         private void SetOn(bool force)
         {
             switchAnimator.Play(force ? "ForceSwitchOn" : "Switch On");
-            IsOn = true;
+            isOn = true;
             OnEvents.Invoke();
 
             if (saveValue == true)
@@ -123,7 +123,7 @@ namespace Michsky.UI.ModernUIPack
             if (isOn) SetOff(force);
             else SetOn(force);
 
-            OnValueChange?.Invoke(IsOn);
+            OnValueChange?.Invoke(this.isOn);
         }
         public void SetValueWithoutNotify(bool isOn, bool force = false)
         {

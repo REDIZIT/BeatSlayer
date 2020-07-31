@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using GameNet;
+using InGame.Helpers;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -73,7 +74,7 @@ public class BeatmapUIItem : MonoBehaviour
     }
     void RefreshStars(int stars)
     {
-        ui.FillContent(starsContent, 10, (star, i) =>
+        HelperUI.FillContent(starsContent, 10, (star, i) =>
         {
             Color color = i < stars ? Color.white : Color.grey * 0.4f;
             star.GetComponent<Image>().color = color;

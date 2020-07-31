@@ -118,21 +118,21 @@ public class ShopHelper : MonoBehaviour
         HelperUI.RefreshContent<SaberShopItem, SaberSO>(saberContent, sodb.sabers, (item, data) =>
         {
             item.Refresh(data, menuscript.PrefsManager.prefs);
-        }, 1);
+        });
     }
     public void RefreshEffectsView()
     {
         HelperUI.RefreshContent<TailShopItem, TailSO>(effectsContent, sodb.tails, (item, data) =>
         {
             item.Refresh(data, menuscript.PrefsManager.prefs);
-        }, 1);
+        });
     }
     public void RefreshLocationsView()
     {
         HelperUI.RefreshContent<LocationShopItem, LocationSO>(locationsContent, sodb.locations, (item, data) =>
         {
             item.Refresh(data, menuscript.PrefsManager.prefs);
-        }, 1);
+        });
     }
 
 

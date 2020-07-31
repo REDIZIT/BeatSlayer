@@ -105,8 +105,6 @@ namespace Multiplayer.Chat
 
         private void OnConnectedOrLoggedIn()
         {
-            Debug.Log("OnConnectedOrLoggedIn");
-
             if (Payload.Account == null)
             {
                 onlineText.text = "You should be logged in";
@@ -176,8 +174,6 @@ namespace Multiplayer.Chat
 
         public void OnGetGroups(List<ChatGroupData> groups)
         {
-            Debug.Log("Got groups");
-
             if(selectedGroupName == "")
             {
                 selectedGroupName = groups[0].Name;
@@ -194,8 +190,6 @@ namespace Multiplayer.Chat
 
         public void OnJoinGroup(string json)
         {
-            Debug.Log("OnJoinGroup");
-
             List<ChatMessage> msgs = JsonConvert.DeserializeObject<List<ChatMessage>>(json);
             
             HelperUI.FillContent<ChatMessageItem, ChatMessage>(content, msgs, (item, message) =>

@@ -257,10 +257,8 @@ namespace Multiplayer.Accounts
                 }
             });*/
             
-            Debug.Log(" << OnLogIn dispatched with result " + op.Type.ToString());
             if (!isLoginBySession)
             {
-                Debug.Log(" << OnLogInResult");
                 signUI.OnLogInResult(op);
             }
             if (op.Type == OperationMessage.OperationType.Success)

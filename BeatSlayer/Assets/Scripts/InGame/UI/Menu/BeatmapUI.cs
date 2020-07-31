@@ -3,17 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Assets.SimpleLocalization;
-using BeatSlayerServer.Multiplayer.Accounts;
 using CoversManagement;
-using InGame.Helpers;
 using InGame.Menu;
+using InGame.Menu.Maps;
 using InGame.SceneManagement;
 using InGame.UI;
-using Newtonsoft.Json;
-using Pixelplacement;
 using ProjectManagement;
 using Testing;
 using UnityEngine;
@@ -28,12 +23,14 @@ public class BeatmapUI : MonoBehaviour
     public MenuScript_v2 menu;
     public MenuAudioManager menuAudioManager;
     public PracticeModeUI practiceModeUI;
+    public MapsDownloadQueuer mapsDownloadQueuer;
 
     public GameObject overlay;
 
     private MapInfo currentMapInfo;
     private DifficultyInfo currentDifficultyInfo;
     private bool isGroupDeleted;
+    private bool isDownloaded, hasUpdate;
 
     [Header("UI")] 
     public RawImage coverImage;
@@ -64,6 +61,87 @@ public class BeatmapUI : MonoBehaviour
     public Text leaderboardPlaceText;
 
 
+
+
+
+    void Update()
+    {
+        RefreshControls();
+    }
+    public void RefreshControls()
+    {
+        if (currentDifficultyInfo != null)
+        {
+            var task = MapsDownloadQueuerBackground.queue.FirstOrDefault(c => c.trackname == currentMapInfo.author + "-" + currentMapInfo.name && c.Mapper == currentMapInfo.nick);
+            if (task != null)
+            {
+                if (task.state == MapDownloadTask.State.Downloading || task.state == MapDownloadTask.State.Waiting)
+                {
+                    progressBar.gameObject.SetActive(true);
+                    progressText.text = task.TaskState.ToString();
+
+                    downloadBtn.SetActive(false);
+                    updateBtn.SetActive(false);
+                    playBtn.SetActive(false);
+
+                    footer.SetActive(false);
+
+                    progressBar.value = task.ProgressPercentage;
+                    progressText.text = task.ProgressPercentage + "%";
+                }
+                else
+                {
+                    bool downloaded = true;
+
+                    if (task.TaskState == MapDownloadTask.State.Error || task.TaskState == MapDownloadTask.State.Canceled)
+                    {
+                        downloaded = false;
+                    }
+
+                    downloadBtn.SetActive(!downloaded);
+                    updateBtn.SetActive(false);
+                    playBtn.SetActive(downloaded);
+
+                    progressBar.gameObject.SetActive(false);
+
+                    recordPan.SetActive(downloaded);
+                    modsPan.SetActive(false);
+                    downloadPan.SetActive(!downloaded);
+                    footer.SetActive(downloaded);
+                }
+
+            }
+            else
+            {
+                bool isTest = testRequest != null;
+
+                if (isTest)
+                {
+                    downloadPan.SetActive(false);
+                    recordPan.SetActive(false);
+                    footer.SetActive(true);
+
+                    playBtn.SetActive(true);
+                    deleteBtn.SetActive(true);
+                }
+                else
+                {
+                    downloadPan.SetActive(hasUpdate || (!isDownloaded && !isGroupDeleted));
+                    downloadBtn.SetActive(!hasUpdate || (!isDownloaded && !isGroupDeleted));
+                    updateBtn.SetActive(isDownloaded && hasUpdate);
+                    progressBar.gameObject.SetActive(false);
+
+                    recordPan.SetActive(false);
+                    modsPan.SetActive(false);
+
+                    footer.SetActive(isDownloaded);
+                    playBtn.SetActive(!isGroupDeleted && !hasUpdate);
+                    deleteBtn.SetActive(true);
+                }
+
+            }
+        }
+    }
 
     public void Open(TrackListItem listItem)
     {
@@ -130,7 +208,6 @@ public class BeatmapUI : MonoBehaviour
     public void OpenModeration(TestRequest request, Project proj)
     {
         overlay.SetActive(true);
-        //GetComponent<StateMachine>().ChangeState("TracksScreen");
         ResetUI();
         ShowAlert("Moderation");
 
@@ -190,10 +267,7 @@ public class BeatmapUI : MonoBehaviour
         alertPan.SetActive(false);
         
         playBtn.SetActive(true);
-        //locationBtn.SetActive(true);
         deleteBtn.SetActive(true);
-        
-        
     }
     
     
@@ -280,8 +354,6 @@ public class BeatmapUI : MonoBehaviour
 
     public void OnDifficultyItemClicked()
     {
-        
-
         ToggleGroup toggleGroup = difficultiesContent.GetComponent<ToggleGroup>();
         if (toggleGroup.ActiveToggles().Count() == 0)
         {
@@ -295,14 +367,15 @@ public class BeatmapUI : MonoBehaviour
         BeatmapUIItem item = toggleGroup.ActiveToggles().First().GetComponent<BeatmapUIItem>();
 
         currentDifficultyInfo = item.difficulty;
+
         string trackname = currentMapInfo.author + "-" + currentMapInfo.name;
 
 
 
-        bool isDownloaded =
+        isDownloaded =
             ProjectManager.IsMapDownloaded(currentMapInfo.author, currentMapInfo.name, currentMapInfo.nick) ||
             currentMapInfo.group.groupType == GroupInfo.GroupType.Own;
-        bool hasUpdate = currentMapInfo.group.groupType == GroupInfo.GroupType.Own ? false : DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.nick);
+        hasUpdate = currentMapInfo.group.groupType == GroupInfo.GroupType.Own ? false : DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.nick);
         bool isTest = testRequest != null;
 
         if (testRequest != null)
@@ -331,13 +404,8 @@ public class BeatmapUI : MonoBehaviour
 
             footer.SetActive(isDownloaded);
             playBtn.SetActive(!isGroupDeleted && !hasUpdate);
-            //locationBtn.SetActive(!isGroupDeleted);
             deleteBtn.SetActive(true);
-
         }
-
-
-
 
         recordText.text = "";
         leaderboardPlaceText.text = "";
@@ -419,49 +487,44 @@ public class BeatmapUI : MonoBehaviour
 
     public void OnDownloadBtnClicked()
     {
-        progressBar.gameObject.SetActive(true);
-        progressText.text = LocalizationManager.Localize("Waiting");
         progressBar.value = 0;
-        
-        downloadBtn.SetActive(false);
-        updateBtn.SetActive(false);
-        playBtn.SetActive(false);
-        
-        footer.SetActive(false);
-        
-        backBtn.interactable = false;
 
-        WebAPI.DownloadMap(currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, args =>
-        {
-            progressBar.value = args.ProgressPercentage;
-            progressText.text = args.ProgressPercentage + "%";
-        }, args =>
-        {
-            bool downloaded = true;
-            backBtn.interactable = true;
-            if (args.Cancelled || args.Error != null)
-            {
-                downloaded = false;
-            }
-            downloadBtn.SetActive(!downloaded);
-            updateBtn.SetActive(false);
-            playBtn.SetActive(downloaded);
+        
+
+        //backBtn.interactable = false;
+        mapsDownloadQueuer.AddTask(currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick);
+
+        //WebAPI.DownloadMap(currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, args =>
+        //{
+        //    progressBar.value = args.ProgressPercentage;
+        //    progressText.text = args.ProgressPercentage + "%";
+        //}, args =>
+        //{
+        //    bool downloaded = true;
+        //    backBtn.interactable = true;
+        //    if (args.Cancelled || args.Error != null)
+        //    {
+        //        downloaded = false;
+        //    }
+        //    downloadBtn.SetActive(!downloaded);
+        //    updateBtn.SetActive(false);
+        //    playBtn.SetActive(downloaded);
             
-            progressBar.gameObject.SetActive(false);
+        //    progressBar.gameObject.SetActive(false);
             
-            recordPan.SetActive(downloaded);
-            modsPan.SetActive(false);
-            downloadPan.SetActive(!downloaded);
-            footer.SetActive(downloaded);
+        //    recordPan.SetActive(downloaded);
+        //    modsPan.SetActive(false);
+        //    downloadPan.SetActive(!downloaded);
+        //    footer.SetActive(downloaded);
             
-            menu.TrackListUI.ReloadDownloadedList();
-            RefreshBeatmapsList();
-        });
+        //    menu.TrackListUI.ReloadDownloadedList();
+        //    RefreshBeatmapsList();
+        //});
     }
 
     public void OnCancelBtnClicked()
     {
-        WebAPI.CancelMapDownloading();
+        mapsDownloadQueuer.RemoveTask(MapsDownloadQueuerBackground.ActiveItem);
     }
     
     public void OnDeleteBtnClicked()
@@ -497,10 +560,11 @@ public class BeatmapUI : MonoBehaviour
         {
             TestManager.DeleteRequest(true);
         }
-
-        //bmAudio.OnClose();
         
         overlay.SetActive(false);
+
+        currentDifficultyInfo = null;
+        currentMapInfo = null;
     }
     
     
@@ -545,7 +609,7 @@ public class BeatmapUI : MonoBehaviour
     /// <param name="implementation"></param>
     /// <typeparam name="T">Content child UI class</typeparam>
     /// <typeparam name="T2">Info class which needs to implement into UI</typeparam>
-    public void FillContent<T, T2>(Transform content, IEnumerable<T2> list, Action<T, T2> implementation)
+    private void FillContent<T, T2>(Transform content, IEnumerable<T2> list, Action<T, T2> implementation)
     {
         GameObject prefab = ClearContent(content);
         prefab.SetActive(true);
@@ -559,7 +623,7 @@ public class BeatmapUI : MonoBehaviour
         prefab.SetActive(false);
     }
     
-    public void FillContent(Transform content, int count, Action<GameObject, int> implementation)
+    private void FillContent(Transform content, int count, Action<GameObject, int> implementation)
     {
         GameObject prefab = ClearContent(content);
         prefab.SetActive(true);
@@ -573,7 +637,7 @@ public class BeatmapUI : MonoBehaviour
         prefab.SetActive(false);
     }
 
-    public GameObject ClearContent(Transform content)
+    private GameObject ClearContent(Transform content)
     {
         Transform prefabTransform = content.GetChild(0);
         foreach(Transform child in content) if (child != prefabTransform) Destroy(child.gameObject);

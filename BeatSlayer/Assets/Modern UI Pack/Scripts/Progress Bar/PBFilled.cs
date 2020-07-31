@@ -12,10 +12,10 @@ namespace Michsky.UI.ModernUIPack
 
         void Update()
         {
-            if (proggresBar.currentPercent >= transitionAfter)
+            if (proggresBar.CurrentPercent >= transitionAfter)
                 barAnimatior.Play("Radial PB Filled");
 
-            if (proggresBar.currentPercent <= transitionAfter)
+            if (proggresBar.CurrentPercent <= transitionAfter)
                 barAnimatior.Play("Radial PB Empty");
         }
     }

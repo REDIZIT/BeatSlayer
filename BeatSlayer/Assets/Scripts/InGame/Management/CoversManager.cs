@@ -51,11 +51,13 @@ namespace CoversManagement
                 if (bytes.Length == 0)
                 {
                     requests[0].image.texture = DefaultTexture;
+                    requests[0].callback?.Invoke(DefaultTexture);
                 }
                 else
                 {
                     Texture2D tex = ProjectManager.LoadTexture(bytes);
                     requests[0].image.texture = tex;
+                    requests[0].callback?.Invoke(tex);
                 }
 
                 requests.RemoveAt(0);
@@ -81,6 +83,7 @@ namespace CoversManagement
             {
                 //Debug.Log("Cover: << Load downloaded texture");
                 requests[0].image.texture = tex;
+                requests[0].callback?.Invoke(tex);
                 requests.RemoveAt(0);
                 OnRequestsListUpdate();
             }
@@ -98,6 +101,7 @@ namespace CoversManagement
                 {
                     //Debug.Log("Cover: >> No inet, set default");
                     requests[0].image.texture = DefaultTexture;
+                    requests[0].callback?.Invoke(DefaultTexture);
                     requests.RemoveAt(0);
                     OnRequestsListUpdate();
                 }
@@ -107,6 +111,11 @@ namespace CoversManagement
         public static void AddPackages(List<CoverRequestPackage> ls)
         {
             requests.AddRange(ls);
+            OnRequestsListUpdate();
+        }
+        public static void AddPackage(CoverRequestPackage package)
+        {
+            requests.Add(package);
             OnRequestsListUpdate();
         }
         public static void ClearPackages(RawImage[] images)
@@ -141,16 +150,18 @@ namespace CoversManagement
     public class CoverRequestPackage
     {
         public RawImage image;
+        public Action<Texture2D> callback;
 
         public string trackname, nick;
         public bool priority;
 
-        public CoverRequestPackage(RawImage image, string trackname, string nick = "", bool priority = false)
+        public CoverRequestPackage(RawImage image, string trackname, string nick = "", bool priority = false, Action<Texture2D> callback = null)
         {
             this.image = image;
             this.trackname = trackname;
             this.nick = nick;
             this.priority = priority;
+            this.callback = callback;
         }
     }
 }

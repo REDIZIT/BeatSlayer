@@ -51,6 +51,13 @@ public class BeatLine : MonoBehaviour, IBeat
 
 
         lineEndTime = cls.linePoints == null || cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
+
+        if (lineEndTime == 0)
+        {
+            lineEndTime = 1;
+            Debug.LogError("Line BUG! Line end time is zero! Value / 0 = Infinity = Unity BAG!!");
+        }
+
         capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
     }
 

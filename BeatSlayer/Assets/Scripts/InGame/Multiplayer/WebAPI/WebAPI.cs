@@ -45,10 +45,16 @@ namespace Web
             mapDownloadClient = new WebClient();
             mapDownloadClient.DownloadProgressChanged += (sender, args) =>
             {
-                progressCallback(args);
+                if (!Application.isPlaying) CancelMapDownloading();
+                else progressCallback(args);
             };
             mapDownloadClient.DownloadFileCompleted += (sender, args) =>
             {
+                if (!Application.isPlaying)
+                {
+                    return;
+                }
+
                 bool doUnpack = false;
 
                 if (args.Cancelled) Debug.Log("Download cancelled");

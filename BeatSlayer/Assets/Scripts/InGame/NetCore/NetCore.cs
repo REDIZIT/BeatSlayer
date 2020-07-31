@@ -162,7 +162,6 @@ namespace GameNet
         // (Internal usage)
         static async void Connect()
         {
-            Debug.Log("> Connect");
             try
             {
                 await conn.StartAsync();

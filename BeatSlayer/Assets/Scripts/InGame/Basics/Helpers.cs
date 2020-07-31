@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Net;
-using ProjectManagement;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,7 +45,9 @@ namespace InGame.Helpers
             prefab.SetActive(false);
         }
 
-        public static void RefreshContent<TItem, TData>(Transform content, IEnumerable<TData> list, Action<TItem, TData> implementation, int startIndex = 0)
+
+
+        public static void RefreshContent<TItem, TData>(Transform content, IEnumerable<TData> list, Action<TItem, TData> implementation, int startIndex = 1)
         {
             int index = startIndex;
             foreach (TData infoClass in list)
@@ -69,8 +67,8 @@ namespace InGame.Helpers
         /// <summary>
         /// Get first child in content and use it as prefab in <see cref="AddContent{T}(Transform, GameObject, Action{T})"/>
         /// </summary>
-        /// <typeparam name="TData">Item MonoBehaviour class</typeparam>
-        public static void AddContent<TData>(Transform content, Action<TData> implementation)
+        /// <typeparam name="TItem">Item MonoBehaviour class</typeparam>
+        public static void AddContent<TItem>(Transform content, Action<TItem> implementation)
         {
             GameObject prefab = GetFirst(content).gameObject;
             AddContent(content, prefab, implementation);
@@ -81,9 +79,13 @@ namespace InGame.Helpers
         /// <typeparam name="TItem">Item MonoBehaviour class</typeparam>
         public static void AddContent<TItem>(Transform content, GameObject prefab, Action<TItem> implementation)
         {
+            prefab.SetActive(true);
+
             GameObject item = Instantiate(prefab, content);
             item.SetActive(true);
             implementation(item.GetComponent<TItem>());
+
+            prefab.SetActive(false);
         }
 
 
