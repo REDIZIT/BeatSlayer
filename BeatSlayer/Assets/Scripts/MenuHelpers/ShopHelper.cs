@@ -233,7 +233,7 @@ public class ShopHelper : MonoBehaviour
         if (Payload.Account == null) return false;
         if (Payload.Account.Purchases == null) return false;
 
-        return Payload.Account.Purchases.Any(c => c.Id == item.purchaseId);
+        return Payload.Account.Purchases.Any(c => c.ItemId == item.purchaseId);
     }
     public async void UpgradePurchases()
     {
@@ -300,7 +300,7 @@ public class ShopHelper : MonoBehaviour
     private async Task<bool> Purchase(int purchaseId)
     {
         // Check if already bought
-        if (Payload.Account.Purchases.Any(c => c.Id == purchaseId)) return false;
+        if (Payload.Account.Purchases.Any(c => c.ItemId == purchaseId)) return false;
 
         PurchaseModel purchase = await NetCore.ServerActions.Shop.TryBuyPurchase(Payload.Account.Nick, purchaseId);
 

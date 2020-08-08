@@ -5,8 +5,11 @@ using System.IO;
 using System.Linq;
 using Assets.SimpleLocalization;
 using CoversManagement;
+using InGame.Game.Scoring.Mods;
+using InGame.Helpers;
 using InGame.Menu;
 using InGame.Menu.Maps;
+using InGame.Menu.Mods;
 using InGame.SceneManagement;
 using InGame.UI;
 using ProjectManagement;
@@ -24,43 +27,36 @@ public class BeatmapUI : MonoBehaviour
     public MenuAudioManager menuAudioManager;
     public PracticeModeUI practiceModeUI;
     public MapsDownloadQueuer mapsDownloadQueuer;
-
-    public GameObject overlay;
+    public ModsUI modsUI;
 
     private MapInfo currentMapInfo;
     private DifficultyInfo currentDifficultyInfo;
     private bool isGroupDeleted;
     private bool isDownloaded, hasUpdate;
 
-    [Header("UI")] 
+    [Header("UI")]
+    public GameObject overlay;
     public RawImage coverImage;
     public Text authorText, nameText;
     public GameObject approvedIcon;
     public Transform beatmapsContent, difficultiesContent;
-    public GameObject recordPan, modsPan, downloadPan;
     public Button backBtn;
     public GameObject errorPan, alertPan;
     public Text errorText, alertText;
 
     public LoadingCircle loadingCircle;
 
-    public TestRequest testRequest;
-
-    [Header("Footer UI")] 
-    public GameObject footer;
-    public GameObject playBtn, locationBtn, deleteBtn;
-    
+    [Header("Pans UI")]
+    public GameObject downloadPan;
+    public GameObject progressPan, footer;
 
     [Header("Download UI")] 
     public Slider progressBar;
     public Text progressText;
     public GameObject downloadBtn, updateBtn;
 
-    [Header("Record UI")] 
-    public Text recordText;
-    public Text leaderboardPlaceText;
 
-
+    public TestRequest testRequest;
 
 
 
@@ -72,22 +68,12 @@ public class BeatmapUI : MonoBehaviour
     {
         if (currentDifficultyInfo != null)
         {
-            var task = MapsDownloadQueuerBackground.queue.FirstOrDefault(c => c.trackname == currentMapInfo.author + "-" + currentMapInfo.name && c.Mapper == currentMapInfo.nick);
+            var task = MapsDownloadQueuerBackground.queue.FirstOrDefault(c => c.Trackname == currentMapInfo.author + "-" + currentMapInfo.name && c.Mapper == currentMapInfo.nick);
             if (task != null)
             {
-                if (task.state == MapDownloadTask.State.Downloading || task.state == MapDownloadTask.State.Waiting)
+                if (task.TaskState == MapDownloadTask.State.Downloading || task.TaskState == MapDownloadTask.State.Waiting)
                 {
-                    progressBar.gameObject.SetActive(true);
-                    progressText.text = task.TaskState.ToString();
-
-                    downloadBtn.SetActive(false);
-                    updateBtn.SetActive(false);
-                    playBtn.SetActive(false);
-
-                    footer.SetActive(false);
-
-                    progressBar.value = task.ProgressPercentage;
-                    progressText.text = task.ProgressPercentage + "%";
+                    RefreshAsProgress(task.ProgressPercentage);
                 }
                 else
                 {
@@ -98,16 +84,12 @@ public class BeatmapUI : MonoBehaviour
                         downloaded = false;
                     }
 
-                    downloadBtn.SetActive(!downloaded);
-                    updateBtn.SetActive(false);
-                    playBtn.SetActive(downloaded);
+                    isDownloaded = downloaded;
 
-                    progressBar.gameObject.SetActive(false);
+                    RefreshBeatmapsList();
 
-                    recordPan.SetActive(downloaded);
-                    modsPan.SetActive(false);
-                    downloadPan.SetActive(!downloaded);
-                    footer.SetActive(downloaded);
+                    if (downloaded) RefreshAsDownloaded();
+                    else RefreshAsUndownloaded();
                 }
 
             }
@@ -118,30 +100,63 @@ public class BeatmapUI : MonoBehaviour
                 if (isTest)
                 {
                     downloadPan.SetActive(false);
-                    recordPan.SetActive(false);
                     footer.SetActive(true);
-
-                    playBtn.SetActive(true);
-                    deleteBtn.SetActive(true);
                 }
                 else
                 {
-                    downloadPan.SetActive(hasUpdate || (!isDownloaded && !isGroupDeleted));
-                    downloadBtn.SetActive(!hasUpdate || (!isDownloaded && !isGroupDeleted));
-                    updateBtn.SetActive(isDownloaded && hasUpdate);
-                    progressBar.gameObject.SetActive(false);
-
-                    recordPan.SetActive(false);
-                    modsPan.SetActive(false);
-
-                    footer.SetActive(isDownloaded);
-                    playBtn.SetActive(!isGroupDeleted && !hasUpdate);
-                    deleteBtn.SetActive(true);
+                    if (currentDifficultyInfo == null) RefreshAsNotSelected();
+                    else if (isDownloaded) RefreshAsDownloaded();
+                    else RefreshAsUndownloaded();
                 }
 
             }
         }
     }
+
+    private void RefreshAsNotSelected()
+    {
+        downloadPan.SetActive(false);
+
+        progressPan.SetActive(false);
+
+        footer.SetActive(false);
+    }
+    private void RefreshAsUndownloaded()
+    {
+        // Download stuff enabled
+        downloadPan.SetActive(true);
+        downloadBtn.SetActive(true);
+        updateBtn.SetActive(false);
+
+        progressPan.SetActive(false);
+
+        footer.SetActive(false);
+    }
+    private void RefreshAsProgress(int progress)
+    {
+        downloadPan.SetActive(false);
+
+        // Downloading stuff enabled
+        progressPan.SetActive(true);
+        progressBar.value = progress;
+        progressText.text = progress + "%";
+
+        footer.SetActive(false);
+    }
+
+    private void RefreshAsDownloaded()
+    {
+        downloadPan.SetActive(false);
+
+        progressPan.SetActive(false);
+
+        // Game stuff enabled
+        footer.SetActive(true);
+    }
+
+
+
+
 
     public void Open(TrackListItem listItem)
     {
@@ -174,37 +189,6 @@ public class BeatmapUI : MonoBehaviour
 
         menuAudioManager.OnMapSelected(listItem.groupInfo);
     }
-    public void Open(GroupInfoExtended group)
-    {
-        overlay.SetActive(true);
-        ResetUI();
-
-        authorText.text = group.author;
-        nameText.text = group.name;
-        CoversManager.AddPackages(new List<CoverRequestPackage>()
-        {
-            new CoverRequestPackage(coverImage, group.author + "-" + group.name, priority: true)
-        });
-
-
-        // Refresh list of player's maps
-        List<MapInfo> mapInfos = null;
-        bool async = false;
-        isGroupDeleted = false;
-        testRequest = null;
-
-        if (group.groupType == GroupInfo.GroupType.Own) mapInfos = database.GetCustomMaps(group);
-        else
-        {
-            async = true;
-            loadingCircle.Play();
-            ClearContent(beatmapsContent);
-            database.GetMapsByTrackAsync(group, RefreshBeatmapsList, ShowError);
-        }
-
-        if (!async) RefreshBeatmapsList(mapInfos);
-    }
-
     public void OpenModeration(TestRequest request, Project proj)
     {
         overlay.SetActive(true);
@@ -259,32 +243,33 @@ public class BeatmapUI : MonoBehaviour
         ClearContent(beatmapsContent);
         ClearContent(difficultiesContent);
         
-        modsPan.SetActive(false);
-        recordPan.SetActive(false);
         footer.SetActive(false);
         
         errorPan.SetActive(false);
         alertPan.SetActive(false);
-        
-        playBtn.SetActive(true);
-        deleteBtn.SetActive(true);
     }
     
     
     void RefreshBeatmapsList(List<MapInfo> mapInfos)
     {
-        ClearContent(difficultiesContent);
+        //downloadPan.SetActive(false);
+        //footer.SetActive(false);
 
-        recordPan.SetActive(false);
-        modsPan.SetActive(false);
-        downloadPan.SetActive(false);
-        footer.SetActive(false);
+        //if (update)
+        //{
+        //    HelperUI.RefreshContent<BeatmapUIItem, MapInfo>(beatmapsContent, mapInfos, (BeatmapUIItem ui, MapInfo info) =>
+        //    {
+        //        ui.Setup(info, mapInfos.Count == 1);
+        //    });
+        //}
+        //else
+        //{
+            HelperUI.FillContent<BeatmapUIItem, MapInfo>(beatmapsContent, mapInfos, (BeatmapUIItem ui, MapInfo info) =>
+            {
+                ui.Setup(info, mapInfos.Count == 1);
+            });
+        //}
 
-        FillContent<BeatmapUIItem, MapInfo>(beatmapsContent, mapInfos, (BeatmapUIItem ui, MapInfo info) =>
-        {
-            ui.Setup(info, mapInfos.Count == 1);
-        });
-        
         loadingCircle.Stop();
     }
 
@@ -305,8 +290,6 @@ public class BeatmapUI : MonoBehaviour
     
     public void OnBeatmapItemClicked()
     {
-        recordPan.SetActive(false);
-        modsPan.SetActive(false);
         downloadPan.SetActive(false);
         footer.SetActive(false);
         
@@ -357,8 +340,6 @@ public class BeatmapUI : MonoBehaviour
         ToggleGroup toggleGroup = difficultiesContent.GetComponent<ToggleGroup>();
         if (toggleGroup.ActiveToggles().Count() == 0)
         {
-            recordPan.SetActive(false);
-            modsPan.SetActive(false);
             downloadPan.SetActive(false);
             footer.SetActive(false);
             return;
@@ -375,6 +356,7 @@ public class BeatmapUI : MonoBehaviour
         isDownloaded =
             ProjectManager.IsMapDownloaded(currentMapInfo.author, currentMapInfo.name, currentMapInfo.nick) ||
             currentMapInfo.group.groupType == GroupInfo.GroupType.Own;
+
         hasUpdate = currentMapInfo.group.groupType == GroupInfo.GroupType.Own ? false : DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.nick);
         bool isTest = testRequest != null;
 
@@ -387,11 +369,7 @@ public class BeatmapUI : MonoBehaviour
         if (isTest)
         {
             downloadPan.SetActive(false);
-            recordPan.SetActive(false);
             footer.SetActive(true);
-
-            playBtn.SetActive(true);
-            deleteBtn.SetActive(true);
         }
         else
         {
@@ -399,52 +377,14 @@ public class BeatmapUI : MonoBehaviour
             downloadBtn.SetActive(!hasUpdate || (!isDownloaded && !isGroupDeleted));
             updateBtn.SetActive(isDownloaded && hasUpdate);
 
-            recordPan.SetActive(!isGroupDeleted);
-            modsPan.SetActive(false);
-
             footer.SetActive(isDownloaded);
-            playBtn.SetActive(!isGroupDeleted && !hasUpdate);
-            deleteBtn.SetActive(true);
         }
-
-        recordText.text = "";
-        leaderboardPlaceText.text = "";
 
         bool doServerStuff =
             !currentMapInfo.isMapDeleted &&
             Application.internetReachability != NetworkReachability.NotReachable &&
             testRequest == null &&
             currentMapInfo.group.groupType == GroupInfo.GroupType.Author;
-
-        recordPan.SetActive(false);
-
-        if (doServerStuff && AccountManager.LegacyAccount != null)
-        {
-            recordPan.SetActive(true);
-            leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
-            AccountManager.GetBestReplay(AccountManager.LegacyAccount.nick, currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick, replay =>
-            {
-                if (replay == null)
-                {
-                    recordText.text = "";
-                    leaderboardPlaceText.text = LocalizationManager.Localize("RecordNotSet");
-                }
-                else
-                {
-                    recordText.text =
-                        $"{replay.Score}   <color=#f00>{replay.Missed}</color>   <color=#eee>{replay.Accuracy * 100}%</color>   <color=#08f>{replay.RP}</color>";
-
-                    leaderboardPlaceText.text = LocalizationManager.Localize("Loading");
-
-                    /*AccountManager.GetMapLeaderboardPlace(AccountManager.LegacyAccount.nick,
-                        currentMapInfo.author + "-" + currentMapInfo.name, currentMapInfo.nick,
-                        (place =>
-                        {
-                            leaderboardPlaceText.text = $"#{place} " + LocalizationManager.Localize("InMapLeaderboard");
-                        }));*/
-                }
-            });
-        }
     }
 
 
@@ -467,11 +407,11 @@ public class BeatmapUI : MonoBehaviour
         }
         else if (currentMapInfo.group.groupType == GroupInfo.GroupType.Own)
         {
-            parameters = SceneloadParameters.OwnMusicPreset(currentMapInfo.filepath, currentMapInfo);
+            parameters = SceneloadParameters.OwnMusicPreset(currentMapInfo.filepath, currentMapInfo, modsUI.selectedMods);
         }
         else if (currentMapInfo.group.groupType == GroupInfo.GroupType.Author)
         {
-            parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo);
+            parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo, modsUI.selectedMods);
         }
         else if (currentMapInfo.group.groupType == GroupInfo.GroupType.Tutorial)
         {

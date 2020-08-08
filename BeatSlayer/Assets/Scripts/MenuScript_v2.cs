@@ -87,6 +87,15 @@ public class MenuScript_v2 : MonoBehaviour
     //private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors) { return true; }
     public void Awake()
     {
+        //Debug.LogError("PATCHING!");
+        //PrefsManager.prefs.boughtSaberEffects = new bool[3] { true, true, true };
+        //PrefsManager.prefs.boughtSabers = new bool[7] { true, true, true, true, true, true, true };
+        //PrefsManager.prefs.mapUnlocked0 = true;
+        //PrefsManager.prefs.mapUnlocked1 = true;
+        //PrefsManager.prefs.mapUnlocked2 = true;
+        //PrefsManager.prefs.mapUnlocked3 = false;
+        //PrefsManager.Save();
+
         Application.targetFrameRate = 60;
         if(Time.timeScale != 1)
         {
@@ -213,8 +222,16 @@ public class MenuScript_v2 : MonoBehaviour
             Directory.CreateDirectory(Application.persistentDataPath + "/maps");
         }
 
-        if (!Directory.Exists(Application.persistentDataPath + "/data")) Directory.CreateDirectory(Application.persistentDataPath + "/data");
-        if (!Directory.Exists(Application.persistentDataPath + "/data/account")) Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
+        if (!Directory.Exists(Application.persistentDataPath + "/data"))
+        {
+            showTutorial = true;
+            Directory.CreateDirectory(Application.persistentDataPath + "/data");
+        }
+        if (!Directory.Exists(Application.persistentDataPath + "/data/account"))
+        {
+            showTutorial = true;
+            Directory.CreateDirectory(Application.persistentDataPath + "/data/account");
+        }
 
         if (showTutorial) tutorialManager.ShowOverlay();
     }

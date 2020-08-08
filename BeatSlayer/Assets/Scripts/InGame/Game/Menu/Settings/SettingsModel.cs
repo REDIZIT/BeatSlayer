@@ -98,6 +98,10 @@ namespace InGame.Settings
 
         [Option("Hide missed text")]
         public bool HideMissedText { get; set; } = false;
+
+        [Option("Cubes sync offset")]
+        [Range(-4, 10)]
+        public float CubesSuncOffset { get; set; } = 2;
     }
 
     public class SettingsMenuModel

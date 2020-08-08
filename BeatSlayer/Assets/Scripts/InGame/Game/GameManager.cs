@@ -18,6 +18,10 @@ using Ranking;
 using GameNet;
 using InGame.Game.Tutorial;
 using InGame.Extensions.Objects;
+using System;
+using InGame.Game.HP;
+using InGame.Game.Scoring.Mods;
+using InGame.Game.Mods;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -38,7 +42,8 @@ public class GameManager : MonoBehaviour
     public MapTutorial tutorial;
     public MissAnim missAnim;
     public Analyzer analyzer;
-
+    public HPManager hpManager;
+    public ModsBar modsBar;
 
     #endregion
 
@@ -77,8 +82,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Animator skipBtnAnimator;
     [SerializeField] private Text fpsText;
     private float comboMultiplierAnimValue;
-    private bool isSkipAnimatorPlaying;
-
 
     public Texture2D defaultTrackTexture;
 
@@ -99,8 +102,16 @@ public class GameManager : MonoBehaviour
 
     private SettingsModel Settings => SettingsManager.Settings;
 
-    private float Pitch { get; set; }
+    private string trackname;
+    public float Pitch { get; set; }
     private Camera cam;
+
+
+    public Action OnCubeMiss { get; set; }
+    public Action OnCubeSlice { get; set; }
+    public Action OnLineSlice { get; set; }
+    public Action OnBombMiss { get; set; }
+    public Action OnBombSlice { get; set; }
 
 
 
@@ -145,8 +156,10 @@ public class GameManager : MonoBehaviour
             InitProject();
         }
 
-        scoringManager.OnGameStart(LoadingData.loadparams.Map, LoadingData.loadparams.difficultyInfo, difficulty, LoadingData.loadparams.Type);
-
+        scoringManager.OnGameStart(
+            LoadingData.loadparams.Map, LoadingData.loadparams.difficultyInfo, difficulty, 
+            LoadingData.loadparams.Type, LoadingData.loadparams.Mods);
+        modsBar.Refresh(LoadingData.loadparams.Mods);
 
         InitSettings();
 
@@ -157,7 +170,8 @@ public class GameManager : MonoBehaviour
 
         StartForUI();
 
-        trackText.text = project.Trackname;
+        trackname = LoadingData.loadparams.Map.author + " - " + LoadingData.loadparams.Map.name;
+        trackText.text = trackname;
 
         AlignToSide();
 
@@ -167,7 +181,7 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(beatManager.IOnStart(isTutorial));
 
-        skipBtnAnimator.gameObject.SetActive(beatManager.CanSkip());
+        //skipBtnAnimator.gameObject.SetActive(beatManager.CanSkip());
 
         if (isTutorial)
         {
@@ -277,18 +291,26 @@ public class GameManager : MonoBehaviour
     {
         audioManager.asource.clip = LoadingData.aclip;
 
+
         Pitch = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.MusicSpeed : 1;
+        float modMultiplier = scoringManager.Replay.Mods.HasFlag(ModEnum.NightCore) ? 1.3f :
+                              scoringManager.Replay.Mods.HasFlag(ModEnum.DoubleTime) ? 1.6f :
+                              1;
+        Pitch *= modMultiplier;
+
+
         float time = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.StartTime : 0;
 
         if (isTutorial)
         {
             audioManager.asource.Play();
             audioManager.asource.Pause();
+            audioManager.asource.pitch = 0;
             time = 0.01f;
         }
-            
 
-        audioManager.asource.pitch = 0;
+
+        audioManager.asource.pitch = Pitch;
         audioManager.asource.time = time;
 
 
@@ -450,6 +472,8 @@ public class GameManager : MonoBehaviour
     }
     public void Pause()
     {
+        if (!hpManager.isAlive) return;
+
         paused = true;
         pausePanel.SetActive(true);
         audioManager.PauseSource();
@@ -523,6 +547,19 @@ public class GameManager : MonoBehaviour
         }
 
         cheatEngine.RemoveCube(beat);
+        beatManager.ActiveBeats.Remove(beat);
+
+        switch (beat.GetClass().type)
+        {
+            case BeatCubeClass.Type.Point:
+            case BeatCubeClass.Type.Dir:
+            case BeatCubeClass.Type.Line:
+                OnCubeMiss?.Invoke();
+                break;
+            case BeatCubeClass.Type.Bomb:
+                OnBombMiss?.Invoke();
+                break;
+        }
     }
 
 
@@ -530,7 +567,7 @@ public class GameManager : MonoBehaviour
     {
         if (Settings.Sound.SliceEffectEnabled)
         {
-            AndroidNativeAudio.play(Payload.HitSoundIds[Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 100f);
+            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 100f);
         }
 
         if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
@@ -540,11 +577,31 @@ public class GameManager : MonoBehaviour
 
         scoringManager.OnCubeHit(beat);
         cheatEngine.RemoveCube(beat);
+
+        beatManager.ActiveBeats.Remove(beat);
+
+        switch (beat.GetClass().type)
+        {
+            case BeatCubeClass.Type.Point:
+            case BeatCubeClass.Type.Dir:
+                OnCubeSlice?.Invoke();
+                break;
+            case BeatCubeClass.Type.Line:
+                OnLineSlice?.Invoke();
+                break;
+            case BeatCubeClass.Type.Bomb:
+                OnBombSlice?.Invoke();
+                break;
+        }
     }
     public void BeatLineSliced(IBeat beat)
     {
         scoringManager.OnLineHit();
         cheatEngine.RemoveCube(beat);
+
+        beatManager.ActiveBeats.Remove(beat);
+
+        OnLineSlice?.Invoke();
     }
     public void BeatLineHold()
     {
@@ -640,21 +697,24 @@ public class GameManager : MonoBehaviour
 
     void UpdateSkipButton()
     {
-        if (!isSkipAnimatorPlaying)
-        {
-            if (beatManager.CanSkip())
-            {
-                isSkipAnimatorPlaying = true;
-                skipBtnAnimator.Play("Show");
-            }
-        }
-        else
-        {
-            if (!beatManager.CanSkip())
-            {
-                skipBtnAnimator.Play("Hide");
-            }
-        }
+        //if (!isSkipAnimatorPlaying)
+        //{
+        //    if (beatManager.CanSkip())
+        //    {
+        //        Debug.Log("Play show");
+        //        isSkipAnimatorPlaying = true;
+        //        skipBtnAnimator.Play("Show");
+        //    }
+        //}
+        //else
+        //{
+        //    if (!beatManager.CanSkip())
+        //    {
+        //        Debug.Log("Play hide");
+        //        skipBtnAnimator.Play("Hide");
+        //    }
+        //}
+        skipBtnAnimator.Play(beatManager.CanSkip() ? "Show" : "Hide");
     }
     public void OnSkipBtnClick()
     {
@@ -704,7 +764,7 @@ public class GameManager : MonoBehaviour
 
     public void RateBtnUpdate()
     {
-        int state = prefsManager.prefs.GetRateState(project.Trackname);
+        int state = prefsManager.prefs.GetRateState(trackname);
 
         if (state != 0)
         {
@@ -719,16 +779,16 @@ public class GameManager : MonoBehaviour
     }
     public void OnRateTrackBtnClicked(GameObject btn)
     {
-        int state = prefsManager.prefs.GetRateState(project.Trackname);
+        int state = prefsManager.prefs.GetRateState(trackname);
         
 
         bool liked = btn.name == "LikeBtn";
 
         if (state == 0)
         {
-            prefsManager.prefs.SetRateState(project.Trackname, liked ? 1 : -1);
+            prefsManager.prefs.SetRateState(trackname, liked ? 1 : -1);
             
-            string trackname = project.author + "-" + project.name;
+            //string trackname = project.author + "-" + project.name;
             DatabaseScript.SendStatistics(trackname, project.creatorNick, difficultyInfo.id, liked ? DatabaseScript.StatisticsKeyType.Like : DatabaseScript.StatisticsKeyType.Dislike);
 
             likeBtnImg.color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);

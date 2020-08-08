@@ -1,5 +1,6 @@
 ﻿using InGame.SceneManagement;
 using ProjectManagement;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -49,7 +50,7 @@ namespace InGame.Menu
 
 
             var parameters = SceneloadParameters.AuthorMusicPreset(mapInfo, difficultyInfo, 
-                startTimeSlider.value, musicSpeedSlider.value / 100f, cubesSpeedSlider.value / 100f);
+                startTimeSlider.value, musicSpeedSlider.value / 100f, cubesSpeedSlider.value / 100f, new List<Mods.ModSO>());
 
             SceneController.instance.LoadScene(parameters);
         }

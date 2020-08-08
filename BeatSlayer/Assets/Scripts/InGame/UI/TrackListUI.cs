@@ -11,8 +11,6 @@ using UnityEngine.UI;
 
 public class TrackListUI : MonoBehaviour
 {
-    public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
-    //public ListController listController { get { return GetComponent<ListController>(); } }
     public MenuScript_v2 menu { get { return GetComponent<MenuScript_v2>(); } }
     public PageController pageController { get { return GetComponent<PageController>(); } }
     public SearchUI SearchUI { get { return GetComponent<SearchUI>(); } }
@@ -237,5 +235,13 @@ public class TrackListUI : MonoBehaviour
         }
 
         return ls;
+    }
+
+    public GroupInfoExtended FindGroupInDownloaded(string trackname)
+    {
+        string author = trackname.Split('-')[0];
+        string name = trackname.Split('-')[1];
+
+        return Database.container.DownloadedGroups.FirstOrDefault(c => c.author == author && c.name == name);
     }
 }

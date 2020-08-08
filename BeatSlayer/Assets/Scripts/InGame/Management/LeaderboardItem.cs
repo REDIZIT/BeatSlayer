@@ -1,4 +1,5 @@
-﻿using Ranking;
+﻿using InGame.Game.Scoring.Mods;
+using Ranking;
 
 namespace InGame.Leaderboard
 {
@@ -17,5 +18,6 @@ namespace InGame.Leaderboard
         public double RP { get; set; }
         public double Score { get; set; }
         public Grade Grade { get; set; }
+        public ModEnum Mods { get; set; }
     }
 }

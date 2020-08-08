@@ -157,6 +157,12 @@ public class BeatLine : MonoBehaviour, IBeat
 
     public void OnPoint(Vector2 direction, bool destroy = false)
     {
+        if (destroy)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         float lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
         //float capMax = lineEndTime * bm.fieldLength;
 

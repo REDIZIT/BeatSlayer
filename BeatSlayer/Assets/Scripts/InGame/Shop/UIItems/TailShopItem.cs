@@ -59,7 +59,9 @@ namespace InGame.Shop
 
         public async void OnBuyBtnClick()
         {
+            buyBtn.interactable = false;
             await shopHelper.BuyTail(item.id);
+            buyBtn.interactable = true;
             Refresh();
         }
         

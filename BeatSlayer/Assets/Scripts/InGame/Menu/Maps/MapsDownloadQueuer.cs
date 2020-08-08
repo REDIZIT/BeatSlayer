@@ -116,6 +116,7 @@ namespace InGame.Menu.Maps
         [Header("UI")]
         public Transform content;
         public GameObject hideImage, closeImage;
+        [SerializeField] private MapsDownloadQueueItem headerItem;
 
         public MapDownloadTask ActiveTask => MapsDownloadQueuerBackground.ActiveItem?.task;
 
@@ -129,17 +130,26 @@ namespace InGame.Menu.Maps
 
         private void Start()
         {
-            MapsDownloadQueuerBackground.OnTaskCompletedCallback += OnTaskCompleted;
+            MapsDownloadQueuerBackground.OnTaskCompletedCallback = OnTaskCompleted;
 
             // Creating items after scene reloading
-            if(MapsDownloadQueuerBackground.queue.Count > 0)
+            if(MapsDownloadQueuerBackground.uncompletedQueue.Count > 0)
             {
-                foreach (var item in MapsDownloadQueuerBackground.queue)
+                MapsDownloadQueuerBackground.queue.RemoveAll(
+                    c => c.TaskState == MapDownloadTask.State.Completed || c.TaskState == MapDownloadTask.State.Error);
+
+                int i = 0;
+                foreach (var task in MapsDownloadQueuerBackground.uncompletedQueue)
                 {
-                    AddItem(item);
+                    task.TaskPosition = i;
+                    AddItem(task);
+                    i++;
                 }
+                MapsDownloadQueuerBackground.ActiveItem = items.FirstOrDefault(c => c.task.TaskState == MapDownloadTask.State.Downloading);
 
                 OnQueueChange();
+
+                ShowWindow();
             }
         }
 
@@ -160,12 +170,11 @@ namespace InGame.Menu.Maps
         }
         public void RemoveTask(MapsDownloadQueueItem item)
         {
+            items.Remove(item);
             MapsDownloadQueuerBackground.RemoveTask(item.task);
 
-            items.Remove(item);
-
             OnQueueChange();
-            
+
             if (MapsDownloadQueuerBackground.queue.Count == 0)
             {
                 OnCloseBtnClick();
@@ -186,11 +195,13 @@ namespace InGame.Menu.Maps
 
         private void OnTaskCompleted()
         {
-            listUI.ReloadDownloadedList();
+            if (listUI.gameObject != null)
+            {
+                listUI.ReloadDownloadedList();
+            }
+            
 
             OnQueueChange();
-
-            MapsDownloadQueuerBackground.OnTaskCompleted();
         }
 
 
@@ -212,27 +223,61 @@ namespace InGame.Menu.Maps
             foreach (var item in items)
             {
                 i++;
-                MapDownloadTask task = MapsDownloadQueuerBackground.queue[i];
+                //MapDownloadTask task = item.task;
+                var task = MapsDownloadQueuerBackground.queue[i];
 
                 if (i == 0) item.RefreshAsFirst(task, MapsDownloadQueuerBackground.queue.Count, closeImage.activeSelf);
                 else item.RefreshAsRegular(task);
             }
+
+            MapsDownloadQueuerBackground.ActiveItem = items.FirstOrDefault();
         }
         private void AddItem(MapDownloadTask task)
         {
-            HelperUI.AddContent<MapsDownloadQueueItem>(content, (item) =>
+            if (task.TaskPosition == 0)
             {
-                item.OnProgress(0);
-                items.Add(item);
+                HelperUI.ClearContent(content);
+                
+                headerItem.OnProgress(0);
+                items.Add(headerItem);
 
-                if (task.TaskPosition == 0) item.RefreshAsFirst(task, MapsDownloadQueuerBackground.queue.Count, false);
-                else item.RefreshAsRegular(task);
+                headerItem.RefreshAsFirst(task, MapsDownloadQueuerBackground.queue.Count, false);
 
-                CoversManager.AddPackage(new CoverRequestPackage(item.coverImage, task.Trackname, task.Mapper, true, (cover) =>
+                if(task.Cover == null)
                 {
-                    task.Cover = cover;
-                }));
-            });
+                    CoversManager.AddPackage(new CoverRequestPackage(headerItem.coverImage, task.Trackname, task.Mapper, true, (cover) =>
+                    {
+                        task.Cover = cover;
+                    }));
+                }
+                else
+                {
+                    headerItem.coverImage.texture = task.Cover;
+                }
+            }
+            else
+            {
+                HelperUI.AddContent<MapsDownloadQueueItem>(content, (item) =>
+                {
+                    item.OnProgress(0);
+                    items.Add(item);
+
+                    item.RefreshAsRegular(task);
+
+
+                    if (task.Cover == null)
+                    {
+                        CoversManager.AddPackage(new CoverRequestPackage(item.coverImage, task.Trackname, task.Mapper, true, (cover) =>
+                        {
+                            task.Cover = cover;
+                        }));
+                    }
+                    else
+                    {
+                        item.coverImage.texture = task.Cover;
+                    }
+                });
+            }
         }
 
 
@@ -258,16 +303,16 @@ namespace InGame.Menu.Maps
     public class MapDownloadTask
     {
         public string Trackname { get { return trackname; } set { trackname = value; } }
-        public string trackname;
+        private string trackname;
 
         public string Mapper { get; set; }
         public Texture2D Cover { get; set; }
 
         public State TaskState { get { return state; } set { state = value; } }
-        public State state;
+        private State state;
 
         public int TaskPosition { get { return pos; } set { pos = value; } }
-        public int pos;
+        private int pos;
 
         public int ProgressPercentage { get; set; }
 

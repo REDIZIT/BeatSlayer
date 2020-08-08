@@ -53,7 +53,10 @@ namespace InGame.Shop.UIItems
 
         public async void OnBuyBtnClick()
         {
+            buyBtn.interactable = false;
             await shopHelper.BuyLocation(item);
+            buyBtn.interactable = true;
+            Refresh();
         }
 
         public void OnSelectBtnClicked()

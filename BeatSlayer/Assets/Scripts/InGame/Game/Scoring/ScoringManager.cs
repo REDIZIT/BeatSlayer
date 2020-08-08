@@ -1,7 +1,11 @@
 ﻿using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
+using InGame.Game.Scoring.Mods;
+using InGame.Menu.Mods;
+using InGame.ScriptableObjects;
 using ProjectManagement;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace InGame.Game
@@ -9,6 +13,7 @@ namespace InGame.Game
     public class ScoringManager : MonoBehaviour
     {
         public GameManager gm;
+        public SODB sodb;
 
         /// <summary>
         /// ReplayData is used for sending to server
@@ -79,9 +84,22 @@ namespace InGame.Game
 
 
         // Ну вот блять, куча разных классов, которые делают одно и тоже, но ска разными буквами
-        public void OnGameStart(ProjectManagement.MapInfo map, DifficultyInfo difficulty, Difficulty projectDifficulty, SceneloadParameters.LoadType loadtype)
+        public void OnGameStart(
+            ProjectManagement.MapInfo map, DifficultyInfo difficulty, Difficulty projectDifficulty, 
+            SceneloadParameters.LoadType loadtype, List<ModSO> mods)
         {
             Loadtype = loadtype;
+
+            ModEnum modsEnum = ModEnum.None;
+            //mods.ForEach(c => c.ApplyEnum(modsEnum));
+            scoreMultiplier = 1;
+            foreach (ModSO mod in mods)
+            {
+                scoreMultiplier *= mod.scoreMultiplier;
+                modsEnum = mod.ApplyEnum(modsEnum);
+            }
+            Debug.Log($"Active mods ({mods.Count}) are " + modsEnum.ToString());
+
             Replay = new ReplayData()
             {
                 Map = new MapData()
@@ -105,7 +123,8 @@ namespace InGame.Game
                 Score = 0,
                 CubesSliced = 0,
                 Missed = 0,
-                RP = 0
+                RP = 0,
+                Mods = modsEnum
             };
         }
 
@@ -151,8 +170,6 @@ namespace InGame.Game
 
         public void OnLineHold()
         {
-            //Replay.Score += comboMultiplier * scoreMultiplier * 0.1f;
-            //Replay.Score += comboMultiplier * scoreMultiplier * 0.04f;
             Replay.Score += comboMultiplier * scoreMultiplier * 2.4f * Time.deltaTime;
         }
         public void OnLineHit()

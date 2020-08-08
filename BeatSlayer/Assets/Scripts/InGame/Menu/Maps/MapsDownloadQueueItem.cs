@@ -1,5 +1,4 @@
 using Michsky.UI.ModernUIPack;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +15,7 @@ namespace InGame.Menu.Maps
         public RawImage coverImage;
         public ProgressBar progressCircle;
         public GameObject completeCheckmark, completeError;
-        public GameObject hideQueueWindowBtn, closeWindowBtn;
+        public GameObject cancelBtn, hideQueueWindowBtn, closeWindowBtn;
 
 
         public void RefreshAsFirst(MapDownloadTask task, int tasksCount, bool spaceForCloseBtn)
@@ -51,15 +50,46 @@ namespace InGame.Menu.Maps
             mapperText.text = task.Mapper;
             coverImage.texture = task.Cover;
 
+            cancelBtn.SetActive(task.TaskState != MapDownloadTask.State.Completed);
+
             progressCircle.gameObject.SetActive(task.TaskState == MapDownloadTask.State.Downloading);
             completeCheckmark.SetActive(task.TaskState == MapDownloadTask.State.Completed);
             completeError.SetActive(task.TaskState == MapDownloadTask.State.Error || task.TaskState == MapDownloadTask.State.Canceled);
         }
 
 
+        private void Update()
+        {
+            if (task.TaskState == MapDownloadTask.State.Downloading)
+            {
+                completeCheckmark.SetActive(false);
+                completeError.SetActive(false);
+
+                progressCircle.gameObject.SetActive(true);
+                progressCircle.CurrentPercent = task.ProgressPercentage;
+            }
+            else if (task.TaskState == MapDownloadTask.State.Completed)
+            {
+                progressCircle.gameObject.SetActive(false);
+
+                completeCheckmark.SetActive(true);
+                completeError.SetActive(false);
+            }
+            else if (task.TaskState == MapDownloadTask.State.Error)
+            {
+                progressCircle.gameObject.SetActive(false);
+
+                completeCheckmark.SetActive(false);
+                completeError.SetActive(true);
+            }
+        }
+
         public void OnProgress(int percents)
         {
             if (progressCircle == null) return;
+
+            completeCheckmark.SetActive(false);
+            completeError.SetActive(false);
 
             progressCircle.gameObject.SetActive(true);
             progressCircle.CurrentPercent = percents;
@@ -78,7 +108,7 @@ namespace InGame.Menu.Maps
 
         public void OnCancelBtnClick()
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
             queuer.RemoveTask(this);
         }
     }

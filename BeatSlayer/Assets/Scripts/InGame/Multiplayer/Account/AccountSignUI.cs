@@ -167,7 +167,7 @@ namespace BeatSlayerServer.Multiplayer.Accounts
             else
             {
                 HelperUI.ColorInputField(nickField, invalidColor);
-                ui.ShowMessage(LocalizationManager.Localize("UseEnglishChars"));
+                ui.ShowMessage(LocalizationManager.Localize(op.Message));
             }
         }
 

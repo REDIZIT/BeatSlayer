@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using InGame.Game.HP;
+using InGame.Game.Mods;
+using InGame.Game.Scoring.Mods;
 using InGame.Settings;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,10 +16,13 @@ namespace InGame.Game.Spawn
     public class BeatManager : MonoBehaviour
     {
         public GameManager gm;
+        public HPManager hp;
+        public AudioManager audioManager;
 
         public List<BeatCubeClass> Beats { get; private set; }
+        public List<IBeat> ActiveBeats { get; private set; } = new List<IBeat>();
 
-        private float firstCubeTime;
+        private float firstCubeTime, lastCubeTime;
 
 
         [Header("Prefabs")]
@@ -45,7 +51,7 @@ namespace InGame.Game.Spawn
 
         public UILineRenderer lineRenderer;
         public UILineRenderer algLineRenderer;
-        private float maxDelay, maxAlgDelay;
+        //private float maxDelay, maxAlgDelay;
         public Text mexDelayText, maxAlgDelayText;
 
         public float CubeSpeed
@@ -60,10 +66,15 @@ namespace InGame.Game.Spawn
                 float speed = distance / time;
                 speed *= dspeed;
 
-                return speed * Time.deltaTime * asource.pitch;
+                return speed * Time.deltaTime * asource.pitch * speedModifier;
             }
         }
         public float maxDistance;
+
+        /// <summary>
+        /// Modifier of <see cref="CubeSpeed"/> based on selected Mods
+        /// </summary>
+        private float speedModifier = 1;
 
 
 
@@ -81,29 +92,31 @@ namespace InGame.Game.Spawn
 
         private Vector3 prevMousePos;
 
+        //public List<IBeat> activeCubes = new List<IBeat>();
 
 
 
 
-        private void Start()
-        {
-            lineRenderer.Points = new Vector2[400];
-            for (int i = 0; i < lineRenderer.Points.Length; i++)
-            {
-                lineRenderer.Points[i] = new Vector2(i * 2, 0);
-            }
 
-            algLineRenderer.Points = new Vector2[400];
-            for (int i = 0; i < algLineRenderer.Points.Length; i++)
-            {
-                algLineRenderer.Points[i] = new Vector2(i * 2, 0);
-            }
+        //private void Start()
+        //{
+        //    lineRenderer.Points = new Vector2[400];
+        //    for (int i = 0; i < lineRenderer.Points.Length; i++)
+        //    {
+        //        lineRenderer.Points[i] = new Vector2(i * 2, 0);
+        //    }
 
-            for (int i = 0; i < spawnPoints.Count; i++)
-            {
-                spawnPoints[i].transform.position = new Vector3(GetPositionByRoad(i), spawnPoints[i].transform.position.y, spawnPoints[i].transform.position.z);
-            }
-        }
+        //    algLineRenderer.Points = new Vector2[400];
+        //    for (int i = 0; i < algLineRenderer.Points.Length; i++)
+        //    {
+        //        algLineRenderer.Points[i] = new Vector2(i * 2, 0);
+        //    }
+
+        //    for (int i = 0; i < spawnPoints.Count; i++)
+        //    {
+        //        spawnPoints[i].transform.position = new Vector3(GetPositionByRoad(i), spawnPoints[i].transform.position.y, spawnPoints[i].transform.position.z);
+        //    }
+        //}
 
         public void Setup(GameManager gm, bool noArrows, bool noLines, float cubesSpeed)
         {
@@ -123,6 +136,14 @@ namespace InGame.Game.Spawn
             secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
 
             if(Beats != null && Beats.Count > 0) firstCubeTime = Beats[0].time;
+            if(Beats != null && Beats.Count > 0) lastCubeTime = Beats.Last().time;
+
+
+            speedModifier = ((gm.scoringManager.Replay.Mods & ModEnum.Easy) == ModEnum.Easy) ? 0.75f :
+                            (gm.scoringManager.Replay.Mods.HasFlag(ModEnum.Hard)) ? 1.25f :
+                            1;
+
+            UnityEngine.Debug.Log("speedModifier is " + speedModifier);
         }
 
         public void SetBeats(IEnumerable<BeatCubeClass> ls)
@@ -140,6 +161,8 @@ namespace InGame.Game.Spawn
             
             yield return new WaitForSeconds(fieldCrossTime);
 
+            UnityEngine.Debug.Log("Is playing? " + asource.isPlaying + " Time: " + asource.time + " Pitch: " + asource.pitch);
+
             if (!isTutorial)
                 asource.Play();
             
@@ -150,16 +173,51 @@ namespace InGame.Game.Spawn
                 if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) gm.audioManager.spectrumAsource.Pause();
             }
         }
+        public void OnGameOver()
+        {
+            //asource.Stop();
+            //spectrumAsource.Stop();
+
+            List<IBeat> toDissolve = new List<IBeat>();
+            toDissolve.AddRange(ActiveBeats);
+            toDissolve.ForEach(c => c.OnPoint(Vector2.zero, true));
+
+            StartCoroutine(IEOnGameOver());
+        }
+        private IEnumerator IEOnGameOver()
+        {
+            float timespeed = 1;
+            float decrease = 0.02f;
+
+            while (timespeed > 0)
+            {
+                decrease /= 1.005f;
+                timespeed -= decrease;
+
+                audioManager.asource.pitch = timespeed * gm.Pitch;
+
+                if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.pitch = timespeed * gm.Pitch;
+
+                //Time.timeScale = timespeed;
+                yield return new WaitForEndOfFrame();
+            }
+
+            audioManager.asource.Stop();
+            audioManager.spectrumAsource.Stop();
+        }
+
 
         /// <summary>
         /// Spawning cubes based on asource.time. Execute every frame
         /// </summary>
         public void ProcessSpawnCycle()
         {
-            Stopwatch w = new Stopwatch();
-            Stopwatch algw = new Stopwatch();
-            algw.Start();
-            w.Start();
+            //Stopwatch w = new Stopwatch();
+            //Stopwatch algw = new Stopwatch();
+            //algw.Start();
+            //w.Start();
+
+            if (!hp.isAlive) return;
 
             // Beat spawning cycle
             List<BeatCubeClass> toRemove = new List<BeatCubeClass>();
@@ -168,9 +226,9 @@ namespace InGame.Game.Spawn
             {
                 if(asource.time >= GetNormalizedTime(cls))
                 {
-                    algw.Stop();
+                    //algw.Stop();
                     SpawnBeatCube(cls);
-                    algw.Start();
+                    //algw.Start();
 
                     toRemove.Add(cls);
                 }
@@ -178,10 +236,10 @@ namespace InGame.Game.Spawn
 
             Beats.RemoveAll(c => toRemove.Contains(c));
 
-            w.Stop();
-            algw.Stop();
+            //w.Stop();
+            //algw.Stop();
 
-            AddPointToChart(w.ElapsedMilliseconds, algw.ElapsedMilliseconds);
+            //AddPointToChart(w.ElapsedMilliseconds, algw.ElapsedMilliseconds);
         }
         private float GetNormalizedTime(BeatCubeClass cls)
         {
@@ -200,36 +258,36 @@ namespace InGame.Game.Spawn
             // Return absolute time
             //return cls.time + timeOffset;
         }
-        private void AddPointToChart(float value, float algTime)
-        {
-            AddPointToArray(lineRenderer, value * 30);
-            lineRenderer.SetAllDirty();
+        //private void AddPointToChart(float value, float algTime)
+        //{
+        //    AddPointToArray(lineRenderer, value * 30);
+        //    lineRenderer.SetAllDirty();
 
-            AddPointToArray(algLineRenderer, algTime * 30);
-            algLineRenderer.SetAllDirty();
+        //    AddPointToArray(algLineRenderer, algTime * 30);
+        //    algLineRenderer.SetAllDirty();
 
-            if(value > maxDelay && asource.time > 5)
-            {
-                maxDelay = value;
-                mexDelayText.text = "Max: " + maxDelay + "ms";
-            }
-            if (value > maxAlgDelay && asource.time > 5)
-            {
-                maxAlgDelay = value;
-                maxAlgDelayText.text = "Only alg time. Max: " + maxAlgDelay + "ms";
-            }
-        }
-        private void AddPointToArray(UILineRenderer renderer, float value)
-        {
-            for (int i = 1; i < renderer.Points.Length; i++)
-            {
-                renderer.Points[i - 1] = new Vector2(renderer.Points[i - 1].x, renderer.Points[i].y); 
-            }
+        //    if(value > maxDelay && asource.time > 5)
+        //    {
+        //        maxDelay = value;
+        //        mexDelayText.text = "Max: " + maxDelay + "ms";
+        //    }
+        //    if (value > maxAlgDelay && asource.time > 5)
+        //    {
+        //        maxAlgDelay = value;
+        //        maxAlgDelayText.text = "Only alg time. Max: " + maxAlgDelay + "ms";
+        //    }
+        //}
+        //private void AddPointToArray(UILineRenderer renderer, float value)
+        //{
+        //    for (int i = 1; i < renderer.Points.Length; i++)
+        //    {
+        //        renderer.Points[i - 1] = new Vector2(renderer.Points[i - 1].x, renderer.Points[i].y); 
+        //    }
 
-            Vector2 lastPoint = renderer.Points[renderer.Points.Length - 1];
+        //    Vector2 lastPoint = renderer.Points[renderer.Points.Length - 1];
 
-            renderer.Points[renderer.Points.Length - 1] = new Vector2(lastPoint.x, value);
-        }
+        //    renderer.Points[renderer.Points.Length - 1] = new Vector2(lastPoint.x, value);
+        //}
 
 
 
@@ -309,7 +367,10 @@ namespace InGame.Game.Spawn
                     inputTouchesPrevPoses[id] = Input.touches[i].position;
                 }
             }
-            
+
+            r = hp.isAlive && r;
+            l = hp.isAlive && l;
+
             gm.rightSaber.SetEnabled(r);
             gm.leftSaber.SetEnabled(l);
         }
@@ -383,7 +444,7 @@ namespace InGame.Game.Spawn
             playAreaZ = cam.transform.position.z + 26; // 26 это расстояние от камеры до точки где удобно резать кубы
             float distanceSpawnAndPlayArea = spawnZ - playAreaZ;
 
-            fieldLength = distanceSpawnAndPlayArea; // Длина поля в юнитах (где летят кубы)
+            fieldLength = distanceSpawnAndPlayArea + SettingsManager.Settings.Gameplay.CubesSuncOffset; // Длина поля в юнитах (где летят кубы)
             fieldCrossTime = 1.5f; // Время за которое куб должен преодолеть поле (в секундах)
 
             //float mult = replay.cubesSpeed / replay.musicSpeed; 
@@ -406,6 +467,14 @@ namespace InGame.Game.Spawn
             else if (beat.type == BeatCubeClass.Type.Line && noLines)
             {
                 return;
+            }
+            if (beat.type == BeatCubeClass.Type.Bomb && gm.scoringManager.Replay.Mods.HasFlag(ModEnum.NoBombs))
+            {
+                return;
+            }
+            if (beat.type == BeatCubeClass.Type.Dir && gm.scoringManager.Replay.Mods.HasFlag(ModEnum.NoArrows))
+            {
+                beat.type = BeatCubeClass.Type.Point;
             }
 
             GameObject prefab;
@@ -438,7 +507,7 @@ namespace InGame.Game.Spawn
 
             GetComponent<CheatEngine>().AddCube(cube);
 
-            gm.activeCubes.Add(cube);
+            ActiveBeats.Add(cube);
         }
 
         public int GetBestSpawnPoint(BeatCubeClass beat)
@@ -512,12 +581,23 @@ namespace InGame.Game.Spawn
 
         public bool CanSkip()
         {
-            if (Beats.Count == 0) return false;
+            if (!asource.isPlaying) return false;
+
+            //UnityEngine.Debug.Log(ActiveBeats.Count);
+
+            if (Beats == null) return true;
+            //if (Beats.Count == 0) return true;
+
+            if (asource.time == 0) return false;
+
+            if (Beats.Count == 0) return asource.time >= lastCubeTime + 2;
             return GetSkipTime() > asource.time;
         }
 
         private float GetSkipTime()
         {
+            if (Beats == null || Beats.Count == 0) return asource.clip.length;
+
             return firstCubeTime - 3;
         }
 

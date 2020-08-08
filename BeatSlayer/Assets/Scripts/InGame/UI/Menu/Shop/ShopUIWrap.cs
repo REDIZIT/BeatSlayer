@@ -10,8 +10,8 @@ namespace InGame.UI.Menu.Shop
         public SidebarScaler sidebar;
         public RectTransform body;
 
-        public ScrollRect sabersScrollRect;
-        public GridLayoutGroup sabersLayoutGroup;
+        public ScrollRect sabersScrollRect, effectsScrollRect, mapsScrollRect;
+        public GridLayoutGroup sabersLayoutGroup, effectsLayoutGroup, mapsLayoutGroup;
         public ContentSizeFitter sabersFitter;
 
         private Vector2 mappedResolution;
@@ -44,6 +44,12 @@ namespace InGame.UI.Menu.Shop
             sabersScrollRect.vertical = isVerticalMode;
             sabersScrollRect.horizontal = !isVerticalMode;
 
+            effectsScrollRect.vertical = isVerticalMode;
+            effectsScrollRect.horizontal = !isVerticalMode;
+
+            mapsScrollRect.vertical = isVerticalMode;
+            mapsScrollRect.horizontal = !isVerticalMode;
+
             // Content fitting
             //sabersFitter.verticalFit = isVerticalMode ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
             //sabersFitter.horizontalFit = !isVerticalMode ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
@@ -52,6 +58,8 @@ namespace InGame.UI.Menu.Shop
 
 
             sabersLayoutGroup.constraint = isVerticalMode ? GridLayoutGroup.Constraint.FixedColumnCount : GridLayoutGroup.Constraint.FixedRowCount;
+            effectsLayoutGroup.constraint = isVerticalMode ? GridLayoutGroup.Constraint.FixedColumnCount : GridLayoutGroup.Constraint.FixedRowCount;
+            mapsLayoutGroup.constraint = isVerticalMode ? GridLayoutGroup.Constraint.FixedColumnCount : GridLayoutGroup.Constraint.FixedRowCount;
 
 
             // Waiting for preferredHeight and width will be calculated

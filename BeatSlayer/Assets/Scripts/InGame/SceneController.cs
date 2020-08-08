@@ -1,5 +1,8 @@
 ﻿using GameNet;
+using InGame.Game.Scoring.Mods;
+using InGame.Menu.Mods;
 using ProjectManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -167,6 +170,7 @@ public class SceneloadParameters
     }
 
     public LoadType Type { get; private set; }
+    public List<ModSO> Mods { get; private set; }
 
     public MapInfo Map { get; private set; } = new MapInfo();
     public DifficultyInfo difficultyInfo { get; private set; }
@@ -186,13 +190,14 @@ public class SceneloadParameters
 
     private SceneloadParameters() { }
 
-    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo)
+    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo, List<ModSO> mods)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
             Map = mapInfo,
-            difficultyInfo = difficultyInfo
+            difficultyInfo = difficultyInfo,
+            Mods = mods
         };
         return parameters;
     }
@@ -206,18 +211,11 @@ public class SceneloadParameters
         };
         return parameters;
     }
-    public static SceneloadParameters TutorialPreset()
-    {
-        var parameters = new SceneloadParameters()
-        {
-            Type = LoadType.Tutorial
-        };
-        return parameters;
-    }
+
     /// <summary>
     /// Start author music with practice mode
     /// </summary>
-    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo, float startTime, float musicSpeed, float cubesSpeed)
+    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo, float startTime, float musicSpeed, float cubesSpeed, List<ModSO> mods)
     {
         var parameters = new SceneloadParameters()
         {
@@ -227,11 +225,12 @@ public class SceneloadParameters
             IsPracticeMode = true,
             StartTime = startTime,
             MusicSpeed = musicSpeed,
-            CubesSpeed = cubesSpeed
+            CubesSpeed = cubesSpeed,
+            Mods = mods
         };
         return parameters;
     }
-    public static SceneloadParameters OwnMusicPreset(string audioFilePath, MapInfo mapInfo)
+    public static SceneloadParameters OwnMusicPreset(string audioFilePath, MapInfo mapInfo, List<ModSO> mods)
     {
         var parameters = new SceneloadParameters()
         {
@@ -242,30 +241,8 @@ public class SceneloadParameters
             {
                 name = "Standard",
                 stars = 4
-            }
-        };
-        return parameters;
-    }
-    public static SceneloadParameters FromFilePreset(string bsuPath)
-    {
-        string trackname = Path.GetFileNameWithoutExtension(bsuPath);
-        GroupInfo groupInfo = new GroupInfo()
-        {
-            author = trackname.Split('-')[0],
-            name = trackname.Split('-')[1],
-            mapsCount = 1
-        };
-        MapInfo info = new MapInfo()
-        {
-            group = groupInfo,
-            nick = "[LOCAL STORAGE *]",
-        };
-
-        var parameters = new SceneloadParameters()
-        {
-            Type = LoadType.ProjectFolder,
-            Map = info,
-            ProjectFolderPath = new FileInfo(bsuPath).DirectoryName
+            },
+            Mods = mods
         };
         return parameters;
     }
@@ -328,6 +305,11 @@ public class SceneloadParameters
             Type = LoadType.Menu
         };
         return parameters;
+    }
+
+    internal static SceneloadParameters AuthorMusicPreset(MapInfo currentMapInfo, object none)
+    {
+        throw new NotImplementedException();
     }
 }
 

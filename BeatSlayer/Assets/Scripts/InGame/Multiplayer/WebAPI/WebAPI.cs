@@ -197,13 +197,6 @@ namespace Web
         }
 
 
-
-
-        public static string GetTutorialGroup()
-        {
-            return new WebClient().DownloadString(Apibase + url_getTutorialGroup);
-        }
-
         public static void OnGameLaunch()
         {
             if (Application.internetReachability == NetworkReachability.NotReachable) return;

@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,8 +19,7 @@ public class CheatEngine : MonoBehaviour
     public BeatManager bm;
     
     public AudioSource asource;
-    //List<BeatCube> cubes = new List<BeatCube>();
-    List<IBeat> beats = new List<IBeat>();
+    public List<IBeat> Beats => bm.ActiveBeats;
 
     public Image[] keys;
 
@@ -51,7 +49,7 @@ public class CheatEngine : MonoBehaviour
             asource.pitch = pitch;
         }
 
-        if(beats.Count > 0)
+        if(Beats.Count > 0)
         {
             //List<BeatCube> cubesToSlice = cubes.Where(c => c != null && Mathf.Abs(c.transform.position.z - transform.position.z) < 30).ToList();
             //if (Input.GetKeyDown(KeyCode.E))
@@ -86,7 +84,7 @@ public class CheatEngine : MonoBehaviour
                 //List<IBeat> toPing = beats.Where(c => c != null && c.Transform != null && c.Transform.position.z - transform.position.z < 30).ToList();
                 List<IBeat> toPing = new List<IBeat>();
 
-                foreach (IBeat beat in beats)
+                foreach (IBeat beat in Beats)
                 {
                     if (beat == null) continue;
                     if (beat.GetClass() == null) continue;
@@ -147,13 +145,12 @@ public class CheatEngine : MonoBehaviour
     {
         if (!Application.isEditor) return;
 
-        //cubes.Add(cube);
-        beats.Add(cube);
+        //Beats.Add(cube);
     }
     public void RemoveCube(IBeat beat)
     {
         if (!Application.isEditor) return;
-        beats.Remove(beat);
+        //Beats.Remove(beat);
 
         if (makeMisses > 0) makeMisses--;
     }

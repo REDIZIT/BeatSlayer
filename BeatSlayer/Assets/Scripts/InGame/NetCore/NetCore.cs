@@ -470,6 +470,10 @@ namespace GameNet
             public static class Tutorial
             {
                 public static void TutorialPlayed(TutorialResult result) => conn.InvokeAsync("Tutorial_Played", JsonConvert.SerializeObject(result));
+
+                public async static Task<KeyValuePair<string, string>> GetTutorialMap() => await conn.InvokeAsync<KeyValuePair<string, string>>("Tutorial_GetTutorialMap");
+                public async static Task<Dictionary<string, string>> GetEasyMaps() => await conn.InvokeAsync<Dictionary<string, string>>("Tutorial_EasyMaps");
+                public async static Task<Dictionary<string, string>> GetHardMaps() => await conn.InvokeAsync<Dictionary<string, string>>("Tutorial_HardMaps");
             }
         }
 

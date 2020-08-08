@@ -57,7 +57,9 @@ namespace InGame.Shop
 
         public async void OnBuyBtnClick()
         {
+            buyBtn.interactable = false;
             await shopHelper.BuySaber(item.id);
+            buyBtn.interactable = true;
             Refresh();
         }
         /// <summary>

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7436d18f16f267b45a3442516c9c46f5, type: 3}
+  m_Name: Hard
+  m_EditorClassIdentifier: 
+  name: Hard
+  shortname: HR
+  sublabel: Speed up
+  description: Speeding up cubes in 1.25 times
+  modEnum: 4
+  modPillowColor: {r: 0.6039216, g: 0.1764706, b: 0.1764706, a: 0.6313726}
+  scoreMultiplier: 1.08
+  rpMultiplier: 1.06

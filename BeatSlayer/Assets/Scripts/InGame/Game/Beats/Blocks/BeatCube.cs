@@ -15,7 +15,7 @@ public class BeatCube : MonoBehaviour, IBeat
     public MeshFilter filter;
     //public ParticleSystem psystem;
 
-    [SerializeField] private ParticleSystem cubeParticleSystem;
+    [SerializeField] private ParticleSystem cubeParticleSystem, cubeDissovleParticleSystem;
 
     public Mesh pointMesh;
 
@@ -61,6 +61,7 @@ public class BeatCube : MonoBehaviour, IBeat
         }
 
         cubeParticleSystem.Stop();
+        cubeDissovleParticleSystem.Stop();
 
         renderer.materials[0].SetFloat("_Threshold", materialThreshold);
         renderer.materials[1].SetFloat("_Threshold", materialThreshold);
@@ -122,7 +123,7 @@ public class BeatCube : MonoBehaviour, IBeat
     {
         if (destroy)
         {
-            Slice(0);
+            Slice(0, destroy);
             return;
         }
 
@@ -151,15 +152,6 @@ public class BeatCube : MonoBehaviour, IBeat
         {
             Slice(degrees);
         }
-
-        //    if (cls.type == BeatCubeClass.Type.Point)
-        //    {
-        //        Slice();
-        //    }
-        //    else
-        //    {
-        // code here
-        //    }
     }
 
     public void Destroy()
@@ -167,17 +159,14 @@ public class BeatCube : MonoBehaviour, IBeat
         Slice(Random.Range(0, 360));
     }
 
-    void Slice(float angle)
+    void Slice(float angle, bool dissolve = false)
     {
         if (isDead) return;
         isDead = true;
 
         gm.BeatCubeSliced(this);
 
-        //w.Stop();
-        //Debug.Log("Life time " + w.ElapsedMilliseconds);
-
-        OnSlice(angle);
+        OnSlice(angle, dissolve);
     }
 
 
@@ -207,18 +196,23 @@ public class BeatCube : MonoBehaviour, IBeat
         {
             gm.MissedBeatCube(this);
 
-            //w.Stop();
-            //Debug.Log("Life time " + w.ElapsedMilliseconds);
-
             Destroy(gameObject);
         }
     }
 
-    void OnSlice(float angle)
+    void OnSlice(float angle, bool dissolve = false)
     {
-        cubeParticleSystem.gameObject.SetActive(true);
-        cubeParticleSystem.transform.parent = null;
-        cubeParticleSystem.transform.eulerAngles = new Vector3(0, 0, angle);
+        if (dissolve)
+        {
+            cubeDissovleParticleSystem.gameObject.SetActive(true);
+            cubeDissovleParticleSystem.transform.parent = null;
+        }
+        else
+        {
+            cubeParticleSystem.gameObject.SetActive(true);
+            cubeParticleSystem.transform.parent = null;
+            cubeParticleSystem.transform.eulerAngles = new Vector3(0, 0, angle);
+        }
 
         thresholdChange = 4;
         foreach (Material mat in renderer.materials)

@@ -43,6 +43,7 @@ public class BeatmapUIItem : MonoBehaviour
             isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, mapInfo.author, mapInfo.name);
         }
 
+        if (passedImage.gameObject == null) return;
         passedImage.SetActive(isPassed);
 
         GetComponent<Toggle>().isOn = isOnlyOneElement;

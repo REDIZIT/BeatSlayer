@@ -1,7 +1,7 @@
-﻿using InGame.Shop;
+﻿using InGame.Menu.Mods;
+using InGame.Shop;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace InGame.ScriptableObjects
@@ -18,6 +18,7 @@ namespace InGame.ScriptableObjects
         public List<SaberSO> sabers;
         public List<TailSO> tails;
         public List<LocationSO> locations;
+        public List<ModSO> mods;
 
         private void OnValidate()
         {

@@ -11,11 +11,13 @@ using BeatSlayerServer.Dtos.Mapping;
 using InGame.Leaderboard;
 using InGame.Animations;
 using InGame.Game.Spawn;
+using InGame.Game.HP;
 
 public class FinishHandler : MonoBehaviour
 {
     public GameManager gm { get { return GetComponent<GameManager>(); } }
     public BeatManager bm;
+    public HPManager hp;
 
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
     public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
@@ -55,7 +57,7 @@ public class FinishHandler : MonoBehaviour
     [Header("Finish conditions")]
     public bool isNotStarting;
     public bool isAudioTimeZero;
-    public bool isArrayEmpty;
+    //public bool isArrayEmpty;
     public bool isAudioStopped;
 
     public float audioTime;
@@ -65,7 +67,7 @@ public class FinishHandler : MonoBehaviour
         // Debuggin' finish end
         isNotStarting = !gm.IsGameStartingMap;
         isAudioTimeZero = audioManager.asource.time == 0;
-        isArrayEmpty = bm.Beats.ToArray().Length == 0;
+        //isArrayEmpty = bm.Beats.ToArray().Length == 0;
         isAudioStopped = !audioManager.asource.isPlaying;
 
         audioTime = audioManager.asource.time;
@@ -89,6 +91,8 @@ public class FinishHandler : MonoBehaviour
     private bool FinishConditions()
     {
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial) return false;
+
+        if (!hp.isAlive) return false;
 
         return
             !gm.IsGameStartingMap
