@@ -23,6 +23,21 @@ namespace InGame.Settings
 
     public class SettingsGraphicsModel
     {
+        [Option("Presets")]
+        public Preset Presets
+        {
+            get { return presets; }
+            set { 
+                if (value != presets)
+                {
+                    presets = value;
+                    OnPresetChanged(value);
+                } 
+            }
+        }
+        private Preset presets = Preset.High;
+
+
         [Option("Glow quality")]
         public GlowQuality GlowQuality { get; set; } = GlowQuality.High;
 
@@ -34,6 +49,43 @@ namespace InGame.Settings
 
         [Option("Trackname text position")]
         public TracknameTextPosition TracknameTextPosition { get; set; } = TracknameTextPosition.Top;
+
+        [Option("Enable blur (expensive)")]
+        public bool IsBlurEnabled { get; set; }
+
+
+        private void OnPresetChanged(Preset newPreset)
+        {
+            switch (newPreset)
+            {
+                case Preset.Low:
+                    GlowQuality = GlowQuality.Disabled;
+                    GlowPower = GlowPower.Low;
+                    IsBlurEnabled = false;
+                    break;
+
+                case Preset.Middle:
+                    GlowQuality = GlowQuality.Low;
+                    GlowPower = GlowPower.Middle;
+                    IsBlurEnabled = false;
+                    break;
+
+                case Preset.High:
+                    GlowQuality = GlowQuality.High;
+                    GlowPower = GlowPower.High;
+                    IsBlurEnabled = false;
+                    break;
+
+                case Preset.Ultra:
+                    GlowQuality = GlowQuality.High;
+                    GlowPower = GlowPower.High;
+                    IsBlurEnabled = true;
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 
 
@@ -135,5 +187,9 @@ namespace InGame.Settings
     public enum TracknameTextPosition
     {
         Top, Bottom, BottomReverse
+    }
+    public enum Preset
+    {
+        Low, Middle, High, Ultra
     }
 }

@@ -31,6 +31,10 @@ namespace InGame.Game.Tutorial
 
         public Text hintText;
 
+        [Header("Lockers")]
+        public GameObject videoLocker;
+        public GameObject meshUI;
+
         [Header("Finish")]
         public GameObject finishLocker;
         public Animator finishAnimator;
@@ -262,7 +266,8 @@ namespace InGame.Game.Tutorial
 
             // Start loading video
             videoCanvas.alpha = 0;
-            videoPlayer.gameObject.SetActive(true);
+            videoLocker.SetActive(true);
+            meshUI.SetActive(!videoLocker.activeSelf);
             videoPlayer.clip = clip;
             videoPlayer.Play();
             while (!videoPlayer.isPlaying) { yield return null; }
@@ -299,7 +304,8 @@ namespace InGame.Game.Tutorial
             if (!isVideoRepeated)
             {
                 videoCanvas.alpha = 0;
-                videoPlayer.gameObject.SetActive(false);
+                videoLocker.SetActive(false);
+                meshUI.SetActive(!videoLocker.activeSelf);
 
                 asource.pitch = 1;
                 asource.Play();

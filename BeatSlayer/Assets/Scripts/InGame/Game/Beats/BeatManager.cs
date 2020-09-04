@@ -9,6 +9,7 @@ using InGame.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
+using Debug = UnityEngine.Debug;
 
 namespace InGame.Game.Spawn
 {

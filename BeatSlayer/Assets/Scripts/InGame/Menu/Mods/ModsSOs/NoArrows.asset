@@ -16,7 +16,7 @@ MonoBehaviour:
   shortname: NA
   sublabel: Remove arrows
   description: Replacing cubes with arrow with cubes with point
-  modEnum: 0
+  modEnum: 128
   modPillowColor: {r: 0.22745098, g: 0.654902, b: 0.2627451, a: 0.6313726}
-  scoreMultiplier: 0.2
-  rpMultiplier: 0.5
+  scoreMultiplier: 0.4
+  rpMultiplier: 0.2

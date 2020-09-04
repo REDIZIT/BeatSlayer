@@ -1,3 +1,4 @@
+using InGame.Game.Scoring.Mods;
 using InGame.Helpers;
 using InGame.ScriptableObjects;
 using System.Collections.Generic;
@@ -64,7 +65,14 @@ namespace InGame.Menu.Mods
             scoreBonusText.text = $"Score: <b>x{(scoreMultiplier == 1 ? "1.0" : scoreMultiplier.ToString())}</b>";
             rpBonusText.text = $"RP: <b>x{(rpMultiplier == 1 ? "1.0" : rpMultiplier.ToString())}</b>";
 
-            Debug.Log(selectedMods.ToString());
+
+
+            ModEnum selectedModEnum = ModEnum.None;
+            foreach (var mod in selectedMods)
+            {
+                selectedModEnum = mod.ApplyEnum(selectedModEnum);
+            }
+            Debug.Log("Mods are " + selectedModEnum);
         }
     }
 }

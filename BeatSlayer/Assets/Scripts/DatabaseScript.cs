@@ -18,14 +18,11 @@ public class DatabaseScript : MonoBehaviour
     public TracksDatabase data;
     
     #region urls
-    public static string url_database => NetCore.Url_Server + "/Home/Database";
     public static string url_getGroups => NetCore.Url_Server + "/Database/GetGroupsExtended";
-    public static string url_getMaps => NetCore.Url_Server + "/Database/GetMaps";
     public static string url_getMapsWithResult => NetCore.Url_Server + "/Database/GetMapsWithResult?trackname={0}";
     public static string url_getMap => NetCore.Url_Server + "/Database/GetMap?trackname={0}&nick={1}";
     public static string url_doesMapExist => NetCore.Url_Server + "/Database/DoesMapExist?trackname={0}&nick={1}";
     public static string url_hasMapUpdate => NetCore.Url_Server + "/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
-    public static string url_setStatistics => NetCore.Url_Server + "/Database/SetStatistics?trackname={0}&nick={1}&key={2}&value=1";
     public static string url_setDifficultyStatistics => NetCore.Url_Server + "/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
     public static string url_getPrelistenFile => NetCore.Url_Server + "/Maps/GetPrelistenFile?trackname={0}";
     public static string url_hasPrelistenFile => NetCore.Url_Server + "/Maps/HasPrelistenFile?trackname={0}";
@@ -266,7 +263,7 @@ public class DatabaseScript : MonoBehaviour
 
     public static bool DoesMapExist(string trackname, string nick)
     {
-        string url = string.Format(url_doesMapExist, trackname, nick);
+        string url = string.Format(url_doesMapExist, trackname.Replace("&", "%26"), nick);
         WebClient c = new WebClient();
         string response = c.DownloadString(url);
         bool b = bool.Parse(response);

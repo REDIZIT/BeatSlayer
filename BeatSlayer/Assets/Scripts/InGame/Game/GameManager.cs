@@ -81,6 +81,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Image comboValueImg;
     [SerializeField] private Animator skipBtnAnimator;
     [SerializeField] private Text fpsText;
+    [SerializeField] private GameObject blurImage;
     private float comboMultiplierAnimValue;
 
     public Texture2D defaultTrackTexture;
@@ -372,6 +373,9 @@ public class GameManager : MonoBehaviour
 
         leftSaber.Init(leftSaberColor, prefsManager.prefs.selectedLeftSaberId, prefsManager.prefs.selectedSaberEffect, trailLifeTime);
         rightSaber.Init(rightSaberColor, prefsManager.prefs.selectedRightSaberId, prefsManager.prefs.selectedSaberEffect, trailLifeTime);
+
+
+        blurImage.gameObject.SetActive(Settings.Graphics.IsBlurEnabled);
     }
     void InitSettings()
     {

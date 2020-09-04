@@ -87,15 +87,6 @@ public class MenuScript_v2 : MonoBehaviour
     //private static bool TrustCertificate(object sender, X509Certificate x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors) { return true; }
     public void Awake()
     {
-        //Debug.LogError("PATCHING!");
-        //PrefsManager.prefs.boughtSaberEffects = new bool[3] { true, true, true };
-        //PrefsManager.prefs.boughtSabers = new bool[7] { true, true, true, true, true, true, true };
-        //PrefsManager.prefs.mapUnlocked0 = true;
-        //PrefsManager.prefs.mapUnlocked1 = true;
-        //PrefsManager.prefs.mapUnlocked2 = true;
-        //PrefsManager.prefs.mapUnlocked3 = false;
-        //PrefsManager.Save();
-
         Application.targetFrameRate = 60;
         if(Time.timeScale != 1)
         {

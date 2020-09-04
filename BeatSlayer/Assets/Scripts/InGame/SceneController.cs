@@ -170,7 +170,7 @@ public class SceneloadParameters
     }
 
     public LoadType Type { get; private set; }
-    public List<ModSO> Mods { get; private set; }
+    public List<ModSO> Mods { get; private set; } = new List<ModSO>();
 
     public MapInfo Map { get; private set; } = new MapInfo();
     public DifficultyInfo difficultyInfo { get; private set; }

@@ -15,6 +15,8 @@ using System.Linq;
 using UnityEditor;
 using Newtonsoft.Json;
 using InGame.Shop.UIItems;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 public class ShopHelper : MonoBehaviour
 {
@@ -145,11 +147,12 @@ public class ShopHelper : MonoBehaviour
         if (Payload.Account.Coins < saberSO.cost) return;
 
 
-        if (!await Purchase(saberSO.purchaseId)) return;
 
         // Updating UI
         RefreshSabersView();
         menuscript.RefreshCoinsTexts();
+
+        await Purchase(saberSO.purchaseId);
     }
    
     public async Task BuyTail(int id)
@@ -159,12 +162,11 @@ public class ShopHelper : MonoBehaviour
         TailSO tail = sodb.tails.Find(c => c.id == id);
         if (Payload.Account.Coins < tail.cost) return;
 
-
-        if (!await Purchase(tail.purchaseId)) return;
-
         // Updating UI
         RefreshEffectsView();
         menuscript.RefreshCoinsTexts();
+
+        await Purchase(tail.purchaseId);
     }
     public async Task BuyLocation(LocationSO so)
     {
@@ -172,12 +174,11 @@ public class ShopHelper : MonoBehaviour
 
         if (Payload.Account.Coins < so.cost) return;
 
-
-        if (!await Purchase(so.purchaseId)) return;
-
         // Updating UI
         RefreshLocationsView();
         menuscript.RefreshCoinsTexts();
+
+        await Purchase(so.purchaseId);
     }
     
 
@@ -302,10 +303,17 @@ public class ShopHelper : MonoBehaviour
         // Check if already bought
         if (Payload.Account.Purchases.Any(c => c.ItemId == purchaseId)) return false;
 
+        Stopwatch w = Stopwatch.StartNew();
         PurchaseModel purchase = await NetCore.ServerActions.Shop.TryBuyPurchase(Payload.Account.Nick, purchaseId);
+        w.Stop();
+        UnityEngine.Debug.Log($"Purchase elapsed time is {w.ElapsedMilliseconds}ms");
 
         // Purchasing failed on server side
-        if (purchase == null) return false;
+        if (purchase == null)
+        {
+            Debug.LogError("Purchase is null");
+            return false;
+        }
 
         // Adding bought purchase to local account class and decrease local balance
         Payload.Account.Purchases.Add(purchase);
