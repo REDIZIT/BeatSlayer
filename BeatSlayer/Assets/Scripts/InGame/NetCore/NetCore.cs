@@ -8,6 +8,7 @@ using BeatSlayerServer.Multiplayer.Accounts;
 using InGame.Game.Tutorial;
 using InGame.Leaderboard;
 using InGame.Multiplayer;
+using LobbyDTO = InGame.Multiplayer.Lobby.Lobby;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
@@ -393,7 +394,7 @@ namespace GameNet
 
                 public static void Search(string nick) => conn.InvokeAsync("Accounts_Search", nick);
                 public static void View(string nick) => conn.InvokeAsync("Accounts_View", nick);
-
+                public static async Task<AccountData> GetAccountByNick(string nick) => await conn.InvokeAsync<AccountData>("GetAccountByNick", nick);
 
 
 
@@ -436,7 +437,7 @@ namespace GameNet
             {
                 public static void GetFriends(string nick) => conn.InvokeAsync("Friends_GetFriends", nick);
                 
-                public static void InviteFriend(string addNick, string nick) => conn.InvokeAsync("Friends_InviteFriend",addNick, nick);
+                public static void InviteFriend(string targetNick, string requesterNick) => conn.InvokeAsync("Friends_InviteFriend",targetNick, requesterNick);
                 
                 public static void RemoveFriend(string fromNick, string nick) => conn.InvokeAsync("Friends_RemoveFriend",fromNick, nick);
             }
@@ -475,6 +476,20 @@ namespace GameNet
                 public async static Task<Dictionary<string, string>> GetEasyMaps() => await conn.InvokeAsync<Dictionary<string, string>>("Tutorial_EasyMaps");
                 public async static Task<Dictionary<string, string>> GetHardMaps() => await conn.InvokeAsync<Dictionary<string, string>>("Tutorial_HardMaps");
             }
+
+
+            public static class Lobby
+            {
+                public static async Task<List<LobbyDTO>> GetLobbies() => await conn.InvokeAsync<List<LobbyDTO>>("GetLobbies");
+                public static async Task<LobbyDTO> Create(string creatorNick) => await conn.InvokeAsync<LobbyDTO>("CreateLobby", creatorNick);
+                public static async Task<LobbyDTO> Join(string nick, int lobbyId) => await conn.InvokeAsync<LobbyDTO>("JoinLobby", lobbyId, nick);
+                public static async Task Leave(string nick, int lobbyId) => await conn.InvokeAsync("LeaveLobby", lobbyId, nick);
+                public static void ChangeMap(int lobbyId, MapData map) => conn.InvokeAsync("ChangeLobbyMap", lobbyId, map);
+                public static async Task ChangeReadyState(int lobbyId, string nick, LobbyPlayer.ReadyState state) 
+                    => await conn.InvokeAsync("ChangeReadyState", lobbyId, nick, state);
+                public static void ChangeHost(int lobbyId, string newHostNick) => conn.InvokeAsync("ChangeLobbyHost", lobbyId, newHostNick);
+                public static void Kick(int lobbyId, string nick) => conn.InvokeAsync("KickPlayerFromLobby", lobbyId, nick);
+            }
         }
 
 
@@ -512,14 +527,20 @@ namespace GameNet
             public Action<byte[]> Accounts_OnGetAvatar;
             public Action<string, string, string> Accounts_ChangePassword;
             
-            //public Action<ReplaySendData> Accounts_OnSendReplay;
             public Action<List<ReplayData>> Accounts_OnGetBestReplays;
-            //public Action<ReplayData> Accounts_OnGetBestReplay;
 
             public Action<List<AccountData>> Friends_OnGetFriends;
 
 
             public Action<NotificationInfo> Notification_OnSend;
+
+            // Lobby
+            public Action<LobbyPlayer> OnLobbyPlayerJoin;
+            public Action<LobbyPlayer> OnLobbyPlayerLeave;
+            public Action<LobbyPlayer> OnLobbyHostChange;
+            public Action<LobbyPlayer> OnLobbyPlayerKick;
+            public Action<MapData> OnLobbyMapChange;
+            public Action<string, LobbyPlayer.ReadyState> OnRemotePlayerReadyStateChange;
         }
     }
 }

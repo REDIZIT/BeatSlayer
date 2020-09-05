@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using InGame.UI.Overlays;
+﻿using InGame.UI.Overlays;
 using Pixelplacement;
 using UnityEngine;
-using UnityEngine.UI.Extensions;
 
 namespace InGame.Animations
 {
@@ -15,10 +12,15 @@ namespace InGame.Animations
         public OwnMusicUI ownMusicUI;
         public PageController pager;
         
+        
         public GameObject authorPage, ownPage;
         public GameObject overlay;
 
-        public bool isExtended;
+        [Header("Lobby")]
+        public State lobbyState;
+        public GameObject roomsPage, lobbyPage;
+
+        private bool isExtended;
 
         public void OnBtnClick()
         {
@@ -55,6 +57,18 @@ namespace InGame.Animations
 
             //ownMusicUI.OnOwnBtnClicked(() => { });
             pager.ShowScrollViewOwn();
+        }
+
+        public void OpenMultiplayerPage()
+        {
+            lobbyState.ChangeState(lobbyState.gameObject);
+            roomsPage.SetActive(true);
+            lobbyPage.SetActive(false);
+        }
+        public void OpenLobbyPage()
+        {
+            roomsPage.SetActive(false);
+            lobbyPage.SetActive(true);
         }
 
 

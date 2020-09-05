@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Assets.SimpleLocalization;
-using CoversManagement;
-using InGame.Game.Scoring.Mods;
 using InGame.Helpers;
 using InGame.Menu;
 using InGame.Menu.Maps;
 using InGame.Menu.Mods;
+using InGame.Multiplayer.Lobby.UI;
 using InGame.SceneManagement;
 using InGame.UI;
 using ProjectManagement;
 using Testing;
 using UnityEngine;
 using UnityEngine.UI;
-using Web;
 using GroupInfo = ProjectManagement.GroupInfo;
 using MapInfo = ProjectManagement.MapInfo;
 
@@ -28,7 +25,12 @@ public class BeatmapUI : MonoBehaviour
     public PracticeModeUI practiceModeUI;
     public MapsDownloadQueuer mapsDownloadQueuer;
     public ModsUI modsUI;
+    public LobbyUIManager lobbyUI;
 
+    [Header("Request flags")]
+    public bool isSelectingLobbyMap;
+
+    [Header("Map Info")]
     private MapInfo currentMapInfo;
     private DifficultyInfo currentDifficultyInfo;
     private bool isGroupDeleted;
@@ -394,6 +396,14 @@ public class BeatmapUI : MonoBehaviour
 
     public void StartBtnCicked()
     {
+        if (isSelectingLobbyMap)
+        {
+            lobbyUI.OnMapSelected(currentMapInfo);
+            isSelectingLobbyMap = false;
+            OnCloseBtnClicked();
+            return;
+        }
+
         // !!!!!  Set defaults coz of mods  !!!!!
         SSytem.instance.SetInt("CubesSpeed", 10);
         SSytem.instance.SetInt("MusicSpeed", 10);
@@ -505,6 +515,8 @@ public class BeatmapUI : MonoBehaviour
 
         currentDifficultyInfo = null;
         currentMapInfo = null;
+
+        isSelectingLobbyMap = false;
     }
     
     
