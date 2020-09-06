@@ -398,8 +398,7 @@ public class BeatmapUI : MonoBehaviour
     {
         if (isSelectingLobbyMap)
         {
-            lobbyUI.OnMapPicked(currentMapInfo);
-            isSelectingLobbyMap = false;
+            lobbyUI.OnMapPicked(currentMapInfo, currentDifficultyInfo);
             OnCloseBtnClicked();
             return;
         }

@@ -1,4 +1,5 @@
 using Assets.SimpleLocalization;
+using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
 using CoversManagement;
 using GameNet;
@@ -55,9 +56,11 @@ namespace InGame.Multiplayer.Lobby.UI
         [Header("Map info")]
         public RawImage mapImage;
         public Text authorText;
-        public Text nameText, mapperText;
+        public Text nameText, difficultyText, mapperText;
         public ProgressBar progressCircle;
         public GameObject progressLocker;
+        public GameObject hostChangingMessage, mapInfoTextsContainer, noMapSetText;
+        public GameObject hostChangingIcon;
 
         [Header("Players list")]
         public List<LobbySlotPresenter> slots;
@@ -99,6 +102,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnLobbyPlayerLeave += OnPlayerLeave;
                 NetCore.Subs.OnLobbyHostChange += OnHostChange;
                 NetCore.Subs.OnLobbyPlayerKick += OnLobbyPlayerKick;
+                NetCore.Subs.OnHostStartChangingMap += OnHostStartChangingMap;
                 NetCore.Subs.OnLobbyMapChange += OnMapRemoteChange;
 
                 NetCore.Subs.OnRemotePlayerReadyStateChange += OnRemotePlayerReadyStateChange;
@@ -133,9 +137,19 @@ namespace InGame.Multiplayer.Lobby.UI
         }
         public void RefreshMapInfo()
         {
+            if (currentLobby.SelectedMap == null)
+            {
+                mapInfoTextsContainer.SetActive(false);
+                noMapSetText.SetActive(true);
+                return;
+            }
+
             authorText.text = currentLobby.SelectedMap.Group.Author;
             nameText.text = currentLobby.SelectedMap.Group.Name;
-            mapperText.text = currentLobby.SelectedMap.Nick;
+            mapperText.text = "by " + currentLobby.SelectedMap.Nick;
+            difficultyText.text = currentLobby.SelectedDifficulty.Name + $"({currentLobby.SelectedDifficulty.Stars})";
+
+            // TODO: make difficulty stars presenter
 
             CoversManager.AddPackage(new CoverRequestPackage(mapImage, currentLobby.SelectedMap.Trackname, currentLobby.SelectedMap.Nick));
         }
@@ -215,12 +229,19 @@ namespace InGame.Multiplayer.Lobby.UI
             mainStateMachine.ChangeState(0);
             pageSwitcher.OnAuthorBtnClick();
             beatmapUI.isSelectingLobbyMap = true;
+
+            NetCore.ServerActions.Lobby.HostStartChangingMap(currentLobby.Id);
         }
-        public void OnMapPicked(MapInfo map)
+        public void OnMapPicked(MapInfo map, DifficultyInfo diff)
         {
             tracksOverlay.SetActive(false);
             mainUI.SetActive(true);
             lobbyStateMachine.ChangeState(lobbyStateMachine.gameObject);
+
+            mapInfoTextsContainer.SetActive(true);
+            hostChangingMessage.SetActive(false);
+            hostChangingIcon.SetActive(false);
+            noMapSetText.SetActive(false);
 
             Task.Run(() =>
             {
@@ -234,8 +255,9 @@ namespace InGame.Multiplayer.Lobby.UI
                     Nick = map.nick
                 };
                 currentLobby.SelectedMap = mapData;
+                currentLobby.SelectedDifficulty = new DifficultyData(diff);
 
-                NetCore.ServerActions.Lobby.ChangeMap(currentLobby.Id, mapData);
+                NetCore.ServerActions.Lobby.ChangeMap(currentLobby.Id, currentLobby.SelectedMap, currentLobby.SelectedDifficulty);
 
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
@@ -391,9 +413,21 @@ namespace InGame.Multiplayer.Lobby.UI
                 RefreshReadyButtons();
             });
         }
-        private void OnMapRemoteChange(MapData map)
+        private void OnHostStartChangingMap()
         {
+            hostChangingMessage.SetActive(true);
+            hostChangingIcon.SetActive(true);
+            mapInfoTextsContainer.SetActive(false);
+        }
+        private void OnMapRemoteChange(MapData map, DifficultyData diff)
+        {
+            hostChangingMessage.SetActive(false);
+            hostChangingIcon.SetActive(false);
+            noMapSetText.SetActive(false);
+            mapInfoTextsContainer.SetActive(true);
+
             currentLobby.SelectedMap = map;
+            currentLobby.SelectedDifficulty = diff;
 
             RefreshMapInfo();
 

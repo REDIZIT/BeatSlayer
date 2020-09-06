@@ -3,9 +3,9 @@ using InGame.Game.Scoring.Mods;
 using InGame.Helpers;
 using InGame.Menu.Mods;
 using InGame.ScriptableObjects;
-using Michsky.UI.ModernUIPack;
 using UnityEngine;
 using UnityEngine.UI;
+using Web;
 
 namespace InGame.Multiplayer.Lobby.UI
 {
@@ -16,6 +16,7 @@ namespace InGame.Multiplayer.Lobby.UI
         public GameObject hostIcon;
         public Image readyIndicatorImage;
         public GameObject textsParent;
+        public RawImage avatarImage;
 
         [Header("Downloading")]
         public Text progressText;
@@ -39,12 +40,11 @@ namespace InGame.Multiplayer.Lobby.UI
             backgroundImage.color = filledSlotColor;
 
 
-            hostIcon.SetActive(player.IsHost);
+            hostIcon.transform.parent.gameObject.SetActive(player.IsHost);
+            WebAPI.GetAvatar(player.Player.Nick, (tex) => avatarImage.texture = tex);
+            
 
             nickText.text = player.Player.Nick;
-            RectTransform nickRect = nickText.GetComponent<RectTransform>();
-            nickRect.offsetMin = player.IsHost ? new Vector2(80, nickRect.offsetMin.y) : new Vector2(26, nickRect.offsetMin.y);
-
 
             progressBar.gameObject.SetActive(false);
 
