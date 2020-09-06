@@ -18,6 +18,7 @@ using Ranking;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Scripting;
+using InGame.Game.Scoring.Mods;
 
 [assembly: Preserve]
 namespace GameNet
@@ -484,11 +485,22 @@ namespace GameNet
                 public static async Task<LobbyDTO> Create(string creatorNick) => await conn.InvokeAsync<LobbyDTO>("CreateLobby", creatorNick);
                 public static async Task<LobbyDTO> Join(string nick, int lobbyId) => await conn.InvokeAsync<LobbyDTO>("JoinLobby", lobbyId, nick);
                 public static async Task Leave(string nick, int lobbyId) => await conn.InvokeAsync("LeaveLobby", lobbyId, nick);
-                public static void ChangeMap(int lobbyId, MapData map) => conn.InvokeAsync("ChangeLobbyMap", lobbyId, map);
-                public static async Task ChangeReadyState(int lobbyId, string nick, LobbyPlayer.ReadyState state) 
-                    => await conn.InvokeAsync("ChangeReadyState", lobbyId, nick, state);
+
+
+
                 public static void ChangeHost(int lobbyId, string newHostNick) => conn.InvokeAsync("ChangeLobbyHost", lobbyId, newHostNick);
                 public static void Kick(int lobbyId, string nick) => conn.InvokeAsync("KickPlayerFromLobby", lobbyId, nick);
+
+
+                public static void ChangeMap(int lobbyId, MapData map) => conn.InvokeAsync("ChangeLobbyMap", lobbyId, map);
+                public static void ChangeMods(int lobbyId, string nick, ModEnum mods) => conn.InvokeAsync("ChangeLobbyMods", lobbyId, nick, mods);
+                public static async Task ChangeReadyState(int lobbyId, string nick, LobbyPlayer.ReadyState state)
+                    => await conn.InvokeAsync("ChangeReadyState", lobbyId, nick, state);
+
+
+                public static void OnStartDownloading(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyStartDownloading", lobbyId, nick);
+                public static void OnDownloadProgress(int lobbyId, string nick, int percent) => conn.InvokeAsync("OnLobbyDownloadProgress", lobbyId, nick, percent);
+                public static void OnDownloaded(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyDownloaded", lobbyId, nick);
             }
         }
 
@@ -540,62 +552,67 @@ namespace GameNet
             public Action<LobbyPlayer> OnLobbyHostChange;
             public Action<LobbyPlayer> OnLobbyPlayerKick;
             public Action<MapData> OnLobbyMapChange;
+
             public Action<string, LobbyPlayer.ReadyState> OnRemotePlayerReadyStateChange;
+            public Action<string, ModEnum> OnRemotePlayerModsChange;
+            public Action<string> OnRemotePlayerStartDownloading;
+            public Action<string, int> OnRemotePlayerDownloadProgress;
+            public Action<string> OnRemotePlayerDownloaded;
         }
     }
 }
 
 
-public class UnityLogger : ILoggerProvider
-{
-    public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
-    {
-        return new UnityLog();
-    }
-    public class UnityLog : Microsoft.Extensions.Logging.ILogger
-    {
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            var id = Guid.NewGuid();
-            Debug.Log($"BeginScope ({id}): {state}");
-            return new Scope<TState>(state, id);
-        }
-        struct Scope<TState> : IDisposable
-        {
-            public Scope(TState state, Guid id)
-            {
-                State = state;
-                Id = id;
-            }
+//public class UnityLogger : ILoggerProvider
+//{
+//    public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
+//    {
+//        return new UnityLog();
+//    }
+//    public class UnityLog : Microsoft.Extensions.Logging.ILogger
+//    {
+//        public IDisposable BeginScope<TState>(TState state)
+//        {
+//            var id = Guid.NewGuid();
+//            Debug.Log($"BeginScope ({id}): {state}");
+//            return new Scope<TState>(state, id);
+//        }
+//        struct Scope<TState> : IDisposable
+//        {
+//            public Scope(TState state, Guid id)
+//            {
+//                State = state;
+//                Id = id;
+//            }
 
-            public TState State { get; }
-            public Guid Id { get; }
+//            public TState State { get; }
+//            public Guid Id { get; }
 
-            public void Dispose() => Debug.Log($"EndScope ({Id}): {State}");
-        }
+//            public void Dispose() => Debug.Log($"EndScope ({Id}): {State}");
+//        }
 
-        public bool IsEnabled(LogLevel logLevel) => true;
+//        public bool IsEnabled(LogLevel logLevel) => true;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            switch (logLevel)
-            {
-                case LogLevel.Trace:
-                case LogLevel.Debug:
-                case LogLevel.Information:
-                    Debug.Log($"{logLevel}, {eventId}, {state}, {exception}");
-                    break;
-                case LogLevel.Warning:
-                    Debug.LogWarning($"{logLevel}, {eventId}, {state}, {exception}");
-                    break;
-                case LogLevel.Error:
-                case LogLevel.Critical:
-                    Debug.LogError($"{logLevel}, {eventId}, {state}, {exception}");
-                    break;
-                case LogLevel.None: break;
-            }
-        }
-    }
+//        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+//        {
+//            switch (logLevel)
+//            {
+//                case LogLevel.Trace:
+//                case LogLevel.Debug:
+//                case LogLevel.Information:
+//                    Debug.Log($"{logLevel}, {eventId}, {state}, {exception}");
+//                    break;
+//                case LogLevel.Warning:
+//                    Debug.LogWarning($"{logLevel}, {eventId}, {state}, {exception}");
+//                    break;
+//                case LogLevel.Error:
+//                case LogLevel.Critical:
+//                    Debug.LogError($"{logLevel}, {eventId}, {state}, {exception}");
+//                    break;
+//                case LogLevel.None: break;
+//            }
+//        }
+//    }
 
-    public void Dispose() { }
-}
+//    public void Dispose() { }
+//}

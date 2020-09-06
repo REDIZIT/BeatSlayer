@@ -51,12 +51,11 @@ namespace InGame.Multiplayer.Lobby.UI
             kickBtn.SetActive(player.Nick != Payload.Account.Nick && amIHost);
 
 
+            // Load avatar and account data
+            WebAPI.GetAvatar(player.Nick, (Texture2D tex) => avatarImage.texture = tex);
 
             Task.Run(async () =>
             {
-                // Load avatar and account data
-                //WebAPI.GetAvatar(player.Nick, (tex) => avatarImage.texture = tex);
-
                 account = await NetCore.ServerActions.Account.GetAccountByNick(player.Nick);
 
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>

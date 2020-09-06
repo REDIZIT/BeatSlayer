@@ -16,6 +16,10 @@ namespace InGame.Animations
         public GameObject authorPage, ownPage;
         public GameObject overlay;
 
+        [Header("Pages")]
+        public StateMachine stateMachine;
+        public GameObject mainState;
+
         [Header("Lobby")]
         public State lobbyState;
         public GameObject roomsPage, lobbyPage;
@@ -27,6 +31,11 @@ namespace InGame.Animations
             anim.Play(isExtended ? "Hide" : "Show");
 
             isExtended = !isExtended;
+        }
+
+        public void OpenMainPage()
+        {
+            stateMachine.ChangeState(mainState);
         }
 
         public void OnAuthorBtnClick()

@@ -82,6 +82,8 @@ namespace InGame.Menu.Maps
                 if (task.TaskState == MapDownloadTask.State.Canceled) return;
 
                 task.ProgressPercentage = progressArgs.ProgressPercentage;
+
+                task.OnProgress?.Invoke(task.ProgressPercentage);
                 ActiveItem?.OnProgress(progressArgs.ProgressPercentage);
 
             }, (completeArgs) =>
@@ -90,6 +92,9 @@ namespace InGame.Menu.Maps
 
 
                 task.TaskState = completeArgs.Error == null ? MapDownloadTask.State.Completed : MapDownloadTask.State.Error;
+
+                if (task.TaskState == MapDownloadTask.State.Completed) task.OnDownloaded?.Invoke();
+
                 ActiveItem?.OnComplete(task.TaskState == MapDownloadTask.State.Completed);
 
                 OnTaskCompleted();
@@ -154,9 +159,9 @@ namespace InGame.Menu.Maps
         }
 
 
-        public void AddTask(string trackname, string mapper)
+        public MapDownloadTask AddTask(string trackname, string mapper)
         {
-            var task = MapsDownloadQueuerBackground.AddTask(trackname, mapper);
+            MapDownloadTask task = MapsDownloadQueuerBackground.AddTask(trackname, mapper);
             AddItem(task);
             MapsDownloadQueuerBackground.ActiveItem = items.First();
 
@@ -167,6 +172,8 @@ namespace InGame.Menu.Maps
             {
                 ShowWindow();
             }
+
+            return task;
         }
         public void RemoveTask(MapsDownloadQueueItem item)
         {
@@ -210,8 +217,6 @@ namespace InGame.Menu.Maps
 
         private void OnQueueChange()
         {
-            Debug.Log("On queue change");
-
             // Update expand/collapse button image
             closeImage.gameObject.SetActive(MapsDownloadQueuerBackground.uncompletedQueue.Count() == 0);
 
@@ -231,6 +236,11 @@ namespace InGame.Menu.Maps
             }
 
             MapsDownloadQueuerBackground.ActiveItem = items.FirstOrDefault();
+
+            if (!isExpanded && MapsDownloadQueuerBackground.queue.All(c => c.TaskState == MapDownloadTask.State.Completed))
+            {
+                OnCloseBtnClick();
+            }
         }
         private void AddItem(MapDownloadTask task)
         {
@@ -315,6 +325,9 @@ namespace InGame.Menu.Maps
         private int pos;
 
         public int ProgressPercentage { get; set; }
+
+        public Action<int> OnProgress { get; set; }
+        public Action OnDownloaded { get; set; }
 
 
         public enum State

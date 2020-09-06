@@ -1,8 +1,8 @@
 using InGame.Game.Scoring.Mods;
 using InGame.Helpers;
 using InGame.ScriptableObjects;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +12,7 @@ namespace InGame.Menu.Mods
     {
         public List<ModUIItem> modsButtons;
         public List<ModSO> selectedMods;
+        public ModEnum selectedModEnum;
         public SODB sodb;
         
         [Header("UI")]
@@ -20,6 +21,8 @@ namespace InGame.Menu.Mods
 
         [Header("Hints UI")]
         public Transform hintsContent;
+
+        private bool isOpen;
 
 
         private void Start()
@@ -31,6 +34,7 @@ namespace InGame.Menu.Mods
         }
         public void Open()
         {
+            isOpen = true;
             locker.SetActive(true);
 
             foreach (ModUIItem item in modsButtons)
@@ -38,8 +42,15 @@ namespace InGame.Menu.Mods
                 item.Refresh(selectedMods.Contains(item.mod));
             }
         }
+        public IEnumerator IEOpen()
+        {
+            Open();
+
+            yield return new WaitWhile(() => isOpen);
+        }
         public void Close()
         {
+            isOpen = false;
             locker.SetActive(false);
         }
 
@@ -67,12 +78,11 @@ namespace InGame.Menu.Mods
 
 
 
-            ModEnum selectedModEnum = ModEnum.None;
+            selectedModEnum = ModEnum.None;
             foreach (var mod in selectedMods)
             {
                 selectedModEnum = mod.ApplyEnum(selectedModEnum);
             }
-            Debug.Log("Mods are " + selectedModEnum);
         }
     }
 }

@@ -1,10 +1,20 @@
+using Assets.SimpleLocalization;
 using BeatSlayerServer.Multiplayer.Accounts;
+using CoversManagement;
 using GameNet;
 using InGame.Animations;
+using InGame.Game.Mods;
+using InGame.Game.Scoring.Mods;
+using InGame.Helpers;
+using InGame.Menu.Maps;
+using InGame.Menu.Mods;
+using InGame.ScriptableObjects;
+using Michsky.UI.ModernUIPack;
 using Newtonsoft.Json;
 using Pixelplacement;
 using ProjectManagement;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +31,9 @@ namespace InGame.Multiplayer.Lobby.UI
         [Header("Components")]
         public BeatmapUI beatmapUI;
         public TrackListUI listUI;
+        public ModsUI modsUI;
+        public SODB sodb;
+        public MapsDownloadQueuer downloader;
 
         [Header("States")]
         public State mainStateMachine;
@@ -31,11 +44,20 @@ namespace InGame.Multiplayer.Lobby.UI
         [Header("Lobby page")]
         public Text lobbyNameText;
         public InputField nameInputField;
-        public GameObject readyBtn, notReadyBtn, startBtn;
+        public GameObject readyBtn, forceStartBtn, notReadyBtn, startBtn, locationBtn;
+        public Text notReadyPlayersCountText;
+        public GameObject changeMapButton;
+
+        [Header("Mods")]
+        public Transform modsContainer;
+        public GameObject modItemPrefab;
 
         [Header("Map info")]
+        public RawImage mapImage;
         public Text authorText;
         public Text nameText, mapperText;
+        public ProgressBar progressCircle;
+        public GameObject progressLocker;
 
         [Header("Players list")]
         public List<LobbySlotPresenter> slots;
@@ -48,6 +70,7 @@ namespace InGame.Multiplayer.Lobby.UI
         public GameObject lobbyItemPrefab;
 
         private Lobby currentLobby;
+        private LobbyPlayer myLobbyPlayer;
 
         public const int MAX_LOBBY_PLAYERS = 10;
 
@@ -76,11 +99,16 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnLobbyPlayerLeave += OnPlayerLeave;
                 NetCore.Subs.OnLobbyHostChange += OnHostChange;
                 NetCore.Subs.OnLobbyPlayerKick += OnLobbyPlayerKick;
-                NetCore.Subs.OnLobbyMapChange += OnMapChanged;
+                NetCore.Subs.OnLobbyMapChange += OnMapRemoteChange;
+
                 NetCore.Subs.OnRemotePlayerReadyStateChange += OnRemotePlayerReadyStateChange;
+                NetCore.Subs.OnRemotePlayerModsChange += OnRemotePlayerModsChange;
+                NetCore.Subs.OnRemotePlayerStartDownloading += OnRemotePlayerStartDownloading;
+                NetCore.Subs.OnRemotePlayerDownloadProgress += OnRemotePlayerDownloadProgress;
+                NetCore.Subs.OnRemotePlayerDownloaded += OnRemotePlayerDownloaded;
             });
         }
-        
+
 
 
 
@@ -108,9 +136,11 @@ namespace InGame.Multiplayer.Lobby.UI
             authorText.text = currentLobby.SelectedMap.Group.Author;
             nameText.text = currentLobby.SelectedMap.Group.Name;
             mapperText.text = currentLobby.SelectedMap.Nick;
+
+            CoversManager.AddPackage(new CoverRequestPackage(mapImage, currentLobby.SelectedMap.Trackname, currentLobby.SelectedMap.Nick));
         }
 
-        
+
 
 
 
@@ -124,10 +154,9 @@ namespace InGame.Multiplayer.Lobby.UI
             Task.Run(async () =>
             {
                 Lobby createdLobby = await NetCore.ServerActions.Lobby.Create(Payload.Account.Nick);
-                Debug.Log("Created successfuly. " + JsonConvert.SerializeObject(createdLobby));
 
                 Lobby lobby = await NetCore.ServerActions.Lobby.Join(Payload.Account.Nick, createdLobby.Id);
-                Debug.Log("Joined. " + JsonConvert.SerializeObject(lobby));
+                myLobbyPlayer = lobby.Players.First(c => c.Player.Nick == Payload.Account.Nick);
 
                 UnityMainThreadDispatcher.Instance().Enqueue(() => RefreshLobby(lobby));
             });
@@ -137,9 +166,11 @@ namespace InGame.Multiplayer.Lobby.UI
             Task.Run(async () =>
             {
                 Lobby lobby = await NetCore.ServerActions.Lobby.Join(Payload.Account.Nick, lobbyToJoin.Id);
+                myLobbyPlayer = lobby.Players.First(c => c.Player.Nick == Payload.Account.Nick);
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
                     RefreshLobby(lobby);
+                    DownloadMapIfNeeded();
                 });
             });
         }
@@ -149,12 +180,13 @@ namespace InGame.Multiplayer.Lobby.UI
             {
                 try
                 {
-                    await NetCore.ServerActions.Lobby.Leave(Payload.Account.Nick, currentLobby.Id);
                     UnityMainThreadDispatcher.Instance().Enqueue(() =>
                     {
                         currentLobby = null;
                         pageSwitcher.OpenMultiplayerPage();
+                        LobbyActionsLocker.instance.Close();
                     });
+                    await NetCore.ServerActions.Lobby.Leave(Payload.Account.Nick, currentLobby.Id);
                 }
                 catch (Exception err)
                 {
@@ -184,7 +216,7 @@ namespace InGame.Multiplayer.Lobby.UI
             pageSwitcher.OnAuthorBtnClick();
             beatmapUI.isSelectingLobbyMap = true;
         }
-        public void OnMapSelected(MapInfo map)
+        public void OnMapPicked(MapInfo map)
         {
             tracksOverlay.SetActive(false);
             mainUI.SetActive(true);
@@ -203,35 +235,70 @@ namespace InGame.Multiplayer.Lobby.UI
                 };
                 currentLobby.SelectedMap = mapData;
 
-                //await NetCore.ServerActions.Lobby.ChangeMap(currentLobby.Id, mapData);
                 NetCore.ServerActions.Lobby.ChangeMap(currentLobby.Id, mapData);
 
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
                     RefreshMapInfo();
                 });
-            });            
+            });
         }
+
 
 
 
 
         public void OnReadyButtonClick()
         {
-            readyBtn.SetActive(false);
-            notReadyBtn.SetActive(true);
+            myLobbyPlayer.State = LobbyPlayer.ReadyState.Ready;
+
             Task.Run(async () => await NetCore.ServerActions.Lobby.ChangeReadyState(currentLobby.Id, Payload.Account.Nick, LobbyPlayer.ReadyState.Ready));
         }
         public void OnNotReadyButtonClick()
         {
-            readyBtn.SetActive(true);
-            notReadyBtn.SetActive(false);
+            myLobbyPlayer.State = LobbyPlayer.ReadyState.NotReady;
+
             Task.Run(async () => await NetCore.ServerActions.Lobby.ChangeReadyState(currentLobby.Id, Payload.Account.Nick, LobbyPlayer.ReadyState.NotReady));
         }
+
         public void OnRemotePlayerReadyStateChange(string nick, LobbyPlayer.ReadyState state)
         {
             slots.First(c => c.player.Player.Nick == nick).ChangeState(state);
+
+            UnityMainThreadDispatcher.Instance().Enqueue(() => { try { RefreshReadyButtons(); } catch (Exception err) { Debug.LogError(err); } });
         }
+
+
+
+        public void OnRemotePlayerModsChange(string nick, ModEnum mods)
+        {
+            slots.First(c => c.player.Player.Nick == nick).ChangeMods(mods);
+        }
+        public void OnRemotePlayerStartDownloading(string nick)
+        {
+            slots.First(c => c.player.Player.Nick == nick).OnStartDownloading();
+        }
+        public void OnRemotePlayerDownloadProgress(string nick, int percent)
+        {
+            slots.First(c => c.player.Player.Nick == nick).OnDownloadProgress(percent);
+        }
+        public void OnRemotePlayerDownloaded(string nick)
+        {
+            slots.First(c => c.player.Player.Nick == nick).OnDownloadComplete();
+        }
+
+
+
+        public void OnModChangeButtonClick()
+        {
+            StartCoroutine(IEOnModChangeButtonClick());
+        }
+
+
+
+
+
+       
 
         public bool AmIHost()
         {
@@ -250,17 +317,70 @@ namespace InGame.Multiplayer.Lobby.UI
             nameText.text = lobby.Name;
             nameInputField.text = lobby.Name;
 
+            changeMapButton.SetActive(myLobbyPlayer.IsHost);
+
             FillSlots(lobby);
 
             RefreshMapInfo();
+            RefreshReadyButtons();
+            RefreshMods();
 
             pageSwitcher.OpenLobbyPage();
         }
+        private void RefreshReadyButtons()
+        {
+            if (AmIHost())
+            {
+                if (myLobbyPlayer.State != LobbyPlayer.ReadyState.Ready)
+                {
+                    readyBtn.SetActive(true);
+                    locationBtn.SetActive(true);
+
+                    notReadyBtn.SetActive(false);
+                    forceStartBtn.SetActive(false);
+                    startBtn.SetActive(false);
+                }
+                else if (myLobbyPlayer.State == LobbyPlayer.ReadyState.Ready)
+                {
+                    notReadyBtn.SetActive(true);
+
+                    readyBtn.SetActive(false);
+                    locationBtn.SetActive(false);
+
+                    if (slots.Where(c => c.player != null).All(c => c.player.State == LobbyPlayer.ReadyState.Ready))
+                    {
+                        startBtn.SetActive(true);
+                        forceStartBtn.SetActive(false);
+                    }
+                    else
+                    {
+                        forceStartBtn.SetActive(true);
+                        startBtn.SetActive(false);
+
+                        notReadyPlayersCountText.text = LocalizationManager.Localize("NotReadyPlayers", slots.Count(c => c.player != null && c.player.State != LobbyPlayer.ReadyState.Ready));
+                    }
+                }
+            }
+            else
+            {
+                readyBtn.SetActive(myLobbyPlayer.State != LobbyPlayer.ReadyState.Ready);
+                locationBtn.SetActive(myLobbyPlayer.State != LobbyPlayer.ReadyState.Ready);
+
+                notReadyBtn.SetActive(myLobbyPlayer.State == LobbyPlayer.ReadyState.Ready);
+
+                // False due to me isn't host
+                forceStartBtn.SetActive(false);
+                startBtn.SetActive(false);
+            }
+        }
+
+
+
         private void OnPlayerJoin(LobbyPlayer player)
         {
             currentLobby.Players.Add(player);
-
             FillSlots(currentLobby);
+            RefreshReadyButtons();
         }
         private void OnPlayerLeave(LobbyPlayer player)
         {
@@ -268,14 +388,54 @@ namespace InGame.Multiplayer.Lobby.UI
             {
                 currentLobby.Players.RemoveAll(c => c.Player.Nick == player.Player.Nick);
                 FillSlots(currentLobby);
+                RefreshReadyButtons();
             });
         }
-        private void OnMapChanged(MapData map)
+        private void OnMapRemoteChange(MapData map)
         {
             currentLobby.SelectedMap = map;
 
             RefreshMapInfo();
+
+            // Reset ready status
+            OnNotReadyButtonClick();
+
+            DownloadMapIfNeeded();
         }
+        private void DownloadMapIfNeeded()
+        {
+            if (!ProjectManager.IsMapDownloaded(currentLobby.SelectedMap.Group.Author, currentLobby.SelectedMap.Group.Name, currentLobby.SelectedMap.Nick))
+            {
+                progressLocker.SetActive(true);
+                progressCircle.CurrentPercent = 0;
+
+                var task = downloader.AddTask(currentLobby.SelectedMap.Trackname, currentLobby.SelectedMap.Nick);
+                task.OnProgress += OnMapDownloadProgress;
+                task.OnDownloaded += OnMapDownloaded;
+
+                myLobbyPlayer.State = LobbyPlayer.ReadyState.Downloading;
+                NetCore.ServerActions.Lobby.OnStartDownloading(currentLobby.Id, Payload.Account.Nick);
+            }
+            else
+            {
+                progressLocker.SetActive(false);
+            }
+        }
+        private void OnMapDownloaded()
+        {
+            progressLocker.SetActive(false);
+            myLobbyPlayer.State = LobbyPlayer.ReadyState.NotReady;
+            NetCore.ServerActions.Lobby.OnDownloaded(currentLobby.Id, Payload.Account.Nick);
+        }
+        private void OnMapDownloadProgress(int percent)
+        {
+            progressCircle.CurrentPercent = percent;
+            if (percent % 5 == 0)
+            {
+                NetCore.ServerActions.Lobby.OnDownloadProgress(currentLobby.Id, Payload.Account.Nick, percent);
+            }
+        }
+
         private void OnHostChange(LobbyPlayer player)
         {
             foreach (LobbyPlayer lobbyPlayer in currentLobby.Players)
@@ -306,6 +466,23 @@ namespace InGame.Multiplayer.Lobby.UI
             }
         }
 
+
+
+
+
+
+
+        private IEnumerator IEOnModChangeButtonClick()
+        {
+            yield return modsUI.IEOpen();
+
+            RefreshMods();
+
+            Task.Run(() =>
+            {
+                NetCore.ServerActions.Lobby.ChangeMods(currentLobby.Id, myLobbyPlayer.Player.Nick, modsUI.selectedModEnum);
+            });
+        }
         private void ClearAllSlots()
         {
             foreach (var slot in slots)
@@ -319,6 +496,19 @@ namespace InGame.Multiplayer.Lobby.UI
             foreach (LobbyPlayer player in lobby.Players)
             {
                 slots[player.SlotIndex].Refresh(player);
+            }
+        }
+        private void RefreshMods()
+        {
+            HelperUI.ClearContentAll(modsContainer);
+
+            foreach (ModSO modSO in sodb.mods)
+            {
+                if (modsUI.selectedMods.Any(c => c.modEnum.HasFlag(modSO.modEnum)))
+                {
+                    GameObject obj = Instantiate(modItemPrefab, modsContainer);
+                    obj.GetComponent<ModsBarItem>().Refresh(modSO);
+                }
             }
         }
     }
