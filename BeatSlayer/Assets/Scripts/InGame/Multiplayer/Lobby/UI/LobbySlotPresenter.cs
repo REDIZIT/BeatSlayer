@@ -109,7 +109,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
         public void OnMoreButtonClick()
         {
-            LobbyActionsLocker.instance.Show(player.Player, LobbyUIManager.instance.AmIHost());
+            LobbyActionsLocker.instance.Show(player.Player, LobbyManager.lobbyPlayer.IsHost);
         }
 
 

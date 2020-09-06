@@ -15,7 +15,6 @@ namespace InGame.Multiplayer.Lobby.UI
         public static LobbyActionsLocker instance;
 
         [Header("Components")]
-        public LobbyUIManager lobbyUI;
         public ProfileUI profileUI;
 
         [Header("UI")]
@@ -79,12 +78,12 @@ namespace InGame.Multiplayer.Lobby.UI
         }
         public void GiveHostRights()
         {
-            lobbyUI.GiveHostRights(account.Nick);
+            LobbyManager.GiveHostRights(account.Nick);
             Close();
         }
         public void Kick()
         {
-            lobbyUI.Kick(account.Nick);
+            LobbyManager.Kick(account.Nick);
             Close();
         }
 

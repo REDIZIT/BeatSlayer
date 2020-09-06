@@ -1,4 +1,6 @@
-﻿using InGame.UI.Overlays;
+﻿using InGame.Multiplayer.Lobby;
+using InGame.Multiplayer.Lobby.UI;
+using InGame.UI.Overlays;
 using Pixelplacement;
 using UnityEngine;
 
@@ -76,15 +78,28 @@ namespace InGame.Animations
         }
         public void OpenLobbyPage()
         {
+            lobbyState.ChangeState(lobbyState.gameObject);
             roomsPage.SetActive(false);
             lobbyPage.SetActive(true);
         }
+        public void ShowModsInLobby()
+        {
+            overlay.SetActive(true);
 
+            authorPage.SetActive(false);
+            ownPage.SetActive(false);
+        }
 
-        public void OnBackBtnClick()
+        public void BackFromAuthorList()
         {
             overlay.SetActive(false);
             mainUI.SetActive(true);
+
+            if (LobbyManager.isPickingMap)
+            {
+                LobbyUIManager.instance.OnMapPickCancel();
+                OpenLobbyPage();
+            }
         }
     }
 }

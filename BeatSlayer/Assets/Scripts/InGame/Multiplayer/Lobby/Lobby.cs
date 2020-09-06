@@ -11,6 +11,7 @@ namespace InGame.Multiplayer.Lobby
 
         public MapData SelectedMap { get; set; }
         public DifficultyData SelectedDifficulty { get; set; }
+        public bool IsHostChangingMap { get; set; }
 
         public List<LobbyPlayer> Players { get; set; }
     }

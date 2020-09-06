@@ -11,10 +11,8 @@ using InGame.Menu.Maps;
 using InGame.Menu.Mods;
 using InGame.ScriptableObjects;
 using Michsky.UI.ModernUIPack;
-using Newtonsoft.Json;
 using Pixelplacement;
 using ProjectManagement;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +37,7 @@ namespace InGame.Multiplayer.Lobby.UI
         [Header("States")]
         public State mainStateMachine;
         public State lobbyStateMachine;
-        public PlayBtnAnim pageSwitcher;
+        public PlayBtnAnim pager;
         public GameObject tracksOverlay, mainUI;
 
         [Header("Lobby page")]
@@ -72,13 +70,6 @@ namespace InGame.Multiplayer.Lobby.UI
         public Transform lobbyStackParent;
         public GameObject lobbyItemPrefab;
 
-        private Lobby currentLobby;
-        private LobbyPlayer myLobbyPlayer;
-
-        public const int MAX_LOBBY_PLAYERS = 10;
-
-
-
 
 
 
@@ -90,7 +81,7 @@ namespace InGame.Multiplayer.Lobby.UI
         private void Start()
         {
             slots = new List<LobbySlotPresenter>();
-            for (int i = 0; i < MAX_LOBBY_PLAYERS; i++)
+            for (int i = 0; i < LobbyManager.MAX_LOBBY_PLAYERS; i++)
             {
                 GameObject slotObj = Instantiate(slotPrefab, slotStackParent);
                 slots.Add(slotObj.GetComponent<LobbySlotPresenter>());
@@ -103,6 +94,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnLobbyHostChange += OnHostChange;
                 NetCore.Subs.OnLobbyPlayerKick += OnLobbyPlayerKick;
                 NetCore.Subs.OnHostStartChangingMap += OnHostStartChangingMap;
+                NetCore.Subs.OnHostCancelChangingMap += OnRemoteHostCancelChanging;
                 NetCore.Subs.OnLobbyMapChange += OnMapRemoteChange;
 
                 NetCore.Subs.OnRemotePlayerReadyStateChange += OnRemotePlayerReadyStateChange;
@@ -116,244 +108,63 @@ namespace InGame.Multiplayer.Lobby.UI
 
 
 
-        public void RefreshLobbiesList()
+        public void RefreshLobby()
         {
-            foreach (Transform item in lobbyStackParent) Destroy(item.gameObject);
-
-            Task.Run(async () =>
-            {
-                List<Lobby> lobbies = await NetCore.ServerActions.Lobby.GetLobbies();
-
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    foreach (var lobby in lobbies)
-                    {
-                        GameObject obj = Instantiate(lobbyItemPrefab, lobbyStackParent);
-                        LobbyPresenter presenter = obj.GetComponent<LobbyPresenter>();
-                        presenter.Refresh(lobby);
-                    }
-                });
-            });
-        }
-        public void RefreshMapInfo()
-        {
-            if (currentLobby.SelectedMap == null)
-            {
-                mapInfoTextsContainer.SetActive(false);
-                noMapSetText.SetActive(true);
-                return;
-            }
-
-            authorText.text = currentLobby.SelectedMap.Group.Author;
-            nameText.text = currentLobby.SelectedMap.Group.Name;
-            mapperText.text = "by " + currentLobby.SelectedMap.Nick;
-            difficultyText.text = currentLobby.SelectedDifficulty.Name + $"({currentLobby.SelectedDifficulty.Stars})";
-
-            // TODO: make difficulty stars presenter
-
-            CoversManager.AddPackage(new CoverRequestPackage(mapImage, currentLobby.SelectedMap.Trackname, currentLobby.SelectedMap.Nick));
-        }
+            nameText.text = LobbyManager.lobby.Name;
+            nameInputField.text = LobbyManager.lobby.Name;
 
 
-
-
-
-
-
-
-
-
-        public void CreateLobby()
-        {
-            Task.Run(async () =>
-            {
-                Lobby createdLobby = await NetCore.ServerActions.Lobby.Create(Payload.Account.Nick);
-
-                Lobby lobby = await NetCore.ServerActions.Lobby.Join(Payload.Account.Nick, createdLobby.Id);
-                myLobbyPlayer = lobby.Players.First(c => c.Player.Nick == Payload.Account.Nick);
-
-                UnityMainThreadDispatcher.Instance().Enqueue(() => RefreshLobby(lobby));
-            });
-        }
-        public void JoinLobby(Lobby lobbyToJoin)
-        {
-            Task.Run(async () =>
-            {
-                Lobby lobby = await NetCore.ServerActions.Lobby.Join(Payload.Account.Nick, lobbyToJoin.Id);
-                myLobbyPlayer = lobby.Players.First(c => c.Player.Nick == Payload.Account.Nick);
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    RefreshLobby(lobby);
-                    DownloadMapIfNeeded();
-                });
-            });
-        }
-        public void LeaveLobby()
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                    {
-                        currentLobby = null;
-                        pageSwitcher.OpenMultiplayerPage();
-                        LobbyActionsLocker.instance.Close();
-                    });
-                    await NetCore.ServerActions.Lobby.Leave(Payload.Account.Nick, currentLobby.Id);
-                }
-                catch (Exception err)
-                {
-                    Debug.LogError(err);
-                }
-            });
-        }
-        public void GiveHostRights(string nick)
-        {
-            NetCore.ServerActions.Lobby.ChangeHost(currentLobby.Id, nick);
-        }
-        public void Kick(string nick)
-        {
-            NetCore.ServerActions.Lobby.Kick(currentLobby.Id, nick);
-        }
-
-
-
-
-
-
-
-        public void SelectMapButtonClick()
-        {
-            listUI.RefreshDownloadedList(0);
-            mainStateMachine.ChangeState(0);
-            pageSwitcher.OnAuthorBtnClick();
-            beatmapUI.isSelectingLobbyMap = true;
-
-            NetCore.ServerActions.Lobby.HostStartChangingMap(currentLobby.Id);
-        }
-        public void OnMapPicked(MapInfo map, DifficultyInfo diff)
-        {
-            tracksOverlay.SetActive(false);
-            mainUI.SetActive(true);
-            lobbyStateMachine.ChangeState(lobbyStateMachine.gameObject);
-
-            mapInfoTextsContainer.SetActive(true);
-            hostChangingMessage.SetActive(false);
-            hostChangingIcon.SetActive(false);
-            noMapSetText.SetActive(false);
-
-            Task.Run(() =>
-            {
-                MapData mapData = new MapData()
-                {
-                    Group = new GroupData()
-                    {
-                        Author = map.author,
-                        Name = map.name
-                    },
-                    Nick = map.nick
-                };
-                currentLobby.SelectedMap = mapData;
-                currentLobby.SelectedDifficulty = new DifficultyData(diff);
-
-                NetCore.ServerActions.Lobby.ChangeMap(currentLobby.Id, currentLobby.SelectedMap, currentLobby.SelectedDifficulty);
-
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    RefreshMapInfo();
-                });
-            });
-        }
-
-
-
-
-
-        public void OnReadyButtonClick()
-        {
-            myLobbyPlayer.State = LobbyPlayer.ReadyState.Ready;
-
-            Task.Run(async () => await NetCore.ServerActions.Lobby.ChangeReadyState(currentLobby.Id, Payload.Account.Nick, LobbyPlayer.ReadyState.Ready));
-        }
-        public void OnNotReadyButtonClick()
-        {
-            myLobbyPlayer.State = LobbyPlayer.ReadyState.NotReady;
-
-            Task.Run(async () => await NetCore.ServerActions.Lobby.ChangeReadyState(currentLobby.Id, Payload.Account.Nick, LobbyPlayer.ReadyState.NotReady));
-        }
-
-        public void OnRemotePlayerReadyStateChange(string nick, LobbyPlayer.ReadyState state)
-        {
-            slots.First(c => c.player.Player.Nick == nick).ChangeState(state);
-
-            UnityMainThreadDispatcher.Instance().Enqueue(() => { try { RefreshReadyButtons(); } catch (Exception err) { Debug.LogError(err); } });
-        }
-
-
-
-        public void OnRemotePlayerModsChange(string nick, ModEnum mods)
-        {
-            slots.First(c => c.player.Player.Nick == nick).ChangeMods(mods);
-        }
-        public void OnRemotePlayerStartDownloading(string nick)
-        {
-            slots.First(c => c.player.Player.Nick == nick).OnStartDownloading();
-        }
-        public void OnRemotePlayerDownloadProgress(string nick, int percent)
-        {
-            slots.First(c => c.player.Player.Nick == nick).OnDownloadProgress(percent);
-        }
-        public void OnRemotePlayerDownloaded(string nick)
-        {
-            slots.First(c => c.player.Player.Nick == nick).OnDownloadComplete();
-        }
-
-
-
-        public void OnModChangeButtonClick()
-        {
-            StartCoroutine(IEOnModChangeButtonClick());
-        }
-
-
-
-
-
-       
-
-        public bool AmIHost()
-        {
-            return currentLobby.Players.Find(c => c.Player.Nick == Payload.Account.Nick).IsHost;
-        }
-
-
-
-
-
-
-        private void RefreshLobby(Lobby lobby)
-        {
-            currentLobby = lobby;
-
-            nameText.text = lobby.Name;
-            nameInputField.text = lobby.Name;
-
-            changeMapButton.SetActive(myLobbyPlayer.IsHost);
-
-            FillSlots(lobby);
-
+            RefreshPlayerSlots();
             RefreshMapInfo();
             RefreshReadyButtons();
             RefreshMods();
 
-            pageSwitcher.OpenLobbyPage();
+            pager.OpenLobbyPage();
+        }
+
+        #region Refresh modules
+
+        private void RefreshMapInfo()
+        {
+            changeMapButton.SetActive(LobbyManager.lobbyPlayer.IsHost);
+
+            RefreshSelectedMapState();
+
+            authorText.text = LobbyManager.lobby.SelectedMap.Group.Author;
+            nameText.text = LobbyManager.lobby.SelectedMap.Group.Name;
+            mapperText.text = "by " + LobbyManager.lobby.SelectedMap.Nick;
+            difficultyText.text = LobbyManager.lobby.SelectedDifficulty.Name + $"({LobbyManager.lobby.SelectedDifficulty.Stars})";
+
+            // TODO: make difficulty stars presenter
+
+            CoversManager.AddPackage(new CoverRequestPackage(mapImage, LobbyManager.lobby.SelectedMap.Trackname, LobbyManager.lobby.SelectedMap.Nick));
+        }
+        private void RefreshPlayerSlots()
+        {
+            ClearAllSlots();
+            foreach (LobbyPlayer player in LobbyManager.lobby.Players)
+            {
+                slots[player.SlotIndex].Refresh(player);
+            }
+        }
+        private void RefreshMods()
+        {
+            HelperUI.ClearContentAll(modsContainer);
+
+            foreach (ModSO modSO in sodb.mods)
+            {
+                if (modsUI.selectedMods.Any(c => c.modEnum.HasFlag(modSO.modEnum)))
+                {
+                    GameObject obj = Instantiate(modItemPrefab, modsContainer);
+                    obj.GetComponent<ModsBarItem>().Refresh(modSO);
+                }
+            }
         }
         private void RefreshReadyButtons()
         {
-            if (AmIHost())
+            if (LobbyManager.lobbyPlayer.IsHost)
             {
-                if (myLobbyPlayer.State != LobbyPlayer.ReadyState.Ready)
+                if (LobbyManager.lobbyPlayer.State != LobbyPlayer.ReadyState.Ready)
                 {
                     readyBtn.SetActive(true);
                     locationBtn.SetActive(true);
@@ -362,7 +173,7 @@ namespace InGame.Multiplayer.Lobby.UI
                     forceStartBtn.SetActive(false);
                     startBtn.SetActive(false);
                 }
-                else if (myLobbyPlayer.State == LobbyPlayer.ReadyState.Ready)
+                else if (LobbyManager.lobbyPlayer.State == LobbyPlayer.ReadyState.Ready)
                 {
                     notReadyBtn.SetActive(true);
 
@@ -385,49 +196,184 @@ namespace InGame.Multiplayer.Lobby.UI
             }
             else
             {
-                readyBtn.SetActive(myLobbyPlayer.State != LobbyPlayer.ReadyState.Ready);
-                locationBtn.SetActive(myLobbyPlayer.State != LobbyPlayer.ReadyState.Ready);
+                readyBtn.SetActive(LobbyManager.lobbyPlayer.State != LobbyPlayer.ReadyState.Ready);
+                locationBtn.SetActive(LobbyManager.lobbyPlayer.State != LobbyPlayer.ReadyState.Ready);
 
-                notReadyBtn.SetActive(myLobbyPlayer.State == LobbyPlayer.ReadyState.Ready);
+                notReadyBtn.SetActive(LobbyManager.lobbyPlayer.State == LobbyPlayer.ReadyState.Ready);
 
                 // False due to me isn't host
                 forceStartBtn.SetActive(false);
                 startBtn.SetActive(false);
             }
         }
-
-
-
-        private void OnPlayerJoin(LobbyPlayer player)
+        private void RefreshSelectedMapState()
         {
-            currentLobby.Players.Add(player);
-            FillSlots(currentLobby);
-            RefreshReadyButtons();
-        }
-        private void OnPlayerLeave(LobbyPlayer player)
-        {
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            if (LobbyManager.lobby.IsHostChangingMap)
             {
-                currentLobby.Players.RemoveAll(c => c.Player.Nick == player.Player.Nick);
-                FillSlots(currentLobby);
-                RefreshReadyButtons();
+                hostChangingMessage.SetActive(true);
+                hostChangingIcon.SetActive(true);
+                noMapSetText.SetActive(false);
+                mapInfoTextsContainer.SetActive(false);
+                return;
+            }
+
+            hostChangingMessage.SetActive(false);
+            hostChangingIcon.SetActive(false);
+
+            noMapSetText.SetActive(LobbyManager.lobby.SelectedMap == null);
+            mapInfoTextsContainer.SetActive(LobbyManager.lobby.SelectedMap != null);
+        }
+
+        #endregion
+
+
+
+        public void RefreshLobbiesList()
+        {
+            foreach (Transform item in lobbyStackParent) Destroy(item.gameObject);
+
+            Task.Run(async () =>
+            {
+                List<Lobby> lobbies = await LobbyManager.GetLobbies();
+
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    foreach (var lobby in lobbies)
+                    {
+                        GameObject obj = Instantiate(lobbyItemPrefab, lobbyStackParent);
+                        LobbyPresenter presenter = obj.GetComponent<LobbyPresenter>();
+                        presenter.Refresh(lobby);
+                    }
+                });
             });
         }
-        private void OnHostStartChangingMap()
+
+
+
+
+
+        #region Create/Join/Leave lobby
+
+        public void CreateLobby()
         {
-            hostChangingMessage.SetActive(true);
-            hostChangingIcon.SetActive(true);
-            mapInfoTextsContainer.SetActive(false);
+            Task.Run(async () =>
+            {
+                await LobbyManager.CreateAndJoinLobby();
+                UnityMainThreadDispatcher.Instance().Enqueue(RefreshLobby);
+            });
+        }
+        public void JoinLobby(Lobby lobbyToJoin)
+        {
+            modsUI.selectedMods.Clear();
+            Task.Run(async () =>
+            {
+                await LobbyManager.JoinLobby(lobbyToJoin);
+               
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    RefreshLobby();
+                    DownloadMapIfNeeded();
+                });
+            });
+        }
+        public void LeaveLobby()
+        {
+            Task.Run(async () =>
+            {
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    pager.OpenMultiplayerPage();
+                    LobbyActionsLocker.instance.Close();
+                });
+                await LobbyManager.LeaveLobby();
+            });
+        }
+
+        #endregion
+
+
+        #region Map picking
+
+        public void SelectMapButtonClick()
+        {
+            listUI.RefreshDownloadedList(0);
+            mainStateMachine.ChangeState(0);
+            pager.OnAuthorBtnClick();
+            LobbyManager.isPickingMap = true;
+
+            LobbyManager.StartMapPicking();
+        }
+        public void OnMapPicked(MapInfo map, DifficultyInfo diff)
+        {
+            LobbyManager.isPickingMap = false;
+
+            tracksOverlay.SetActive(false);
+            mainUI.SetActive(true);
+            lobbyStateMachine.ChangeState(lobbyStateMachine.gameObject);
+
+            Task.Run(async () =>
+            {
+                await LobbyManager.ChangeMap(map, diff);
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    RefreshMapInfo();
+                });
+            });
+        }
+        public void OnMapPickCancel()
+        {
+            LobbyManager.CancelMapPicking();
+            OnRemoteHostCancelChanging();
+        }
+
+        #endregion
+
+
+        #region Ready state button events
+
+        public void OnReadyButtonClick()
+        {
+            LobbyManager.ChangeReadyState(LobbyPlayer.ReadyState.Ready);
+        }
+        public void OnNotReadyButtonClick()
+        {
+            LobbyManager.ChangeReadyState(LobbyPlayer.ReadyState.NotReady);
+        }
+
+        #endregion
+
+
+
+        #region OnRemote (other players activity)
+
+        private void OnRemotePlayerReadyStateChange(string nick, LobbyPlayer.ReadyState state)
+        {
+            slots.First(c => c.player.Player.Nick == nick).ChangeState(state);
+
+            UnityMainThreadDispatcher.Instance().Enqueue(RefreshReadyButtons);
+        }
+        private void OnRemotePlayerModsChange(string nick, ModEnum mods)
+        {
+            slots.First(c => c.player.Player.Nick == nick).ChangeMods(mods);
+        }
+        private void OnRemotePlayerStartDownloading(string nick)
+        {
+            slots.First(c => c.player.Player.Nick == nick).OnStartDownloading();
+        }
+        private void OnRemotePlayerDownloadProgress(string nick, int percent)
+        {
+            slots.First(c => c.player.Player.Nick == nick).OnDownloadProgress(percent);
+        }
+        private void OnRemotePlayerDownloaded(string nick)
+        {
+            slots.First(c => c.player.Player.Nick == nick).OnDownloadComplete();
         }
         private void OnMapRemoteChange(MapData map, DifficultyData diff)
         {
-            hostChangingMessage.SetActive(false);
-            hostChangingIcon.SetActive(false);
-            noMapSetText.SetActive(false);
-            mapInfoTextsContainer.SetActive(true);
+            LobbyManager.lobby.SelectedMap = map;
+            LobbyManager.lobby.SelectedDifficulty = diff;
 
-            currentLobby.SelectedMap = map;
-            currentLobby.SelectedDifficulty = diff;
+            LobbyManager.lobby.IsHostChangingMap = false;
 
             RefreshMapInfo();
 
@@ -436,19 +382,25 @@ namespace InGame.Multiplayer.Lobby.UI
 
             DownloadMapIfNeeded();
         }
+
+        #endregion
+
+        #region Map downloading
+
         private void DownloadMapIfNeeded()
         {
-            if (!ProjectManager.IsMapDownloaded(currentLobby.SelectedMap.Group.Author, currentLobby.SelectedMap.Group.Name, currentLobby.SelectedMap.Nick))
+            if (LobbyManager.lobby.SelectedMap == null) return;
+
+            if (!ProjectManager.IsMapDownloaded(LobbyManager.lobby.SelectedMap.Group.Author, LobbyManager.lobby.SelectedMap.Group.Name, LobbyManager.lobby.SelectedMap.Nick))
             {
                 progressLocker.SetActive(true);
                 progressCircle.CurrentPercent = 0;
 
-                var task = downloader.AddTask(currentLobby.SelectedMap.Trackname, currentLobby.SelectedMap.Nick);
+                var task = downloader.AddTask(LobbyManager.lobby.SelectedMap.Trackname, LobbyManager.lobby.SelectedMap.Nick);
                 task.OnProgress += OnMapDownloadProgress;
                 task.OnDownloaded += OnMapDownloaded;
 
-                myLobbyPlayer.State = LobbyPlayer.ReadyState.Downloading;
-                NetCore.ServerActions.Lobby.OnStartDownloading(currentLobby.Id, Payload.Account.Nick);
+                LobbyManager.PingStartDownloading();
             }
             else
             {
@@ -458,91 +410,100 @@ namespace InGame.Multiplayer.Lobby.UI
         private void OnMapDownloaded()
         {
             progressLocker.SetActive(false);
-            myLobbyPlayer.State = LobbyPlayer.ReadyState.NotReady;
-            NetCore.ServerActions.Lobby.OnDownloaded(currentLobby.Id, Payload.Account.Nick);
+            LobbyManager.PingDownloadCompleted();
         }
         private void OnMapDownloadProgress(int percent)
         {
             progressCircle.CurrentPercent = percent;
             if (percent % 5 == 0)
             {
-                NetCore.ServerActions.Lobby.OnDownloadProgress(currentLobby.Id, Payload.Account.Nick, percent);
+                LobbyManager.PingDownloadProgress(percent);
             }
         }
 
-        private void OnHostChange(LobbyPlayer player)
+        #endregion
+
+        #region Mods
+
+        public void OnModChangeButtonClick()
         {
-            foreach (LobbyPlayer lobbyPlayer in currentLobby.Players)
-            {
-                lobbyPlayer.IsHost = lobbyPlayer.Player.Nick == player.Player.Nick;
-            }
+            StartCoroutine(IEOnModChangeButtonClick());
+        }
+        private IEnumerator IEOnModChangeButtonClick()
+        {
+            pager.ShowModsInLobby();
+            yield return modsUI.IEOpen();
+
+            RefreshMods();
+            LobbyManager.ChangeMods(modsUI.selectedModEnum);
+        }
+
+        #endregion
+
+        #region Player Join/Leave/Kick
+
+        private void OnPlayerJoin(LobbyPlayer player)
+        {
+            LobbyManager.lobby.Players.Add(player);
+            RefreshPlayerSlots();
+            RefreshReadyButtons();
+        }
+        private void OnPlayerLeave(LobbyPlayer player)
+        {
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                RefreshLobby(currentLobby);
+                LobbyManager.lobby.Players.RemoveAll(c => c.Player.Nick == player.Player.Nick);
+                RefreshPlayerSlots();
+                RefreshReadyButtons();
             });
         }
         private void OnLobbyPlayerKick(LobbyPlayer player)
         {
             // You're were too bad... you have been kicked ;(
-            if (player.Player.Nick == Payload.Account.Nick)
+            if (player.Player.Nick == LobbyManager.lobbyPlayer.Player.Nick)
             {
-                //LeaveLobby();
+                LobbyManager.RemoteKickMe();
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
-                    currentLobby = null;
-                    pageSwitcher.OpenMultiplayerPage();
+                    pager.OpenMultiplayerPage();
                 });
             }
             else
             {
-                currentLobby.Players.RemoveAll(c => c.Player.Nick == player.Player.Nick);
-                FillSlots(currentLobby);
+                LobbyManager.RemoteKick(player.Player.Nick);
+                RefreshPlayerSlots();
             }
         }
 
+        #endregion
 
+        #region Host
 
-
-
-
-
-        private IEnumerator IEOnModChangeButtonClick()
+        private void OnHostStartChangingMap()
         {
-            yield return modsUI.IEOpen();
-
-            RefreshMods();
-
-            Task.Run(() =>
-            {
-                NetCore.ServerActions.Lobby.ChangeMods(currentLobby.Id, myLobbyPlayer.Player.Nick, modsUI.selectedModEnum);
-            });
+            LobbyManager.lobby.IsHostChangingMap = true;
+            RefreshSelectedMapState();
         }
+        private void OnHostChange(LobbyPlayer player)
+        {
+            LobbyManager.RemoteHostChanged(player.Player.Nick);
+
+            UnityMainThreadDispatcher.Instance().Enqueue(RefreshLobby);
+        }
+        private void OnRemoteHostCancelChanging()
+        {
+            LobbyManager.lobby.IsHostChangingMap = false;
+            RefreshSelectedMapState();
+        }
+
+        #endregion
+
+
         private void ClearAllSlots()
         {
             foreach (var slot in slots)
             {
                 slot.Clear();
-            }
-        }
-        private void FillSlots(Lobby lobby)
-        {
-            ClearAllSlots();
-            foreach (LobbyPlayer player in lobby.Players)
-            {
-                slots[player.SlotIndex].Refresh(player);
-            }
-        }
-        private void RefreshMods()
-        {
-            HelperUI.ClearContentAll(modsContainer);
-
-            foreach (ModSO modSO in sodb.mods)
-            {
-                if (modsUI.selectedMods.Any(c => c.modEnum.HasFlag(modSO.modEnum)))
-                {
-                    GameObject obj = Instantiate(modItemPrefab, modsContainer);
-                    obj.GetComponent<ModsBarItem>().Refresh(modSO);
-                }
             }
         }
     }

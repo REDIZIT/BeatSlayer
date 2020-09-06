@@ -7,6 +7,7 @@ using InGame.Helpers;
 using InGame.Menu;
 using InGame.Menu.Maps;
 using InGame.Menu.Mods;
+using InGame.Multiplayer.Lobby;
 using InGame.Multiplayer.Lobby.UI;
 using InGame.SceneManagement;
 using InGame.UI;
@@ -26,9 +27,6 @@ public class BeatmapUI : MonoBehaviour
     public MapsDownloadQueuer mapsDownloadQueuer;
     public ModsUI modsUI;
     public LobbyUIManager lobbyUI;
-
-    [Header("Request flags")]
-    public bool isSelectingLobbyMap;
 
     [Header("Map Info")]
     private MapInfo currentMapInfo;
@@ -396,7 +394,7 @@ public class BeatmapUI : MonoBehaviour
 
     public void StartBtnCicked()
     {
-        if (isSelectingLobbyMap)
+        if (LobbyManager.isPickingMap)
         {
             lobbyUI.OnMapPicked(currentMapInfo, currentDifficultyInfo);
             OnCloseBtnClicked();
@@ -514,8 +512,6 @@ public class BeatmapUI : MonoBehaviour
 
         currentDifficultyInfo = null;
         currentMapInfo = null;
-
-        isSelectingLobbyMap = false;
     }
     
     
