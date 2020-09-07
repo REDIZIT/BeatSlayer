@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Scripting;
 using InGame.Game.Scoring.Mods;
+using InGame.Multiplayer.Lobby.Chat.Models;
 
 [assembly: Preserve]
 namespace GameNet
@@ -503,6 +504,10 @@ namespace GameNet
                 public static void OnStartDownloading(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyStartDownloading", lobbyId, nick);
                 public static void OnDownloadProgress(int lobbyId, string nick, int percent) => conn.InvokeAsync("OnLobbyDownloadProgress", lobbyId, nick, percent);
                 public static void OnDownloaded(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyDownloaded", lobbyId, nick);
+
+
+
+                public static void SendChatMessage(int lobbyId, LobbyPlayerChatMessage message) => conn.InvokeAsync("SendLobbyPlayerMessage", lobbyId, message);
             }
         }
 
@@ -562,6 +567,9 @@ namespace GameNet
             public Action<string> OnRemotePlayerStartDownloading;
             public Action<string, int> OnRemotePlayerDownloadProgress;
             public Action<string> OnRemotePlayerDownloaded;
+
+
+            public Action<LobbyPlayerChatMessage> OnLobbyPlayerMessage;
         }
     }
 }

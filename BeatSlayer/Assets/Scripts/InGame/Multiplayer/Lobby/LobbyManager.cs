@@ -42,9 +42,9 @@ namespace InGame.Multiplayer.Lobby
         }
         public static async Task LeaveLobby()
         {
+            await NetCore.ServerActions.Lobby.Leave(Payload.Account.Nick, lobby.Id);
             lobby = null;
             lobbyPlayer = null;
-            await NetCore.ServerActions.Lobby.Leave(Payload.Account.Nick, lobby.Id);
         }
 
         #endregion

@@ -129,6 +129,7 @@ namespace InGame.Multiplayer.Lobby.UI
             changeMapButton.SetActive(LobbyManager.lobbyPlayer.IsHost);
 
             RefreshSelectedMapState();
+            if (LobbyManager.lobby.SelectedMap == null) return;
 
             authorText.text = LobbyManager.lobby.SelectedMap.Group.Author;
             nameText.text = LobbyManager.lobby.SelectedMap.Group.Name;
