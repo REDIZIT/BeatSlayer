@@ -496,7 +496,7 @@ namespace GameNet
 
                 public static void HostStartChangingMap(int lobbyId) => conn.InvokeAsync("HostStartChangingMap", lobbyId);
                 public static void HostCancelChangingMap(int lobbyId) => conn.InvokeAsync("HostCancelChangingMap", lobbyId);
-                public static async Task ChangeMap(int lobbyId, ProjectManagement.MapInfo map, DifficultyInfo difficulty) => await conn.InvokeAsync("ChangeLobbyMap", lobbyId, map, difficulty);
+                public static async Task ChangeMap(int lobbyId, ProjectManagement.ProjectMapInfo map, DifficultyInfo difficulty) => await conn.InvokeAsync("ChangeLobbyMap", lobbyId, map, difficulty);
                 public static void ChangeMods(int lobbyId, string nick, ModEnum mods) => conn.InvokeAsync("ChangeLobbyMods", lobbyId, nick, mods);
                 public static async Task ChangeReadyState(int lobbyId, string nick, LobbyPlayer.ReadyState state)
                     => await conn.InvokeAsync("ChangeReadyState", lobbyId, nick, state);
@@ -563,7 +563,7 @@ namespace GameNet
             public Action<LobbyPlayer> OnLobbyPlayerKick;
             public Action OnHostStartChangingMap;
             public Action OnHostCancelChangingMap;
-            public Action<ProjectManagement.MapInfo, DifficultyInfo> OnLobbyMapChange;
+            public Action<ProjectManagement.ProjectMapInfo, DifficultyInfo> OnLobbyMapChange;
 
             public Action<string, LobbyPlayer.ReadyState> OnRemotePlayerReadyStateChange;
             public Action<string, ModEnum> OnRemotePlayerModsChange;

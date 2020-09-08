@@ -12,7 +12,7 @@ namespace InGame.Multiplayer.Lobby
 
         //public MapData SelectedMap { get; set; }
         //public DifficultyData SelectedDifficulty { get; set; }
-        public ProjectManagement.MapInfo SelectedMap { get; set; }
+        public ProjectManagement.ProjectMapInfo SelectedMap { get; set; }
         public DifficultyInfo SelectedDifficulty { get; set; }
 
         public bool IsHostChangingMap { get; set; }

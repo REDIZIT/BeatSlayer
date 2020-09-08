@@ -195,7 +195,7 @@ namespace InGame.UI.Overlays
                     name = name,
                     mapsCount = 1,
                     filepath = file,
-                    groupType = GroupInfo.GroupType.Own
+                    groupType = GroupType.Own
                 };
                 ls.Add(group);
             }

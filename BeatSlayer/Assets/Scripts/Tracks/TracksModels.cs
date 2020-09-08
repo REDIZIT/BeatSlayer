@@ -1,9 +1,4 @@
-﻿using ProjectManagement;
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using UnityEngine;
-
+﻿using System.Collections.Generic;
 
 // Class that will be saved into file and used when no internet access
 public class TracksDatabase
@@ -24,42 +19,4 @@ public class TrackGroupClass
     public bool novelty;
 
     public TrackGroupClass() { }
-    public TrackGroupClass(GroupInfoExtended info)
-    {
-        author = info.author;
-        name = info.name;
-        mapsCount = info.mapsCount;
-        downloads = info.allDownloads;
-        plays = info.allPlays;
-        likes = info.allLikes;
-        dislikes = info.allDislikes;
-
-        TimeSpan timeDifference = DateTime.Now - info.updateTime;
-        novelty = timeDifference.TotalDays <= 3;
-    }
-}
-
-public class TrackClass
-{
-    public TrackGroupClass group;
-    public string nick;
-
-    public int likes, dislikes, downloads, plays;
-    public Sprite cover;
-
-    public bool hasUpdate;
-
-    public int difficulty;
-    public string difficultyName;
-}
-
-public class TrackRecordGroup
-{
-    public List<TrackRecord> ls = new List<TrackRecord>();
-}
-public class TrackRecord
-{
-    public string author, name, nick;
-    public string score;
-    public string multiplier;
 }

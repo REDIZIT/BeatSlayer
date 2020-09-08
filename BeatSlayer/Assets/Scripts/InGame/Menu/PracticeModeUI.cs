@@ -1,4 +1,5 @@
-﻿using InGame.SceneManagement;
+﻿using InGame.Models;
+using InGame.SceneManagement;
 using ProjectManagement;
 using System.Collections.Generic;
 using System.IO;
@@ -17,10 +18,10 @@ namespace InGame.Menu
         //private Project selectedProject;
         private AudioClip selectedClip;
 
-        private MapInfo mapInfo;
+        private BasicMapData mapInfo;
         private DifficultyInfo difficultyInfo;
 
-        public void ShowWindow(MapInfo mapInfo, DifficultyInfo difficultyInfo)
+        public void ShowWindow(BasicMapData mapInfo, DifficultyInfo difficultyInfo)
         {
             this.mapInfo = mapInfo;
             this.difficultyInfo = difficultyInfo;
@@ -32,8 +33,8 @@ namespace InGame.Menu
 
             string perPath = Application.persistentDataPath;
 
-            string trackname = mapInfo.author + "-" + mapInfo.name;
-            string filepath = perPath + "/maps/" + trackname + "/" + mapInfo.nick + "/" + trackname + ".mp3";
+            string trackname = mapInfo.Author + "-" + mapInfo.Name;
+            string filepath = perPath + "/maps/" + trackname + "/" + mapInfo.Nick + "/" + trackname + ".mp3";
             if (!File.Exists(filepath)) filepath = Path.ChangeExtension(filepath, ".ogg");
 
             selectedClip = ProjectManager.LoadAudio(filepath);

@@ -6,9 +6,5 @@ namespace ProjectManagement
         public int mapsCount;
         
         public GroupType groupType;
-        public enum GroupType
-        {
-            Author, Own, Tutorial
-        }
     }
 }

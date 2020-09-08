@@ -5,9 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class DatabaseScript : MonoBehaviour
@@ -31,7 +29,7 @@ public class DatabaseScript : MonoBehaviour
 
     #region Groups and maps (Server loading)
     // Get all tracks from db (maps groups)
-    public IEnumerator LoadDatabaseAsync(bool refresh = false)
+    public IEnumerator LoadDatabaseAsync()
     {
         System.Net.ServicePointManager.ServerCertificateValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
         GetComponent<MenuScript_v2>().musicLoadingText.color = Color.white;
@@ -66,16 +64,16 @@ public class DatabaseScript : MonoBehaviour
         if (data.tracks == null) data.tracks = new List<TrackGroupClass>();
         else data.tracks.Clear();
 
-        List<MapInfo> mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
+        List<ProjectMapInfo> mapInfos = (List<ProjectMapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<ProjectMapInfo>)));
 
-        foreach (MapInfo info in mapInfos)
+        foreach (ProjectMapInfo info in mapInfos)
         {
             bool isNew = (DateTime.Now - info.publishTime) <= new TimeSpan(3, 0, 0, 0);
 
             TrackGroupClass cls = new TrackGroupClass()
             {
-                author = info.author,
-                name = info.name,
+                author = info.Author,
+                name = info.Name,
                 mapsCount = info.group.mapsCount,
                 downloads = info.downloads,
                 plays = info.playCount,
@@ -85,49 +83,13 @@ public class DatabaseScript : MonoBehaviour
             };
             data.tracks.Add(cls);
         }
-
-        //TheGreat.SyncRecords(this);
-        //GetComponent<ListController>().RefreshAuthorList();
     }
     
     
     
-    public List<MapInfo> GetMapsByTrack(GroupInfoExtended groupInfo)
-    { 
-        List<MapInfo> mapInfos;
-
-        if(Application.internetReachability != NetworkReachability.NotReachable)
-        {
-            WebClient client = new WebClient();
-            
-            string trackname = groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
-            string url = string.Format(url_getMapsWithResult, trackname);
-            string response = client.DownloadString(url);
-
-            mapInfos = (List<MapInfo>)(JsonConvert.DeserializeObject(response, typeof(List<MapInfo>)));
-        }
-        else
-        {
-            mapInfos = new List<MapInfo>();
-            string trackname = groupInfo.author + "-" + groupInfo.name;
-            string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
-            foreach(string mapFolder in Directory.GetDirectories(groupFolder))
-            {
-                MapInfo info = new MapInfo()
-                {
-                    group = groupInfo,
-                    nick = new DirectoryInfo(mapFolder).Name
-                };
-                mapInfos.Add(info);
-            }
-        }
-        
-
-        return mapInfos;
-    }
-    public void GetMapsByTrackAsync(GroupInfoExtended groupInfo, Action<List<MapInfo>> callback, Action<string> error)
+    public void GetMapsByTrackAsync(GroupInfoExtended groupInfo, Action<List<ProjectMapInfo>> callback, Action<string> error)
     {
-        List<MapInfo> mapInfos = null;
+        List<ProjectMapInfo> mapInfos = null;
 
         if(Application.internetReachability != NetworkReachability.NotReachable)
         {
@@ -142,7 +104,7 @@ public class DatabaseScript : MonoBehaviour
                         error(err);
                         if (err == "Group has been deleted")
                         {
-                            List<MapInfo> ls = LoadMapInfosFromLocal(groupInfo);
+                            List<ProjectMapInfo> ls = LoadMapInfosFromLocal(groupInfo);
                             ls.ForEach((info) =>
                             {
                                 info.isMapDeleted = true;
@@ -152,7 +114,7 @@ public class DatabaseScript : MonoBehaviour
                     }
                     else
                     {
-                        mapInfos = (List<MapInfo>) (JsonConvert.DeserializeObject(a.Result, typeof(List<MapInfo>)));
+                        mapInfos = (List<ProjectMapInfo>) (JsonConvert.DeserializeObject(a.Result, typeof(List<ProjectMapInfo>)));
                         callback(mapInfos);   
                     }
                 }
@@ -175,14 +137,14 @@ public class DatabaseScript : MonoBehaviour
 
     
     
-    List<MapInfo> LoadMapInfosFromLocal(GroupInfo groupInfo)
+    List<ProjectMapInfo> LoadMapInfosFromLocal(GroupInfo groupInfo)
     {
-        List<MapInfo> mapInfos = new List<MapInfo>();
+        List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
         string trackname = groupInfo.author + "-" + groupInfo.name;
         string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
         foreach(string mapFolder in Directory.GetDirectories(groupFolder))
         {
-            MapInfo info = new MapInfo()
+            ProjectMapInfo info = new ProjectMapInfo()
             {
                 group = groupInfo,
                 nick = new DirectoryInfo(mapFolder).Name,
@@ -196,53 +158,24 @@ public class DatabaseScript : MonoBehaviour
     
     
     
-
-    public Task<List<TrackGroupClass>> GetDownloadedMusic()
-    {
-        string mapsFolder = Application.persistentDataPath + "/maps";
-        return Task.Factory.StartNew<List<TrackGroupClass>>(() =>
-        {
-            List<TrackGroupClass> ls = new List<TrackGroupClass>();
-
-            string[] groups = Directory.GetDirectories(mapsFolder);
-            for (int i = 0; i < groups.Length; i++)
-            {
-                string trackname = new DirectoryInfo(groups[i]).Name;
-
-                TrackGroupClass groupcls = new TrackGroupClass()
-                {
-                    author = trackname.Split('-')[0],
-                    name = trackname.Split('-')[1],
-                    mapsCount = Directory.GetDirectories(mapsFolder + "/" + trackname).Length
-                };
-
-                ls.Add(groupcls);
-            }
-
-            return ls;
-        });
-    }
-    public List<MapInfo> GetDownloadedMaps(GroupInfo group)
+    public List<ProjectMapInfo> GetDownloadedMaps(GroupInfo group)
     {
         string trackFolder = Application.persistentDataPath + "/maps/" + group.author + "-" + group.name;
         string[] mapsPathes = Directory.GetDirectories(trackFolder);
 
-        List<MapInfo> mapInfos = new List<MapInfo>();
+        List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
         for (int i = 0; i < mapsPathes.Length; i++)
         {
-            string nick = new DirectoryInfo(mapsPathes[i]).Name;
-            MapInfo info = GetMapInfo(group.author + "-" + group.name, new DirectoryInfo(mapsPathes[i]).Name);
+            ProjectMapInfo info = GetMapInfo(group.author + "-" + group.name, new DirectoryInfo(mapsPathes[i]).Name);
             mapInfos.Add(info);
-
-            //arr[i].hasUpdate = HasUpdateForMap(group.author + "-" + group.name, arr[i].nick);
         }
 
         return mapInfos;
     }
-    public List<MapInfo> GetCustomMaps(GroupInfoExtended group)
+    public List<ProjectMapInfo> GetCustomMaps(GroupInfoExtended group)
     {
-        List<MapInfo> ls = new List<MapInfo>();
-        ls.Add(new MapInfo(group)
+        List<ProjectMapInfo> ls = new List<ProjectMapInfo>();
+        ls.Add(new ProjectMapInfo(group)
         {
             nick = "[LOCAL STORAGE]",
             filepath = group.filepath,
@@ -275,19 +208,19 @@ public class DatabaseScript : MonoBehaviour
 
     #endregion
 
-    public MapInfo GetMapInfo(string trackname, string nick)
+    public ProjectMapInfo GetMapInfo(string trackname, string nick)
     {
         try
         {
             WebClient c = new WebClient();
             string response = c.DownloadString(string.Format(url_getMap, trackname, nick));
 
-            return (MapInfo)JsonConvert.DeserializeObject(response, typeof(MapInfo));
+            return (ProjectMapInfo)JsonConvert.DeserializeObject(response, typeof(ProjectMapInfo));
         }
         catch (Exception err)
         {
             Debug.LogError("GetMapStatistics for " + trackname + "   " + nick + "\n" + err.Message);
-            return new MapInfo();
+            return new ProjectMapInfo();
         }
     }
     

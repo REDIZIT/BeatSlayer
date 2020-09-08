@@ -10,6 +10,7 @@ using System.IO;
 using Testing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using InGame.Models;
 
 namespace InGame.SceneManagement
 {
@@ -171,9 +172,9 @@ public class SceneloadParameters
     public LoadType Type { get; private set; }
     public List<ModSO> Mods { get; private set; } = new List<ModSO>();
 
-    public MapInfo Map { get; private set; } = new MapInfo();
+    public BasicMapData Map { get; private set; } = new BasicMapData();
     public DifficultyInfo difficultyInfo { get; private set; }
-    public string Trackname { get { return Map.author + "-" + Map.name; } }
+    public string Trackname { get { return Map.Author + "-" + Map.Name; } }
 
     public string AudioFilePath { get; private set; }
     public string ProjectFolderPath { get; private set; }
@@ -193,12 +194,12 @@ public class SceneloadParameters
 
     private SceneloadParameters() { }
 
-    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo, List<ModSO> mods)
+    public static SceneloadParameters AuthorMusicPreset(BasicMapData map, DifficultyInfo difficultyInfo, List<ModSO> mods)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
-            Map = mapInfo,
+            Map = map,
             difficultyInfo = difficultyInfo,
             Mods = mods
         };
@@ -207,12 +208,12 @@ public class SceneloadParameters
 
 
 
-    public static SceneloadParameters TutorialPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo)
+    public static SceneloadParameters TutorialPreset(BasicMapData map, DifficultyInfo difficultyInfo)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Tutorial,
-            Map = mapInfo,
+            Map = map,
             difficultyInfo = difficultyInfo
         };
         return parameters;
@@ -221,12 +222,12 @@ public class SceneloadParameters
     /// <summary>
     /// Start author music with practice mode
     /// </summary>
-    public static SceneloadParameters AuthorMusicPreset(MapInfo mapInfo, DifficultyInfo difficultyInfo, float startTime, float musicSpeed, float cubesSpeed, List<ModSO> mods)
+    public static SceneloadParameters AuthorMusicPreset(BasicMapData map, DifficultyInfo difficultyInfo, float startTime, float musicSpeed, float cubesSpeed, List<ModSO> mods)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
-            Map = mapInfo,
+            Map = map,
             difficultyInfo = difficultyInfo,
             IsPracticeMode = true,
             StartTime = startTime,
@@ -236,13 +237,13 @@ public class SceneloadParameters
         };
         return parameters;
     }
-    public static SceneloadParameters OwnMusicPreset(string audioFilePath, MapInfo mapInfo, List<ModSO> mods)
+    public static SceneloadParameters OwnMusicPreset(OwnMapData map, List<ModSO> mods)
     {
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.AudioFile,
-            AudioFilePath = audioFilePath,
-            Map = mapInfo,
+            AudioFilePath = map.Filepath,
+            Map = map,
             difficultyInfo = new DifficultyInfo()
             {
                 name = "Standard",
@@ -256,22 +257,17 @@ public class SceneloadParameters
     {
         string mapFolder = Application.persistentDataPath + "/data/moderation/map";
 
-        GroupInfo groupInfo = new GroupInfo()
+        BasicMapData map = new BasicMapData()
         {
-            author = request.trackname.Split('-')[0],
-            name = request.trackname.Split('-')[1],
-            mapsCount = 1
-        };
-        MapInfo info = new MapInfo()
-        {
-            group = groupInfo,
-            nick = "[MODERATION *]"
+            Name = request.trackname.Split('-')[0],
+            Author = request.trackname.Split('-')[1],
+            Nick = "[MODERATION *]"
         };
 
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Moderation,
-            Map = info, 
+            Map = map, 
             ProjectFolderPath = mapFolder,
             difficultyInfo = difficultyInfo
         };
@@ -280,22 +276,17 @@ public class SceneloadParameters
     public static SceneloadParameters EditorTestPreset(TestRequest request)
     {
         string trackname = Path.GetFileNameWithoutExtension(request.filepath);
-        GroupInfo groupInfo = new GroupInfo()
+        BasicMapData map = new BasicMapData()
         {
-            author = trackname.Split('-')[0],
-            name = trackname.Split('-')[1],
-            mapsCount = 1
-        };
-        MapInfo info = new MapInfo()
-        {
-            group = groupInfo,
-            nick = "[EDITOR TEST *]",
+            Author = trackname.Split('-')[0],
+            Name = trackname.Split('-')[1],
+            Nick = "[EDITOR TEST *]",
         };
 
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.ProjectFolder,
-            Map = info,
+            Map = map,
             ProjectFolderPath = new FileInfo(request.filepath).DirectoryName,
             difficultyInfo = new DifficultyInfo()
             {
@@ -313,7 +304,7 @@ public class SceneloadParameters
         return parameters;
     }
 
-    internal static SceneloadParameters AuthorMusicPreset(MapInfo currentMapInfo, object none)
+    internal static SceneloadParameters AuthorMusicPreset(ProjectMapInfo currentMapInfo, object none)
     {
         throw new NotImplementedException();
     }
@@ -338,7 +329,7 @@ public class ProjectLoaderMap : IProjectLoader
 
         if(parameters.Type == SceneloadParameters.LoadType.Author)
         {
-            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.nick;
+            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.Nick;
         }
         else
         {

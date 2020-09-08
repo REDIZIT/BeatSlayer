@@ -235,7 +235,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void OnRefreshAuthorBtnClick()
     {
-        StartCoroutine(database.LoadDatabaseAsync(true));
+        StartCoroutine(database.LoadDatabaseAsync());
     }
     
 

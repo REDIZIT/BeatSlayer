@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class BeatmapUIItem : MonoBehaviour
 {
     public BeatmapUI ui;
-    public MapInfo mapInfo;
+    public ProjectMapInfo mapInfo;
     public DifficultyInfo difficulty;
     
     public RawImage coverImage;
@@ -18,13 +18,13 @@ public class BeatmapUIItem : MonoBehaviour
 
     public GameObject downloadIndicator, approvedImage, passedImage;
 
-    public async void Setup(MapInfo info, bool isOnlyOneElement)
+    public async void Setup(ProjectMapInfo info, bool isOnlyOneElement)
     {
         mapInfo = info;
         
         nickText.text = mapInfo.nick;
 
-        if (info.group.groupType == GroupInfo.GroupType.Author)
+        if (info.group.groupType == GroupType.Author)
         {
             likesText.text = mapInfo.Likes.ToString();
             dislikesText.text = mapInfo.Dislikes.ToString();
@@ -32,13 +32,13 @@ public class BeatmapUIItem : MonoBehaviour
             playCountText.text = mapInfo.PlayCount.ToString();
         }
         
-        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.author, mapInfo.name, mapInfo.nick));
+        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.nick));
         approvedImage.SetActive(mapInfo.approved);
 
         bool isPassed = false;
         if(Payload.Account != null)
         {
-            isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, mapInfo.author, mapInfo.name);
+            isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, mapInfo.Author, mapInfo.Name);
         }
 
         if (passedImage.gameObject == null) return;
@@ -69,7 +69,7 @@ public class BeatmapUIItem : MonoBehaviour
 
     public void Refresh()
     {
-        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.author, mapInfo.name, mapInfo.nick));
+        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.nick));
     }
     void RefreshStars(int stars)
     {

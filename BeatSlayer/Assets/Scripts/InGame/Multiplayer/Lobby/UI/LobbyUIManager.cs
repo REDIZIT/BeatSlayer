@@ -20,7 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using MapInfo = ProjectManagement.MapInfo;
+using ProjectMapInfo = ProjectManagement.ProjectMapInfo;
 
 namespace InGame.Multiplayer.Lobby.UI
 {
@@ -133,15 +133,15 @@ namespace InGame.Multiplayer.Lobby.UI
             RefreshSelectedMapState();
             if (LobbyManager.lobby.SelectedMap == null) return;
 
-            authorText.text = LobbyManager.lobby.SelectedMap.author;
-            nameText.text = LobbyManager.lobby.SelectedMap.name;
+            authorText.text = LobbyManager.lobby.SelectedMap.Author;
+            nameText.text = LobbyManager.lobby.SelectedMap.Name;
             mapperText.text = "by " + LobbyManager.lobby.SelectedMap.nick;
             difficultyText.text = LobbyManager.lobby.SelectedDifficulty.name + $"({LobbyManager.lobby.SelectedDifficulty.stars})";
 
             // TODO: make difficulty stars presenter
 
             CoversManager.AddPackage(new CoverRequestPackage(mapImage,
-                /*LobbyManager.lobby.SelectedMap.Trackname*/LobbyManager.lobby.SelectedMap.author + "-" + LobbyManager.lobby.SelectedMap.name
+                /*LobbyManager.lobby.SelectedMap.Trackname*/LobbyManager.lobby.SelectedMap.Author + "-" + LobbyManager.lobby.SelectedMap.Name
                 , LobbyManager.lobby.SelectedMap.nick));
         }
         private void RefreshPlayerSlots()
@@ -309,7 +309,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
             LobbyManager.StartMapPicking();
         }
-        public void OnMapPicked(MapInfo map, DifficultyInfo diff)
+        public void OnMapPicked(ProjectMapInfo map, DifficultyInfo diff)
         {
             LobbyManager.isPickingMap = false;
 
@@ -389,7 +389,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
         //    DownloadMapIfNeeded();
         //}
-        private void OnMapRemoteChange(ProjectManagement.MapInfo map, DifficultyInfo diff)
+        private void OnMapRemoteChange(ProjectManagement.ProjectMapInfo map, DifficultyInfo diff)
         {
             LobbyManager.lobby.SelectedMap = map;
             LobbyManager.lobby.SelectedDifficulty = diff;
@@ -412,12 +412,12 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             if (LobbyManager.lobby.SelectedMap == null) return;
 
-            if (!ProjectManager.IsMapDownloaded(LobbyManager.lobby.SelectedMap.author, LobbyManager.lobby.SelectedMap.name, LobbyManager.lobby.SelectedMap.nick))
+            if (!ProjectManager.IsMapDownloaded(LobbyManager.lobby.SelectedMap.Author, LobbyManager.lobby.SelectedMap.Name, LobbyManager.lobby.SelectedMap.nick))
             {
                 progressLocker.SetActive(true);
                 progressCircle.CurrentPercent = 0;
 
-                var task = downloader.AddTask(LobbyManager.lobby.SelectedMap.author + "-" + LobbyManager.lobby.SelectedMap.name, LobbyManager.lobby.SelectedMap.nick);
+                var task = downloader.AddTask(LobbyManager.lobby.SelectedMap.Author + "-" + LobbyManager.lobby.SelectedMap.Name, LobbyManager.lobby.SelectedMap.nick);
                 task.OnProgress += OnMapDownloadProgress;
                 task.OnDownloaded += OnMapDownloaded;
 

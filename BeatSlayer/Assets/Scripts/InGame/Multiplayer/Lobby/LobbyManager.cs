@@ -90,7 +90,7 @@ namespace InGame.Multiplayer.Lobby
 
         #region Map
 
-        public static async Task ChangeMap(ProjectManagement.MapInfo map, DifficultyInfo difficulty)
+        public static async Task ChangeMap(ProjectManagement.ProjectMapInfo map, DifficultyInfo difficulty)
         {
             //lobby.SelectedMap = new MapData(map);
             //lobby.SelectedDifficulty = new DifficultyData(difficulty);

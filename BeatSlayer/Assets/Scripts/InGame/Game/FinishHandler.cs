@@ -127,7 +127,7 @@ public class FinishHandler : MonoBehaviour
 
             if(LoadingData.loadparams.Type == SceneloadParameters.LoadType.Moderation)
             {
-                string filepath = Application.persistentDataPath + "/data/moderation/" + LoadingData.loadparams.Map.author + "-" + LoadingData.loadparams.Map.name + ".bsz";
+                string filepath = Application.persistentDataPath + "/data/moderation/" + LoadingData.loadparams.Map.Author + "-" + LoadingData.loadparams.Map.Name + ".bsz";
                 File.Delete(filepath);
             }
         }
@@ -146,9 +146,9 @@ public class FinishHandler : MonoBehaviour
         string coverPath = ProjectManager.GetCoverPath(gm.project.author + "-" + gm.project.name, gm.project.creatorNick);
         coverImage.texture = coverPath == "" ? gm.defaultTrackTexture : ProjectManager.LoadTexture(coverPath);
 
-        authorText.text = LoadingData.loadparams.Map.author;
-        nameText.text = LoadingData.loadparams.Map.name;
-        creatorText.text = LocalizationManager.Localize("by") + " " + LoadingData.loadparams.Map.nick;
+        authorText.text = LoadingData.loadparams.Map.Author;
+        nameText.text = LoadingData.loadparams.Map.Name;
+        creatorText.text = LocalizationManager.Localize("by") + " " + LoadingData.loadparams.Map.Nick;
 
         ShowScoring(replay.Score, replay.Missed, replay.Accuracy);
 
@@ -158,7 +158,7 @@ public class FinishHandler : MonoBehaviour
         noLinesToggle.isOn = gm.nolines;
         noArrowsToggle.isOn = gm.noarrows;
 
-        heartIcon.SetActive(LoadingData.loadparams.Map.approved);
+        heartIcon.SetActive(LoadingData.loadparams.Map.IsApproved);
 
         UpdateDifficulty();
 
@@ -199,7 +199,7 @@ public class FinishHandler : MonoBehaviour
         string trackname = gm.project.author.Trim() + "-" + gm.project.name.Trim();
 
         DatabaseScript.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, DatabaseScript.StatisticsKeyType.Play);
-        WebAPI.OnMapPlayed(LoadingData.loadparams.Map.approved);
+        WebAPI.OnMapPlayed(LoadingData.loadparams.Map.IsApproved);
 
 
         if (Payload.Account == null)
@@ -234,7 +234,7 @@ public class FinishHandler : MonoBehaviour
 
 
         // Show or hide rp container
-        if (LoadingData.loadparams.Map.approved) ShowRPLoading();
+        if (LoadingData.loadparams.Map.IsApproved) ShowRPLoading();
         else HideRP();
 
 
@@ -256,7 +256,7 @@ public class FinishHandler : MonoBehaviour
         coinsText.text = "+" + data.Coins;
         Payload.Account.Coins += data.Coins;
 
-        if (LoadingData.loadparams.Map.approved)
+        if (LoadingData.loadparams.Map.IsApproved)
         {
             ShowRP(data.RP);
         }
@@ -276,7 +276,7 @@ public class FinishHandler : MonoBehaviour
 
         // Load map leaderboard validation
 
-        if (!LoadingData.loadparams.Map.approved)
+        if (!LoadingData.loadparams.Map.IsApproved)
         {
             leaderboard.SetStatus(LocalizationManager.Localize("NotApprovedMap"));
             return;

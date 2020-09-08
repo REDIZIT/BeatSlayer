@@ -13,12 +13,12 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         public List<ReplayData> Replays { get; set; }
 
         public MapData() { }
-        public MapData(ProjectManagement.MapInfo map)
+        public MapData(ProjectManagement.ProjectMapInfo map)
         {
             Group = new GroupData()
             {
-                Author = map.author,
-                Name = map.name
+                Author = map.Author,
+                Name = map.Name
             };
             Nick = map.nick;
         }

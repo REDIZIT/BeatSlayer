@@ -48,7 +48,7 @@ public class TrackListItem : MonoBehaviour
             : defaultColor;
 
 
-        if(Payload.Account != null && groupInfo.groupType == GroupInfo.GroupType.Author)
+        if(Payload.Account != null && groupInfo.groupType == GroupType.Author)
         {
             bool isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, groupInfo.author, groupInfo.name);
             if (isPassedImage != null) isPassedImage.SetActive(isPassed);

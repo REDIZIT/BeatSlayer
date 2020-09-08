@@ -114,7 +114,7 @@ public class TutorialManager : MonoBehaviour
     {
         var mapInfo = database.GetMapInfo(tutorialMapTask.Trackname, tutorialMapTask.Mapper);
 
-        SceneloadParameters param = SceneloadParameters.AuthorMusicPreset(mapInfo, mapInfo.difficulties[0], new List<InGame.Menu.Mods.ModSO>());
+        SceneloadParameters param = SceneloadParameters.AuthorMusicPreset(new InGame.Models.BasicMapData(mapInfo), mapInfo.difficulties[0], new List<InGame.Menu.Mods.ModSO>());
         SceneController.instance.LoadScene(param);
     }
 }

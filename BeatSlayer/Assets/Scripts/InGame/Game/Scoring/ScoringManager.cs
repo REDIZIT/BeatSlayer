@@ -3,6 +3,7 @@ using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using InGame.Game.Scoring.Mods;
 using InGame.Menu.Mods;
+using InGame.Models;
 using InGame.ScriptableObjects;
 using ProjectManagement;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ namespace InGame.Game
 
         // Ну вот блять, куча разных классов, которые делают одно и тоже, но ска разными буквами
         public void OnGameStart(
-            ProjectManagement.MapInfo map, DifficultyInfo difficulty, Difficulty projectDifficulty, 
+            BasicMapData map, DifficultyInfo difficulty, Difficulty projectDifficulty, 
             SceneloadParameters.LoadType loadtype, List<ModSO> mods)
         {
             Loadtype = loadtype;
@@ -106,10 +107,10 @@ namespace InGame.Game
                 {
                     Group = new GroupData()
                     {
-                        Author = map.author,
-                        Name = map.name
+                        Author = map.Author,
+                        Name = map.Name
                     },
-                    Nick = map.nick
+                    Nick = map.Nick
                 },
                 Difficulty = new DifficultyData()
                 {

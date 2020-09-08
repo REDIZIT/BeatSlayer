@@ -37,9 +37,9 @@ namespace InGame.Multiplayer.Lobby.UI
                 return;
             }
 
-            CoversManager.AddPackage(new CoverRequestPackage(mapCoverImage, lobby.SelectedMap.author + "-" + lobby.SelectedMap.name, lobby.SelectedMap.nick, true));
-            mapNameText.text = lobby.SelectedMap.name;
-            mapAuthorText.text = lobby.SelectedMap.author;
+            CoversManager.AddPackage(new CoverRequestPackage(mapCoverImage, lobby.SelectedMap.Author + "-" + lobby.SelectedMap.Name, lobby.SelectedMap.nick, true));
+            mapNameText.text = lobby.SelectedMap.Name;
+            mapAuthorText.text = lobby.SelectedMap.Author;
         }
 
         public void OnJoinButtonClick()

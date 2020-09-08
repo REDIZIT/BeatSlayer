@@ -171,7 +171,7 @@ public class GameManager : MonoBehaviour
 
         StartForUI();
 
-        trackname = LoadingData.loadparams.Map.author + " - " + LoadingData.loadparams.Map.name;
+        trackname = LoadingData.loadparams.Map.Author + " - " + LoadingData.loadparams.Map.Name;
         trackText.text = trackname;
 
         AlignToSide();
@@ -379,7 +379,7 @@ public class GameManager : MonoBehaviour
     }
     void InitSettings()
     {
-        if (!LoadingData.loadparams.Map.approved)
+        if (!LoadingData.loadparams.Map.IsApproved)
         {
             noarrows = SSytem.instance.GetBool("NoArrows");
             nolines = SSytem.instance.GetBool("NoLines");
