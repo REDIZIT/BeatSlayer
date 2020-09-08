@@ -20,6 +20,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Scripting;
 using InGame.Game.Scoring.Mods;
 using InGame.Multiplayer.Lobby.Chat.Models;
+using ProjectManagement;
 
 [assembly: Preserve]
 namespace GameNet
@@ -495,7 +496,7 @@ namespace GameNet
 
                 public static void HostStartChangingMap(int lobbyId) => conn.InvokeAsync("HostStartChangingMap", lobbyId);
                 public static void HostCancelChangingMap(int lobbyId) => conn.InvokeAsync("HostCancelChangingMap", lobbyId);
-                public static async Task ChangeMap(int lobbyId, MapData map, DifficultyData difficulty) => await conn.InvokeAsync("ChangeLobbyMap", lobbyId, map, difficulty);
+                public static async Task ChangeMap(int lobbyId, ProjectManagement.MapInfo map, DifficultyInfo difficulty) => await conn.InvokeAsync("ChangeLobbyMap", lobbyId, map, difficulty);
                 public static void ChangeMods(int lobbyId, string nick, ModEnum mods) => conn.InvokeAsync("ChangeLobbyMods", lobbyId, nick, mods);
                 public static async Task ChangeReadyState(int lobbyId, string nick, LobbyPlayer.ReadyState state)
                     => await conn.InvokeAsync("ChangeReadyState", lobbyId, nick, state);
@@ -508,6 +509,8 @@ namespace GameNet
 
 
                 public static void SendChatMessage(int lobbyId, LobbyPlayerChatMessage message) => conn.InvokeAsync("SendLobbyPlayerMessage", lobbyId, message);
+                public static void StartTyping(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyPlayerStartTyping", lobbyId, nick);
+                public static void StopTyping(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyPlayerStopTyping", lobbyId, nick);
             }
         }
 
@@ -560,7 +563,7 @@ namespace GameNet
             public Action<LobbyPlayer> OnLobbyPlayerKick;
             public Action OnHostStartChangingMap;
             public Action OnHostCancelChangingMap;
-            public Action<MapData, DifficultyData> OnLobbyMapChange;
+            public Action<ProjectManagement.MapInfo, DifficultyInfo> OnLobbyMapChange;
 
             public Action<string, LobbyPlayer.ReadyState> OnRemotePlayerReadyStateChange;
             public Action<string, ModEnum> OnRemotePlayerModsChange;
@@ -570,6 +573,9 @@ namespace GameNet
 
 
             public Action<LobbyPlayerChatMessage> OnLobbyPlayerMessage;
+            public Action<LobbySystemChatMessage> OnLobbySystemMessage;
+            public Action<string> OnLobbyPlayerStartTyping;
+            public Action<string> OnLobbyPlayerStopTyping;
         }
     }
 }

@@ -9,6 +9,7 @@ using InGame.Game.Scoring.Mods;
 using InGame.Helpers;
 using InGame.Menu.Maps;
 using InGame.Menu.Mods;
+using InGame.Multiplayer.Lobby.Chat;
 using InGame.ScriptableObjects;
 using Michsky.UI.ModernUIPack;
 using Pixelplacement;
@@ -28,6 +29,7 @@ namespace InGame.Multiplayer.Lobby.UI
         public static LobbyUIManager instance;
 
         [Header("Components")]
+        public LobbyChatUIManager chatUI;
         public BeatmapUI beatmapUI;
         public TrackListUI listUI;
         public ModsUI modsUI;
@@ -110,7 +112,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
         public void RefreshLobby()
         {
-            nameText.text = LobbyManager.lobby.Name;
+            lobbyNameText.text = LobbyManager.lobby.Name;
             nameInputField.text = LobbyManager.lobby.Name;
 
 
@@ -131,14 +133,16 @@ namespace InGame.Multiplayer.Lobby.UI
             RefreshSelectedMapState();
             if (LobbyManager.lobby.SelectedMap == null) return;
 
-            authorText.text = LobbyManager.lobby.SelectedMap.Group.Author;
-            nameText.text = LobbyManager.lobby.SelectedMap.Group.Name;
-            mapperText.text = "by " + LobbyManager.lobby.SelectedMap.Nick;
-            difficultyText.text = LobbyManager.lobby.SelectedDifficulty.Name + $"({LobbyManager.lobby.SelectedDifficulty.Stars})";
+            authorText.text = LobbyManager.lobby.SelectedMap.author;
+            nameText.text = LobbyManager.lobby.SelectedMap.name;
+            mapperText.text = "by " + LobbyManager.lobby.SelectedMap.nick;
+            difficultyText.text = LobbyManager.lobby.SelectedDifficulty.name + $"({LobbyManager.lobby.SelectedDifficulty.stars})";
 
             // TODO: make difficulty stars presenter
 
-            CoversManager.AddPackage(new CoverRequestPackage(mapImage, LobbyManager.lobby.SelectedMap.Trackname, LobbyManager.lobby.SelectedMap.Nick));
+            CoversManager.AddPackage(new CoverRequestPackage(mapImage,
+                /*LobbyManager.lobby.SelectedMap.Trackname*/LobbyManager.lobby.SelectedMap.author + "-" + LobbyManager.lobby.SelectedMap.name
+                , LobbyManager.lobby.SelectedMap.nick));
         }
         private void RefreshPlayerSlots()
         {
@@ -274,6 +278,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 {
                     RefreshLobby();
                     DownloadMapIfNeeded();
+                    chatUI.ClearChat();
                 });
             });
         }
@@ -341,6 +346,7 @@ namespace InGame.Multiplayer.Lobby.UI
             LobbyManager.ChangeReadyState(LobbyPlayer.ReadyState.NotReady);
         }
 
+
         #endregion
 
 
@@ -369,7 +375,21 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             slots.First(c => c.player.Player.Nick == nick).OnDownloadComplete();
         }
-        private void OnMapRemoteChange(MapData map, DifficultyData diff)
+        //private void OnMapRemoteChange(MapData map, DifficultyData diff)
+        //{
+        //    LobbyManager.lobby.SelectedMap = map;
+        //    LobbyManager.lobby.SelectedDifficulty = diff;
+
+        //    LobbyManager.lobby.IsHostChangingMap = false;
+
+        //    RefreshMapInfo();
+
+        //    // Reset ready status
+        //    OnNotReadyButtonClick();
+
+        //    DownloadMapIfNeeded();
+        //}
+        private void OnMapRemoteChange(ProjectManagement.MapInfo map, DifficultyInfo diff)
         {
             LobbyManager.lobby.SelectedMap = map;
             LobbyManager.lobby.SelectedDifficulty = diff;
@@ -392,12 +412,12 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             if (LobbyManager.lobby.SelectedMap == null) return;
 
-            if (!ProjectManager.IsMapDownloaded(LobbyManager.lobby.SelectedMap.Group.Author, LobbyManager.lobby.SelectedMap.Group.Name, LobbyManager.lobby.SelectedMap.Nick))
+            if (!ProjectManager.IsMapDownloaded(LobbyManager.lobby.SelectedMap.author, LobbyManager.lobby.SelectedMap.name, LobbyManager.lobby.SelectedMap.nick))
             {
                 progressLocker.SetActive(true);
                 progressCircle.CurrentPercent = 0;
 
-                var task = downloader.AddTask(LobbyManager.lobby.SelectedMap.Trackname, LobbyManager.lobby.SelectedMap.Nick);
+                var task = downloader.AddTask(LobbyManager.lobby.SelectedMap.author + "-" + LobbyManager.lobby.SelectedMap.name, LobbyManager.lobby.SelectedMap.nick);
                 task.OnProgress += OnMapDownloadProgress;
                 task.OnDownloaded += OnMapDownloaded;
 

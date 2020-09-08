@@ -92,8 +92,10 @@ namespace InGame.Multiplayer.Lobby
 
         public static async Task ChangeMap(ProjectManagement.MapInfo map, DifficultyInfo difficulty)
         {
-            lobby.SelectedMap = new MapData(map);
-            lobby.SelectedDifficulty = new DifficultyData(difficulty);
+            //lobby.SelectedMap = new MapData(map);
+            //lobby.SelectedDifficulty = new DifficultyData(difficulty);
+            lobby.SelectedMap = map;
+            lobby.SelectedDifficulty = difficulty;
 
             await NetCore.ServerActions.Lobby.ChangeMap(lobby.Id, lobby.SelectedMap, lobby.SelectedDifficulty);
         }

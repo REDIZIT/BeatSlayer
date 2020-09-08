@@ -13,18 +13,24 @@ namespace CoversManagement
 {
     public static class CoversManager
     {
-        public static List<CoverRequestPackage> requests = new List<CoverRequestPackage>();
+        public static List<BasicRequestPackage> requests = new List<BasicRequestPackage>();
 
-        static bool isInited;
-        static bool isDownloading;
 
-        public static string apibase = NetCore.Url_Server;
-        public static string url_cover => apibase + "/Database/GetCover?trackname={0}&nick={1}";
-        static WebClient client = new WebClient();
+        private static string apibase = NetCore.Url_Server;
+        private static Texture2D DefaultTexture { get { return TrackListUI.defaultIcon; } }
 
-        static Texture2D DefaultTexture { get { return TrackListUI.defaultIcon; } }
 
-        public static void Init()
+        private static Dictionary<string, CachedRequestPackage> playersAvatarsCache = new Dictionary<string, CachedRequestPackage>();
+        private static Dictionary<string, CachedRequestPackage> mapsCoversCache = new Dictionary<string, CachedRequestPackage>();
+
+
+        private static bool isInited;
+        private static bool isDownloading;
+
+
+        static readonly WebClient client = new WebClient();
+
+        private static void Init()
         {
             if (isInited) return;
 
@@ -33,40 +39,55 @@ namespace CoversManagement
             isInited = true;
         }
 
-        static void OnDataDownloaded(object sender, DownloadDataCompletedEventArgs e)
+      
+
+        public static void AddPackages(List<CoverRequestPackage> ls)
         {
-            isDownloading = false;
-            if (e.Cancelled) return;
+            requests.AddRange(ls);
+            OnRequestsListUpdate();
+        }
+        public static void AddPackage(CoverRequestPackage package)
+        {
+            requests.Add(package);
+            OnRequestsListUpdate();
+        }
+        public static void AddAvatarPackage(RawImage targetImage, string playerNick, bool priority = false)
+        {
+            requests.Add(new AvatarRequestPackage(targetImage, playerNick, priority));
+            OnRequestsListUpdate();
+        }
+        public static void ClearPackages(RawImage[] images)
+        {
+            if (requests.Count == 0) return;
 
-            if (e.Error != null)
+            List<BasicRequestPackage> toRemove = new List<BasicRequestPackage>();
+            foreach (RawImage img in images)
             {
-                Debug.LogError(e.Error);
-                requests.RemoveAt(0);
-
-                OnRequestsListUpdate();
-            }
-            else
-            {
-                byte[] bytes = e.Result;
-                if (bytes.Length == 0)
+                if (requests[0].targetImage == img)
                 {
-                    requests[0].image.texture = DefaultTexture;
-                    requests[0].callback?.Invoke(DefaultTexture);
-                }
-                else
-                {
-                    Texture2D tex = ProjectManager.LoadTexture(bytes);
-                    requests[0].image.texture = tex;
-                    requests[0].callback?.Invoke(tex);
+                    client.CancelAsync();
+                    toRemove.Add(requests[0]);
+                    continue;
                 }
 
-                requests.RemoveAt(0);
-
-                OnRequestsListUpdate();
+                BasicRequestPackage package = requests.Find(c => c.targetImage == img);
+                if(package != null)
+                {
+                    toRemove.Add(package);
+                }
             }
+            requests = requests.Except(toRemove).ToList();
+        }
+        public static void ClearAll()
+        {
+            if(requests.Count > 0) client.CancelAsync();
+            requests.Clear();
         }
 
-        public static void OnRequestsListUpdate()
+
+
+
+        private static void OnRequestsListUpdate()
         {
             if (requests.Count == 0 || isDownloading) return;
 
@@ -74,16 +95,35 @@ namespace CoversManagement
 
             requests = requests.OrderByDescending(c => c.priority).ToList();
 
-            string url = string.Format(url_cover, TheGreat.UrlEncode(requests[0].trackname), TheGreat.UrlEncode(requests[0].nick));
+            string url = string.Format(apibase + requests[0].GetUrl());
 
-            // file path for downloaded map cover
-            Texture2D tex = ProjectManager.LoadCoverOrNull(requests[0].trackname);
-            //Debug.Log("Cover: > Handling " + requests[0].trackname);
+            Texture2D tex = null;
+
+            // Load from cache
+            // If not cache -> try load from downloads
+            CachedRequestPackage cache = GetCachedTextureOrNull(requests[0]);
+            if (cache == null)
+            {
+                if (requests[0] is CoverRequestPackage)
+                {
+                    // file path for downloaded map cover
+                    tex = ProjectManager.LoadCoverOrNull((requests[0] as CoverRequestPackage).trackname);
+                }
+            }
+            else
+            {
+                tex = cache.texture;
+            }
+            
+
+
             if (tex != null)
             {
                 //Debug.Log("Cover: << Load downloaded texture");
-                requests[0].image.texture = tex;
-                requests[0].callback?.Invoke(tex);
+                requests[0].Apply(tex);
+
+                AddTextureToCache(requests[0], tex);
+
                 requests.RemoveAt(0);
                 OnRequestsListUpdate();
             }
@@ -100,68 +140,156 @@ namespace CoversManagement
                 else
                 {
                     //Debug.Log("Cover: >> No inet, set default");
-                    requests[0].image.texture = DefaultTexture;
-                    requests[0].callback?.Invoke(DefaultTexture);
+                    requests[0].Apply(DefaultTexture);
                     requests.RemoveAt(0);
+
                     OnRequestsListUpdate();
                 }
             }
         }
+        private static void OnDataDownloaded(object sender, DownloadDataCompletedEventArgs e)
+        {
+            isDownloading = false;
+            if (e.Cancelled) return;
 
-        public static void AddPackages(List<CoverRequestPackage> ls)
-        {
-            requests.AddRange(ls);
-            OnRequestsListUpdate();
-        }
-        public static void AddPackage(CoverRequestPackage package)
-        {
-            requests.Add(package);
-            OnRequestsListUpdate();
-        }
-        public static void ClearPackages(RawImage[] images)
-        {
-            if (requests.Count == 0) return;
-
-            List<CoverRequestPackage> toRemove = new List<CoverRequestPackage>();
-            foreach (RawImage img in images)
+            if (e.Error != null)
             {
-                if (requests[0].image == img)
+                Debug.LogError(e.Error);
+                requests.RemoveAt(0);
+
+                OnRequestsListUpdate();
+            }
+            else
+            {
+                byte[] bytes = e.Result;
+                if (bytes.Length == 0)
                 {
-                    client.CancelAsync();
-                    toRemove.Add(requests[0]);
-                    continue;
+                    requests[0].Apply(DefaultTexture);
+                    AddTextureToCache(requests[0], null);
+                }
+                else
+                {
+                    Texture2D tex = ProjectManager.LoadTexture(bytes);
+                    requests[0].Apply(tex);
+                    AddTextureToCache(requests[0], tex);
                 }
 
-                CoverRequestPackage package = requests.Find(c => c.image == img);
-                if(package != null)
-                {
-                    toRemove.Add(package);
-                }
+                requests.RemoveAt(0);
+
+                OnRequestsListUpdate();
             }
-            requests = requests.Except(toRemove).ToList();
         }
-        public static void ClearAll()
+
+
+        private static void AddTextureToCache(BasicRequestPackage package, Texture2D tex)
         {
-            if(requests.Count > 0) client.CancelAsync();
-            requests.Clear();
+            if (package is CoverRequestPackage)
+            {
+                mapsCoversCache[(package as CoverRequestPackage).trackname] = new CachedRequestPackage(tex);
+            }
+            else if (package is AvatarRequestPackage)
+            {
+                playersAvatarsCache[(package as AvatarRequestPackage).nick] = new CachedRequestPackage(tex);
+            }
+        }
+        private static CachedRequestPackage GetCachedTextureOrNull(BasicRequestPackage package)
+        {
+            if (package is CoverRequestPackage)
+            {
+                CoverRequestPackage pack = package as CoverRequestPackage;
+
+                if (mapsCoversCache.ContainsKey(pack.trackname)) return mapsCoversCache[pack.trackname];
+                else return null;
+            }
+            else if (package is AvatarRequestPackage)
+            {
+                AvatarRequestPackage pack = package as AvatarRequestPackage;
+
+                if (playersAvatarsCache.ContainsKey(pack.nick)) return playersAvatarsCache[pack.nick];
+                else return null;
+            }
+
+            return null;
         }
     }
-    
-    public class CoverRequestPackage
-    {
-        public RawImage image;
-        public Action<Texture2D> callback;
 
-        public string trackname, nick;
+
+    public class CachedRequestPackage
+    {
+        public bool isDefault;
+        public Texture2D texture;
+
+        /// <param name="texture">Set null if need to use default texture</param>
+        public CachedRequestPackage(Texture2D texture)
+        {
+            isDefault = texture == null;
+            this.texture = texture;
+        }
+    }
+
+
+
+
+
+    public abstract class BasicRequestPackage
+    {
+        public RawImage targetImage;
+        public Action<Texture2D> callback;
         public bool priority;
 
-        public CoverRequestPackage(RawImage image, string trackname, string nick = "", bool priority = false, Action<Texture2D> callback = null)
+        public BasicRequestPackage(RawImage targetImage, bool priority = false, Action<Texture2D> callback = null)
         {
-            this.image = image;
-            this.trackname = trackname;
-            this.nick = nick;
+            this.targetImage = targetImage;
             this.priority = priority;
             this.callback = callback;
+        }
+        public abstract string GetUrl();
+        public void Apply(Texture2D tex)
+        {
+            if(targetImage != null)
+            {
+                targetImage.texture = tex;
+            }
+            callback?.Invoke(tex);
+        }
+    }
+    public class CoverRequestPackage : BasicRequestPackage
+    {
+        public string trackname, nick;
+
+        public CoverRequestPackage(RawImage targetImage, string trackname, string nick = "", bool priority = false, Action<Texture2D> callback = null) : base(targetImage, priority, callback)
+        {
+            this.targetImage = targetImage;
+            this.priority = priority;
+            this.callback = callback;
+
+            this.trackname = trackname;
+            this.nick = nick;
+        }
+
+        public override string GetUrl()
+        {
+            return $"/Database/GetCover?trackname={TheGreat.UrlEncode(trackname)}&nick={TheGreat.UrlEncode(nick)}";
+        }
+    }
+
+    public class AvatarRequestPackage : BasicRequestPackage
+    {
+        public string nick;
+
+
+        public AvatarRequestPackage(RawImage targetImage, string playerNick, bool priority = false, Action<Texture2D> callback = null) : base(targetImage, priority, callback)
+        {
+            this.targetImage = targetImage;
+            this.priority = priority;
+            this.callback = callback;
+
+            this.nick = playerNick;
+        }
+
+        public override string GetUrl()
+        {
+            return "/WebAPI/GetAvatar?nick=" + TheGreat.UrlEncode(nick);
         }
     }
 }
