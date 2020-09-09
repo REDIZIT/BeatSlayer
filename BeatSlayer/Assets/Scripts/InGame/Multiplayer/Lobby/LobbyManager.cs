@@ -2,6 +2,7 @@ using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using InGame.Game.Scoring.Mods;
+using InGame.Models;
 using ProjectManagement;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,10 +91,8 @@ namespace InGame.Multiplayer.Lobby
 
         #region Map
 
-        public static async Task ChangeMap(ProjectManagement.ProjectMapInfo map, DifficultyInfo difficulty)
+        public static async Task ChangeMap(BasicMapData map, DifficultyInfo difficulty)
         {
-            //lobby.SelectedMap = new MapData(map);
-            //lobby.SelectedDifficulty = new DifficultyData(difficulty);
             lobby.SelectedMap = map;
             lobby.SelectedDifficulty = difficulty;
 

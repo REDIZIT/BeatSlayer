@@ -17,8 +17,6 @@ using ProjectManagement;
 using Testing;
 using UnityEngine;
 using UnityEngine.UI;
-using GroupInfo = ProjectManagement.GroupInfo;
-using ProjectMapInfo = ProjectManagement.ProjectMapInfo;
 
 public class BeatmapUI : MonoBehaviour
 {
@@ -30,7 +28,6 @@ public class BeatmapUI : MonoBehaviour
     public LobbyUIManager lobbyUI;
 
     [Header("Map Info")]
-    //private ProjectMapInfo currentMapInfo;
     private BasicMapData currentMapInfo;
     private DifficultyInfo currentDifficultyInfo;
     private bool isGroupDeleted;
@@ -380,8 +377,7 @@ public class BeatmapUI : MonoBehaviour
     {
         if (LobbyManager.isPickingMap)
         {
-            //lobbyUI.OnMapPicked(currentMapInfo, currentDifficultyInfo);
-            throw new NotImplementedException("Not map converting code");
+            lobbyUI.OnMapPicked(currentMapInfo, currentDifficultyInfo);
             OnCloseBtnClicked();
             return;
         }

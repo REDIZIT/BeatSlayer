@@ -9,7 +9,7 @@ namespace BeatSlayerServer.Dtos.Mapping
     /// </summary>
     public class ReplayData
     {
-        public MapData Map { get; set; }
+        public AccountMapData Map { get; set; }
         public string DifficultyName { get; set; }
         public DifficultyData Difficulty { get; set; }
         public ModEnum Mods { get; set; }

@@ -15,6 +15,6 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         public string Author { get; set; }
         public string Name { get; set; }
 
-        public List<MapData> Maps { get; set; }
+        public List<AccountMapData> Maps { get; set; }
     }
 }

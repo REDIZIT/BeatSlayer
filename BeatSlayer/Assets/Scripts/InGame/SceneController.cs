@@ -1,5 +1,5 @@
 ﻿using BeatSlayerServer.Dtos.Mapping;
-using MapData = BeatSlayerServer.Multiplayer.Accounts.MapData;
+using MapData = BeatSlayerServer.Multiplayer.Accounts.AccountMapData;
 using GameNet;
 using InGame.Menu.Mods;
 using ProjectManagement;
@@ -302,11 +302,6 @@ public class SceneloadParameters
             Type = LoadType.Menu
         };
         return parameters;
-    }
-
-    internal static SceneloadParameters AuthorMusicPreset(ProjectMapInfo currentMapInfo, object none)
-    {
-        throw new NotImplementedException();
     }
 }
 

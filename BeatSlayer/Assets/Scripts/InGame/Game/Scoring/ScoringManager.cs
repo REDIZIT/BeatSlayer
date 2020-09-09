@@ -103,7 +103,7 @@ namespace InGame.Game
 
             Replay = new ReplayData()
             {
-                Map = new MapData()
+                Map = new AccountMapData()
                 {
                     Group = new GroupData()
                     {

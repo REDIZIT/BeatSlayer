@@ -629,7 +629,7 @@ public class AccountManager : MonoBehaviour
         ReplayData dto = new ReplayData()
         {
             Nick = replay.player,
-            Map = new MapData()
+            Map = new AccountMapData()
             {
                 Group = new GroupData()
                 {

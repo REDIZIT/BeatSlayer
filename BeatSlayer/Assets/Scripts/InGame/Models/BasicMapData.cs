@@ -25,14 +25,6 @@ namespace InGame.Models
             Name = mapsDataParent.Name;
             MapType = mapsDataParent.MapType;
         }
-
-        public BasicMapData(ProjectMapInfo map)
-        {
-            Author = map.Author;
-            Name = map.Name;
-            MapperNick = map.nick;
-            IsApproved = map.approved;
-        }
     }
 
     public class OwnMapData : BasicMapData
