@@ -165,8 +165,8 @@ public class BeatmapUI : MonoBehaviour
         overlay.SetActive(true);
         ResetUI();
         
-        authorText.text = listItem.groupInfo.author;
-        nameText.text = listItem.groupInfo.name;
+        authorText.text = listItem.groupInfo.Author;
+        nameText.text = listItem.groupInfo.Name;
         coverImage.texture = listItem.coverImage.texture;
 
 
@@ -176,7 +176,7 @@ public class BeatmapUI : MonoBehaviour
         isGroupDeleted = false;
         testRequest = null;
 
-        if (listItem.groupInfo.groupType == GroupType.Own) mapInfos = new List<ProjectMapInfo>() { new ProjectMapInfo(listItem.groupInfo) };
+        if (listItem.groupInfo.MapType == GroupType.Own) mapInfos = new List<ProjectMapInfo>() { new ProjectMapInfo(listItem.groupInfo) };
         else if (listItem.isLocalItem) mapInfos = DatabaseManager.GetDownloadedMaps(listItem.groupInfo);
         else
         {
@@ -187,9 +187,6 @@ public class BeatmapUI : MonoBehaviour
         }
 
         if(!async) RefreshBeatmapsList(mapInfos);
-
-
-        menuAudioManager.OnMapSelected(listItem.groupInfo);
     }
     public void OpenModeration(TestRequest request, Project proj)
     {

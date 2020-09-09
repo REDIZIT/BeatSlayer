@@ -1,4 +1,5 @@
-﻿using ProjectManagement;
+﻿using InGame.Models;
+using ProjectManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,11 +48,11 @@ namespace Searching
         {
             ui.Refresh();
         }
-        public IEnumerable<GroupInfoExtended> OnSearch(IEnumerable<GroupInfoExtended> data)
+        public IEnumerable<MapsData> OnSearch(IEnumerable<MapsData> data)
         {
             DateTime d1 = DateTime.Now;
 
-            IEnumerable<GroupInfoExtended> ls = new List<GroupInfoExtended>();
+            IEnumerable<MapsData> ls = new List<MapsData>();
 
             ls = data;
 
@@ -61,8 +62,8 @@ namespace Searching
             // Searching for matches in correct type (Map or player)
             ls = ls.Where(t => 
                 searchingForType == SearchingForType.Map ?
-                    (t.author + "-" + t.name).ToLower().Contains(searchText.ToLower()) :
-                    (t.nicks == null ? true : t.nicks.Any(c => c != null && c.ToLower().Contains(searchText.ToLower()))));
+                    (t.Author + "-" + t.Name).ToLower().Contains(searchText.ToLower()) :
+                    (t.MappersNicks == null ? true : t.MappersNicks.Any(c => c != null && c.ToLower().Contains(searchText.ToLower()))));
             /*ls = ls.Where(t => 
                 searchingForType == SearchingForType.Map ?
                     (t.author + "-" + t.name).ToLower().Contains(searchText.ToLower()) :
@@ -74,18 +75,18 @@ namespace Searching
             {
                 ls = ls.Where(t =>
                     showType == ShowType.OnlyNew ? t.IsNew : 
-                    showType == ShowType.Played ? AccountManager.LegacyAccount.playedMaps.Any(m => m.author + "-" + m.name == t.author + "-" + t.name) : 
-                    AccountManager.LegacyAccount.playedMaps.Any(m => m.author + "-" + m.name != t.author + "-" + t.name));
+                    showType == ShowType.Played ? AccountManager.LegacyAccount.playedMaps.Any(m => m.author + "-" + m.name == t.Author + "-" + t.Name) : 
+                    AccountManager.LegacyAccount.playedMaps.Any(m => m.author + "-" + m.name != t.Author + "-" + t.Name));
             }
 
 
             // Sorting
-            Func<GroupInfoExtended, long> keySelector = c => sortByType == SortByType.Popularity ?
+            Func<MapsData, long> keySelector = c => sortByType == SortByType.Popularity ?
                 GetPopularity(c) : sortByType == SortByType.Likes ?
-                c.allLikes : sortByType == SortByType.Dislikes ?
-                c.allDislikes : sortByType == SortByType.Downloads ?
-                c.allDownloads : sortByType == SortByType.MapsCount ?
-                c.mapsCount : c.updateTime.Ticks;
+                c.Likes : sortByType == SortByType.Dislikes ?
+                c.Dislikes : sortByType == SortByType.Downloads ?
+                c.Downloads : sortByType == SortByType.MapsCount ?
+                c.MappersNicks.Count : c.UpdateTime.Ticks;
 
             ls = listSortDirection == ListSortDirection.Descending ? ls.OrderByDescending(keySelector) : ls.OrderBy(keySelector);
 
@@ -120,9 +121,9 @@ namespace Searching
 
 
 
-        int GetPopularity(GroupInfoExtended group)
+        private int GetPopularity(MapsData group)
         {
-            return (group.allLikes * 20 + group.allPlays * 15 + group.allDownloads * 10 + group.allDislikes * 4);
+            return (group.Likes * 20 + group.PlayCount * 15 + group.Downloads * 10 + group.Dislikes * 4);
         }
     }
 

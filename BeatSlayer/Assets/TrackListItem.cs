@@ -1,4 +1,5 @@
 ﻿using GameNet;
+using InGame.Models;
 using ProjectManagement;
 using System.IO;
 using UnityEngine;
@@ -12,7 +13,7 @@ using UnityEngine.UI;
 public class TrackListItem : MonoBehaviour
 {
     MenuScript_v2 menu;
-    public GroupInfoExtended groupInfo;
+    public MapsData groupInfo;
 
     public Text nameText, authorText, mapsCountText;
     public RawImage coverImage;
@@ -25,32 +26,33 @@ public class TrackListItem : MonoBehaviour
     public Color32 defaultColor, downloadedColor, newColor;
 
     
-    public async void Setup(GroupInfoExtended groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
+    public async void Setup(MapsData groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
     {
         //this.group = group;
         this.groupInfo = groupInfo;
-        authorText.text = this.groupInfo.author;
-        nameText.text = this.groupInfo.name;
         this.menu = menu;
         this.isCustomMusic = isCustomMusic;
-        if (isCustomMusic)
+
+
+        authorText.text = groupInfo.Author;
+        nameText.text = groupInfo.Author;
+        if (!isCustomMusic)
         {
-            //mapsCountText.text = groupInfo.filepath;
+            mapsCountText.text = Assets.SimpleLocalization.LocalizationManager.Localize("MapsCount") + ": " + groupInfo.MappersNicks.Count;
         }
-        else mapsCountText.text = Assets.SimpleLocalization.LocalizationManager.Localize("MapsCount") + ": " + groupInfo.mapsCount;
         
         isLocalItem = !getSpriteFromServer;
 
-        string folderPath = Application.persistentDataPath + "/maps/" + groupInfo.author + "-" + groupInfo.name;
+        string folderPath = Application.persistentDataPath + "/maps/" + groupInfo.Trackname;
         GetComponent<Image>().color =
             groupInfo.IsNew ? newColor 
             : Directory.Exists(folderPath) && Directory.GetDirectories(folderPath).Length > 0 ? downloadedColor 
             : defaultColor;
 
 
-        if(Payload.Account != null && groupInfo.groupType == GroupType.Author)
+        if(Payload.Account != null && groupInfo.MapType == GroupType.Author)
         {
-            bool isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, groupInfo.author, groupInfo.name);
+            bool isPassed = await NetCore.ServerActions.Account.IsPassed(Payload.Account.Nick, groupInfo.Author, groupInfo.Name);
             if (isPassedImage != null) isPassedImage.SetActive(isPassed);
         }
     }

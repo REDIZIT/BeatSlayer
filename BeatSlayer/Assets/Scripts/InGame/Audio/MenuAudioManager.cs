@@ -1,8 +1,5 @@
 ﻿using InGame.Menu;
 using InGame.Settings;
-using ProjectManagement;
-using System.Collections;
-using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -69,47 +66,6 @@ public class MenuAudioManager : MonoBehaviour
             SetAudioText(asource.clip.name);
             spectrum.SetEnabled(true);
         }
-    }
-
-
-
-
-
-    // Invoked when player select group.
-    public void OnMapSelected(GroupInfoExtended group)
-    {
-        return;
-        StartCoroutine(IEOnMapSelected(group));
-    }
-    IEnumerator IEOnMapSelected(GroupInfoExtended group)
-    {
-        string trackname = group.author + "-" + group.name;
-        string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
-
-        if (!Directory.Exists(groupFolder)) yield break;
-
-        string mapFolder = Directory.GetDirectories(groupFolder)[0];
-
-
-
-        string unknownAudioPath = mapFolder + "/" + trackname;
-        string audioFilePath = ProjectManager.GetRealPath(unknownAudioPath, ".mp3", ".ogg");
-
-        if (audioFilePath == "") yield break;
-
-
-
-        AudioClip clip = null;
-        yield return ProjectManager.LoadAudioCoroutine(audioFilePath, (c) => clip = c);
-
-        if (clip == null) yield break;
-
-
-
-        asource.clip = clip;
-        asource.Play();
-        asource.time = 30;
-        SetAudioText(trackname.Replace("-", " - "));
     }
 
 

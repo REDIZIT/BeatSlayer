@@ -2,6 +2,7 @@
 using DatabaseManagement;
 using GameNet;
 using InGame.Helpers;
+using InGame.Models;
 using Newtonsoft.Json;
 using ProjectManagement;
 using System;
@@ -163,13 +164,13 @@ namespace InGame.UI.Overlays
         }
         void SaveToFile()
         {
-            string json = JsonConvert.SerializeObject(DatabaseManager.container.OwnGroups.Select(c => c.filepath));
+            string json = JsonConvert.SerializeObject(DatabaseManager.container.OwnGroups.Select(c => (c as OwnMapsData).Filepath));
             string path = DataFolder + "/data/musicfiles.json";
             File.WriteAllText(path, json);
         }
-        List<GroupInfoExtended> LoadGroupsFromFilepathes(IEnumerable<string> files)
+        List<MapsData> LoadGroupsFromFilepathes(IEnumerable<string> files)
         {
-            List<GroupInfoExtended> ls = new List<GroupInfoExtended>();
+            List<MapsData> ls = new List<MapsData>();
             foreach (var file in files)
             {
                 string filename = Path.GetFileNameWithoutExtension(file);
@@ -189,13 +190,11 @@ namespace InGame.UI.Overlays
                     name = split[0].Trim();
                 }
 
-                GroupInfoExtended group = new GroupInfoExtended()
+                OwnMapsData group = new OwnMapsData()
                 {
-                    author = author,
-                    name = name,
-                    mapsCount = 1,
-                    filepath = file,
-                    groupType = GroupType.Own
+                    Author = author,
+                    Name = name,
+                    Filepath = file
                 };
                 ls.Add(group);
             }

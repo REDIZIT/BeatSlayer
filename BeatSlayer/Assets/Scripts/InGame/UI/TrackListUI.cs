@@ -1,5 +1,6 @@
 ﻿using CoversManagement;
 using DatabaseManagement;
+using InGame.Models;
 using ProjectManagement;
 using Searching;
 using System;
@@ -137,11 +138,11 @@ public class TrackListUI : MonoBehaviour
             }
         }
 
-        List<GroupInfoExtended> sortedList = SearchUI.OnSearch(GetData()).ToList();
+        List<MapsData> sortedList = SearchUI.OnSearch(GetData()).ToList();
         
         RefreshList(sortedList);
     }
-    void RefreshList(List<GroupInfoExtended> ls)
+    void RefreshList(List<MapsData> ls)
     {
         // Clear cover downloading queue and content
         //CoversManager.ClearPackages(content.GetComponentsInChildren<RawImage>());
@@ -152,7 +153,7 @@ public class TrackListUI : MonoBehaviour
         }
 
 
-        List<GroupInfoExtended> data = new List<GroupInfoExtended>();
+        List<MapsData> data = new List<MapsData>();
         data.AddRange(ls);
 
 
@@ -163,7 +164,7 @@ public class TrackListUI : MonoBehaviour
 
 
         // Creating TrackGroupClass for items from Database container
-        List<GroupInfoExtended> groups = data.GetRange(pagingItemStart, pagingItemCount);
+        List<MapsData> groups = data.GetRange(pagingItemStart, pagingItemCount);
 
 
         // Creating items and cover requests
@@ -174,9 +175,7 @@ public class TrackListUI : MonoBehaviour
             TrackListItem item = Instantiate(trackItemPrefab, content).GetComponent<TrackListItem>();
             item.Setup(groups[i], menu);
 
-            coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), groups[i].author + "-" + groups[i].name));
-
-            //listController.displayedApprovedGroup.Add(new TrackGroupPair(group, item.gameObject));
+            coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), groups[i].Trackname));
         }
 
 
@@ -214,9 +213,9 @@ public class TrackListUI : MonoBehaviour
             DatabaseManager.LoadOwnGroups(callback);
         }
     }
-    public List<GroupInfoExtended> GetData()
+    public List<MapsData> GetData()
     {
-        List<GroupInfoExtended> ls = new List<GroupInfoExtended>();
+        List<MapsData> ls = new List<MapsData>();
         if (showedListType == ListType.Approved)
         {
             ls.AddRange(DatabaseManager.container.approvedGroups);
@@ -237,11 +236,8 @@ public class TrackListUI : MonoBehaviour
         return ls;
     }
 
-    public GroupInfoExtended FindGroupInDownloaded(string trackname)
+    public MapsData FindGroupInDownloaded(string trackname)
     {
-        string author = trackname.Split('-')[0];
-        string name = trackname.Split('-')[1];
-
-        return DatabaseManager.container.DownloadedGroups.FirstOrDefault(c => c.author == author && c.name == name);
+        return DatabaseManager.container.DownloadedGroups.FirstOrDefault(c => c.Trackname == trackname);
     }
 }

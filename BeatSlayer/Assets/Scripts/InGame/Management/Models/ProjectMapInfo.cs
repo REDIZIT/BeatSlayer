@@ -1,3 +1,4 @@
+using InGame.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -38,10 +39,9 @@ namespace ProjectManagement
 
         public ProjectMapInfo() { }
 
-        public ProjectMapInfo(GroupInfoExtended group)
+        public ProjectMapInfo(MapsData groupData)
         {
             nick = "[LOCAL STORAGE]";
-            filepath = group.filepath;
             difficultyName = "Standard";
             difficultyStars = 4;
             difficulties = new List<DifficultyInfo>()
@@ -52,6 +52,11 @@ namespace ProjectManagement
                     stars = 4
                 }
             };
+
+            if (groupData is OwnMapsData)
+            {
+                filepath = (groupData as OwnMapsData).Filepath;
+            }
         }
     }
 }

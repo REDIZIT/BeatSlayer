@@ -1,4 +1,5 @@
-﻿using MusicFilesManagement;
+﻿using InGame.Models;
+using MusicFilesManagement;
 using Pixelplacement;
 using ProjectManagement;
 using System.Collections;
@@ -54,13 +55,11 @@ public class MusicFilesUI : MonoBehaviour
             string author = trackname.Contains("-") ? trackname.Split('-')[0] : "";
             string name = trackname.Contains("-") ? trackname.Split('-')[1] : trackname.Split('-')[0];
 
-            GroupInfoExtended groupInfo = new GroupInfoExtended()
+            MapsData groupInfo = new OwnMapsData()
             {
-                author = author,
-                name = name,
-                mapsCount = 1,
-                filepath = filepath,
-                groupType = GroupType.Own
+                Author = author,
+                Name = name,
+                Filepath = filepath
             };
 
             TrackListItem item = Instantiate(trackItemPrefab, ownMusicList).GetComponent<TrackListItem>();

@@ -1,4 +1,5 @@
 ﻿using GameNet;
+using InGame.Models;
 using InGame.UI.Overlays;
 using Newtonsoft.Json;
 using ProjectManagement;
@@ -54,23 +55,20 @@ namespace DatabaseManagement
         {
             onDownloadedMusicCallback = callback;
 
-            List<GroupInfoExtended> groups = new List<GroupInfoExtended>();
+            List<MapsData> groups = new List<MapsData>();
             string[] groupFolders = Directory.GetDirectories(Application.persistentDataPath + "/maps");
             foreach (string groupFolder in groupFolders)
             {
                 int mapsCount = Directory.GetDirectories(groupFolder).Count();
                 string trackname = new DirectoryInfo(groupFolder).Name;
-
-                GroupInfoExtended info = new GroupInfoExtended()
-                {
-                    author = trackname.Split('-')[0],
-                    name = trackname.Split('-')[1],
-                    mapsCount = mapsCount
-                };
-
                 string[] mapFolders = Directory.GetDirectories(groupFolder);
-                info.nicks = new List<string>();
-                info.nicks.AddRange(mapFolders.Select(c => new DirectoryInfo(c).Name));
+
+                MapsData info = new MapsData()
+                {
+                    Author = trackname.Split('-')[0],
+                    Name = trackname.Split('-')[1],
+                    MappersNicks = mapFolders.Select(c => new DirectoryInfo(c).Name).ToList()
+                };
 
                 groups.Add(info);
             }
@@ -85,9 +83,8 @@ namespace DatabaseManagement
 
 
 
-        public static void GetMapsByTrackAsync(GroupInfoExtended groupInfo, Action<List<ProjectMapInfo>> callback, Action<string> error)
+        public static void GetMapsByTrackAsync(MapsData groupInfo, Action<List<ProjectMapInfo>> callback, Action<string> error)
         {
-            Debug.Log("GetMapsByTrackAsync");
             List<ProjectMapInfo> mapInfos = null;
 
             if (Application.internetReachability != NetworkReachability.NotReachable)
@@ -119,7 +116,7 @@ namespace DatabaseManagement
                     }
                 };
 
-                string trackname = groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
+                string trackname = groupInfo.Trackname.Replace("&", "%amp%");
                 string url = string.Format(url_getAllMaps, trackname);
                 client.DownloadStringAsync(new Uri(url));
             }
@@ -131,15 +128,15 @@ namespace DatabaseManagement
         }
 
         /// <summary>Get already downloaded maps</summary>
-        public static List<ProjectMapInfo> GetDownloadedMaps(GroupInfo group)
+        public static List<ProjectMapInfo> GetDownloadedMaps(MapsData group)
         {
-            string trackFolder = Application.persistentDataPath + "/maps/" + group.author + "-" + group.name;
+            string trackFolder = Application.persistentDataPath + "/maps/" + group.Trackname;
             string[] mapsPathes = Directory.GetDirectories(trackFolder);
 
             List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
             for (int i = 0; i < mapsPathes.Length; i++)
             {
-                ProjectMapInfo info = GetMapInfo(group.author + "-" + group.name, new DirectoryInfo(mapsPathes[i]).Name);
+                ProjectMapInfo info = GetMapInfo(group.Trackname, new DirectoryInfo(mapsPathes[i]).Name);
                 mapInfos.Add(info);
             }
 
@@ -204,11 +201,10 @@ namespace DatabaseManagement
 
 
         /// <summary>Used when no internet and needed to play</summary>
-        private static List<ProjectMapInfo> LoadMapDataFromStorage(GroupInfo groupInfo)
+        private static List<ProjectMapInfo> LoadMapDataFromStorage(MapsData groupInfo)
         {
             List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
-            string trackname = groupInfo.author + "-" + groupInfo.name;
-            string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+            string groupFolder = Application.persistentDataPath + "/maps/" + groupInfo.Trackname;
             foreach (string mapFolder in Directory.GetDirectories(groupFolder))
             {
                 ProjectMapInfo info = new ProjectMapInfo()
@@ -238,7 +234,7 @@ namespace DatabaseManagement
             
             try
             {
-                List<GroupInfoExtended> maps = JsonConvert.DeserializeObject<List<GroupInfoExtended>>(json);
+                List<MapsData> maps = JsonConvert.DeserializeObject<List<MapsData>>(json);
                 container.approvedGroups = maps;
             }
             catch (Exception err)
@@ -254,7 +250,7 @@ namespace DatabaseManagement
 
             try
             {
-                List<GroupInfoExtended> maps = JsonConvert.DeserializeObject<List<GroupInfoExtended>>(json);
+                List<MapsData> maps = JsonConvert.DeserializeObject<List<MapsData>>(json);
                 container.allGroups = maps;
             }
             catch (Exception err)
@@ -276,9 +272,9 @@ namespace DatabaseManagement
 
     public class DatabaseContainer
     {
-        public List<GroupInfoExtended> approvedGroups = new List<GroupInfoExtended>();
-        public List<GroupInfoExtended> allGroups = new List<GroupInfoExtended>();
-        public List<GroupInfoExtended> DownloadedGroups { get; set; } = new List<GroupInfoExtended>();
-        public List<GroupInfoExtended> OwnGroups { get; set; } = new List<GroupInfoExtended>();
+        public List<MapsData> approvedGroups = new List<MapsData>();
+        public List<MapsData> allGroups = new List<MapsData>();
+        public List<MapsData> DownloadedGroups { get; set; } = new List<MapsData>();
+        public List<MapsData> OwnGroups { get; set; } = new List<MapsData>();
     }
 }
