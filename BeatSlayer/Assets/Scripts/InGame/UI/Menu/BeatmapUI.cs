@@ -171,12 +171,12 @@ public class BeatmapUI : MonoBehaviour
 
 
         // Refresh list of player's maps
-        List<ProjectMapInfo> mapInfos = null;
+        List<FullMapData> mapInfos = null;
         bool async = false;
         isGroupDeleted = false;
         testRequest = null;
 
-        if (listItem.groupInfo.MapType == GroupType.Own) mapInfos = new List<ProjectMapInfo>() { new ProjectMapInfo(listItem.groupInfo) };
+        if (listItem.groupInfo.MapType == GroupType.Own) mapInfos = new List<FullMapData>() { new FullMapData(listItem.groupInfo) };
         else if (listItem.isLocalItem) mapInfos = DatabaseManager.GetDownloadedMaps(listItem.groupInfo);
         else
         {
@@ -209,7 +209,7 @@ public class BeatmapUI : MonoBehaviour
 
 
         // Refresh list of player's maps
-        List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
+        List<FullMapData> mapInfos = new List<FullMapData>();
         
         List<DifficultyInfo> dInfos = new List<DifficultyInfo>();
         foreach (var d in proj.difficulties)
@@ -222,16 +222,12 @@ public class BeatmapUI : MonoBehaviour
             });
         }
         
-        mapInfos.Add(new ProjectMapInfo()
+        mapInfos.Add(new FullMapData()
         {
-            group = new GroupInfo()
-            {
-                author = author,
-                name = name, 
-                mapsCount = 1
-            },
-            difficulties = dInfos,
-            nick = proj.creatorNick
+            Author = author,
+            Name = name,
+            Difficulties = dInfos,
+            Nick = proj.creatorNick
         });
 
         RefreshBeatmapsList(mapInfos);
@@ -249,25 +245,12 @@ public class BeatmapUI : MonoBehaviour
     }
     
     
-    void RefreshBeatmapsList(List<ProjectMapInfo> mapInfos)
+    void RefreshBeatmapsList(List<FullMapData> mapInfos)
     {
-        //downloadPan.SetActive(false);
-        //footer.SetActive(false);
-
-        //if (update)
-        //{
-        //    HelperUI.RefreshContent<BeatmapUIItem, MapInfo>(beatmapsContent, mapInfos, (BeatmapUIItem ui, MapInfo info) =>
-        //    {
-        //        ui.Setup(info, mapInfos.Count == 1);
-        //    });
-        //}
-        //else
-        //{
-            HelperUI.FillContent<BeatmapUIItem, ProjectMapInfo>(beatmapsContent, mapInfos, (BeatmapUIItem ui, ProjectMapInfo info) =>
-            {
-                ui.Setup(info, mapInfos.Count == 1);
-            });
-        //}
+        HelperUI.FillContent(beatmapsContent, mapInfos, (BeatmapUIItem ui, FullMapData info) =>
+        {
+            ui.Setup(info, mapInfos.Count == 1);
+        });
 
         loadingCircle.Stop();
     }
@@ -305,24 +288,25 @@ public class BeatmapUI : MonoBehaviour
     }
     public void OnBeatmapItemClicked(BeatmapUIItem item)
     {
-        currentMapInfo = new BasicMapData(item.mapInfo);
+        currentMapInfo = item.mapInfo;
 
         List<DifficultyInfo> difficulties = new List<DifficultyInfo>();
-        if (item.mapInfo.difficulties.Count == 0)
+        if (item.mapInfo.Difficulties.Count == 0)
         {
-            difficulties.Add(new DifficultyInfo()
-            {
-                name = item.mapInfo.difficultyName,
-                stars = item.mapInfo.difficultyStars,
-                downloads = item.mapInfo.downloads,
-                playCount = item.mapInfo.playCount,
-                likes = item.mapInfo.likes,
-                dislikes = item.mapInfo.dislikes
-            });
+            throw new NotImplementedException("Difficulties count is 0");
+            //difficulties.Add(new DifficultyInfo()
+            //{
+            //    name = item.mapInfo.Difficulties,
+            //    stars = item.mapInfo.difficultyStars,
+            //    downloads = item.mapInfo.downloads,
+            //    playCount = item.mapInfo.PlayCount,
+            //    likes = item.mapInfo.Likes,
+            //    dislikes = item.mapInfo.Dislikes
+            //});
         }
         else
         {
-            difficulties.AddRange(item.mapInfo.difficulties);
+            difficulties.AddRange(item.mapInfo.Difficulties);
         }
 
 

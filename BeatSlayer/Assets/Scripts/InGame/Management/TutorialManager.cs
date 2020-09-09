@@ -1,6 +1,7 @@
 ﻿using DatabaseManagement;
 using GameNet;
 using InGame.Menu.Maps;
+using InGame.Models;
 using InGame.SceneManagement;
 using Michsky.UI.ModernUIPack;
 using ProjectManagement;
@@ -112,9 +113,9 @@ public class TutorialManager : MonoBehaviour
 
     public void OnStartMapBtnClick()
     {
-        var mapInfo = DatabaseManager.GetMapInfo(tutorialMapTask.Trackname, tutorialMapTask.Mapper);
+        FullMapData mapInfo = DatabaseManager.GetMapInfo(tutorialMapTask.Trackname, tutorialMapTask.Mapper);
 
-        SceneloadParameters param = SceneloadParameters.AuthorMusicPreset(new InGame.Models.BasicMapData(mapInfo), mapInfo.difficulties[0], new List<InGame.Menu.Mods.ModSO>());
+        SceneloadParameters param = SceneloadParameters.AuthorMusicPreset(mapInfo, mapInfo.Difficulties[0], new List<InGame.Menu.Mods.ModSO>());
         SceneController.instance.LoadScene(param);
     }
 }

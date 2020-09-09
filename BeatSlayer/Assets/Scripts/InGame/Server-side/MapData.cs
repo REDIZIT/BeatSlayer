@@ -1,4 +1,5 @@
 ﻿using BeatSlayerServer.Dtos.Mapping;
+using InGame.Models;
 using System.Collections.Generic;
 
 namespace BeatSlayerServer.Multiplayer.Accounts

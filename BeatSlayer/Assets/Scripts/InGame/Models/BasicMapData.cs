@@ -18,6 +18,14 @@ namespace InGame.Models
 
        
         public BasicMapData() { }
+
+        public BasicMapData(MapsData mapsDataParent)
+        {
+            Author = mapsDataParent.Author;
+            Name = mapsDataParent.Name;
+            MapType = mapsDataParent.MapType;
+        }
+
         public BasicMapData(ProjectMapInfo map)
         {
             Author = map.Author;
@@ -50,5 +58,14 @@ namespace InGame.Models
 
         public DateTime PublishTime { get; set; }
         //public DateTime ApprovedTime { get; set; }
+
+
+        public FullMapData() { }
+        public FullMapData(MapsData mapsDataParent)
+        {
+            Author = mapsDataParent.Author;
+            Name = mapsDataParent.Name;
+            MapType = mapsDataParent.MapType;
+        }
     }
 }

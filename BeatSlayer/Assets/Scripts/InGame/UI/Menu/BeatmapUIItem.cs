@@ -1,5 +1,6 @@
 ﻿using GameNet;
 using InGame.Helpers;
+using InGame.Models;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 public class BeatmapUIItem : MonoBehaviour
 {
     public BeatmapUI ui;
-    public ProjectMapInfo mapInfo;
+    public FullMapData mapInfo;
     public DifficultyInfo difficulty;
     
     public RawImage coverImage;
@@ -18,13 +19,13 @@ public class BeatmapUIItem : MonoBehaviour
 
     public GameObject downloadIndicator, approvedImage, passedImage;
 
-    public async void Setup(ProjectMapInfo info, bool isOnlyOneElement)
+    public async void Setup(FullMapData info, bool isOnlyOneElement)
     {
         mapInfo = info;
         
-        nickText.text = mapInfo.nick;
+        nickText.text = mapInfo.Nick;
 
-        if (info.group.groupType == GroupType.Author)
+        if (info.MapType == GroupType.Author)
         {
             likesText.text = mapInfo.Likes.ToString();
             dislikesText.text = mapInfo.Dislikes.ToString();
@@ -32,8 +33,8 @@ public class BeatmapUIItem : MonoBehaviour
             playCountText.text = mapInfo.PlayCount.ToString();
         }
         
-        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.nick));
-        approvedImage.SetActive(mapInfo.approved);
+        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.Nick));
+        approvedImage.SetActive(mapInfo.IsApproved);
 
         bool isPassed = false;
         if(Payload.Account != null)
@@ -69,7 +70,7 @@ public class BeatmapUIItem : MonoBehaviour
 
     public void Refresh()
     {
-        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.nick));
+        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.Nick));
     }
     void RefreshStars(int stars)
     {

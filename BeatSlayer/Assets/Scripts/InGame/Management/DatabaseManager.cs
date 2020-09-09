@@ -83,9 +83,9 @@ namespace DatabaseManagement
 
 
 
-        public static void GetMapsByTrackAsync(MapsData groupInfo, Action<List<ProjectMapInfo>> callback, Action<string> error)
+        public static void GetMapsByTrackAsync(MapsData groupInfo, Action<List<FullMapData>> callback, Action<string> error)
         {
-            List<ProjectMapInfo> mapInfos = null;
+            List<FullMapData> mapInfos = null;
 
             if (Application.internetReachability != NetworkReachability.NotReachable)
             {
@@ -100,13 +100,13 @@ namespace DatabaseManagement
                             error(err);
                             if (err == "Group has been deleted")
                             {
-                                List<ProjectMapInfo> ls = LoadMapDataFromStorage(groupInfo);
+                                List<FullMapData> ls = LoadMapDataFromStorage(groupInfo);
                                 callback(ls);
                             }
                         }
                         else
                         {
-                            mapInfos = (List<ProjectMapInfo>)(JsonConvert.DeserializeObject(a.Result, typeof(List<ProjectMapInfo>)));
+                            mapInfos = JsonConvert.DeserializeObject<List<FullMapData>>(a.Result);
                             callback(mapInfos);
                         }
                     }
@@ -128,33 +128,33 @@ namespace DatabaseManagement
         }
 
         /// <summary>Get already downloaded maps</summary>
-        public static List<ProjectMapInfo> GetDownloadedMaps(MapsData group)
+        public static List<FullMapData> GetDownloadedMaps(MapsData group)
         {
             string trackFolder = Application.persistentDataPath + "/maps/" + group.Trackname;
             string[] mapsPathes = Directory.GetDirectories(trackFolder);
 
-            List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
+            List<FullMapData> mapInfos = new List<FullMapData>();
             for (int i = 0; i < mapsPathes.Length; i++)
             {
-                ProjectMapInfo info = GetMapInfo(group.Trackname, new DirectoryInfo(mapsPathes[i]).Name);
+                FullMapData info = GetMapInfo(group.Trackname, new DirectoryInfo(mapsPathes[i]).Name);
                 mapInfos.Add(info);
             }
 
             return mapInfos;
         }
-        public static ProjectMapInfo GetMapInfo(string trackname, string nick)
+        public static FullMapData GetMapInfo(string trackname, string nick)
         {
             try
             {
                 WebClient c = new WebClient();
                 string response = c.DownloadString(string.Format(url_getMap, trackname, nick));
 
-                return (ProjectMapInfo)JsonConvert.DeserializeObject(response, typeof(ProjectMapInfo));
+                return JsonConvert.DeserializeObject<FullMapData>(response);
             }
             catch (Exception err)
             {
                 Debug.LogError("GetMapStatistics for " + trackname + "   " + nick + "\n" + err.Message);
-                return new ProjectMapInfo();
+                throw err;
             }
         }
        
@@ -201,17 +201,18 @@ namespace DatabaseManagement
 
 
         /// <summary>Used when no internet and needed to play</summary>
-        private static List<ProjectMapInfo> LoadMapDataFromStorage(MapsData groupInfo)
+        private static List<FullMapData> LoadMapDataFromStorage(MapsData groupInfo)
         {
-            List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
+            var mapInfos = new List<FullMapData>();
+
             string groupFolder = Application.persistentDataPath + "/maps/" + groupInfo.Trackname;
+
             foreach (string mapFolder in Directory.GetDirectories(groupFolder))
             {
-                ProjectMapInfo info = new ProjectMapInfo()
+                FullMapData info = new FullMapData(groupInfo)
                 {
-                    group = groupInfo,
-                    nick = new DirectoryInfo(mapFolder).Name,
-                    difficulties = new List<DifficultyInfo>()
+                    Nick = new DirectoryInfo(mapFolder).Name,
+                    Difficulties = new List<DifficultyInfo>()
                 };
                 mapInfos.Add(info);
             }
