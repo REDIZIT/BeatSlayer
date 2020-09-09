@@ -1,4 +1,5 @@
-﻿using GameNet;
+﻿using DatabaseManagement;
+using GameNet;
 using InGame.Menu.Maps;
 using InGame.SceneManagement;
 using Michsky.UI.ModernUIPack;
@@ -12,7 +13,6 @@ public class TutorialManager : MonoBehaviour
 {
     public BeatmapUI ui;
     public GameObject overlay;
-    public DatabaseScript database;
 
     [SerializeField] private MapsDownloadQueuer queuer;
 
@@ -112,7 +112,7 @@ public class TutorialManager : MonoBehaviour
 
     public void OnStartMapBtnClick()
     {
-        var mapInfo = database.GetMapInfo(tutorialMapTask.Trackname, tutorialMapTask.Mapper);
+        var mapInfo = DatabaseManager.GetMapInfo(tutorialMapTask.Trackname, tutorialMapTask.Mapper);
 
         SceneloadParameters param = SceneloadParameters.AuthorMusicPreset(new InGame.Models.BasicMapData(mapInfo), mapInfo.difficulties[0], new List<InGame.Menu.Mods.ModSO>());
         SceneController.instance.LoadScene(param);

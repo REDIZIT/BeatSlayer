@@ -141,9 +141,9 @@ namespace InGame.UI.Overlays
 
 
             // Adding files to groups container
-            Database.container.OwnGroups.Clear();
+            DatabaseManager.container.OwnGroups.Clear();
 
-            Database.container.OwnGroups = LoadGroupsFromFilepathes(allFiles);
+            DatabaseManager.container.OwnGroups = LoadGroupsFromFilepathes(allFiles);
 
             SaveToFile();
 
@@ -158,12 +158,12 @@ namespace InGame.UI.Overlays
             {
                 string json = File.ReadAllText(path);
                 List<string> files = JsonConvert.DeserializeObject<List<string>>(json);
-                Database.container.OwnGroups = LoadGroupsFromFilepathes(files);
+                DatabaseManager.container.OwnGroups = LoadGroupsFromFilepathes(files);
             }
         }
         void SaveToFile()
         {
-            string json = JsonConvert.SerializeObject(Database.container.OwnGroups.Select(c => c.filepath));
+            string json = JsonConvert.SerializeObject(DatabaseManager.container.OwnGroups.Select(c => c.filepath));
             string path = DataFolder + "/data/musicfiles.json";
             File.WriteAllText(path, json);
         }

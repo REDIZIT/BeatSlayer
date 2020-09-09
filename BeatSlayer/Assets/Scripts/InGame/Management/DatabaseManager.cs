@@ -1,27 +1,29 @@
 ﻿using GameNet;
 using InGame.UI.Overlays;
-using MusicFilesManagement;
 using Newtonsoft.Json;
 using ProjectManagement;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace DatabaseManagement
 {
-    public static class Database
+    public static class DatabaseManager
     {
         public static DatabaseContainer container;
         public static OwnMusicUI ownMusicUI;
 
-        public static string apibase => NetCore.Url_Server;
-        public static string url_approved = apibase + "/Moderation/GetApprovedGroups";
-        public static string url_groups = apibase + "/Database/GetGroupsExtended";
+        public static string Apibase => NetCore.Url_Server;
+        public static string url_approved = Apibase + "/Moderation/GetApprovedGroups";
+        public static string url_groups = Apibase + "/Database/GetGroupsExtended";
+        public static string url_getAllMaps = Apibase + "/Database/GetMapsWithResult?trackname={0}";
+        public static string url_getMap = Apibase + "/Database/GetMap?trackname={0}&nick={1}";
+        public static string url_doesMapExist = Apibase + "/Database/DoesMapExist?trackname={0}&nick={1}";
+        public static string url_hasMapUpdate = Apibase + "/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
+        public static string url_setDifficultyStatistics = Apibase + "/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
 
 
         public static Action onApprovedLoadedCallback, onAllMusicLoadedCallback, onDownloadedMusicCallback;
@@ -83,6 +85,153 @@ namespace DatabaseManagement
 
 
 
+        public static void GetMapsByTrackAsync(GroupInfoExtended groupInfo, Action<List<ProjectMapInfo>> callback, Action<string> error)
+        {
+            Debug.Log("GetMapsByTrackAsync");
+            List<ProjectMapInfo> mapInfos = null;
+
+            if (Application.internetReachability != NetworkReachability.NotReachable)
+            {
+                WebClient client = new WebClient();
+                client.DownloadStringCompleted += (s, a) =>
+                {
+                    if (!a.Cancelled && a.Error == null)
+                    {
+                        if (a.Result.StartsWith("[ERR]"))
+                        {
+                            string err = a.Result.Replace("[ERR] ", "");
+                            error(err);
+                            if (err == "Group has been deleted")
+                            {
+                                List<ProjectMapInfo> ls = LoadMapDataFromStorage(groupInfo);
+                                callback(ls);
+                            }
+                        }
+                        else
+                        {
+                            mapInfos = (List<ProjectMapInfo>)(JsonConvert.DeserializeObject(a.Result, typeof(List<ProjectMapInfo>)));
+                            callback(mapInfos);
+                        }
+                    }
+                    else if (!a.Cancelled)
+                    {
+                        error(a.Error.Message);
+                    }
+                };
+
+                string trackname = groupInfo.author.Replace("&", "%amp%") + "-" + groupInfo.name.Replace("&", "%amp%");
+                string url = string.Format(url_getAllMaps, trackname);
+                client.DownloadStringAsync(new Uri(url));
+            }
+            else
+            {
+                error("No internet connection");
+                callback(LoadMapDataFromStorage(groupInfo));
+            }
+        }
+
+        /// <summary>Get already downloaded maps</summary>
+        public static List<ProjectMapInfo> GetDownloadedMaps(GroupInfo group)
+        {
+            string trackFolder = Application.persistentDataPath + "/maps/" + group.author + "-" + group.name;
+            string[] mapsPathes = Directory.GetDirectories(trackFolder);
+
+            List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
+            for (int i = 0; i < mapsPathes.Length; i++)
+            {
+                ProjectMapInfo info = GetMapInfo(group.author + "-" + group.name, new DirectoryInfo(mapsPathes[i]).Name);
+                mapInfos.Add(info);
+            }
+
+            return mapInfos;
+        }
+        public static ProjectMapInfo GetMapInfo(string trackname, string nick)
+        {
+            try
+            {
+                WebClient c = new WebClient();
+                string response = c.DownloadString(string.Format(url_getMap, trackname, nick));
+
+                return (ProjectMapInfo)JsonConvert.DeserializeObject(response, typeof(ProjectMapInfo));
+            }
+            catch (Exception err)
+            {
+                Debug.LogError("GetMapStatistics for " + trackname + "   " + nick + "\n" + err.Message);
+                return new ProjectMapInfo();
+            }
+        }
+       
+        public static void SendStatistics(string trackname, string nick, int difficultyId, StatisticsKeyType key)
+        {
+            string keyStr = key.ToString().ToLower();
+
+            trackname = trackname.Replace("&", "%amp%");
+
+            string url = string.Format(url_setDifficultyStatistics, trackname, nick, difficultyId, keyStr);
+
+            WebClient c = new WebClient();
+            c.DownloadStringAsync(new Uri(url));
+        }
+
+
+        public static bool DoesMapExist(string trackname, string nick)
+        {
+            string url = string.Format(url_doesMapExist, trackname.Replace("&", "%26"), nick);
+            WebClient c = new WebClient();
+            string response = c.DownloadString(url);
+            bool b = bool.Parse(response);
+
+            Debug.Log("Does map " + trackname + " by " + nick + " exists? " + b);
+            return b;
+        }
+        public static bool HasUpdateForMap(string trackname, string nick)
+        {
+            if (Application.internetReachability == NetworkReachability.NotReachable) return false;
+
+            string path = Application.persistentDataPath + "/maps/" + trackname + "/" + nick + "/" + trackname + ".bsu";
+            long utcTicks = new FileInfo(path).LastWriteTimeUtc.Ticks;
+
+            trackname = trackname.Replace("&", "%amp%");
+            nick = nick.Replace("&", "%amp%");
+
+            string url = string.Format(url_hasMapUpdate, trackname, nick, utcTicks);
+            string response = new WebClient().DownloadString(url);
+
+            return bool.Parse(response);
+        }
+
+
+
+
+        /// <summary>Used when no internet and needed to play</summary>
+        private static List<ProjectMapInfo> LoadMapDataFromStorage(GroupInfo groupInfo)
+        {
+            List<ProjectMapInfo> mapInfos = new List<ProjectMapInfo>();
+            string trackname = groupInfo.author + "-" + groupInfo.name;
+            string groupFolder = Application.persistentDataPath + "/maps/" + trackname;
+            foreach (string mapFolder in Directory.GetDirectories(groupFolder))
+            {
+                ProjectMapInfo info = new ProjectMapInfo()
+                {
+                    group = groupInfo,
+                    nick = new DirectoryInfo(mapFolder).Name,
+                    difficulties = new List<DifficultyInfo>()
+                };
+                mapInfos.Add(info);
+            }
+
+            return mapInfos;
+        }
+
+
+
+
+
+
+
+
+        #region OnLoadedData events
+
         private static void OnLoadedApproved(object sender, DownloadStringCompletedEventArgs e)
         {
             string json = e.Result;
@@ -115,6 +264,14 @@ namespace DatabaseManagement
 
             onAllMusicLoadedCallback();
         }
+
+        #endregion
+    }
+
+
+    public enum StatisticsKeyType
+    {
+        Download, Play, Like, Dislike
     }
 
     public class DatabaseContainer

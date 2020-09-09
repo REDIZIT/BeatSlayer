@@ -12,6 +12,7 @@ using InGame.Leaderboard;
 using InGame.Animations;
 using InGame.Game.Spawn;
 using InGame.Game.HP;
+using DatabaseManagement;
 
 public class FinishHandler : MonoBehaviour
 {
@@ -198,7 +199,7 @@ public class FinishHandler : MonoBehaviour
 
         string trackname = gm.project.author.Trim() + "-" + gm.project.name.Trim();
 
-        DatabaseScript.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, DatabaseScript.StatisticsKeyType.Play);
+        DatabaseManager.SendStatistics(trackname, gm.project.creatorNick, LoadingData.loadparams.difficultyInfo.id, StatisticsKeyType.Play);
         WebAPI.OnMapPlayed(LoadingData.loadparams.Map.IsApproved);
 
 
@@ -225,7 +226,7 @@ public class FinishHandler : MonoBehaviour
             return;
         }
 
-        if (!DatabaseScript.DoesMapExist(trackname, gm.project.creatorNick))
+        if (!DatabaseManager.DoesMapExist(trackname, gm.project.creatorNick))
         {
             leaderboard.SetStatus(LocalizationManager.Localize("MapHasBeenDeleted"));
             return;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Assets.SimpleLocalization;
+using DatabaseManagement;
 using InGame.Helpers;
 using InGame.Menu;
 using InGame.Menu.Maps;
@@ -21,7 +22,6 @@ using ProjectMapInfo = ProjectManagement.ProjectMapInfo;
 
 public class BeatmapUI : MonoBehaviour
 {
-    public DatabaseScript database;
     public MenuScript_v2 menu;
     public MenuAudioManager menuAudioManager;
     public PracticeModeUI practiceModeUI;
@@ -176,14 +176,14 @@ public class BeatmapUI : MonoBehaviour
         isGroupDeleted = false;
         testRequest = null;
 
-        if (listItem.groupInfo.groupType == GroupType.Own) mapInfos = database.GetCustomMaps(listItem.groupInfo);
-        else if (listItem.isLocalItem) mapInfos = database.GetDownloadedMaps(listItem.groupInfo);
+        if (listItem.groupInfo.groupType == GroupType.Own) mapInfos = new List<ProjectMapInfo>() { new ProjectMapInfo(listItem.groupInfo) };
+        else if (listItem.isLocalItem) mapInfos = DatabaseManager.GetDownloadedMaps(listItem.groupInfo);
         else
         {
             async = true;
             loadingCircle.Play();
             ClearContent(beatmapsContent);
-            database.GetMapsByTrackAsync(listItem.groupInfo, RefreshBeatmapsList, ShowError);
+            DatabaseManager.GetMapsByTrackAsync(listItem.groupInfo, RefreshBeatmapsList, ShowError);
         }
 
         if(!async) RefreshBeatmapsList(mapInfos);
@@ -360,7 +360,7 @@ public class BeatmapUI : MonoBehaviour
             //currentMapInfo.group.groupType == GroupInfo.GroupType.Own;
             currentMapInfo.MapType == GroupType.Own;
 
-        hasUpdate = currentMapInfo.MapType == GroupType.Own ? false : DatabaseScript.HasUpdateForMap(trackname, currentMapInfo.Nick);
+        hasUpdate = currentMapInfo.MapType == GroupType.Own ? false : DatabaseManager.HasUpdateForMap(trackname, currentMapInfo.Nick);
         bool isTest = testRequest != null;
 
         if (testRequest != null)

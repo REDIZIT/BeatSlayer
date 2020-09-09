@@ -90,7 +90,7 @@ public class TrackListUI : MonoBehaviour
     public void ReloadDownloadedList()
     {
         showedListType = ListType.Downloaded;
-        Database.container.DownloadedGroups.Clear();
+        DatabaseManager.container.DownloadedGroups.Clear();
         Refresh();
     }
 
@@ -199,19 +199,19 @@ public class TrackListUI : MonoBehaviour
     {
         if(showedListType == ListType.Approved)
         {
-            Database.LoadApproved(callback);
+            DatabaseManager.LoadApproved(callback);
         }
         else if (showedListType == ListType.AllMusic)
         {
-            Database.LoadAllGroups(callback);
+            DatabaseManager.LoadAllGroups(callback);
         }
         else if (showedListType == ListType.Downloaded)
         {
-            Database.LoadDownloadedGroups(callback);
+            DatabaseManager.LoadDownloadedGroups(callback);
         }
         else
         {
-            Database.LoadOwnGroups(callback);
+            DatabaseManager.LoadOwnGroups(callback);
         }
     }
     public List<GroupInfoExtended> GetData()
@@ -219,19 +219,19 @@ public class TrackListUI : MonoBehaviour
         List<GroupInfoExtended> ls = new List<GroupInfoExtended>();
         if (showedListType == ListType.Approved)
         {
-            ls.AddRange(Database.container.approvedGroups);
+            ls.AddRange(DatabaseManager.container.approvedGroups);
         }
         else if (showedListType == ListType.AllMusic)
         {
-            ls.AddRange(Database.container.allGroups);
+            ls.AddRange(DatabaseManager.container.allGroups);
         }
         else if (showedListType == ListType.Downloaded)
         {
-            ls.AddRange(Database.container.DownloadedGroups);
+            ls.AddRange(DatabaseManager.container.DownloadedGroups);
         }
         else
         {
-            ls.AddRange(Database.container.OwnGroups);
+            ls.AddRange(DatabaseManager.container.OwnGroups);
         }
 
         return ls;
@@ -242,6 +242,6 @@ public class TrackListUI : MonoBehaviour
         string author = trackname.Split('-')[0];
         string name = trackname.Split('-')[1];
 
-        return Database.container.DownloadedGroups.FirstOrDefault(c => c.author == author && c.name == name);
+        return DatabaseManager.container.DownloadedGroups.FirstOrDefault(c => c.author == author && c.name == name);
     }
 }

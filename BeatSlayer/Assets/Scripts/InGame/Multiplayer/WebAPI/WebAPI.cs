@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BeatSlayer.Utils;
+using DatabaseManagement;
 using GameNet;
 using Multiplayer.Accounts;
 using Newtonsoft.Json;
@@ -76,7 +77,7 @@ namespace Web
                 completeCallback(args);
 
                 // -1 coz of Difficulty has no Downloads field 
-                DatabaseScript.SendStatistics(trackname, nick, -1, DatabaseScript.StatisticsKeyType.Download);
+                DatabaseManager.SendStatistics(trackname, nick, -1, StatisticsKeyType.Download);
             };
 
             mapDownloadClient.DownloadFileAsync(new Uri(url), tempPath);

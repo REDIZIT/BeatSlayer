@@ -22,6 +22,7 @@ using System;
 using InGame.Game.HP;
 using InGame.Game.Scoring.Mods;
 using InGame.Game.Mods;
+using DatabaseManagement;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -793,7 +794,7 @@ public class GameManager : MonoBehaviour
             prefsManager.prefs.SetRateState(trackname, liked ? 1 : -1);
             
             //string trackname = project.author + "-" + project.name;
-            DatabaseScript.SendStatistics(trackname, project.creatorNick, difficultyInfo.id, liked ? DatabaseScript.StatisticsKeyType.Like : DatabaseScript.StatisticsKeyType.Dislike);
+            DatabaseManager.SendStatistics(trackname, project.creatorNick, difficultyInfo.id, liked ? StatisticsKeyType.Like : StatisticsKeyType.Dislike);
 
             likeBtnImg.color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);
             likeBtnImg.transform.GetChild(0).GetComponent<Image>().color = new Color32(0, (byte)(liked ? 145 : 34), 0, 255);

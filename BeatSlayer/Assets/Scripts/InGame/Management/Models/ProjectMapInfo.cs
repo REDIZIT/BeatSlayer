@@ -8,11 +8,9 @@ namespace ProjectManagement
     public class ProjectMapInfo
     {
         public GroupInfo group;
-        public bool isMapDeleted;
 
         public string Author { get { return group.author; } }
         public string Name { get { return group.name; } }
-        [JsonIgnore] public string Trackname { get { return Author + "-" + Name; } }
 
         public string nick;
 
@@ -34,15 +32,26 @@ namespace ProjectManagement
         public DateTime publishTime;
 
         public bool approved;
-        public DateTime grantedTime;
 
         // If map isn't on server
         [JsonIgnore] public string filepath = "";
 
         public ProjectMapInfo() { }
-        public ProjectMapInfo(GroupInfo group)
+
+        public ProjectMapInfo(GroupInfoExtended group)
         {
-            this.group = group;
+            nick = "[LOCAL STORAGE]";
+            filepath = group.filepath;
+            difficultyName = "Standard";
+            difficultyStars = 4;
+            difficulties = new List<DifficultyInfo>()
+            {
+                new DifficultyInfo()
+                {
+                    name = "Standard",
+                    stars = 4
+                }
+            };
         }
     }
 }

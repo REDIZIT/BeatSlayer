@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using GameNet;
+using InGame.Utils;
 using ProjectManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -269,7 +270,7 @@ namespace CoversManagement
 
         public override string GetUrl()
         {
-            return $"/Database/GetCover?trackname={TheGreat.UrlEncode(trackname)}&nick={TheGreat.UrlEncode(nick)}";
+            return $"/Database/GetCover?trackname={UrlEncoder.Encode(trackname)}&nick={UrlEncoder.Encode(nick)}";
         }
     }
 
@@ -289,7 +290,7 @@ namespace CoversManagement
 
         public override string GetUrl()
         {
-            return "/WebAPI/GetAvatar?nick=" + TheGreat.UrlEncode(nick);
+            return "/WebAPI/GetAvatar?nick=" + UrlEncoder.Encode(nick);
         }
     }
 }
