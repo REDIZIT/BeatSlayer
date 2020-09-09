@@ -10,7 +10,7 @@ namespace InGame.Models
     {
         public string Author { get; set; }
         public string Name { get; set; }
-        public string Nick { get; set; }
+        public string MapperNick { get; set; }
         public bool IsApproved { get; set; }
         public GroupType MapType { get; set; } = GroupType.Author;
 
@@ -30,7 +30,7 @@ namespace InGame.Models
         {
             Author = map.Author;
             Name = map.Name;
-            Nick = map.nick;
+            MapperNick = map.nick;
             IsApproved = map.approved;
         }
     }
@@ -54,7 +54,7 @@ namespace InGame.Models
 
         public int downloads;
 
-        public List<DifficultyInfo> Difficulties { get; set; }
+        public List<DifficultyInfo> Difficulties { get; set; } = new List<DifficultyInfo>();
 
         public DateTime PublishTime { get; set; }
         //public DateTime ApprovedTime { get; set; }

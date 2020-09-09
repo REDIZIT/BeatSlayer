@@ -34,7 +34,7 @@ namespace InGame.Menu
             string perPath = Application.persistentDataPath;
 
             string trackname = mapInfo.Author + "-" + mapInfo.Name;
-            string filepath = perPath + "/maps/" + trackname + "/" + mapInfo.Nick + "/" + trackname + ".mp3";
+            string filepath = perPath + "/maps/" + trackname + "/" + mapInfo.MapperNick + "/" + trackname + ".mp3";
             if (!File.Exists(filepath)) filepath = Path.ChangeExtension(filepath, ".ogg");
 
             selectedClip = ProjectManager.LoadAudio(filepath);

@@ -23,7 +23,7 @@ public class BeatmapUIItem : MonoBehaviour
     {
         mapInfo = info;
         
-        nickText.text = mapInfo.Nick;
+        nickText.text = mapInfo.MapperNick;
 
         if (info.MapType == GroupType.Author)
         {
@@ -33,7 +33,7 @@ public class BeatmapUIItem : MonoBehaviour
             playCountText.text = mapInfo.PlayCount.ToString();
         }
         
-        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.Nick));
+        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.MapperNick));
         approvedImage.SetActive(mapInfo.IsApproved);
 
         bool isPassed = false;
@@ -70,7 +70,7 @@ public class BeatmapUIItem : MonoBehaviour
 
     public void Refresh()
     {
-        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.Nick));
+        downloadIndicator.SetActive(ProjectManager.IsMapDownloaded(mapInfo.Author, mapInfo.Name, mapInfo.MapperNick));
     }
     void RefreshStars(int stars)
     {

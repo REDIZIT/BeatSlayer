@@ -261,7 +261,7 @@ public class SceneloadParameters
         {
             Name = request.trackname.Split('-')[0],
             Author = request.trackname.Split('-')[1],
-            Nick = "[MODERATION *]"
+            MapperNick = "[MODERATION *]"
         };
 
         var parameters = new SceneloadParameters()
@@ -280,7 +280,7 @@ public class SceneloadParameters
         {
             Author = trackname.Split('-')[0],
             Name = trackname.Split('-')[1],
-            Nick = "[EDITOR TEST *]",
+            MapperNick = "[EDITOR TEST *]",
         };
 
         var parameters = new SceneloadParameters()
@@ -329,7 +329,7 @@ public class ProjectLoaderMap : IProjectLoader
 
         if(parameters.Type == SceneloadParameters.LoadType.Author)
         {
-            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.Nick;
+            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.MapperNick;
         }
         else
         {

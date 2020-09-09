@@ -17,14 +17,13 @@ namespace DatabaseManagement
         public static DatabaseContainer container;
         public static OwnMusicUI ownMusicUI;
 
-        public static string Apibase => NetCore.Url_Server;
-        public static string url_approved = Apibase + "/Moderation/GetApprovedGroups";
-        public static string url_groups = Apibase + "/Database/GetGroupsExtended";
-        public static string url_getAllMaps = Apibase + "/Database/GetMapsWithResult?trackname={0}";
-        public static string url_getMap = Apibase + "/Database/GetMap?trackname={0}&nick={1}";
-        public static string url_doesMapExist = Apibase + "/Database/DoesMapExist?trackname={0}&nick={1}";
-        public static string url_hasMapUpdate = Apibase + "/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
-        public static string url_setDifficultyStatistics = Apibase + "/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
+        public static string url_approved => NetCore.Url_Server + "/Moderation/GetApprovedGroups";
+        public static string url_groups => NetCore.Url_Server + "/Database/GetGroupsExtended";
+        public static string url_getAllMaps => NetCore.Url_Server + "/Database/GetMapsWithResult?trackname={0}";
+        public static string url_getMap => NetCore.Url_Server + "/Database/GetMap?trackname={0}&nick={1}";
+        public static string url_doesMapExist => NetCore.Url_Server + "/Database/DoesMapExist?trackname={0}&nick={1}";
+        public static string url_hasMapUpdate => NetCore.Url_Server + "/Database/HasUpdateForMap?trackname={0}&nick={1}&utcTicks={2}";
+        public static string url_setDifficultyStatistics => NetCore.Url_Server + "/Database/SetDifficultyStatistics?trackname={0}&nick={1}&difficultyId={2}&key={3}";
 
 
         public static Action onApprovedLoadedCallback, onAllMusicLoadedCallback, onDownloadedMusicCallback;
@@ -118,6 +117,7 @@ namespace DatabaseManagement
 
                 string trackname = groupInfo.Trackname.Replace("&", "%amp%");
                 string url = string.Format(url_getAllMaps, trackname);
+                Debug.Log("Url: " + url);
                 client.DownloadStringAsync(new Uri(url));
             }
             else
@@ -211,7 +211,7 @@ namespace DatabaseManagement
             {
                 FullMapData info = new FullMapData(groupInfo)
                 {
-                    Nick = new DirectoryInfo(mapFolder).Name,
+                    MapperNick = new DirectoryInfo(mapFolder).Name,
                     Difficulties = new List<DifficultyInfo>()
                 };
                 mapInfos.Add(info);

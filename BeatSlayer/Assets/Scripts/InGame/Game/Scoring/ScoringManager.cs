@@ -110,7 +110,7 @@ namespace InGame.Game
                         Author = map.Author,
                         Name = map.Name
                     },
-                    Nick = map.Nick
+                    Nick = map.MapperNick
                 },
                 Difficulty = new DifficultyData()
                 {

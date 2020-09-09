@@ -35,7 +35,7 @@ public class TrackListItem : MonoBehaviour
 
 
         authorText.text = groupInfo.Author;
-        nameText.text = groupInfo.Author;
+        nameText.text = groupInfo.Name;
         if (!isCustomMusic)
         {
             mapsCountText.text = Assets.SimpleLocalization.LocalizationManager.Localize("MapsCount") + ": " + groupInfo.MappersNicks.Count;

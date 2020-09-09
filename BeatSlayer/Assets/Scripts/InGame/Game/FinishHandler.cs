@@ -149,7 +149,7 @@ public class FinishHandler : MonoBehaviour
 
         authorText.text = LoadingData.loadparams.Map.Author;
         nameText.text = LoadingData.loadparams.Map.Name;
-        creatorText.text = LocalizationManager.Localize("by") + " " + LoadingData.loadparams.Map.Nick;
+        creatorText.text = LocalizationManager.Localize("by") + " " + LoadingData.loadparams.Map.MapperNick;
 
         ShowScoring(replay.Score, replay.Missed, replay.Accuracy);
 

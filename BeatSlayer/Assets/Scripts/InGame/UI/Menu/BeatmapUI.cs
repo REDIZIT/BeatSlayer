@@ -70,7 +70,7 @@ public class BeatmapUI : MonoBehaviour
     {
         if (currentDifficultyInfo != null)
         {
-            var task = MapsDownloadQueuerBackground.queue.FirstOrDefault(c => c.Trackname == currentMapInfo.Author + "-" + currentMapInfo.Name && c.Mapper == currentMapInfo.Nick);
+            var task = MapsDownloadQueuerBackground.queue.FirstOrDefault(c => c.Trackname == currentMapInfo.Author + "-" + currentMapInfo.Name && c.Mapper == currentMapInfo.MapperNick);
             if (task != null)
             {
                 if (task.TaskState == MapDownloadTask.State.Downloading || task.TaskState == MapDownloadTask.State.Waiting)
@@ -227,7 +227,7 @@ public class BeatmapUI : MonoBehaviour
             Author = author,
             Name = name,
             Difficulties = dInfos,
-            Nick = proj.creatorNick
+            MapperNick = proj.creatorNick
         });
 
         RefreshBeatmapsList(mapInfos);
@@ -337,11 +337,11 @@ public class BeatmapUI : MonoBehaviour
 
 
         isDownloaded =
-            ProjectManager.IsMapDownloaded(currentMapInfo.Author, currentMapInfo.Name, currentMapInfo.Nick) ||
+            ProjectManager.IsMapDownloaded(currentMapInfo.Author, currentMapInfo.Name, currentMapInfo.MapperNick) ||
             //currentMapInfo.group.groupType == GroupInfo.GroupType.Own;
             currentMapInfo.MapType == GroupType.Own;
 
-        hasUpdate = currentMapInfo.MapType == GroupType.Own ? false : DatabaseManager.HasUpdateForMap(trackname, currentMapInfo.Nick);
+        hasUpdate = currentMapInfo.MapType == GroupType.Own ? false : DatabaseManager.HasUpdateForMap(trackname, currentMapInfo.MapperNick);
         bool isTest = testRequest != null;
 
         if (testRequest != null)
@@ -416,7 +416,7 @@ public class BeatmapUI : MonoBehaviour
     public void OnDownloadBtnClicked()
     {
         progressBar.value = 0;
-        mapsDownloadQueuer.AddTask(currentMapInfo.Author + "-" + currentMapInfo.Name, currentMapInfo.Nick);
+        mapsDownloadQueuer.AddTask(currentMapInfo.Trackname, currentMapInfo.MapperNick);
     }
 
     public void OnCancelBtnClicked()
@@ -428,7 +428,7 @@ public class BeatmapUI : MonoBehaviour
     {
         if (testRequest == null)
         {
-            ProjectManager.DeleteProject(currentMapInfo.Author + "-" + currentMapInfo.Name, currentMapInfo.Nick);
+            ProjectManager.DeleteProject(currentMapInfo.Trackname, currentMapInfo.MapperNick);
             RefreshBeatmapsList();
             OnBeatmapItemClicked();
         
@@ -444,7 +444,7 @@ public class BeatmapUI : MonoBehaviour
     public void OnUpdateBtnClicked()
     {
         // Delete old project
-        ProjectManager.DeleteProject(currentMapInfo.Author + "-" + currentMapInfo.Name, currentMapInfo.Nick);
+        ProjectManager.DeleteProject(currentMapInfo.Trackname, currentMapInfo.MapperNick);
         RefreshBeatmapsList();
         
         // Download update
@@ -517,20 +517,6 @@ public class BeatmapUI : MonoBehaviour
             implementation(itemUI, infoClass);
         }
         
-        prefab.SetActive(false);
-    }
-    
-    private void FillContent(Transform content, int count, Action<GameObject, int> implementation)
-    {
-        GameObject prefab = ClearContent(content);
-        prefab.SetActive(true);
-
-        for (int i = 0; i < count; i++)
-        {
-            GameObject item = Instantiate(prefab, content);
-            implementation(item, i);
-        }
-
         prefab.SetActive(false);
     }
 
