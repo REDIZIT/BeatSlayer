@@ -13,9 +13,12 @@ using InGame.Animations;
 using InGame.Game.Spawn;
 using InGame.Game.HP;
 using DatabaseManagement;
+using InGame.Multiplayer.Lobby;
 
 public class FinishHandler : MonoBehaviour
 {
+    public static FinishHandler instance;
+
     public GameManager gm { get { return GetComponent<GameManager>(); } }
     public BeatManager bm;
     public HPManager hp;
@@ -56,20 +59,24 @@ public class FinishHandler : MonoBehaviour
     public Text leaderboardLoadingText;
 
     [Header("Finish conditions")]
-    public bool isNotStarting;
-    public bool isAudioTimeZero;
-    //public bool isArrayEmpty;
-    public bool isAudioStopped;
+    //public bool isNotStarting;
+    //public bool isAudioTimeZero;
+   
+    //public bool isAudioStopped;
 
     public float audioTime;
 
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     public void CheckLevelFinish()
     {
-        // Debuggin' finish end
-        isNotStarting = !gm.IsGameStartingMap;
-        isAudioTimeZero = audioManager.asource.time == 0;
-        //isArrayEmpty = bm.Beats.ToArray().Length == 0;
-        isAudioStopped = !audioManager.asource.isPlaying;
+        //isNotStarting = !gm.IsGameStartingMap;
+        //isAudioTimeZero = audioManager.asource.time == 0;
+        //isAudioStopped = !audioManager.asource.isPlaying;
 
         audioTime = audioManager.asource.time;
 
@@ -251,6 +258,7 @@ public class FinishHandler : MonoBehaviour
 
 
         ReplaySendData data = await NetCore.ServerActions.Account.SendReplay(replay);
+        replay.Grade = data.Grade;
         uploadingText.SetActive(false);
 
 
@@ -263,8 +271,9 @@ public class FinishHandler : MonoBehaviour
         }
 
         ShowGrade(data.Grade);
+        FinishLobby(replay);
 
-        if(data.Grade == Grade.SS || data.Grade == Grade.S)
+        if (data.Grade == Grade.SS || data.Grade == Grade.S)
         {
             fireworksSystem.StartEmitting();
         }
@@ -285,6 +294,12 @@ public class FinishHandler : MonoBehaviour
 
         await leaderboard.LoadLeaderboard(replay.Map.Trackname, replay.Map.Nick);
 
+    }
+    private void FinishLobby(ReplayData replay)
+    {
+        if (Payload.Account == null || LobbyManager.lobby == null) return;
+
+        NetCore.ServerActions.Multiplayer.OnFinished(LobbyManager.lobby.Id, Payload.Account.Nick, replay);
     }
 
 

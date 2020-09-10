@@ -178,7 +178,6 @@ namespace DatabaseManagement
             string response = c.DownloadString(url);
             bool b = bool.Parse(response);
 
-            Debug.Log("Does map " + trackname + " by " + nick + " exists? " + b);
             return b;
         }
         public static bool HasUpdateForMap(string trackname, string nick)

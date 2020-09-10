@@ -351,7 +351,7 @@ namespace InGame.Multiplayer.Lobby.UI
         public void OnStartButtonClick()
         {
             NetCore.ServerActions.Multiplayer.StartGame(LobbyManager.lobby.Id);
-            LobbyManager.StartMap();
+            //LobbyManager.StartMap();
         }
         
 

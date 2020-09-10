@@ -1,6 +1,8 @@
+using BeatSlayerServer.Dtos.Mapping;
 using GameNet;
 using InGame.Game;
 using InGame.Helpers;
+using InGame.Multiplayer.Game.Leaderboard;
 using InGame.Multiplayer.Lobby;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +14,19 @@ namespace InGame.Multiplayer.Game
     {
         public ScoringManager sm;
 
+        [Header("Runtime leaderboard")]
         public Transform container;
         public GameObject itemPrefab, myItemPrefab;
+
+        [Header("Result leaderboard")]
+        public Transform resultContainer;
+        public GameObject resultItemPrefab;
 
         public Animator gradientAnimator;
 
 
         private List<MpLeaderboardItemPresenter> slots = new List<MpLeaderboardItemPresenter>();
+        private List<MpResultLeaderboardPresenter> resultSlots = new List<MpResultLeaderboardPresenter>();
         private MpLeaderboardItemPresenter mySlot;
         private float scoreUpdateTimer;
 
@@ -29,10 +37,11 @@ namespace InGame.Multiplayer.Game
             NetCore.Configure(() =>
             {
                 NetCore.Subs.OnMultiplayerScoreUpdate += OnScoreUpdate;
-                // TODO: Configute netcore
+                NetCore.Subs.OnMultiplayerPlayerFinished += RemotePlayerFinished;
             });
 
             CreateItems();
+            CreateResultItems();
         }
         private void Update()
         {
@@ -47,6 +56,8 @@ namespace InGame.Multiplayer.Game
                 NetCore.ServerActions.Multiplayer.ScoreUpdate(LobbyManager.lobby.Id, Payload.Account.Nick, sm.Replay.Score, Mathf.FloorToInt(sm.comboMultiplier));
             }
         }
+
+
 
         private void CreateItems()
         {
@@ -71,6 +82,18 @@ namespace InGame.Multiplayer.Game
                 }
             });
         }
+        private void CreateResultItems()
+        {
+            HelperUI.FillContent(resultContainer, resultItemPrefab, LobbyManager.lobby.Players, (MpResultLeaderboardPresenter presenter, LobbyPlayer player) =>
+            {
+                presenter.RefreshAndWaitForReplay(player);
+                resultSlots.Add(presenter);
+            });
+        }
+
+
+
+
 
         private void ResortItems()
         {
@@ -126,12 +149,20 @@ namespace InGame.Multiplayer.Game
         }
 
 
+
+
+
+
         private void OnScoreUpdate(string nick, float score, int combo)
         {
             var slot = slots.First(c => c.player.Player.Nick == nick);
             slot.UpdateScore(score, combo);
 
             ResortItems();
+        }
+        private void RemotePlayerFinished(string nick, ReplayData replay)
+        {
+            resultSlots.Find(c => c.player.Player.Nick == nick).RefreshReplay(replay);
         }
     }
 }

@@ -521,6 +521,7 @@ namespace GameNet
                 public static void StartGame(int lobbyId) => conn.InvokeAsync("OnMultiplayerStartGame", lobbyId);
                 public static void OnLoaded(int lobbyId, string nick) => conn.InvokeAsync("OnMultiplayerPlayerLoaded", lobbyId, nick);
                 public static void ScoreUpdate(int lobbyId, string nick, float score, int combo) => conn.InvokeAsync("OnMultiplayerScoreUpdate", lobbyId, nick, score, combo);
+                public static void OnFinished(int lobbyId, string nick, ReplayData replay) => conn.InvokeAsync("OnMultiplayerPlayerFinished", lobbyId, nick, replay);
             }
         }
 
@@ -596,6 +597,7 @@ namespace GameNet
             public Action OnMultiplayerGameStart;
             public Action OnMultiplayerPlayersLoaded;
             public Action<string, float, int> OnMultiplayerScoreUpdate;
+            public Action<string, ReplayData> OnMultiplayerPlayerFinished;
 
             #endregion
         }

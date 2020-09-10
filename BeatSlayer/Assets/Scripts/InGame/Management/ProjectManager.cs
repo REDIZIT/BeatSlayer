@@ -209,8 +209,8 @@ namespace ProjectManagement
         /// </summary>
         public static Project UpgradeToDifficulty(Project legacyProject)
         {
-            Debug.Log("UpgradeToDifficulty " + legacyProject.author + "-" + legacyProject.name);
-            Debug.Log("Upgrade ls count: " + legacyProject.beatCubeList.Count);
+            //Debug.Log("UpgradeToDifficulty " + legacyProject.author + "-" + legacyProject.name);
+            //Debug.Log("Upgrade ls count: " + legacyProject.beatCubeList.Count);
             Project proj = legacyProject;
     
             proj.difficulties = new List<Difficulty>();
