@@ -16,6 +16,10 @@ namespace InGame.Multiplayer.Game
         public GameObject waitingOverlay;
         public Text waitingText;
 
+        [Header("UI")]
+        public GameObject restartBtn;
+        public GameObject leaderboardToDisable;
+
 
         private void Awake()
         {
@@ -36,6 +40,9 @@ namespace InGame.Multiplayer.Game
             waitingAnimator.Play("FadeOpen");
             waitingText.text = LocalizationManager.Localize("WaitingForPlayersLoaded");
 
+            restartBtn.SetActive(false);
+
+            FinishHandler.instance.OnFinishEvent += OnLocalPlayerFinished;
             NetCore.Configure(() =>
             {
                 NetCore.Subs.OnMultiplayerPlayersLoaded += OnAllPlayersLoaded;
@@ -58,6 +65,12 @@ namespace InGame.Multiplayer.Game
             yield return new WaitForSeconds(2);
 
             gm.StartGame();
+        }
+
+
+        private void OnLocalPlayerFinished()
+        {
+            leaderboardToDisable.SetActive(false);
         }
     }
 }

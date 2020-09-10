@@ -437,6 +437,8 @@ MonoBehaviour:
   waitingAnimator: {fileID: 185677896}
   waitingOverlay: {fileID: 1334777570}
   waitingText: {fileID: 415096657}
+  restartBtn: {fileID: 1513297184}
+  leaderboardToDisable: {fileID: 1497903726}
 --- !u!4 &18446122
 Transform:
   m_ObjectHideFlags: 0

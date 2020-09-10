@@ -14,6 +14,7 @@ using InGame.Game.Spawn;
 using InGame.Game.HP;
 using DatabaseManagement;
 using InGame.Multiplayer.Lobby;
+using System;
 
 public class FinishHandler : MonoBehaviour
 {
@@ -65,6 +66,8 @@ public class FinishHandler : MonoBehaviour
     //public bool isAudioStopped;
 
     public float audioTime;
+
+    public Action OnFinishEvent { get; set; }
 
 
     private void Awake()
@@ -138,6 +141,9 @@ public class FinishHandler : MonoBehaviour
                 string filepath = Application.persistentDataPath + "/data/moderation/" + LoadingData.loadparams.Map.Author + "-" + LoadingData.loadparams.Map.Name + ".bsz";
                 File.Delete(filepath);
             }
+
+
+            OnFinishEvent?.Invoke();
         }
     }
 

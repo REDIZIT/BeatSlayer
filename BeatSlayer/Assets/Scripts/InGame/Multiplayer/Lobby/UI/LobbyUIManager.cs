@@ -87,6 +87,15 @@ namespace InGame.Multiplayer.Lobby.UI
                 slots.Add(slotObj.GetComponent<LobbySlotPresenter>());
             }
 
+            // Open lobby page if game finished
+            if (LobbyManager.lobby != null)
+            {
+                pager.OpenLobbyPage();
+                RefreshLobby();
+            }
+
+
+
             NetCore.Configure(() =>
             {
                 NetCore.Subs.OnLobbyPlayerJoin += OnPlayerJoin;

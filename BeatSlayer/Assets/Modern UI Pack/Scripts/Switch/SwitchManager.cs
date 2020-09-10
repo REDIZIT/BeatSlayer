@@ -96,7 +96,7 @@ namespace Michsky.UI.ModernUIPack
         }
         private void SetOff(bool force)
         {
-            switchAnimator.Play(force ? "ForceSwitchOff" : "Switch Off");
+            switchAnimator?.Play(force ? "ForceSwitchOff" : "Switch Off");
             isOn = false;
             OffEvents.Invoke();
 
@@ -105,7 +105,7 @@ namespace Michsky.UI.ModernUIPack
         }
         private void SetOn(bool force)
         {
-            switchAnimator.Play(force ? "ForceSwitchOn" : "Switch On");
+            switchAnimator?.Play(force ? "ForceSwitchOn" : "Switch On");
             isOn = true;
             OnEvents.Invoke();
 
