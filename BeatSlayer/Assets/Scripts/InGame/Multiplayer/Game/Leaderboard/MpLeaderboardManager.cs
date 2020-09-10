@@ -1,4 +1,5 @@
 using GameNet;
+using InGame.Game;
 using InGame.Helpers;
 using InGame.Multiplayer.Lobby;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ namespace InGame.Multiplayer.Game
 {
     public class MpLeaderboardManager : MonoBehaviour
     {
+        public ScoringManager sm;
+
         public Transform container;
         public GameObject itemPrefab, myItemPrefab;
 
@@ -17,6 +20,7 @@ namespace InGame.Multiplayer.Game
 
         private List<MpLeaderboardItemPresenter> slots = new List<MpLeaderboardItemPresenter>();
         private MpLeaderboardItemPresenter mySlot;
+        private float scoreUpdateTimer;
 
         private void Start()
         {
@@ -24,7 +28,7 @@ namespace InGame.Multiplayer.Game
 
             NetCore.Configure(() =>
             {
-                //NetCore.Subs.OnMultiplayerScoreUpdate += OnScoreUpdate;
+                NetCore.Subs.OnMultiplayerScoreUpdate += OnScoreUpdate;
                 // TODO: Configute netcore
             });
 
@@ -32,16 +36,15 @@ namespace InGame.Multiplayer.Game
         }
         private void Update()
         {
-            if (Mathf.RoundToInt(Time.time) % 2 == 0)
+            if (scoreUpdateTimer > 0)
             {
-                if (Time.timeSinceLevelLoad < 5)
-                {
-                    OnScoreUpdate("REDIZIT", Time.timeSinceLevelLoad, 1);
-                }
-                else
-                {
-                    OnScoreUpdate("Tester", Time.timeSinceLevelLoad * 2, 1);
-                }
+                scoreUpdateTimer -= Time.deltaTime;
+            }
+            else
+            {
+                scoreUpdateTimer = 1;
+                OnScoreUpdate(Payload.Account.Nick, sm.Replay.Score, Mathf.FloorToInt(sm.comboMultiplier));
+                NetCore.ServerActions.Multiplayer.ScoreUpdate(LobbyManager.lobby.Id, Payload.Account.Nick, sm.Replay.Score, Mathf.FloorToInt(sm.comboMultiplier));
             }
         }
 
