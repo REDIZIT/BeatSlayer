@@ -1,8 +1,8 @@
-using BeatSlayerServer.Dtos.Mapping;
-using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
 using InGame.Game.Scoring.Mods;
+using InGame.Menu.Mods;
 using InGame.Models;
+using InGame.SceneManagement;
 using ProjectManagement;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,8 @@ namespace InGame.Multiplayer.Lobby
         public static Lobby lobby;
         public static LobbyPlayer lobbyPlayer;
         public static List<Lobby> lobbies;
+
+        public static List<ModSO> selectedMods = new List<ModSO>();
 
         public static bool isPickingMap;
 
@@ -128,10 +130,16 @@ namespace InGame.Multiplayer.Lobby
         #endregion
 
 
-
-
-        public static void ChangeMods(ModEnum mods)
+        public static void StartMap()
         {
+            var sceneParams = SceneloadParameters.AuthorMusicPreset(lobby.SelectedMap, lobby.SelectedDifficulty, selectedMods);
+            SceneController.instance.LoadScene(sceneParams);
+        }
+
+
+        public static void ChangeMods(List<ModSO> modSOs, ModEnum mods)
+        {
+            selectedMods = modSOs;
             NetCore.ServerActions.Lobby.ChangeMods(lobby.Id, lobbyPlayer.Player.Nick, mods);
         }
 

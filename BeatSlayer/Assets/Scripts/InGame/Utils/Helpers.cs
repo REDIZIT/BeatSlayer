@@ -30,7 +30,21 @@ namespace InGame.Helpers
         
             prefab.SetActive(false);
         }
-    
+
+        public static void FillContent<TItem, TData>(Transform content, GameObject prefab, IEnumerable<TData> list, Action<TItem, TData> implementation)
+        {
+            prefab.SetActive(true);
+
+            foreach (TData infoClass in list)
+            {
+                TItem itemUI = Instantiate(prefab, content).GetComponent<TItem>();
+                implementation(itemUI, infoClass);
+            }
+
+            prefab.SetActive(false);
+        }
+
+
         public static void FillContent(Transform content, int count, Action<GameObject, int> implementation)
         {
             GameObject prefab = ClearContent(content);

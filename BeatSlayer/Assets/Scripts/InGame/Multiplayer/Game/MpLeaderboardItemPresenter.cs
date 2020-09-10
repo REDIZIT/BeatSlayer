@@ -8,6 +8,8 @@ namespace InGame.Multiplayer.Game
     {
         public LobbyPlayer player;
 
+        public Animator animator;
+
         public int currentPlace;
         public float currentScore;
         public int currentCombo;
@@ -15,7 +17,7 @@ namespace InGame.Multiplayer.Game
 
         [Header("UI")]
         public Text nickText;
-        public Text scoreText, comboText;
+        public Text scoreText, comboText, placeText;
         public RawImage avatarImage;
 
        
@@ -37,6 +39,17 @@ namespace InGame.Multiplayer.Game
 
             currentScore = score;
             currentCombo = combo;
+        }
+
+        public void UpdatePlace(int place)
+        {
+            currentPlace = place;
+            placeText.text = "#" + (place + 1);
+        }
+
+        public void PlayAnimation(string clipName)
+        {
+            animator.Play(clipName);
         }
     }
 }

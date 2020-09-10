@@ -513,6 +513,13 @@ namespace GameNet
                 public static void StartTyping(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyPlayerStartTyping", lobbyId, nick);
                 public static void StopTyping(int lobbyId, string nick) => conn.InvokeAsync("OnLobbyPlayerStopTyping", lobbyId, nick);
             }
+
+
+
+            public static class Multiplayer
+            {
+                public static void StartGame(int lobbyId) => conn.InvokeAsync("OnMultiplayerStartGame", lobbyId);
+            }
         }
 
 
@@ -557,7 +564,9 @@ namespace GameNet
 
             public Action<NotificationInfo> Notification_OnSend;
 
-            // Lobby
+
+            #region Lobby
+
             public Action<LobbyPlayer> OnLobbyPlayerJoin;
             public Action<LobbyPlayer> OnLobbyPlayerLeave;
             public Action<LobbyPlayer> OnLobbyHostChange;
@@ -577,61 +586,14 @@ namespace GameNet
             public Action<LobbySystemChatMessage> OnLobbySystemMessage;
             public Action<string> OnLobbyPlayerStartTyping;
             public Action<string> OnLobbyPlayerStopTyping;
+
+            #endregion
+
+            #region Multiplayer
+
+            public Action OnMultiplayerGameStart;
+
+            #endregion
         }
     }
 }
-
-
-//public class UnityLogger : ILoggerProvider
-//{
-//    public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
-//    {
-//        return new UnityLog();
-//    }
-//    public class UnityLog : Microsoft.Extensions.Logging.ILogger
-//    {
-//        public IDisposable BeginScope<TState>(TState state)
-//        {
-//            var id = Guid.NewGuid();
-//            Debug.Log($"BeginScope ({id}): {state}");
-//            return new Scope<TState>(state, id);
-//        }
-//        struct Scope<TState> : IDisposable
-//        {
-//            public Scope(TState state, Guid id)
-//            {
-//                State = state;
-//                Id = id;
-//            }
-
-//            public TState State { get; }
-//            public Guid Id { get; }
-
-//            public void Dispose() => Debug.Log($"EndScope ({Id}): {State}");
-//        }
-
-//        public bool IsEnabled(LogLevel logLevel) => true;
-
-//        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-//        {
-//            switch (logLevel)
-//            {
-//                case LogLevel.Trace:
-//                case LogLevel.Debug:
-//                case LogLevel.Information:
-//                    Debug.Log($"{logLevel}, {eventId}, {state}, {exception}");
-//                    break;
-//                case LogLevel.Warning:
-//                    Debug.LogWarning($"{logLevel}, {eventId}, {state}, {exception}");
-//                    break;
-//                case LogLevel.Error:
-//                case LogLevel.Critical:
-//                    Debug.LogError($"{logLevel}, {eventId}, {state}, {exception}");
-//                    break;
-//                case LogLevel.None: break;
-//            }
-//        }
-//    }
-
-//    public void Dispose() { }
-//}

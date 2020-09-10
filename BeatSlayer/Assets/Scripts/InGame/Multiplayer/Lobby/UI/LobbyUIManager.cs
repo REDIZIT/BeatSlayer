@@ -102,6 +102,8 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnRemotePlayerStartDownloading += OnRemotePlayerStartDownloading;
                 NetCore.Subs.OnRemotePlayerDownloadProgress += OnRemotePlayerDownloadProgress;
                 NetCore.Subs.OnRemotePlayerDownloaded += OnRemotePlayerDownloaded;
+
+                NetCore.Subs.OnMultiplayerGameStart += LobbyManager.StartMap;
             });
         }
 
@@ -227,10 +229,6 @@ namespace InGame.Multiplayer.Lobby.UI
             mapInfoTextsContainer.SetActive(LobbyManager.lobby.SelectedMap != null);
         }
 
-        #endregion
-
-
-
         public void RefreshLobbiesList()
         {
             foreach (Transform item in lobbyStackParent) Destroy(item.gameObject);
@@ -250,6 +248,13 @@ namespace InGame.Multiplayer.Lobby.UI
                 });
             });
         }
+
+
+        #endregion
+
+
+
+
 
 
 
@@ -343,7 +348,12 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             LobbyManager.ChangeReadyState(LobbyPlayer.ReadyState.NotReady);
         }
-
+        public void OnStartButtonClick()
+        {
+            NetCore.ServerActions.Multiplayer.StartGame(LobbyManager.lobby.Id);
+            LobbyManager.StartMap();
+        }
+        
 
         #endregion
 
@@ -440,7 +450,7 @@ namespace InGame.Multiplayer.Lobby.UI
             yield return modsUI.IEOpen();
 
             RefreshMods();
-            LobbyManager.ChangeMods(modsUI.selectedModEnum);
+            LobbyManager.ChangeMods(modsUI.selectedMods, modsUI.selectedModEnum);
         }
 
         #endregion
@@ -502,7 +512,6 @@ namespace InGame.Multiplayer.Lobby.UI
         }
 
         #endregion
-
 
         private void ClearAllSlots()
         {

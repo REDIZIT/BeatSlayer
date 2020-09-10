@@ -816,10 +816,4 @@ public class GameManager : MonoBehaviour
 
         return mins + ":" + (secs < 10 ? "0" + secs : secs.ToString());
     }
-    public int[] SplitTime(float allTime)
-    {
-        int mins = Mathf.FloorToInt(allTime / 60f);
-        int secs = Mathf.FloorToInt(allTime - mins * 60);
-        return new int[2] { mins, secs };
-    }
 }

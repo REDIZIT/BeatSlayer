@@ -59,6 +59,8 @@ namespace InGame.Multiplayer.Lobby.Chat
 
         public void RefreshTypingStatus()
         {
+            if (typingBar == null) return;
+
             if(typingPlayersNicks.Count > 0)
             {
                 typingBar.SetActive(true);
