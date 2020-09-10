@@ -14,6 +14,10 @@ namespace InGame.Multiplayer.Game
     {
         public ScoringManager sm;
 
+        [Header("Finish leaderboard")]
+        public GameObject globalMapLeaderboard;
+        public GameObject multiplayerMapLeaderboard;
+
         [Header("Runtime leaderboard")]
         public Transform container;
         public GameObject itemPrefab, myItemPrefab;
@@ -32,6 +36,10 @@ namespace InGame.Multiplayer.Game
 
         private void Start()
         {
+            globalMapLeaderboard.SetActive(LobbyManager.lobby == null);
+            multiplayerMapLeaderboard.SetActive(LobbyManager.lobby != null);
+
+            enabled = LobbyManager.lobby != null;
             if (LobbyManager.lobby == null) return;
 
             NetCore.Configure(() =>

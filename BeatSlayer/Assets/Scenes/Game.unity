@@ -464,6 +464,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sm: {fileID: 1901715895}
+  globalMapLeaderboard: {fileID: 1701399166}
+  multiplayerMapLeaderboard: {fileID: 1023850588}
   container: {fileID: 829289703}
   itemPrefab: {fileID: 1111027478939796909, guid: 87dde43d1678c6542b8f7393e99636d5,
     type: 3}
@@ -46397,7 +46399,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: SS
+  m_Text: '
+
+'
 --- !u!222 &1726322855
 CanvasRenderer:
   m_ObjectHideFlags: 0
