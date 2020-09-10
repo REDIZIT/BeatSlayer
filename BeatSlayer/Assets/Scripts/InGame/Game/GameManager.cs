@@ -23,6 +23,7 @@ using InGame.Game.HP;
 using InGame.Game.Scoring.Mods;
 using InGame.Game.Mods;
 using DatabaseManagement;
+using InGame.Models;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -53,6 +54,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public DifficultyInfo difficultyInfo;
     [HideInInspector] public Difficulty difficulty;
     [HideInInspector] public TestRequest testRequest;
+    [HideInInspector] public BasicMapData mapData;
 
     [Header("Environment")]
     public PostProcessVolume PostProcessing;
@@ -90,6 +92,9 @@ public class GameManager : MonoBehaviour
     [Header("Statistics UI")]
     public Image likeBtnImg;
     public Image dislikeBtnImg;
+
+    /// <summary>If True start game on Start() method in GameManager. If False you should <see cref="StartGame"/> it manually</summary>
+    public bool StartGameAuto { get; set; } = true;
 
 
     [HideInInspector] public bool paused;
@@ -145,8 +150,7 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
-        bool isTutorial = LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial || LoadingData.project.Trackname == "Beat Slayer-Tutorial";
-
+        mapData = LoadingData.loadparams.Map;
 
         GetComponent<SceneController>().Init(GetComponent<SceneControllerUI>());
         cam = GetComponent<Camera>();
@@ -177,18 +181,13 @@ public class GameManager : MonoBehaviour
 
         AlignToSide();
 
-        InitAudio(isTutorial);
 
         IsGameStartingMap = true;
 
-        StartCoroutine(beatManager.IOnStart(isTutorial));
+        InitAudio(mapData.MapType == GroupType.Tutorial);
 
-        //skipBtnAnimator.gameObject.SetActive(beatManager.CanSkip());
-
-        if (isTutorial)
-        {
-            tutorial.StartTutorial();
-        }
+        // If nothing have disabled automatic game starting -> start game
+        if (StartGameAuto) StartGame();
     }
     void Update()
     {
@@ -256,6 +255,20 @@ public class GameManager : MonoBehaviour
 
     }
 
+
+
+    public void StartGame()
+    {
+        bool isTutorial = mapData.MapType == GroupType.Tutorial;
+
+        StartCoroutine(beatManager.IStartGame(isTutorial));
+
+
+        if (isTutorial)
+        {
+            tutorial.StartTutorial();
+        }
+    }
 
 
 

@@ -519,6 +519,7 @@ namespace GameNet
             public static class Multiplayer
             {
                 public static void StartGame(int lobbyId) => conn.InvokeAsync("OnMultiplayerStartGame", lobbyId);
+                public static void OnLoaded(int lobbyId, string nick) => conn.InvokeAsync("OnMultiplayerPlayerLoaded", lobbyId, nick);
             }
         }
 
@@ -592,6 +593,7 @@ namespace GameNet
             #region Multiplayer
 
             public Action OnMultiplayerGameStart;
+            public Action OnMultiplayerPlayersLoaded;
 
             #endregion
         }

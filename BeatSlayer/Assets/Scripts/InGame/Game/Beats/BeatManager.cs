@@ -143,8 +143,6 @@ namespace InGame.Game.Spawn
             speedModifier = ((gm.scoringManager.Replay.Mods & ModEnum.Easy) == ModEnum.Easy) ? 0.75f :
                             (gm.scoringManager.Replay.Mods.HasFlag(ModEnum.Hard)) ? 1.25f :
                             1;
-
-            UnityEngine.Debug.Log("speedModifier is " + speedModifier);
         }
 
         public void SetBeats(IEnumerable<BeatCubeClass> ls)
@@ -154,15 +152,13 @@ namespace InGame.Game.Spawn
         }
 
 
-        public IEnumerator IOnStart(bool isTutorial)
+        public IEnumerator IStartGame(bool isTutorial)
         {
             CalculateField();
 
             if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) gm.audioManager.spectrumAsource.Play();
             
             yield return new WaitForSeconds(fieldCrossTime);
-
-            UnityEngine.Debug.Log("Is playing? " + asource.isPlaying + " Time: " + asource.time + " Pitch: " + asource.pitch);
 
             if (!isTutorial)
                 asource.Play();

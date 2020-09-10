@@ -55,8 +55,6 @@ namespace InGame.Game.HP
         }
         private void Start()
         {
-            Debug.Log("Mods are " + sm.Replay.Mods.ToString());
-
             IsNoFail = (sm.Replay.Mods & ModEnum.NoFail) == ModEnum.NoFail;
             IsEasy = sm.Replay.Mods.HasFlag(ModEnum.Easy);
             IsHard = sm.Replay.Mods.HasFlag(ModEnum.Hard);
