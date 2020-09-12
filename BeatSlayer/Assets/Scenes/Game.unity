@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -439,6 +439,7 @@ MonoBehaviour:
   waitingText: {fileID: 415096657}
   restartBtn: {fileID: 1513297184}
   leaderboardToDisable: {fileID: 1497903726}
+  restartButton: {fileID: 1687114294}
 --- !u!4 &18446122
 Transform:
   m_ObjectHideFlags: 0

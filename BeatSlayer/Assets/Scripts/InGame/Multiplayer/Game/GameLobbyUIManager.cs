@@ -19,6 +19,7 @@ namespace InGame.Multiplayer.Game
         [Header("UI")]
         public GameObject restartBtn;
         public GameObject leaderboardToDisable;
+        public Button restartButton, restartGameOverBtn;
 
 
         private void Awake()
@@ -30,6 +31,9 @@ namespace InGame.Multiplayer.Game
             // Stop automatic game starting after loading
             // We will start game manually further
             gm.StartGameAuto = false;
+
+            restartButton.interactable = false;
+            restartGameOverBtn.interactable = false;
         }
         private void Start()
         {

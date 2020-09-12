@@ -24,6 +24,7 @@ using InGame.Game.Scoring.Mods;
 using InGame.Game.Mods;
 using DatabaseManagement;
 using InGame.Models;
+using InGame.Multiplayer.Lobby;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -492,18 +493,40 @@ public class GameManager : MonoBehaviour
     {
         if (!hpManager.isAlive) return;
 
-        paused = true;
         pausePanel.SetActive(true);
-        audioManager.PauseSource();
-        UIManager.OnPause();
-        Time.timeScale = 0;
-        if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
+
+        // If singleplay -> pause game
+        if (LobbyManager.lobby == null)
+        {
+            paused = true;
+            audioManager.PauseSource();
+            UIManager.OnPause();
+            Time.timeScale = 0;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.Pause();
+        }
+        else
+        {
+            // If multiplayer -> mute audio
+            audioManager.asource.mute = true;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.mute = true;
+        }
     }
     public void Unpause()
     {
         pausePanel.SetActive(false);
-        UIManager.OnResume();
-        StartCoroutine(Unpauing());
+        // If singleplayer -> unpause with animation
+        if (LobbyManager.lobby == null)
+        {
+            UIManager.OnResume();
+            StartCoroutine(Unpauing());
+        }
+        else
+        {
+            // If multiplayer -> unmute
+            //paused = false;
+            audioManager.asource.mute = false;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) audioManager.spectrumAsource.mute = false;
+        }
     }
     public IEnumerator Unpauing()
     {
