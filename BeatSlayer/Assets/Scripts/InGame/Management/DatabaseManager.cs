@@ -117,7 +117,6 @@ namespace DatabaseManagement
 
                 string trackname = groupInfo.Trackname.Replace("&", "%amp%");
                 string url = string.Format(url_getAllMaps, trackname);
-                Debug.Log("Url: " + url);
                 client.DownloadStringAsync(new Uri(url));
             }
             else

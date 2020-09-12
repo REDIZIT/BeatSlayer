@@ -13,6 +13,7 @@ using InGame.ScriptableObjects;
 using Michsky.UI.ModernUIPack;
 using Pixelplacement;
 using ProjectManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,11 @@ namespace InGame.Multiplayer.Lobby.UI
         public Text notReadyPlayersCountText;
         public GameObject changeMapButton;
 
+        [Header("Timeline")]
+        public GameObject timeline;
+        public Slider timelineSlider;
+        public Text timelineText;
+
         [Header("Mods")]
         public Transform modsContainer;
         public GameObject modItemPrefab;
@@ -69,7 +75,8 @@ namespace InGame.Multiplayer.Lobby.UI
         [Header("Lobbies list")]
         public Transform lobbyStackParent;
         public GameObject lobbyItemPrefab;
-
+        public Button refreshLobbiesBtn, createLobbyBtn;
+        public Text refreshLabel;
 
 
 
@@ -90,6 +97,8 @@ namespace InGame.Multiplayer.Lobby.UI
             // Open lobby page if game finished
             if (LobbyManager.lobby != null)
             {
+                LobbyManager.ChangeReadyState(LobbyPlayer.ReadyState.NotReady);
+
                 pager.OpenLobbyPage();
                 RefreshLobby();
             }
@@ -115,7 +124,17 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnMultiplayerGameStart += LobbyManager.StartMap;
             });
         }
+        //private void Update()
+        //{
+        //    if (LobbyManager.lobby == null) return;
 
+        //    if (LobbyManager.lobby.IsPlaying)
+        //    {
+        //        // Increase timeline seconds
+        //        LobbyManager.lobby.CurrentSecond += Time.deltaTime;
+        //        RefreshTimeline();
+        //    }
+        //}
 
 
 
@@ -129,6 +148,7 @@ namespace InGame.Multiplayer.Lobby.UI
             RefreshMapInfo();
             RefreshReadyButtons();
             RefreshMods();
+            //RefreshTimeline();
 
             pager.OpenLobbyPage();
         }
@@ -150,8 +170,7 @@ namespace InGame.Multiplayer.Lobby.UI
             // TODO: make difficulty stars presenter
 
             CoversManager.AddPackage(new CoverRequestPackage(mapImage,
-                /*LobbyManager.lobby.SelectedMap.Trackname*/LobbyManager.lobby.SelectedMap.Author + "-" + LobbyManager.lobby.SelectedMap.Name
-                , LobbyManager.lobby.SelectedMap.MapperNick));
+                LobbyManager.lobby.SelectedMap.Trackname, LobbyManager.lobby.SelectedMap.MapperNick));
         }
         private void RefreshPlayerSlots()
         {
@@ -237,10 +256,35 @@ namespace InGame.Multiplayer.Lobby.UI
             noMapSetText.SetActive(LobbyManager.lobby.SelectedMap == null);
             mapInfoTextsContainer.SetActive(LobbyManager.lobby.SelectedMap != null);
         }
+        //private void RefreshTimeline()
+        //{
+        //    if (!LobbyManager.lobby.IsPlaying)
+        //    {
+        //        timeline.SetActive(false);
+        //        return;
+        //    }
+
+        //    timeline.SetActive(true);
+        //    timelineSlider.maxValue = LobbyManager.lobby.MapDuration;
+        //    timelineSlider.value = LobbyManager.lobby.CurrentSecond;
+
+
+        //    RefreshTimelineText();
+        //}
+        //private void RefreshTimelineText()
+        //{
+        //    string currentTime = TimeSpan.FromSeconds(LobbyManager.lobby.CurrentSecond).ToString("m:ss");
+        //    string durationTime = TimeSpan.FromSeconds(LobbyManager.lobby.MapDuration).ToString("m:ss");
+
+        //    timelineText.text = $"<b>{currentTime}</b> / {durationTime}";
+        //}
 
         public void RefreshLobbiesList()
         {
             foreach (Transform item in lobbyStackParent) Destroy(item.gameObject);
+            refreshLobbiesBtn.interactable = false;
+            refreshLabel.gameObject.SetActive(true);
+            refreshLabel.text = LocalizationManager.Localize("Refreshing");
 
             Task.Run(async () =>
             {
@@ -253,6 +297,16 @@ namespace InGame.Multiplayer.Lobby.UI
                         GameObject obj = Instantiate(lobbyItemPrefab, lobbyStackParent);
                         LobbyPresenter presenter = obj.GetComponent<LobbyPresenter>();
                         presenter.Refresh(lobby);
+                    }
+
+                    refreshLobbiesBtn.interactable = true;
+                    if(lobbies.Count == 0)
+                    {
+                        refreshLabel.text = LocalizationManager.Localize("NoLobbies");
+                    }
+                    else
+                    {
+                        refreshLabel.gameObject.SetActive(false);
                     }
                 });
             });
@@ -273,10 +327,15 @@ namespace InGame.Multiplayer.Lobby.UI
 
         public void CreateLobby()
         {
+            createLobbyBtn.interactable = false;
             Task.Run(async () =>
             {
                 await LobbyManager.CreateAndJoinLobby();
-                UnityMainThreadDispatcher.Instance().Enqueue(RefreshLobby);
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    createLobbyBtn.interactable = true;
+                    RefreshLobby();
+                });
             });
         }
         public void JoinLobby(Lobby lobbyToJoin)
@@ -521,6 +580,7 @@ namespace InGame.Multiplayer.Lobby.UI
         }
 
         #endregion
+
 
         private void ClearAllSlots()
         {

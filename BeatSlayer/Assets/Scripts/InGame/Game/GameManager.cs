@@ -585,7 +585,7 @@ public class GameManager : MonoBehaviour
     {
         if (Settings.Sound.SliceEffectEnabled)
         {
-            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 100f);
+            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 300f);
         }
 
         if(beat.GetClass().type == BeatCubeClass.Type.Bomb)

@@ -1,8 +1,9 @@
 using Assets.SimpleLocalization;
-using Boo.Lang;
 using GameNet;
 using InGame.Helpers;
 using InGame.Multiplayer.Lobby.Chat.Models;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,9 +30,16 @@ namespace InGame.Multiplayer.Lobby.Chat
         private bool isTyping;
         private float typingCancelTimer;
 
+        private static List<LobbyChatMessage> chatHistory = new List<LobbyChatMessage>();
+
 
         private void Start()
         {
+            if (LobbyManager.lobby != null)
+            {
+                RestoreChat();
+            }
+
             NetCore.Configure(() =>
             {
                 NetCore.Subs.OnLobbyPlayerMessage += RemotePlayerMessage;
@@ -93,6 +101,8 @@ namespace InGame.Multiplayer.Lobby.Chat
 
         public void OnInputFieldTextChange()
         {
+            if (LobbyManager.lobby == null) return;
+
             if(inputField.text == "")
             {
                 if (isTyping)
@@ -123,27 +133,18 @@ namespace InGame.Multiplayer.Lobby.Chat
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
                 RemotePlayerStopTyping(msg.PlayerNick);
-
-
-                bool isPlayerMessage = msg is LobbyPlayerChatMessage;
-                bool isPrevPlayerMessage = prevMessage != null && prevMessage.message is LobbyPlayerChatMessage;
-
-                if (prevMessage != null && isPlayerMessage && isPrevPlayerMessage && prevMessage.message.PlayerNick == msg.PlayerNick)
-                {
-                    prevMessage.AppendMessage(msg as LobbyPlayerChatMessage);
-                    contentSizeFitter.enabled = false;
-                    contentSizeFitter.enabled = true;
-                }
-                else
-                {
-                    GameObject obj = Instantiate(isPlayerMessage ? playerMessageItemPrefab : systemMessageItemPrefab, chatContent);
-                    LobbyChatMessagePresenter presenter = obj.GetComponent<LobbyChatMessagePresenter>();
-                    presenter.Refresh(msg);
-                    prevMessage = presenter;
-                }
+                AppendChatMessage(msg);
+                chatHistory.Add(msg);
             });
-            
         }
+        private void RestoreChat()
+        {
+            foreach (var message in chatHistory.Take(30))
+            {
+                AppendChatMessage(message);
+            }
+        }
+
         private void RemotePlayerStartTyping(string nick)
         {
             typingPlayersNicks.Add(nick);
@@ -154,6 +155,28 @@ namespace InGame.Multiplayer.Lobby.Chat
             typingPlayersNicks.Remove(nick);
             RefreshTypingStatus();
         }
+
+
+        private void AppendChatMessage(LobbyChatMessage msg)
+        {
+            bool isPlayerMessage = msg is LobbyPlayerChatMessage;
+            bool isPrevPlayerMessage = prevMessage != null && prevMessage.message is LobbyPlayerChatMessage;
+
+            if (prevMessage != null && isPlayerMessage && isPrevPlayerMessage && prevMessage.message.PlayerNick == msg.PlayerNick)
+            {
+                prevMessage.AppendMessage(msg as LobbyPlayerChatMessage);
+                contentSizeFitter.enabled = false;
+                contentSizeFitter.enabled = true;
+            }
+            else
+            {
+                GameObject obj = Instantiate(isPlayerMessage ? playerMessageItemPrefab : systemMessageItemPrefab, chatContent);
+                LobbyChatMessagePresenter presenter = obj.GetComponent<LobbyChatMessagePresenter>();
+                presenter.Refresh(msg);
+                prevMessage = presenter;
+            }
+        }
+
 
 
 

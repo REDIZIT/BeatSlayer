@@ -1,3 +1,4 @@
+using Assets.SimpleLocalization;
 using InGame.Game.Mods;
 using InGame.Game.Scoring.Mods;
 using InGame.Helpers;
@@ -45,6 +46,8 @@ namespace InGame.Multiplayer.Lobby.UI
             
 
             nickText.text = player.Player.Nick;
+            if (player.State == LobbyPlayer.ReadyState.Playing)
+                nickText.text += $" ({LocalizationManager.Localize("playing")})";
 
             progressBar.gameObject.SetActive(false);
 
@@ -118,7 +121,6 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             readyIndicatorImage.color =
                 player.State == LobbyPlayer.ReadyState.Downloading ? downloadingColor :
-                player.State == LobbyPlayer.ReadyState.WaitingForDownloading ? waitingColor :
                 player.State == LobbyPlayer.ReadyState.Ready ? readyColor : notReadyColor;
         }
     }

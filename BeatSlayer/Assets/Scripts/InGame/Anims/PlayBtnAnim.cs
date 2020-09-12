@@ -75,6 +75,7 @@ namespace InGame.Animations
             lobbyState.ChangeState(lobbyState.gameObject);
             roomsPage.SetActive(true);
             lobbyPage.SetActive(false);
+            LobbyUIManager.instance.RefreshLobbiesList();
         }
         public void OpenLobbyPage()
         {

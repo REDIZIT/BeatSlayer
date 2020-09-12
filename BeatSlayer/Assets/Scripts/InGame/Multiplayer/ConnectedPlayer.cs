@@ -18,7 +18,7 @@ namespace InGame.Multiplayer
 
         public enum ReadyState
         {
-            NotReady, Ready, Downloading, WaitingForDownloading
+            NotReady, Ready, Downloading, Playing
         }
     }
 }
