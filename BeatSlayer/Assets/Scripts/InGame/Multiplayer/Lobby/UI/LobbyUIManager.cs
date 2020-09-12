@@ -114,6 +114,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnHostStartChangingMap += OnHostStartChangingMap;
                 NetCore.Subs.OnHostCancelChangingMap += OnRemoteHostCancelChanging;
                 NetCore.Subs.OnLobbyMapChange += OnMapRemoteChange;
+                NetCore.Subs.OnLobbyRename += OnLobbyRename;
 
                 NetCore.Subs.OnRemotePlayerReadyStateChange += OnRemotePlayerReadyStateChange;
                 NetCore.Subs.OnRemotePlayerModsChange += OnRemotePlayerModsChange;
@@ -142,6 +143,10 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             lobbyNameText.text = LobbyManager.lobby.Name;
             nameInputField.text = LobbyManager.lobby.Name;
+
+            lobbyNameText.gameObject.SetActive(!LobbyManager.lobbyPlayer.IsHost);
+            nameInputField.gameObject.SetActive(LobbyManager.lobbyPlayer.IsHost);
+
 
 
             RefreshPlayerSlots();
@@ -323,7 +328,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
 
 
-        #region Create/Join/Leave lobby
+        #region Create/Join/Leave/Rename lobby
 
         public void CreateLobby()
         {
@@ -364,6 +369,18 @@ namespace InGame.Multiplayer.Lobby.UI
                 });
                 await LobbyManager.LeaveLobby();
             });
+        }
+        public void OnRenameLobbyInputFieldChange()
+        {
+            Task.Run(async () =>
+            {
+                await LobbyManager.RenameLobby(nameInputField.text);
+            });
+        }
+        private void OnLobbyRename(string lobbyName)
+        {
+            LobbyManager.lobby.Name = lobbyName;
+            RefreshLobby();
         }
 
         #endregion

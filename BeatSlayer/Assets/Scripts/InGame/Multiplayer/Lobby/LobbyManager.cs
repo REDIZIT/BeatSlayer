@@ -49,6 +49,10 @@ namespace InGame.Multiplayer.Lobby
             lobby = null;
             lobbyPlayer = null;
         }
+        public static async Task RenameLobby(string lobbyName)
+        {
+            await NetCore.ServerActions.Lobby.Rename(lobby.Id, lobbyName);
+        }
 
         #endregion
 
