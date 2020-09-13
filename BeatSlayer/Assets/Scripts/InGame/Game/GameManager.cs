@@ -555,6 +555,11 @@ public class GameManager : MonoBehaviour
     {
         accountManager.UpdateSessionTime();
 
+        if (LobbyManager.lobby != null)
+        {
+            NetCore.ServerActions.Multiplayer.LeftGame(LobbyManager.lobby.Id, Payload.Account.Nick);
+        }
+
         SceneloadParameters parameters = SceneloadParameters.GoToMenuPreset();
         SceneController.instance.LoadScene(parameters);
     }

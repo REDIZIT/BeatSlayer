@@ -1,3 +1,4 @@
+using Assets.SimpleLocalization;
 using CoversManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,6 +51,10 @@ namespace InGame.Multiplayer.Game
         public void UpdateAlive(bool isAlive)
         {
             deadLocker.SetActive(!isAlive);
+        }
+        public void OnLeft()
+        {
+            nickText.text = $"<color=red>[{LocalizationManager.Localize("LeftGame")}]</color> " + nickText.text;
         }
 
         public void PlayAnimation(string clipName)
