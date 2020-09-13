@@ -17,6 +17,7 @@ MonoBehaviour:
   sublabel: Miss - death
   description: After one missed cube / exploded bombs you lose
   modEnum: 16
+  blockInMultiplayer: 1
   modPillowColor: {r: 0.6039216, g: 0.1764706, b: 0.1764706, a: 0.6313726}
   scoreMultiplier: 1.02
   rpMultiplier: 1

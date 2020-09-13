@@ -12,6 +12,8 @@ namespace InGame.Menu.Mods
         public string description;
         public ModEnum modEnum;
 
+        public bool blockInMultiplayer;
+
         [Header("UI")]
         public Color modPillowColor;
 

@@ -32,19 +32,22 @@ namespace InGame.Menu.Mods
                 item.Refresh(data);
             });
         }
-        public void Open()
+        public void Open(bool isMultiplayer)
         {
             isOpen = true;
             locker.SetActive(true);
 
             foreach (ModUIItem item in modsButtons)
             {
-                item.Refresh(selectedMods.Contains(item.mod));
+                bool isModEnabled = true;
+                if (isMultiplayer && item.mod.blockInMultiplayer) isModEnabled = false;
+
+                item.Refresh(selectedMods.Contains(item.mod), isModEnabled);
             }
         }
-        public IEnumerator IEOpen()
+        public IEnumerator IEOpen(bool isMultiplayer)
         {
-            Open();
+            Open(isMultiplayer);
 
             yield return new WaitWhile(() => isOpen);
         }

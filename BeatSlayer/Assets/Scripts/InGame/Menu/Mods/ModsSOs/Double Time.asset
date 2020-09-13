@@ -17,6 +17,7 @@ MonoBehaviour:
   sublabel: Music speed x1.6
   description: Increasing music and therefore cubes speed in 1.6 times
   modEnum: 8
+  blockInMultiplayer: 1
   modPillowColor: {r: 0.19215687, g: 0.1764706, b: 0.6039216, a: 0.6313726}
   scoreMultiplier: 1.14
   rpMultiplier: 1.09

@@ -154,6 +154,8 @@ namespace InGame.Multiplayer.Lobby.UI
             RefreshPlayerSlots();
             RefreshMapInfo();
             RefreshReadyButtons();
+
+            RemoveBlockedMods();
             RefreshMods();
             //RefreshTimeline();
 
@@ -460,7 +462,11 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             slots.First(c => c.player.Player.Nick == nick).ChangeState(state);
 
-            UnityMainThreadDispatcher.Instance().Enqueue(RefreshReadyButtons);
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                RefreshPlayerSlots();
+                RefreshReadyButtons();
+            });
         }
         private void OnRemotePlayerModsChange(string nick, ModEnum mods)
         {
@@ -541,11 +547,16 @@ namespace InGame.Multiplayer.Lobby.UI
         }
         private IEnumerator IEOnModChangeButtonClick()
         {
+            RemoveBlockedMods();
             pager.ShowModsInLobby();
-            yield return modsUI.IEOpen();
+            yield return modsUI.IEOpen(true);
 
             RefreshMods();
             LobbyManager.ChangeMods(modsUI.selectedMods, modsUI.selectedModEnum);
+        }
+        private void RemoveBlockedMods()
+        {
+            modsUI.selectedMods.RemoveAll(c => c.blockInMultiplayer);
         }
 
         #endregion

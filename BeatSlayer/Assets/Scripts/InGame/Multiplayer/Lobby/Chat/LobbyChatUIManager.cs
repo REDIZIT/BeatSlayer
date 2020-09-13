@@ -91,6 +91,8 @@ namespace InGame.Multiplayer.Lobby.Chat
 
         public void OnSendButtonClick()
         {
+            if (inputField.text.Trim() == "") return;
+
             NetCore.ServerActions.Lobby.SendChatMessage(LobbyManager.lobby.Id, new LobbyPlayerChatMessage()
             {
                 PlayerNick = Payload.Account.Nick,
@@ -147,12 +149,12 @@ namespace InGame.Multiplayer.Lobby.Chat
 
         private void RemotePlayerStartTyping(string nick)
         {
-            typingPlayersNicks.Add(nick);
+            if (!typingPlayersNicks.Contains(nick)) typingPlayersNicks.Add(nick);
             RefreshTypingStatus();
         }
         private void RemotePlayerStopTyping(string nick)
         {
-            typingPlayersNicks.Remove(nick);
+            typingPlayersNicks.RemoveAll(c => c == nick);
             RefreshTypingStatus();
         }
 

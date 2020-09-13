@@ -185,7 +185,7 @@ public class GameManager : MonoBehaviour
 
         InitAudio(mapData.MapType == GroupType.Tutorial);
 
-        // If nothing have disabled automatic game starting -> start game
+        // If no one have disabled automatic game starting -> start game
         if (StartGameAuto) StartGame();
     }
     void Update()
@@ -483,13 +483,12 @@ public class GameManager : MonoBehaviour
     }
     public void Pause()
     {
-        if (!hpManager.isAlive) return;
-
         pausePanel.SetActive(true);
 
         // If singleplay -> pause game
         if (LobbyManager.lobby == null)
         {
+            if (!hpManager.isAlive) return;
             paused = true;
             audioManager.PauseSource();
             UIManager.OnPause();

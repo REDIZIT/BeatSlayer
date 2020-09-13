@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 2450341860934147436}
   - component: {fileID: 2450341860934147441}
   m_Layer: 5
-  m_Name: NoDeath
+  m_Name: Mod Pillow Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -269,7 +269,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 2450341860934147443}
+  m_TargetGraphic: {fileID: 2450341860528156357}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -298,6 +298,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ui: {fileID: 0}
   incompatibleModItem: {fileID: 0}
+  button: {fileID: 2450341860934147436}
   iconImage: {fileID: 2450341860528156357}
   checkmark: {fileID: 2450341860473151452}
   modNameText: {fileID: 2450341861954323191}

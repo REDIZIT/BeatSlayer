@@ -7,6 +7,7 @@ namespace InGame.Menu.Mods
     {
         public ModsUI ui;
         public ModUIItem incompatibleModItem;
+        public Button button;
 
         [Header("UI")]
         public Image iconImage;
@@ -18,8 +19,10 @@ namespace InGame.Menu.Mods
         public bool isSelected;
 
 
-        public void Refresh(bool isSelected)
+        public void Refresh(bool isSelected, bool isInteractable)
         {
+            button.interactable = isInteractable;
+
             this.isSelected = isSelected;
             RefreshUI();
         }
