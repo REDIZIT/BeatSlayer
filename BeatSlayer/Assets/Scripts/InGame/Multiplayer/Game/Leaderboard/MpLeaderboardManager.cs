@@ -46,6 +46,7 @@ namespace InGame.Multiplayer.Game
             {
                 NetCore.Subs.OnMultiplayerScoreUpdate += OnScoreUpdate;
                 NetCore.Subs.OnMultiplayerPlayerFinished += RemotePlayerFinished;
+                NetCore.Subs.OnMultiplayerPlayerAliveChanged += RemotePlayerAliveChanged;
             });
 
             CreateItems();
@@ -167,6 +168,11 @@ namespace InGame.Multiplayer.Game
             slot.UpdateScore(score, combo);
 
             ResortItems();
+        }
+
+        private void RemotePlayerAliveChanged(string nick, bool isAlive)
+        {
+            slots.First(c => c.player.Player.Nick == nick).UpdateAlive(isAlive);
         }
         private void RemotePlayerFinished(string nick, ReplayData replay)
         {

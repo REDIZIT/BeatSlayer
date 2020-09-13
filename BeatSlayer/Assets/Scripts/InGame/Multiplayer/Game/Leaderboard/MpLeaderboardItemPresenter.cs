@@ -19,7 +19,7 @@ namespace InGame.Multiplayer.Game
         public Text nickText;
         public Text scoreText, comboText, placeText;
         public RawImage avatarImage;
-
+        public GameObject deadLocker;
        
 
         public void Refresh(LobbyPlayer player)
@@ -45,6 +45,11 @@ namespace InGame.Multiplayer.Game
         {
             currentPlace = place;
             placeText.text = "#" + (place + 1);
+        }
+
+        public void UpdateAlive(bool isAlive)
+        {
+            deadLocker.SetActive(!isAlive);
         }
 
         public void PlayAnimation(string clipName)

@@ -180,6 +180,7 @@ MonoBehaviour:
   comboText: {fileID: 638179302080261202}
   placeText: {fileID: 456081394211528711}
   avatarImage: {fileID: 4427418251226149484}
+  deadLocker: {fileID: 0}
 --- !u!95 &3862791082503912588
 Animator:
   serializedVersion: 3

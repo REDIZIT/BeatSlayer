@@ -82,8 +82,12 @@ namespace InGame.Game.HP
 
             if (deadOverlay.alpha <= 0)
             {
+                // Relive
+
                 isAlive = true;
                 deadOverlay.gameObject.SetActive(false);
+
+                NetCore.ServerActions.Multiplayer.AliveChanged(LobbyManager.lobby.Id, Payload.Account.Nick, true);
             }
         }
 
@@ -116,6 +120,8 @@ namespace InGame.Game.HP
                 isAlive = false;
 
                 deadOverlay.gameObject.SetActive(true);
+
+                NetCore.ServerActions.Multiplayer.AliveChanged(LobbyManager.lobby.Id, Payload.Account.Nick, false);
             }
             else
             {
