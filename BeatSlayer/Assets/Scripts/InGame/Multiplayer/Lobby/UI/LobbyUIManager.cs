@@ -34,6 +34,7 @@ namespace InGame.Multiplayer.Lobby.UI
         public ModsUI modsUI;
         public SODB sodb;
         public MapsDownloadQueuer downloader;
+        public StartLobbyGameButtonPresenter startBtn;
 
         [Header("States")]
         public State mainStateMachine;
@@ -44,7 +45,7 @@ namespace InGame.Multiplayer.Lobby.UI
         [Header("Lobby page")]
         public Text lobbyNameText;
         public InputField nameInputField;
-        public GameObject readyBtn, forceStartBtn, notReadyBtn, startBtn, locationBtn;
+        public GameObject readyBtn, notReadyBtn, locationBtn;
         public Text notReadyPlayersCountText;
         public GameObject changeMapButton;
 
@@ -115,6 +116,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnHostCancelChangingMap += OnRemoteHostCancelChanging;
                 NetCore.Subs.OnLobbyMapChange += OnMapRemoteChange;
                 NetCore.Subs.OnLobbyRename += OnLobbyRename;
+                NetCore.Subs.OnLobbyPlayStatusChanged += OnLobbyPlayStatusChanged;
 
                 NetCore.Subs.OnRemotePlayerReadyStateChange += OnRemotePlayerReadyStateChange;
                 NetCore.Subs.OnRemotePlayerModsChange += OnRemotePlayerModsChange;
@@ -208,8 +210,7 @@ namespace InGame.Multiplayer.Lobby.UI
                     locationBtn.SetActive(true);
 
                     notReadyBtn.SetActive(false);
-                    forceStartBtn.SetActive(false);
-                    startBtn.SetActive(false);
+                    startBtn.gameObject.SetActive(false);
                 }
                 else if (LobbyManager.lobbyPlayer.State == LobbyPlayer.ReadyState.Ready)
                 {
@@ -217,18 +218,23 @@ namespace InGame.Multiplayer.Lobby.UI
 
                     readyBtn.SetActive(false);
                     locationBtn.SetActive(false);
+                    startBtn.gameObject.SetActive(true);
 
-                    if (slots.Where(c => c.player != null).All(c => c.player.State == LobbyPlayer.ReadyState.Ready))
+                    if (LobbyManager.lobby.IsPlaying || slots.Where(c => c.player != null).Any(c => c.player.State == LobbyPlayer.ReadyState.Playing))
                     {
-                        startBtn.SetActive(true);
-                        forceStartBtn.SetActive(false);
+                        startBtn.RefreshAsPlaying();
+                    }
+                    else if (LobbyManager.lobby.SelectedMap == null)
+                    {
+                        startBtn.RefreshAsMapNotSet();
+                    }
+                    else if (slots.Where(c => c.player != null).All(c => c.player.State == LobbyPlayer.ReadyState.Ready))
+                    {
+                        startBtn.RefreshAsStart();
                     }
                     else
                     {
-                        forceStartBtn.SetActive(true);
-                        startBtn.SetActive(false);
-
-                        notReadyPlayersCountText.text = LocalizationManager.Localize("NotReadyPlayers", slots.Count(c => c.player != null && c.player.State != LobbyPlayer.ReadyState.Ready));
+                        startBtn.RefreshAsForce(slots.Count(c => c.player != null && c.player.State != LobbyPlayer.ReadyState.Ready));
                     }
                 }
             }
@@ -240,8 +246,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 notReadyBtn.SetActive(LobbyManager.lobbyPlayer.State == LobbyPlayer.ReadyState.Ready);
 
                 // False due to me isn't host
-                forceStartBtn.SetActive(false);
-                startBtn.SetActive(false);
+                startBtn.gameObject.SetActive(false);
             }
         }
         private void RefreshSelectedMapState()
@@ -381,6 +386,11 @@ namespace InGame.Multiplayer.Lobby.UI
         {
             LobbyManager.lobby.Name = lobbyName;
             RefreshLobby();
+        }
+        private void OnLobbyPlayStatusChanged(bool isPlaying)
+        {
+            LobbyManager.lobby.IsPlaying = isPlaying;
+            RefreshReadyButtons();
         }
 
         #endregion

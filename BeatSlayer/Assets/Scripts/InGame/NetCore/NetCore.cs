@@ -587,6 +587,7 @@ namespace GameNet
             public Action<string, int> OnRemotePlayerDownloadProgress;
             public Action<string> OnRemotePlayerDownloaded;
             public Action<string> OnLobbyRename;
+            public Action<bool> OnLobbyPlayStatusChanged;
 
 
             public Action<LobbyPlayerChatMessage> OnLobbyPlayerMessage;
