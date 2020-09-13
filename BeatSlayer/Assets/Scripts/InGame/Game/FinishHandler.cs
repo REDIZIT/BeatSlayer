@@ -169,8 +169,6 @@ public class FinishHandler : MonoBehaviour
 
         cubesSpeedText.text = replay.Difficulty.CubesSpeed == 1 ? "1.0x" : replay.Difficulty.CubesSpeed.ToString().Replace(",", ".") + "x";
         //musicSpeedText.text = (.replay.musicSpeed == 1 ? "1.0x" : gm.replay.musicSpeed.ToString().Replace(",", ".") + "x");
-        noLinesToggle.isOn = gm.nolines;
-        noArrowsToggle.isOn = gm.noarrows;
 
         heartIcon.SetActive(LoadingData.loadparams.Map.IsApproved);
 

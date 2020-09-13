@@ -99,8 +99,6 @@ public class GameManager : MonoBehaviour
 
 
     [HideInInspector] public bool paused;
-    [HideInInspector] public bool noarrows;
-    [HideInInspector] public bool nolines;
     [HideInInspector] public bool gameCompleted;
 
     /// <summary>
@@ -170,7 +168,7 @@ public class GameManager : MonoBehaviour
 
         InitSettings();
 
-        beatManager.Setup(this, noarrows, nolines, difficulty.speed);
+        beatManager.Setup(this, difficulty.speed);
 
 
         InitGraphics();
@@ -394,12 +392,6 @@ public class GameManager : MonoBehaviour
     }
     void InitSettings()
     {
-        if (!LoadingData.loadparams.Map.IsApproved)
-        {
-            noarrows = SSytem.instance.GetBool("NoArrows");
-            nolines = SSytem.instance.GetBool("NoLines");
-        }
-
         SettingsModel settings = SettingsManager.Settings;
 
         cam.fieldOfView = settings.Gameplay.FOV;

@@ -1,3 +1,4 @@
+using InGame.Multiplayer.Lobby;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,7 +25,10 @@ namespace InGame.Game.HP
 
         private void Update()
         {
-            gameOverWindow.SetActive(!IsAlive);
+            if (LobbyManager.lobby == null)
+            {
+                gameOverWindow.SetActive(!IsAlive);
+            }
             if (!IsAlive)
             {
                 colorFilterOverlay.color = gameOverLockerColor;

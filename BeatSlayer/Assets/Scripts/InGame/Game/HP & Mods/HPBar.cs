@@ -1,4 +1,3 @@
-using GameNet;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +21,7 @@ namespace InGame.Game.HP
         public Color32 lowColor;
 
 
-        private string PlayerNick => manager.playerNick;
+        public string playerNick;
         private float HP => manager.HP;
         private float smoothHP;
 
@@ -47,7 +46,7 @@ namespace InGame.Game.HP
 
             smoothHP = Mathf.Lerp(HP, smoothHP, lerpedHP);
 
-            nickText.text = $"<b>{PlayerNick}</b> <color=#888>{HPInt}/100</color>";
+            nickText.text = $"<b>{playerNick}</b> <color=#888>{HPInt}/100</color>";
             hpbar.value = smoothHP;
 
 

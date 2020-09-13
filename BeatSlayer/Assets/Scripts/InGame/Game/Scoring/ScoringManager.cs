@@ -1,6 +1,7 @@
 ﻿using BeatSlayerServer.Dtos.Mapping;
 using BeatSlayerServer.Multiplayer.Accounts;
 using GameNet;
+using InGame.Game.HP;
 using InGame.Game.Scoring.Mods;
 using InGame.Menu.Mods;
 using InGame.Models;
@@ -15,6 +16,7 @@ namespace InGame.Game
     {
         public GameManager gm;
         public SODB sodb;
+        public HPManager hpManager;
 
         /// <summary>
         /// ReplayData is used for sending to server
@@ -43,7 +45,19 @@ namespace InGame.Game
         {
             if (gm.paused) return;
 
-            // == // == == Combo == == // == //
+            CalculateComboEarned();
+
+            CalculateLinesEarned();
+        }
+        private void CalculateComboEarned()
+        {
+            if (!hpManager.isAlive)
+            {
+                comboMultiplier = 1;
+                comboValue = 0;
+                return;
+            }
+
 
             if (comboValue >= comboValueMax && comboMultiplier < 16)
             {
@@ -64,17 +78,11 @@ namespace InGame.Game
                     comboValue = 0;
                 }
             }
-            if (comboValue > 0)
-            {
-                //comboValue -= Time.deltaTime * comboMultiplier * 0.4f;
-            }
 
             if (comboMultiplier > maxCombo) maxCombo = comboMultiplier;
-
-
-
-            // == // == == Lines == == // == //
-
+        }
+        private void CalculateLinesEarned()
+        {
             if (earnedScore >= 1)
             {
                 float rounded = Mathf.FloorToInt(earnedScore) * scoreMultiplier;
@@ -92,14 +100,12 @@ namespace InGame.Game
             Loadtype = loadtype;
 
             ModEnum modsEnum = ModEnum.None;
-            //mods.ForEach(c => c.ApplyEnum(modsEnum));
             scoreMultiplier = 1;
             foreach (ModSO mod in mods)
             {
                 scoreMultiplier *= mod.scoreMultiplier;
                 modsEnum = mod.ApplyEnum(modsEnum);
             }
-            Debug.Log($"Active mods ({mods.Count}) are " + modsEnum.ToString());
 
             Replay = new ReplayData()
             {
@@ -139,7 +145,6 @@ namespace InGame.Game
             else
             {
                 CubeHitAddScore();
-                //gm.tutorial.OnCubeHit();
             }
         }
         private void CubeHitAddScore()
@@ -153,12 +158,10 @@ namespace InGame.Game
             if (beat.GetClass().type == BeatCubeClass.Type.Bomb)
             {
                 CubeHitAddScore();
-                //gm.tutorial.OnBombMiss();
             }
             else
             {
                 CubeMissRemoveScore();
-                //gm.tutorial.OnCubeMiss();
             }
         }
         private void CubeMissRemoveScore()

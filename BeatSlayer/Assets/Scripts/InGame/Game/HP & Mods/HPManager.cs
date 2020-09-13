@@ -1,6 +1,7 @@
 using GameNet;
 using InGame.Game.Scoring.Mods;
 using InGame.Game.Spawn;
+using InGame.Multiplayer.Lobby;
 using UnityEngine;
 
 namespace InGame.Game.HP
@@ -13,15 +14,18 @@ namespace InGame.Game.HP
         public HPBar bar;
         public HPLocker locker;
 
+
+        public CanvasGroup deadOverlay;
+
+
+
         public bool isAlive = true;
         public float HP
         {
             get { return hp; }
             set { hp = Mathf.Clamp(value, 0, 100); }
         }
-        [SerializeField] private float hp;
-
-        public string playerNick;
+        private float hp;
 
 
 
@@ -35,6 +39,7 @@ namespace InGame.Game.HP
         public bool IsEasy { get; private set; }
         public bool IsHard { get; private set; }
         public bool IsInstantDeath { get; private set; }
+        private bool IsMultiplayer { get; set; }
 
 
 
@@ -42,9 +47,9 @@ namespace InGame.Game.HP
         {
             isAlive = true;
             HP = 100;
-            playerNick = Payload.Account == null ? "Player" : Payload.Account.Nick;
 
             bar.manager = this;
+            bar.playerNick = Payload.Account == null ? "Player" : Payload.Account.Nick;
             locker.manager = this;
 
             gm.OnCubeMiss += OnMiss;
@@ -52,6 +57,8 @@ namespace InGame.Game.HP
             gm.OnLineSlice += OnSlice;
             gm.OnBombSlice += OnMiss;
             gm.OnBombMiss += OnSlice;
+
+            IsMultiplayer = LobbyManager.lobby != null;
         }
         private void Start()
         {
@@ -64,16 +71,32 @@ namespace InGame.Game.HP
             rewardHP *= IsEasy ? 1.25f : IsHard ? 0.75f : 1;
             punishHP *= IsEasy ? 0.75f : IsHard ? 1.25f : 1;
         }
+        private void Update()
+        {
+            if (isAlive) return;
+
+            //     -x + offset
+            // y = ——————————— + 1
+            //       fadeHP
+            deadOverlay.alpha = (-HP + 20) / 20f + 1;
+
+            if (deadOverlay.alpha <= 0)
+            {
+                isAlive = true;
+                deadOverlay.gameObject.SetActive(false);
+            }
+        }
+
 
         public void OnSlice()
         {
-            if (!isAlive) return;
+            if (!isAlive && !IsMultiplayer) return;
 
             HP += rewardHP;
         }
         public void OnMiss()
         {
-            if (!isAlive) return;
+            if (!isAlive && !IsMultiplayer) return;
 
             if (IsInstantDeath) HP = 0;
             else HP -= punishHP;
@@ -86,11 +109,20 @@ namespace InGame.Game.HP
         public void KillPlayer()
         {
             if (IsNoFail) return;
-
             if (!isAlive) return;
-            isAlive = false;
 
-            bm.OnGameOver();
+            if (IsMultiplayer)
+            {
+                isAlive = false;
+
+                deadOverlay.gameObject.SetActive(true);
+            }
+            else
+            {
+                isAlive = false;
+
+                bm.OnGameOver();
+            }
         }
     }
 }
