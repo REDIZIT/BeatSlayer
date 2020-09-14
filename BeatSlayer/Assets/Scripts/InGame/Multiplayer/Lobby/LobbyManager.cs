@@ -2,6 +2,7 @@ using GameNet;
 using InGame.Game.Scoring.Mods;
 using InGame.Menu.Mods;
 using InGame.Models;
+using InGame.Multiplayer.Lobby.UI;
 using InGame.SceneManagement;
 using ProjectManagement;
 using System.Collections.Generic;
@@ -22,6 +23,20 @@ namespace InGame.Multiplayer.Lobby
 
         public const int MAX_LOBBY_PLAYERS = 10;
 
+
+        static LobbyManager()
+        {
+            NetCore.Configure(() =>
+            {
+                NetCore.OnDisconnect += () =>
+                {
+                    if (lobby != null)
+                    {
+                        LobbyUIManager.instance.LeaveLobby();
+                    }
+                };
+            });
+        }
 
 
         #region Lobby View/Create/Join/Leave

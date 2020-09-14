@@ -11,7 +11,6 @@ using InGame.Multiplayer;
 using LobbyDTO = InGame.Multiplayer.Lobby.Lobby;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Notifications;
 using Ranking;
@@ -92,13 +91,11 @@ namespace GameNet
             OnConnect = null;
             OnDisconnect = null;
             OnReconnect = null;
-            //OnLogIn = null;
-            
+
             OnSceneLoad();
             
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                Debug.Log(" > Configure() in unity thread");
                 Configurators.Invoke();
                 
                 OnFullReady?.Invoke();
@@ -225,30 +222,12 @@ namespace GameNet
         // (Internal usage)
         static void BuildConnection()
         {
-            Debug.Log("> Create HubConnection (autoreconnect = true) with " + Url_Hub);
+            Debug.Log("> Create HubConnection with " + Url_Hub);
 
-            /// Not working il2cpp
-            /*conn = new HubConnectionBuilder()
-                 .WithUrl(new Uri(Url_Hub), options => {
-                     options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
-                     options.SkipNegotiation = false;
-                 })
-                 .WithAutomaticReconnect()
-                 .ConfigureLogging(logging =>
-                 {
-                     logging.ClearProviders();
-                     logging.SetMinimumLevel(LogLevel.Debug);
-                     logging.AddProvider(new UnityLogger());
-                 })
-                 .Build();
-             */
             conn = new HubConnectionBuilder()
                  .WithUrl(Url_Hub, (o) =>
                  {
                      o.SkipNegotiation = false;
-                     //o.Url = new Uri("https://bsserver.tk/GameHub");
-                     //o.Url = new Uri("https://localhost:5011/GameHub");
-                     o.CloseTimeout = TimeSpan.MaxValue;
                      o.Transports = HttpTransportType.WebSockets;
                  })
                  .ConfigureLogging(logging =>
@@ -258,12 +237,12 @@ namespace GameNet
                      logging.AddProvider(new UnityLogger());*/
                  })
                  .Build();
+            conn.ServerTimeout = TimeSpan.FromMinutes(10);
 
             conn.Closed += (err =>
             {
                 Debug.Log("Conn closed due to " + err.Message);
                 OnDisconnect?.Invoke();
-                //BuildConnection();
                 Reconnect(true);
                 return null;
             });
