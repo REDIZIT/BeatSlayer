@@ -350,8 +350,6 @@ namespace GameNet
         [Preserve]
         public static class ServerActions
         {
-            public static void Test() => conn.InvokeAsync("Test");
-            public static void TestPar(int i) => conn.InvokeAsync("TestPar", i);
             public static void SendChatMessage(string nick, string msg, AccountRole role, string group)
                =>  conn.InvokeAsync("Chat_SendMessage", nick, msg, role, group);
 

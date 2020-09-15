@@ -151,7 +151,6 @@ namespace Multiplayer.Accounts
 
         public void LogIn(string nick, string password)
         {
-            //MultiplayerCore.conn.InvokeAsync("Accounts_LogIn", nick, password);
             NetCore.ServerActions.Account.LogIn(nick, password);
             sessionToWrite = nick + '|' + password;
         }

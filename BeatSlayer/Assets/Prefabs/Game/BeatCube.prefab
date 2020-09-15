@@ -9625,7 +9625,7 @@ GameObject:
   - component: {fileID: 7409750262783325907}
   - component: {fileID: 8332485804496702313}
   m_Layer: 0
-  m_Name: Cube_Dir_Smooth
+  m_Name: DefaultCubeModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

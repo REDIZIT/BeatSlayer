@@ -121,50 +121,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &109145293
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 109145294}
-  - component: {fileID: 109145295}
-  m_Layer: 0
-  m_Name: Saber
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &109145294
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 109145293}
-  m_LocalRotation: {x: -0.2299074, y: -0.6686872, z: -0.2299074, w: 0.6686872}
-  m_LocalPosition: {x: 0, y: 0, z: 0.8919}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: -37.948, y: -90.00001, z: 0}
---- !u!114 &109145295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 109145293}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d7f8d16c166a894585e573859569ef1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  saber: {fileID: 11400000, guid: 1797436069af8454887a1cbbfa4c73db, type: 2}
 --- !u!1 &1679437449
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,7 +204,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1679437449}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.059, y: 0.208, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -405,3 +361,72 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b54b537353efab4b93b691e568d1bcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &280951436033499057
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 280951435924403068, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_Name
+      value: Athenas Twinblades
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.8919
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.2299074
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.6686872
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.2299074
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6686872
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -37.948
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 280951435924403071, guid: 9b22411caa9b26545a233ac2859dcee3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9b22411caa9b26545a233ac2859dcee3, type: 3}

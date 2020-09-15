@@ -84,7 +84,6 @@ namespace InGame.Multiplayer.Lobby.UI
         private void Awake()
         {
             if (instance == null) instance = this;
-            else Destroy(this);
         }
         private void Start()
         {
@@ -102,6 +101,13 @@ namespace InGame.Multiplayer.Lobby.UI
 
                 pager.OpenLobbyPage();
                 RefreshLobby();
+            }
+
+            if (Payload.Account == null)
+            {
+                refreshLabel.text = LocalizationManager.Localize("NotLoggedIn");
+                createLobbyBtn.interactable = false;
+                refreshLobbiesBtn.interactable = false;
             }
 
 
@@ -293,6 +299,17 @@ namespace InGame.Multiplayer.Lobby.UI
 
         public void RefreshLobbiesList()
         {
+            if (Payload.Account == null)
+            {
+                refreshLabel.text = LocalizationManager.Localize("NotLoggedIn");
+                createLobbyBtn.interactable = false;
+                refreshLobbiesBtn.interactable = false;
+                return;
+            }
+            createLobbyBtn.interactable = true;
+            refreshLobbiesBtn.interactable = true;
+
+
             foreach (Transform item in lobbyStackParent) Destroy(item.gameObject);
             refreshLobbiesBtn.interactable = false;
             refreshLabel.gameObject.SetActive(true);
