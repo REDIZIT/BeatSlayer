@@ -20,5 +20,13 @@ namespace InGame.Multiplayer
         {
             NotReady, Ready, Downloading, Playing
         }
+
+        public void UpdateValues(LobbyPlayer player)
+        {
+            SlotIndex = player.SlotIndex;
+            IsHost = player.IsHost;
+            State = player.State;
+            Mods = player.Mods;
+        }
     }
 }

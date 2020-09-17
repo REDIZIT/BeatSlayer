@@ -31,6 +31,8 @@ using UnityEditor;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+
     #region Unity components
 
     [Header("Components")]
@@ -138,7 +140,9 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         if (!enabled) return;
-        
+
+        instance = this;
+
         #region Redirect to menu
 
         if (LoadingData.loadparams == null || (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Menu && enabled))
@@ -186,7 +190,11 @@ public class GameManager : MonoBehaviour
         InitAudio(mapData.MapType == GroupType.Tutorial);
 
         // If no one have disabled automatic game starting -> start game
-        if (StartGameAuto) StartGame();
+        if (StartGameAuto)
+        {
+            Debug.Log("Start game automatically");
+            StartGame();
+        }
     }
     void Update()
     {
@@ -258,6 +266,8 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        Debug.Log("Start game");
+
         bool isTutorial = mapData.MapType == GroupType.Tutorial;
 
         StartCoroutine(beatManager.IStartGame(isTutorial));
@@ -604,7 +614,7 @@ public class GameManager : MonoBehaviour
     {
         if (Settings.Sound.SliceEffectEnabled)
         {
-            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 300f);
+            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 100f / 50f);
         }
 
         if(beat.GetClass().type == BeatCubeClass.Type.Bomb)

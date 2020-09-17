@@ -19,7 +19,7 @@ namespace InGame.Menu.Maps
 
         public static MapsDownloadQueueItem ActiveItem { get; set; }
 
-        public static Action OnTaskCompletedCallback;
+        public static Action onTaskCompletedCallback;
 
 
 
@@ -59,18 +59,15 @@ namespace InGame.Menu.Maps
         }
         public static void OnTaskCompleted()
         {
-            Debug.Log("On task completed");
-
             if (waitingQueue.Count() > 0)
             {
                 StartDownloading(waitingQueue.First());
             }
 
-            OnTaskCompletedCallback?.Invoke();
+            onTaskCompletedCallback?.Invoke();
         }
         public static void StartDownloading(MapDownloadTask task)
         {
-            Debug.Log("Start downloading");
             if (task.TaskState != MapDownloadTask.State.Waiting) return;
 
             task.TaskState = MapDownloadTask.State.Downloading;
@@ -124,6 +121,7 @@ namespace InGame.Menu.Maps
         [SerializeField] private MapsDownloadQueueItem headerItem;
 
         public MapDownloadTask ActiveTask => MapsDownloadQueuerBackground.ActiveItem?.task;
+        public Action onDownloaded;
 
 
         private bool isExpanded;
@@ -135,7 +133,7 @@ namespace InGame.Menu.Maps
 
         private void Start()
         {
-            MapsDownloadQueuerBackground.OnTaskCompletedCallback = OnTaskCompleted;
+            MapsDownloadQueuerBackground.onTaskCompletedCallback = OnTaskCompleted;
 
             // Creating items after scene reloading
             if(MapsDownloadQueuerBackground.uncompletedQueue.Count > 0)
@@ -206,9 +204,10 @@ namespace InGame.Menu.Maps
             {
                 listUI.ReloadDownloadedList();
             }
-            
 
             OnQueueChange();
+
+            onDownloaded?.Invoke();
         }
 
 

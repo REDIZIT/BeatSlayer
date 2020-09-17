@@ -68,6 +68,10 @@ namespace InGame.Multiplayer.Lobby
         {
             await NetCore.ServerActions.Lobby.Rename(lobby.Id, lobbyName);
         }
+        public static async Task ChangePassword(string password)
+        {
+            await NetCore.ServerActions.Lobby.ChangePassword(lobby.Id, password);
+        }
 
         #endregion
 
@@ -101,6 +105,8 @@ namespace InGame.Multiplayer.Lobby
         }
         public static void RemoteHostChanged(string newHostNick)
         {
+            if (lobby == null) return;
+
             lobby.IsHostChangingMap = false;
             foreach (LobbyPlayer lobbyPlayer in lobby.Players)
             {

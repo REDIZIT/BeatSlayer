@@ -52,14 +52,17 @@ namespace InGame.Multiplayer.Lobby.Chat
         {
             if (LobbyManager.lobby == null) return;
 
-            if (typingCancelTimer > 0)
+            if (isTyping)
             {
-                typingCancelTimer -= Time.deltaTime;
-            }
-            else
-            {
-                isTyping = false;
-                NetCore.ServerActions.Lobby.StopTyping(LobbyManager.lobby.Id, Payload.Account.Nick);
+                if (typingCancelTimer > 0)
+                {
+                    typingCancelTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    isTyping = false;
+                    NetCore.ServerActions.Lobby.StopTyping(LobbyManager.lobby.Id, Payload.Account.Nick);
+                }
             }
         }
 

@@ -22,6 +22,8 @@ namespace InGame.Multiplayer.Game
         public GameObject leaderboardToDisable;
         public Button restartButton, restartGameOverBtn;
 
+        public bool isGameStarted;
+
 
         private void Awake()
         {
@@ -63,6 +65,8 @@ namespace InGame.Multiplayer.Game
                 {
                     if (areAllLoaded)
                     {
+                        Debug.Log("Start game coz all are loaded");
+                        isGameStarted = true;
                         gm.StartGame();
                     }
                     else
@@ -83,11 +87,21 @@ namespace InGame.Multiplayer.Game
 
         private IEnumerator IEOnAllPlayersLoaded()
         {
-            waitingAnimator.Play("FadeClose");
+            // If someone isn't loaded when we're
+            if (!isGameStarted)
+            {
+                waitingAnimator.Play("FadeClose");
 
-            yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(2);
 
-            gm.StartGame();
+                // If someone is still not loaded
+                if (!isGameStarted)
+                {
+                    Debug.Log("Start game coz IEOnAllPlayersLoaded");
+                    isGameStarted = true;
+                    gm.StartGame();
+                }
+            }
         }
 
 

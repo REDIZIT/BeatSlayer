@@ -44,10 +44,13 @@ namespace InGame.Multiplayer.Lobby.UI
 
         [Header("Lobby page")]
         public Text lobbyNameText;
-        public InputField nameInputField;
+        public InputField nameInputField, passwordInputField;
+        public GameObject nonHostNameContainer, hostNameContainer;
+        public GameObject lockImage;
+
         public GameObject readyBtn, notReadyBtn, locationBtn;
-        public Text notReadyPlayersCountText;
         public GameObject changeMapButton;
+
 
         [Header("Timeline")]
         public GameObject timeline;
@@ -60,6 +63,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
         [Header("Map info")]
         public RawImage mapImage;
+        public Texture2D defaultMapImage;
         public Text authorText;
         public Text nameText, difficultyText, mapperText;
         public ProgressBar progressCircle;
@@ -100,7 +104,16 @@ namespace InGame.Multiplayer.Lobby.UI
                 LobbyManager.ChangeReadyState(LobbyPlayer.ReadyState.NotReady);
 
                 pager.OpenLobbyPage();
-                RefreshLobby();
+                RefreshLobby(); // Refresh as not actual lobby
+
+                Task.Run(async () =>
+                {
+                    // Get actual lobby
+                    Lobby lobby = await NetCore.ServerActions.Lobby.GetLobby(LobbyManager.lobby.Id);
+                    LobbyManager.lobby.UpdateValues(lobby);
+                    // Refresh as actual lobby
+                    UnityMainThreadDispatcher.Instance().Enqueue(RefreshLobby);
+                });
             }
 
             if (Payload.Account == null)
@@ -122,6 +135,7 @@ namespace InGame.Multiplayer.Lobby.UI
                 NetCore.Subs.OnHostCancelChangingMap += OnRemoteHostCancelChanging;
                 NetCore.Subs.OnLobbyMapChange += OnMapRemoteChange;
                 NetCore.Subs.OnLobbyRename += OnLobbyRename;
+                NetCore.Subs.OnLobbyChangePassword += OnLobbyChangePassword;
                 NetCore.Subs.OnLobbyPlayStatusChanged += OnLobbyPlayStatusChanged;
 
                 NetCore.Subs.OnRemotePlayerReadyStateChange += OnRemotePlayerReadyStateChange;
@@ -149,11 +163,15 @@ namespace InGame.Multiplayer.Lobby.UI
 
         public void RefreshLobby()
         {
+            if (LobbyManager.lobby == null) return;
+
+            nonHostNameContainer.SetActive(!LobbyManager.lobbyPlayer.IsHost);
+            hostNameContainer.SetActive(LobbyManager.lobbyPlayer.IsHost);
+
             lobbyNameText.text = LobbyManager.lobby.Name;
             nameInputField.text = LobbyManager.lobby.Name;
-
-            lobbyNameText.gameObject.SetActive(!LobbyManager.lobbyPlayer.IsHost);
-            nameInputField.gameObject.SetActive(LobbyManager.lobbyPlayer.IsHost);
+            passwordInputField.text = LobbyManager.lobby.Password;
+            lockImage.SetActive(LobbyManager.lobby.HasPassword);
 
 
 
@@ -175,7 +193,11 @@ namespace InGame.Multiplayer.Lobby.UI
             changeMapButton.SetActive(LobbyManager.lobbyPlayer.IsHost);
 
             RefreshSelectedMapState();
-            if (LobbyManager.lobby.SelectedMap == null) return;
+            if (LobbyManager.lobby.SelectedMap == null)
+            {
+                mapImage.texture = defaultMapImage;
+                return;
+            }
 
             authorText.text = LobbyManager.lobby.SelectedMap.Author;
             nameText.text = LobbyManager.lobby.SelectedMap.Name;
@@ -321,12 +343,10 @@ namespace InGame.Multiplayer.Lobby.UI
 
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
-                    foreach (var lobby in lobbies)
+                    HelperUI.FillContent<LobbyPresenter, Lobby>(lobbyStackParent, lobbyItemPrefab, lobbies, (presenter, lobby) =>
                     {
-                        GameObject obj = Instantiate(lobbyItemPrefab, lobbyStackParent);
-                        LobbyPresenter presenter = obj.GetComponent<LobbyPresenter>();
                         presenter.Refresh(lobby);
-                    }
+                    });
 
                     refreshLobbiesBtn.interactable = true;
                     if(lobbies.Count == 0)
@@ -352,7 +372,7 @@ namespace InGame.Multiplayer.Lobby.UI
 
 
 
-        #region Create/Join/Leave/Rename lobby
+        #region Create/Join/Leave/Rename/Password lobby
 
         public void CreateLobby()
         {
@@ -401,9 +421,22 @@ namespace InGame.Multiplayer.Lobby.UI
                 await LobbyManager.RenameLobby(nameInputField.text);
             });
         }
+        public void OnPasswordInputFieldChange()
+        {
+            Task.Run(async () =>
+            {
+                await LobbyManager.ChangePassword(passwordInputField.text);
+            });
+        }
+
         private void OnLobbyRename(string lobbyName)
         {
             LobbyManager.lobby.Name = lobbyName;
+            RefreshLobby();
+        }
+        private void OnLobbyChangePassword(string password)
+        {
+            LobbyManager.lobby.Password = password;
             RefreshLobby();
         }
         private void OnLobbyPlayStatusChanged(bool isPlaying)
@@ -477,10 +510,10 @@ namespace InGame.Multiplayer.Lobby.UI
 
         private void OnRemotePlayerReadyStateChange(string nick, LobbyPlayer.ReadyState state)
         {
-            slots.First(c => c.player.Player.Nick == nick).ChangeState(state);
-
             UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
+                if (slots == null) return;
+                slots.First(c => c.player.Player.Nick == nick).ChangeState(state);
                 RefreshPlayerSlots();
                 RefreshReadyButtons();
             });

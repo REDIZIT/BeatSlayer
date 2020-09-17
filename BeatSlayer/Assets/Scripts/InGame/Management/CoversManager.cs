@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using GameNet;
 using InGame.Utils;
 using ProjectManagement;
@@ -25,19 +26,15 @@ namespace CoversManagement
         private static Dictionary<string, CachedRequestPackage> mapsCoversCache = new Dictionary<string, CachedRequestPackage>();
 
 
-        private static bool isInited;
         private static bool isDownloading;
 
 
         static readonly WebClient client = new WebClient();
 
-        private static void Init()
+
+        static CoversManager()
         {
-            if (isInited) return;
-
             client.DownloadDataCompleted += OnDataDownloaded;
-
-            isInited = true;
         }
 
       
@@ -57,6 +54,12 @@ namespace CoversManagement
             requests.Add(new AvatarRequestPackage(targetImage, playerNick, priority));
             OnRequestsListUpdate();
         }
+        public static void AddMapPackage(RawImage image, string trackname, string mapperNick = "")
+        {
+            requests.Add(new CoverRequestPackage(image, trackname, mapperNick));
+            OnRequestsListUpdate();
+        }
+
         public static void ClearPackages(RawImage[] images)
         {
             if (requests.Count == 0) return;
@@ -91,8 +94,6 @@ namespace CoversManagement
         private static void OnRequestsListUpdate()
         {
             if (requests.Count == 0 || isDownloading) return;
-
-            if (!isInited) Init();
 
             requests = requests.OrderByDescending(c => c.priority).ToList();
 

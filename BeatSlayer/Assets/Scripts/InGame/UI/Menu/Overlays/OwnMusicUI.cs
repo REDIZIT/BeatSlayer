@@ -52,7 +52,6 @@ namespace InGame.UI.Overlays
         {
             SearchAllMusic(() =>
             {
-                Debug.Log("OnOwnBtnClicked");
                 callback();
             }, false);
         }

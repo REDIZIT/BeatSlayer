@@ -168,14 +168,14 @@ public class TrackListUI : MonoBehaviour
 
 
         // Creating items and cover requests
-        List<CoverRequestPackage> coverPackages = new List<CoverRequestPackage>();
+        //List<CoverRequestPackage> coverPackages = new List<CoverRequestPackage>();
 
         for (int i = 0; i < groups.Count; i++)
         {
             TrackListItem item = Instantiate(trackItemPrefab, content).GetComponent<TrackListItem>();
             item.Setup(groups[i], menu);
 
-            coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), groups[i].Trackname));
+            //coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), groups[i].Trackname));
         }
 
 
@@ -186,7 +186,7 @@ public class TrackListUI : MonoBehaviour
 
 
         // Start downloading covers images for showed groups
-        if(showedListType != ListType.Own) CoversManager.AddPackages(coverPackages);
+        //if(showedListType != ListType.Own) CoversManager.AddPackages(coverPackages);
 
 
         pageController.RefreshPageButtons(data.Count);

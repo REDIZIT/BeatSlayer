@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -441,6 +441,7 @@ MonoBehaviour:
   leaderboardToDisable: {fileID: 1497903726}
   restartButton: {fileID: 1687114294}
   restartGameOverBtn: {fileID: 1924574879}
+  isGameStarted: 0
 --- !u!4 &18446122
 Transform:
   m_ObjectHideFlags: 0
@@ -467,6 +468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4534e2ede67e44387a58566a296e14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameLobby: {fileID: 18446121}
   sm: {fileID: 1901715895}
   globalMapLeaderboard: {fileID: 1701399166}
   multiplayerMapLeaderboard: {fileID: 1023850588}
@@ -10646,10 +10648,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0, g: 0, b: 0, a: 0.19607843}
-    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0.19607843}
-    m_PressedColor: {r: 0, g: 0, b: 0, a: 0.3137255}
-    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0.11764706}
+    m_NormalColor: {r: 0.15686275, g: 0, b: 0, a: 0.7058824}
+    m_HighlightedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
+    m_PressedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
+    m_SelectedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
     m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -42745,7 +42747,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.7058824}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -45725,10 +45727,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0, g: 0, b: 0, a: 0.19607843}
-    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0.19607843}
-    m_PressedColor: {r: 0, g: 0, b: 0, a: 0.3137255}
-    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0.11764706}
+    m_NormalColor: {r: 0.09411765, g: 0.09411765, b: 0, a: 0.7058824}
+    m_HighlightedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
+    m_PressedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
+    m_SelectedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
     m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -46005,10 +46007,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0, g: 0, b: 0, a: 0.19607843}
-    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0.19607843}
-    m_PressedColor: {r: 0, g: 0, b: 0, a: 0.3137255}
-    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0.11764706}
+    m_NormalColor: {r: 0, g: 0.09411765, b: 0, a: 0.7058824}
+    m_HighlightedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
+    m_PressedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
+    m_SelectedColor: {r: 0.05490196, g: 0.05490196, b: 0.05490196, a: 0.7058824}
     m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1

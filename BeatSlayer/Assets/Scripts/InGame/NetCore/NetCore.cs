@@ -461,11 +461,12 @@ namespace GameNet
             public static class Lobby
             {
                 public static async Task<List<LobbyDTO>> GetLobbies() => await conn.InvokeAsync<List<LobbyDTO>>("GetLobbies");
+                public static async Task<LobbyDTO> GetLobby(int lobbyId) => await conn.InvokeAsync<LobbyDTO>("GetLobby", lobbyId);
                 public static async Task<LobbyDTO> Create(string creatorNick) => await conn.InvokeAsync<LobbyDTO>("CreateLobby", creatorNick);
                 public static async Task<LobbyDTO> Join(string nick, int lobbyId) => await conn.InvokeAsync<LobbyDTO>("JoinLobby", lobbyId, nick);
                 public static async Task Leave(string nick, int lobbyId) => await conn.InvokeAsync("LeaveLobby", lobbyId, nick);
                 public static async Task Rename(int lobbyId, string lobbyName) => await conn.InvokeAsync("RenameLobby", lobbyId, lobbyName);
-
+                public static async Task ChangePassword(int lobbyId, string password) => await conn.InvokeAsync("ChangeLobbyPassword", lobbyId, password);
 
 
                 public static void ChangeHost(int lobbyId, string newHostNick) => conn.InvokeAsync("ChangeLobbyHost", lobbyId, newHostNick);
@@ -564,6 +565,7 @@ namespace GameNet
             public Action<string, int> OnRemotePlayerDownloadProgress;
             public Action<string> OnRemotePlayerDownloaded;
             public Action<string> OnLobbyRename;
+            public Action<string> OnLobbyChangePassword;
             public Action<bool> OnLobbyPlayStatusChanged;
 
 

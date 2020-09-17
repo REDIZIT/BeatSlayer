@@ -1,7 +1,5 @@
 ﻿using InGame.Game.Spawn;
-using System.Diagnostics;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class BeatCube : MonoBehaviour, IBeat
 {
@@ -13,7 +11,6 @@ public class BeatCube : MonoBehaviour, IBeat
 
     public MeshRenderer renderer;
     public MeshFilter filter;
-    //public ParticleSystem psystem;
 
     [SerializeField] private ParticleSystem cubeParticleSystem, cubeDissovleParticleSystem;
 
@@ -28,12 +25,11 @@ public class BeatCube : MonoBehaviour, IBeat
     public float SpeedMultiplier { get; set; }
     public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
 
-    float materialThreshold = 0.5f;
-    float thresholdChange = -1;
+    private float materialThreshold = 0.5f;
+    private float thresholdChange = -1;
 
-    //Stopwatch w = new Stopwatch();
+    private bool isDead;
 
-    bool isDead;
 
     public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
     {
@@ -173,7 +169,7 @@ public class BeatCube : MonoBehaviour, IBeat
 
     void Animate()
     {
-        materialThreshold += Time.deltaTime * thresholdChange; 
+        materialThreshold += Time.deltaTime * thresholdChange * CurrentSpeed; 
         if (materialThreshold< -0.1f) {materialThreshold = -0.1f; thresholdChange = 0; }
         else if (materialThreshold > 1) materialThreshold = 1;
 

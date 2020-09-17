@@ -12,6 +12,7 @@ namespace InGame.Multiplayer.Game
 {
     public class MpLeaderboardManager : MonoBehaviour
     {
+        public GameLobbyUIManager gameLobby;
         public ScoringManager sm;
 
         [Header("Finish leaderboard")]
@@ -55,6 +56,8 @@ namespace InGame.Multiplayer.Game
         }
         private void Update()
         {
+            if (!gameLobby.isGameStarted) return;
+
             if (scoreUpdateTimer > 0)
             {
                 scoreUpdateTimer -= Time.deltaTime;

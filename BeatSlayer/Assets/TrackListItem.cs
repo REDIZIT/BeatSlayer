@@ -1,4 +1,5 @@
-﻿using GameNet;
+﻿using CoversManagement;
+using GameNet;
 using InGame.Models;
 using ProjectManagement;
 using System.IO;
@@ -28,7 +29,6 @@ public class TrackListItem : MonoBehaviour
     
     public async void Setup(MapsData groupInfo, MenuScript_v2 menu, bool getSpriteFromServer = true, bool isCustomMusic = false)
     {
-        //this.group = group;
         this.groupInfo = groupInfo;
         this.menu = menu;
         this.isCustomMusic = isCustomMusic;
@@ -40,6 +40,8 @@ public class TrackListItem : MonoBehaviour
         {
             mapsCountText.text = Assets.SimpleLocalization.LocalizationManager.Localize("MapsCount") + ": " + groupInfo.MappersNicks.Count;
         }
+        CoversManager.AddMapPackage(coverImage, groupInfo.Trackname);
+
         
         isLocalItem = !getSpriteFromServer;
 

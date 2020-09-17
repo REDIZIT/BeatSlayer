@@ -59,6 +59,10 @@ public class BeatmapUI : MonoBehaviour
 
 
 
+    private void Start()
+    {
+        mapsDownloadQueuer.onDownloaded = OnDifficultyItemClicked;
+    }
     void Update()
     {
         RefreshControls();
