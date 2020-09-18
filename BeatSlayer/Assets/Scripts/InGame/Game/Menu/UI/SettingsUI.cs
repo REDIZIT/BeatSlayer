@@ -5,6 +5,8 @@ using InGame.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 namespace InGame.Game.Menu
 {
@@ -18,9 +20,10 @@ namespace InGame.Game.Menu
         [SerializeField] private Transform dropdownlocker;
 
         private SettingsModel Settings => SettingsManager.Settings;
+        private List<PropertyInfo> SettingsProperties { get; set; } = new List<PropertyInfo>();
 
         private List<OptionChangeSubscription> Subscriptions { get; set; } = new List<OptionChangeSubscription>();
-
+        private List<SettingsUIItem> Items { get; set; } = new List<SettingsUIItem>();
 
 
         private void Start()
@@ -34,22 +37,43 @@ namespace InGame.Game.Menu
             ShowSettingsPage();
         }
 
+        /// <summary>Recreate all groups and items</summary>
         public void ShowSettingsPage()
         {
+            //Stopwatch w = Stopwatch.StartNew();
+
             HelperUI.ClearContentAll(content);
 
-            var props = Settings.GetType().GetProperties();
+            var props = Settings.GetType().GetProperties().ToList();
+
+            SettingsProperties.Clear();
+
+            foreach (var prop in props)
+            {
+                var innerProps = prop.PropertyType.GetProperties();
+                SettingsProperties.AddRange(innerProps);
+            }
 
             foreach (var prop in props)
             {
                 if (prop.PropertyType.IsClass)
                 {
-                    ShowItemsGroup(prop, prop.GetValue(Settings), content);
+                    CreateGroup(prop, prop.GetValue(Settings), content);
                 }
                 else
                 {
-                    AddOptionItem(prop, props, Settings, null);
+                    AddGroupItem(prop, Settings, null);
                 }
+            }
+
+            //Debug.Log($"ShowSettingsPage elapsed {w.ElapsedMilliseconds}ms");
+        }
+        /// <summary>Update already crated groups and items</summary>
+        public void UpdateSettingsPage()
+        {
+            foreach (SettingsUIItem item in Items)
+            {
+                RefreshGroupItem(item);
             }
         }
 
@@ -71,6 +95,9 @@ namespace InGame.Game.Menu
 
         public void SaveSetting(PropertyInfo prop, SettingsUIItemModel model, object value)
         {
+            Stopwatch w = Stopwatch.StartNew();
+
+
             object casted;
             if (prop.PropertyType.IsEnum)
             {
@@ -88,9 +115,13 @@ namespace InGame.Game.Menu
 
             if (model.Type == SettingsUIItemType.Toggle || model.Type == SettingsUIItemType.Dropdown)
             {
-                ShowSettingsPage();
+                //ShowSettingsPage();
+                UpdateSettingsPage();
                 OnOptionChange(model.NameInFile);
             }
+
+
+            Debug.Log($"SaveSetting elapsed {w.ElapsedMilliseconds}ms");
         }
 
         private void OnOptionChange(string optionName)
@@ -104,9 +135,9 @@ namespace InGame.Game.Menu
 
 
 
-        private void ShowItemsGroup(PropertyInfo parentprop, object parentObject, Transform currentContent)
+        private void CreateGroup(PropertyInfo parentprop, object parentObject, Transform currentContent)
         {
-            SettingsUIGroup group = AddOptionsGroup(parentprop, currentContent);
+            SettingsUIGroup group = AddGroup(parentprop, currentContent);
 
 
             var props = parentprop.PropertyType.GetProperties();
@@ -115,17 +146,17 @@ namespace InGame.Game.Menu
             {
                 if (prop.PropertyType.IsClass)
                 {
-                    ShowItemsGroup(prop, prop.GetValue(parentObject), group.content);
+                    CreateGroup(prop, prop.GetValue(parentObject), group.content);
                 }
                 else
                 {
-                    AddOptionItem(prop, props, parentObject, group);
+                    AddGroupItem(prop, parentObject, group);
                 }
             }
 
             group.FitContent();
         }
-        private SettingsUIGroup AddOptionsGroup(PropertyInfo prop, Transform content)
+        private SettingsUIGroup AddGroup(PropertyInfo prop, Transform content)
         {
             SettingsUIGroup group = null;
             OptionAttribute attribute = prop.GetCustomAttribute<OptionAttribute>();
@@ -154,57 +185,26 @@ namespace InGame.Game.Menu
 
             return group;
         }
-        private void AddOptionItem(PropertyInfo prop, PropertyInfo[] props, object subValue, SettingsUIGroup group)
+        private void AddGroupItem(PropertyInfo prop, object subValue, SettingsUIGroup group)
         {
-            string strName = prop.Name;
-
+            // Get attribute to detect property as option
             OptionAttribute attribute = prop.GetCustomAttribute<OptionAttribute>();
-            if (attribute == null)
-            {
-                //Debug.LogError($"SettingsModel has property ({prop.Name}) with no display name attribute");
-                return;
-            }
-
-            EnabledAttribute enabledAttribute = prop.GetCustomAttribute<EnabledAttribute>();
-            bool enabled = true;
-            if (enabledAttribute != null)
-            {
-                var basedProp = props.FirstOrDefault(c => c.Name == enabledAttribute.BaseName);
-                if (basedProp == null) return;
-                if (basedProp.PropertyType != typeof(bool))
-                {
-                    Debug.LogError($"SettingsModel has property ({prop.Name}) with EnabledAttribute based on non bool value");
-                    return;
-                }
-
-                bool basedPropValue = (bool)basedProp.GetValue(subValue);
-                enabled = basedPropValue;
-            }
-
-
-            MediaAttribute mediaAttribute = prop.GetCustomAttribute<MediaAttribute>();
-            string[] mediaArray = null;
-            if(mediaAttribute != null)
-            {
-                mediaArray = mediaAttribute.Images;
-            }
-
-
+            if (attribute == null) return;
 
 
             SettingsUIItemType type = SettingsManager.GetItemType(prop.PropertyType);
 
-            SettingsUIItemModel model = GetItemValue(prop, subValue, type);
+            SettingsUIItemModel model = SettingsManager.GetSpecificModelForType(prop, subValue, type);
             model.NameInFile = prop.Name;
             model.NameWithoutLocalization = attribute.DisplayName;
             model.Description = attribute.Description ?? "";
-            model.Media = mediaArray;
+            model.Media = SettingsManager.GetMediaOrNull(prop);
             model.Type = type;
             model.PropertyInfo = prop;
             model.PropertyTarget = subValue;
-            model.Enabled = enabled;
+            model.Enabled = SettingsManager.IsPropertyEnabled(prop, SettingsProperties, subValue);
 
-            if(group == null)
+            if (group == null)
             {
                 HelperUI.AddContent<SettingsUIItem>(content, itemPrefab, (item) =>
                 {
@@ -216,47 +216,30 @@ namespace InGame.Game.Menu
                 HelperUI.AddContent<SettingsUIItem>(group.content, itemPrefab, (item) =>
                 {
                     item.Refresh(model, this, dropdownlocker);
+                    Items.Add(item);
                 });
             }
         }
-
-
-        private SettingsUIItemModel GetItemValue(PropertyInfo property, object parentClass, SettingsUIItemType type)
+        private void RefreshGroupItem(SettingsUIItem item)
         {
-            object propertyValue = property.GetValue(parentClass);
+            // Get value
+            SettingsUIItemModel model = SettingsManager.GetSpecificModelForType(item.model.PropertyInfo, item.model.PropertyTarget, item.model.Type);
 
-            switch (type)
-            {
-                case SettingsUIItemType.Dropdown:
-                    object underlayingValue = Convert.ChangeType(propertyValue, Enum.GetUnderlyingType(propertyValue.GetType()));
+            // Copy values
+            model.NameInFile = item.model.NameInFile;
+            model.NameWithoutLocalization = item.model.NameWithoutLocalization;
+            model.Description = item.model.Description;
+            model.Media = item.model.Media;
+            model.Type = item.model.Type;
+            model.PropertyInfo = item.model.PropertyInfo;
+            model.PropertyTarget = item.model.PropertyTarget;
 
-                    List<string> values = new List<string>();
-                    values.AddRange(Enum.GetNames(propertyValue.GetType()));
+            // Update values
+            model.Enabled = SettingsManager.IsPropertyEnabled(item.model.PropertyInfo, SettingsProperties, item.model.PropertyTarget);
 
-                    return new SettingsDropdownValue(values, (int)underlayingValue);
+            if (model.Enabled == false) Debug.Log(model.NameWithoutLocalization + " is disabled");
 
-
-                case SettingsUIItemType.Slider:
-                    Settings.RangeAttribute range = property.GetCustomAttribute<Settings.RangeAttribute>();
-
-                    //float currentValueInt = (float)property.GetValue(parentClass);
-                    float valueFloat = Convert.ToSingle(propertyValue);
-
-                    //currentValueInt = (float)range.Clamp(currentValueInt);
-
-                    return new SettingsSliderValue(range.MinValue, range.MaxValue, valueFloat);
-
-                case SettingsUIItemType.Group:
-                    return new SettingsGroupValue();
-
-                case SettingsUIItemType.Toggle:
-
-                    bool isOn = Convert.ToBoolean(propertyValue);
-
-                    return new SettingsToggleValue(isOn);
-
-                default: return null;
-            }
+            item.Refresh(model, this, dropdownlocker);
         }
     }
 

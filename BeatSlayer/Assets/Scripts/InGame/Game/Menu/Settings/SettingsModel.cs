@@ -144,7 +144,7 @@ namespace InGame.Settings
         [Range(2.5f, 4)]
         public float RoadsDistance { get; set; } = 2.5f;
 
-        [Option("NEW! Are texts (score, %, SS) in game always on top?")]
+        [Option("Are texts (score, %, SS) in game always on top?")]
         [Media("OverlayOn", "OverlayOff")]
         public bool TextMeshOverlay { get; set; } = true;
 
@@ -154,6 +154,9 @@ namespace InGame.Settings
         [Option("Cubes sync offset")]
         [Range(-4, 10)]
         public float CubesSuncOffset { get; set; } = 2;
+
+        [Option("Hide sabers")]
+        public bool HideSabers { get; set; } = false;
     }
 
     public class SettingsMenuModel

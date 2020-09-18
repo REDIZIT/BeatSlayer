@@ -72,6 +72,9 @@ namespace InGame.Settings
         }
 
 
+
+
+
         private void ResetValueContainers()
         {
             dropdown.gameObject.SetActive(false);
@@ -81,7 +84,7 @@ namespace InGame.Settings
         private void RefreshDropdown()
         {
             dropdown.gameObject.SetActive(true);
-            dropdown.OnValueChanged += (i) => OnValueChange(i);
+            dropdown.OnValueChanged = (i) => OnValueChange(i);
 
             FillDropdown((SettingsDropdownValue)model);
         }
@@ -95,6 +98,7 @@ namespace InGame.Settings
             slider.maxValue = val.maxValue;
             slider.SetValueWithoutNotify(val.currentValue);
 
+            slider.onValueChanged.RemoveAllListeners();
             slider.onValueChanged.AddListener((f) => OnValueChange(f));
         }
         private void RefreshSwitch()
@@ -104,7 +108,7 @@ namespace InGame.Settings
             SettingsToggleValue val = (SettingsToggleValue)model;
 
             toggle.SetValueWithoutNotify(val.isOn, true);
-            toggle.OnValueChange += (b) => OnValueChange(b);
+            toggle.OnValueChange = (b) => OnValueChange(b);
         }
 
 

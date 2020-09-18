@@ -1,7 +1,9 @@
 using InGame.Extensions.Objects;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -54,6 +56,83 @@ namespace InGame.Settings
 
             throw new Exception("Unknown setting property type " + propertyType.Name + $" ( {propertyType} )");
         }
+
+        
+        public static SettingsUIItemModel GetSpecificModelForType(PropertyInfo property, object parentClass, SettingsUIItemType type)
+        {
+            object propertyValue = property.GetValue(parentClass);
+
+            switch (type)
+            {
+                case SettingsUIItemType.Dropdown:
+                    object underlayingValue = Convert.ChangeType(propertyValue, Enum.GetUnderlyingType(propertyValue.GetType()));
+
+                    List<string> values = new List<string>();
+                    values.AddRange(Enum.GetNames(propertyValue.GetType()));
+
+                    return new SettingsDropdownValue(values, (int)underlayingValue);
+
+
+                case SettingsUIItemType.Slider:
+                    RangeAttribute range = property.GetCustomAttribute<Settings.RangeAttribute>();
+
+                    float valueFloat = Convert.ToSingle(propertyValue);
+
+                    return new SettingsSliderValue(range.MinValue, range.MaxValue, valueFloat);
+
+                case SettingsUIItemType.Group:
+                    return new SettingsGroupValue();
+
+                case SettingsUIItemType.Toggle:
+
+                    bool isOn = Convert.ToBoolean(propertyValue);
+
+                    return new SettingsToggleValue(isOn);
+
+                default: return null;
+            }
+        }
+
+        /// <summary>Get attached media files names (<see cref="MediaAttribute"/>) or null</summary>
+        public static string[] GetMediaOrNull(PropertyInfo prop)
+        {
+            MediaAttribute mediaAttribute = prop.GetCustomAttribute<MediaAttribute>();
+            string[] mediaArray = null;
+            if (mediaAttribute != null)
+            {
+                mediaArray = mediaAttribute.Images;
+            }
+            return mediaArray;
+        }
+
+        /// <summary>Is property can be changed. Affected by <see cref="EnabledAttribute"/> and his dependencies</summary>
+        public static bool IsPropertyEnabled(PropertyInfo prop, IEnumerable<PropertyInfo> allProperties, object optionValue)
+        {
+            EnabledAttribute enabledAttribute = prop.GetCustomAttribute<EnabledAttribute>();
+
+            // If EnabledAttribute isn't set, just return true
+            if (enabledAttribute == null) return true;
+
+            // Get based PropertyInfo by EnabledAttribue.Name
+            PropertyInfo basedProp = allProperties.FirstOrDefault(c => c.Name == enabledAttribute.BaseName);
+            if (basedProp == null)
+            {
+                Debug.LogError($"BasedProp is null: c ({allProperties.Count()})=> c.Name == {enabledAttribute.BaseName}");
+                return false;
+            }
+
+
+            // If option isn't bool
+            if (basedProp.PropertyType != typeof(bool))
+            {
+                Debug.LogError($"SettingsModel has property ({prop.Name}) with EnabledAttribute based on non bool value");
+                return false;
+            }
+
+            // If is, return this bool value
+            return (bool)basedProp.GetValue(optionValue);
+        }
+
 
 
         public static void Reset()

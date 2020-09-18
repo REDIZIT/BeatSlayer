@@ -39,6 +39,8 @@ namespace InGame.Settings
             return Mathf.Clamp(value, MinValue, MaxValue);
         }
     }
+
+    /// <summary>Will change enabled status based on another property bool value</summary>
     public class EnabledAttribute : Attribute
     {
         public string BaseName { get; set; }
