@@ -58,7 +58,10 @@ public class BeatLine : MonoBehaviour, IBeat
             Debug.LogError("Line BUG! Line end time is zero! Value / 0 = Infinity = Unity BAG!!");
         }
 
-        capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
+        //capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
+
+        capMax = lineEndTime * (bm.fieldLength / bm.fieldCrossTime) / CurrentSpeed;
+        //Debug.Log($"{capMax} = {lineEndTime} * ({bm.fieldLength} / {bm.fieldCrossTime}) / {CurrentSpeed}");
     }
 
     void Update()

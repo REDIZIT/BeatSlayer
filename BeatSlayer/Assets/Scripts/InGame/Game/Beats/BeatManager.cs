@@ -300,7 +300,7 @@ namespace InGame.Game.Spawn
         {
             Vector3 dir = screenPos - prevScreenPos;
 
-            int samples = 4;
+            int samples = SettingsManager.Settings.Gameplay.HideSabers ? 1 : 4;
             int offset = 100;
             int xOffset = saberSide == -1 ? 14 : saberSide == 1 ? -14 : 0;
 
