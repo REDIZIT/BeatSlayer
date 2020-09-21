@@ -23,7 +23,7 @@ public class BeatCube : MonoBehaviour, IBeat
     /// Multiplier of cube calculated speed from 0 to 1
     /// </summary>
     public float SpeedMultiplier { get; set; }
-    public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
+    public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
 
     private float materialThreshold = 0.5f;
     private float thresholdChange = -1;
@@ -186,8 +186,7 @@ public class BeatCube : MonoBehaviour, IBeat
         // Время за которое куб его проходит
         // 
         //
-        //transform.position += new Vector3(0, 0, -1) * speed * Time.deltaTime;
-        transform.position += new Vector3(0, 0, -1) * CurrentSpeed * SpeedMultiplier;
+        transform.position += new Vector3(0, 0, -1) * CurrentSpeed/* * SpeedMultiplier*/;
         if (transform.position.z <= bm.maxDistance && !isDead)
         {
             gm.MissedBeatCube(this);

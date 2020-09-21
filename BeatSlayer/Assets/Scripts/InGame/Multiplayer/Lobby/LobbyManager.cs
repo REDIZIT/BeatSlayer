@@ -56,6 +56,7 @@ namespace InGame.Multiplayer.Lobby
         public static async Task JoinLobby(Lobby lobbyToJoin)
         {
             lobby = await NetCore.ServerActions.Lobby.Join(Payload.Account.Nick, lobbyToJoin.Id);
+            if (lobby == null) return;
             lobbyPlayer = lobby.Players.First(c => c.Player.Nick == Payload.Account.Nick);
         }
         public static async Task LeaveLobby()

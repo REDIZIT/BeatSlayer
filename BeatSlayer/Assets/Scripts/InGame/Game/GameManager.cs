@@ -25,6 +25,7 @@ using InGame.Game.Mods;
 using DatabaseManagement;
 using InGame.Models;
 using InGame.Multiplayer.Lobby;
+using InGame.Game.Sabers;
 #if UNITYEDITOR
 using UnityEditor;
 #endif
@@ -67,11 +68,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshPro scoreText, missedText, perText, comboText, comboMultiplierText;
     [SerializeField] private TextMeshPro gradeText;
 
-
-
-    [Header("Sabers")]
-    public SaberController rightSaber;
-    public SaberController leftSaber;
 
 
     [Header("Skills")]
@@ -257,9 +253,6 @@ public class GameManager : MonoBehaviour
         }
 
         #endregion
-
-        beatManager.SabersUpdate();
-
     }
 
 
@@ -298,7 +291,7 @@ public class GameManager : MonoBehaviour
         }
 
         difficulty = project.difficulties.Find(c => c.id == difficultyInfo.id);
-        Debug.Log("Id: " + difficultyInfo.id + "\nIs DIFF null? " + (difficulty == null) + "\nCount is: " + project.difficulties.Count);
+        //Debug.Log("Id: " + difficultyInfo.id + "\nIs DIFF null? " + (difficulty == null) + "\nCount is: " + project.difficulties.Count);
 
         IEnumerable<BeatCubeClass> ls = difficulty == null ? project.beatCubeList : difficulty.beatCubeList;
 
@@ -387,15 +380,6 @@ public class GameManager : MonoBehaviour
         dislikeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);
 
         gradeText.gameObject.SetActive(Settings.Gameplay.ShowGrade);
-
-
-        Color leftSaberColor = SSytem.instance.leftColor * (1 + SSytem.instance.GlowPowerSaberLeft / 25f);
-        Color rightSaberColor = SSytem.instance.rightColor * (1 + SSytem.instance.GlowPowerSaberRight / 25f);
-
-        float trailLifeTime = SSytem.instance.TrailLength / 100f * 0.4f;
-
-        leftSaber.Init(leftSaberColor, prefsManager.prefs.selectedLeftSaberId, prefsManager.prefs.selectedSaberEffect, trailLifeTime);
-        rightSaber.Init(rightSaberColor, prefsManager.prefs.selectedRightSaberId, prefsManager.prefs.selectedSaberEffect, trailLifeTime);
 
 
         blurImage.gameObject.SetActive(Settings.Graphics.IsBlurEnabled);
@@ -614,7 +598,7 @@ public class GameManager : MonoBehaviour
     {
         if (Settings.Sound.SliceEffectEnabled)
         {
-            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume / 100f / 50f);
+            AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume * 0.001f);
         }
 
         if(beat.GetClass().type == BeatCubeClass.Type.Bomb)

@@ -393,6 +393,7 @@ namespace InGame.Multiplayer.Lobby.UI
             Task.Run(async () =>
             {
                 await LobbyManager.JoinLobby(lobbyToJoin);
+                if (LobbyManager.lobby == null) return;
                
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {

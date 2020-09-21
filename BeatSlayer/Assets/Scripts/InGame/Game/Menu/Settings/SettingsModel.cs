@@ -146,7 +146,7 @@ namespace InGame.Settings
 
         [Option("Are texts (score, %, SS) in game always on top?")]
         [Media("OverlayOn", "OverlayOff")]
-        public bool TextMeshOverlay { get; set; } = true;
+        public bool TextMeshOverlay { get; set; } = false;
 
         [Option("Hide missed text")]
         public bool HideMissedText { get; set; } = false;

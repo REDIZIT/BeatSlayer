@@ -6,13 +6,14 @@ using InGame.Game.Scoring.Mods;
 using InGame.Multiplayer.Lobby;
 using InGame.Settings;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace InGame.Game.Spawn
 {
 
     public class BeatManager : MonoBehaviour
     {
+        public static BeatManager instance;
+
         [Header("Components")]
         public GameManager gm;
         public HPManager hp;
@@ -26,8 +27,10 @@ namespace InGame.Game.Spawn
 
         [Header("Valuables")]
         public float secondHeight;
+
         public float fieldLength;
         public float fieldCrossTime;
+
         public float maxDistance;
         public List<SpawnPointScript> spawnPoints;
 
@@ -44,7 +47,22 @@ namespace InGame.Game.Spawn
         
 
 
-        public float CubeSpeed
+        public float LineLengthMultiplier
+        {
+            get
+            {
+                return gm.difficulty.speed * speedModifier / asource.pitch;
+            }
+        }
+        /// <summary>Cube speed per frame</summary>
+        public float CubeSpeedPerFrame
+        {
+            get
+            {
+                return CubeSpeedPerSecond * Time.deltaTime;
+            }
+        }
+        public float CubeSpeedPerSecond
         {
             get
             {
@@ -56,33 +74,32 @@ namespace InGame.Game.Spawn
                 float speed = distance / time;
                 speed *= dspeed;
 
-                return speed * Time.deltaTime * asource.pitch * speedModifier;
+                return speed * asource.pitch * speedModifier;
             }
         }
         
 
         /// <summary>
-        /// Modifier of <see cref="CubeSpeed"/> based on selected Mods
+        /// Modifier of <see cref="CubeSpeedPerFrame"/> based on selected Mods
         /// </summary>
         private float speedModifier = 1;
 
 
 
-        private float playAreaZ;
+       
         private float firstCubeTime, lastCubeTime;
 
+        public float playAreaZ;
         private float cubesSpeed;
 
-        private readonly Dictionary<int, Vector3> inputTouchesStartPoses = new Dictionary<int, Vector3>();
-        private readonly Dictionary<int, Vector3> inputTouchesPrevPoses = new Dictionary<int, Vector3>();
-
-        private readonly bool isEditor = Application.isEditor;
-
-        private Vector3 prevMousePos;
 
 
 
 
+        private void Awake()
+        {
+            instance = this;
+        }
 
 
 
@@ -212,150 +229,7 @@ namespace InGame.Game.Spawn
             //return cls.time + timeOffset;
         }
 
-        public void SabersUpdate()
-        {
-            bool r = false, l = false; // Включение и выключение мечей
-
-            if (isEditor)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    if (!inputTouchesStartPoses.ContainsKey(0))
-                    {
-                        inputTouchesStartPoses.Add(0, Input.mousePosition);
-                    }
-                    else
-                    {
-                        inputTouchesStartPoses[0] = Input.mousePosition;
-                    }
-
-                }
-                else if (Input.GetMouseButton(0))
-                {
-                    if (inputTouchesStartPoses[0].x >= Screen.width / 2f)
-                    {
-                        r = true;
-                        gm.rightSaber.SetSword(Input.mousePosition);
-                    }
-                    else
-                    {
-                        l = true;
-                        gm.leftSaber.SetSword(Input.mousePosition);
-                    }
-                }
-
-                RaycastSaber(Input.mousePosition, prevMousePos, r ? 1 : l ? -1 : 0);
-                prevMousePos = Input.mousePosition;
-            }
-            else
-            {
-                for (int i = 0; i < Input.touches.Length; i++)
-                {
-                    int saberSide = 0;
-                    int id = Input.touches[i].fingerId;
-
-                    if (Input.touches[i].phase == TouchPhase.Began)
-                    {
-                        if (!inputTouchesStartPoses.ContainsKey(id))
-                        {
-                            inputTouchesStartPoses.Add(id, Input.touches[i].position);
-                            inputTouchesPrevPoses.Add(id, Input.touches[i].position);
-                        }
-                        else
-                        {
-                            inputTouchesStartPoses[id] = Input.touches[i].position;
-                        }
-
-                    }
-                    else if (Input.touches[i].phase != TouchPhase.Canceled && Input.touches[i].phase != TouchPhase.Ended)
-                    {
-                        if (inputTouchesStartPoses[id].x >= Screen.width / 2f)
-                        {
-                            r = true;
-                            gm.rightSaber.SetSword(Input.touches[i].position);
-                            saberSide = 1;
-                        }
-                        else
-                        {
-                            l = true;
-                            gm.leftSaber.SetSword(Input.touches[i].position);
-                            saberSide = -1;
-                        }
-                    }
-
-
-                    RaycastSaber(Input.touches[i].position, inputTouchesPrevPoses[id], saberSide);
-                    inputTouchesPrevPoses[id] = Input.touches[i].position;
-                }
-            }
-
-            r = hp.isAlive && r;
-            l = hp.isAlive && l;
-
-            gm.rightSaber.SetEnabled(r);
-            gm.leftSaber.SetEnabled(l);
-        }
-
-        void RaycastSaber(Vector3 screenPos, Vector3 prevScreenPos, int saberSide)
-        {
-            Vector3 dir = screenPos - prevScreenPos;
-
-            int samples = SettingsManager.Settings.Gameplay.HideSabers ? 1 : 4;
-            int offset = 100;
-            int xOffset = saberSide == -1 ? 14 : saberSide == 1 ? -14 : 0;
-
-            List<RaycastHit> hits = new List<RaycastHit>();
-            List<IBeat> cubesToPing = new List<IBeat>();
-            for (int i = 0; i < samples; i++)
-            {
-                int sampleOffset = offset * i;
-                int sampleXOffset = xOffset * i;
-
-                Ray ray = cam.ScreenPointToRay(screenPos + new Vector3(sampleXOffset, sampleOffset));
-
-                List<RaycastHit> raycasted = new List<RaycastHit>();
-                raycasted.AddRange(Physics.RaycastAll(ray, 100));
-
-                if (i == samples - 1)
-                {
-                    raycasted.RemoveAll(c => GetComponent<IBeat>()?.GetClass().type == BeatCubeClass.Type.Bomb);
-                }
-
-                hits.AddRange(raycasted);
-            }
-
-            foreach (RaycastHit hit in hits.Distinct().OrderBy(c => c.point.z))
-            {
-                
-                if (hit.point.z > playAreaZ + 10) continue;
-                IBeat beat = hit.transform.GetComponent<IBeat>();
-                if (beat == null)
-                {
-                    beat = hit.transform.parent.GetComponent<IBeat>();
-                }
-                
-
-                if (beat != null)
-                {
-                    if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
-                    {
-                        if(hit.point.z <= playAreaZ) cubesToPing.Add(beat);
-                    }
-                    else cubesToPing.Add(beat);
-                }
-            }
-
-
-            foreach (IBeat beat in cubesToPing.Distinct())
-            {
-                int beatSaberType = beat.GetClass().saberType;
-                if (beatSaberType == saberSide || beatSaberType == 0 || isEditor)
-                {
-                    beat.OnPoint(dir);
-                    break;
-                }
-            }
-        }
+        
 
         void CalculateField()
         {
@@ -365,13 +239,8 @@ namespace InGame.Game.Spawn
 
             fieldLength = distanceSpawnAndPlayArea + SettingsManager.Settings.Gameplay.CubesSuncOffset; // Длина поля в юнитах (где летят кубы)
             fieldCrossTime = 1.5f; // Время за которое куб должен преодолеть поле (в секундах)
-
-            //float mult = replay.cubesSpeed / replay.musicSpeed; 
-            //float mult = 1;
-            // scale для поля
-            // Чем больше игрок поставил скорость кубам, тем .... в жопу, потом разберусь с модами
-
-            //cubeSpeed = fieldLength * Time.deltaTime * mult; // Скорость куба (логично)
+            //fieldCrossTime = .5f; // Время за которое куб должен преодолеть поле (в секундах)
+            //fieldCrossTime = 1f; // Время за которое куб должен преодолеть поле (в секундах)
         }
 
 
@@ -401,8 +270,13 @@ namespace InGame.Game.Spawn
                 default:
                     prefab = null; break;
             }
+
+
             GameObject c = Instantiate(prefab);
             c.transform.name = prefab.name;
+            // Copensate error appeared due to limited fps
+            // Make offset to proper time
+            c.transform.position += new Vector3(0, 0, (asource.time - beat.time) * CubeSpeedPerSecond);
 
             IBeat cube = c.GetComponent<IBeat>();
 
@@ -491,11 +365,7 @@ namespace InGame.Game.Spawn
         {
             if (!asource.isPlaying) return false;
 
-            //UnityEngine.Debug.Log(ActiveBeats.Count);
-
             if (Beats == null) return true;
-            //if (Beats.Count == 0) return true;
-
             if (asource.time == 0) return false;
 
             if (Beats.Count == 0) return asource.time >= lastCubeTime + 2;

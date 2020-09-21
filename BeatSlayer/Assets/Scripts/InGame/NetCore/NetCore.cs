@@ -143,14 +143,8 @@ namespace GameNet
         // (Internal usage)
         static void CreateConnection()
         {
-            /*ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-            ServicePointManager.SecurityProtocol =
-                    SecurityProtocolType.Tls11;*/
-
             BuildConnection();
             SubcribeOnServerCalls();
-            SubcribeOnServerCallsManually();
-            //SubcribeOnClientInvokes();
             Connect();
         }
         
@@ -253,7 +247,6 @@ namespace GameNet
         // (Internal usage)
         static void SubcribeOnServerCalls()
         {
-            //return;
             Subs = new Subscriptions();
            
 
@@ -261,10 +254,8 @@ namespace GameNet
             foreach (var field in fields)
             {
                 Type t = field.FieldType;
-                //Debug.Log(" << " + field.Name);
                 conn.On(field.Name, t.GenericTypeArguments, (objects =>
                 {
-                    //Debug.Log("[CONNECTION ON] << " + field.Name);
                     FieldInfo info = typeof(Subscriptions).GetField(field.Name, BindingFlags.Public | BindingFlags.Instance);
 
                     object yourfield = info.GetValue(Subs);
@@ -278,64 +269,6 @@ namespace GameNet
                 }));
             }
         }
-        static void SubcribeOnServerCallsManually()
-        {
-            return;
-            Debug.Log(" > Sub on server calls (manually)");
-            //HubConnectionBindExtensions.BindOnInterface<ISubs>(conn, Subs.OnTest, Subs.OnTest)
-            conn.On("OnTest2", () =>
-            {
-                Debug.Log(" << Manually on test2");
-                Subs.OnTest();
-            });
-            conn.On<int>("OnTestPar", (int i) =>
-            {
-                Debug.Log(" << Manually on OnTestPar with " + i);
-                Subs.OnTest();
-            });
-
-            conn.On<OperationMessage>(nameof(Subs.Accounts_OnLogIn), (op) =>
-            {
-                Debug.Log(" << Manualy on log in\n" + JsonConvert.SerializeObject(op, Formatting.Indented));
-                Subs.Accounts_OnLogIn(op);
-            });
-            conn.On<int>("OnOnlineChange", (i) =>
-            {
-                Debug.Log(" << Manually on online change\n" + i);
-                Subs.OnOnlineChange(i);
-            });
-            conn.On<string>(nameof(Subs.OnJoinGroup), (str) =>
-            {
-                Debug.Log(" << Manually on join group\n" + str);
-                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.OnJoinGroup(str));
-            });
-            conn.On<List<ChatGroupData>>(nameof(Subs.OnGetGroups), (ls) =>
-            {
-                Debug.Log(" << Manually on get groups\n" + ls.Count);
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    Subs.OnGetGroups(ls);
-                });
-                
-            });
-            conn.On<string>(nameof(Subs.OnSendChatMessage), (str) =>
-            {
-                Debug.Log(" << Manually OnSendChatMessage\n" + str);
-                Subs.OnSendChatMessage(str);
-            });
-            conn.On(nameof(Subs.Friends_OnGetFriends), (List<AccountData> ls) =>
-            {
-                Debug.Log(" << Manually Friends_OnGetFriends\n" + ls.Count);
-                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.Friends_OnGetFriends(ls));
-            });
-            conn.On(nameof(Subs.Accounts_OnGetAvatar), (byte[] bytes) =>
-            {
-                Debug.Log(" << Manually Accounts_OnGetAvatar\n");
-                UnityMainThreadDispatcher.Instance().Enqueue(() => Subs.Accounts_OnGetAvatar(bytes));
-            });
-        }
-
-
         #endregion
 
 

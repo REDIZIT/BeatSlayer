@@ -16,13 +16,13 @@ public class BeatLine : MonoBehaviour, IBeat
     public Transform cylinder;
     public ParticleSystem psystem;
 
-    float capMax;
-    float lineEndTime;
+    float lineEndPosition;
+    float lineTime;
     public float secondCapRoadPos;
 
 
     public float SpeedMultiplier { get; set; }
-    public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
+    public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
 
 
     public Transform firstAnimCap, secondAnimCap;
@@ -50,17 +50,18 @@ public class BeatLine : MonoBehaviour, IBeat
         secondCapRotation = new Vector3(GetRandom(), GetRandom(), GetRandom());
 
 
-        lineEndTime = cls.linePoints == null || cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
+        lineTime = cls.linePoints == null || cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
 
-        if (lineEndTime == 0)
+        if (lineTime == 0)
         {
-            lineEndTime = 1;
+            lineTime = 1;
             Debug.LogError("Line BUG! Line end time is zero! Value / 0 = Infinity = Unity BAG!!");
         }
 
         //capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
 
-        capMax = lineEndTime * (bm.fieldLength / bm.fieldCrossTime) / CurrentSpeed;
+        //lineEndPosition = lineTime * bm.CubeSpeedPerSecond;
+        lineEndPosition = lineTime * bm.fieldLength * bm.LineLengthMultiplier;
         //Debug.Log($"{capMax} = {lineEndTime} * ({bm.fieldLength} / {bm.fieldCrossTime}) / {CurrentSpeed}");
     }
 
@@ -77,7 +78,7 @@ public class BeatLine : MonoBehaviour, IBeat
     void Movement()
     {
         transform.position += new Vector3(0, 0, -CurrentSpeed);
-        totalDist += CurrentSpeed * SpeedMultiplier;
+        totalDist += CurrentSpeed;
         if (firstCap.position.z <= bm.maxDistance)
         {
             gm.MissedBeatCube(this);
@@ -89,22 +90,20 @@ public class BeatLine : MonoBehaviour, IBeat
         // Cap speed in units/frame
         float capSpeed = CurrentSpeed;
         
-        ///Debug.Log("Line: bm.CubeSpeed * cls.speed: " + bm.CubeSpeed * cls.speed);
-        //float capMax = lineEndTime * bm.fieldLength; 
         /// not field length because lines are more longer than should be due to
         /// cube can pass field faster than one second and we can just multiplay seconds on field len
         
 
         // Offset to selected road second cap at spawn
-        float capRoadOffsetTime = capMax / capSpeed;
+        float capRoadOffsetTime = lineEndPosition / capSpeed;
         float capRoadOffsetDistance = secondCapRoadPos - transform.position.x;
         float capRoadOffsetSpeed = capRoadOffsetDistance / capRoadOffsetTime;
 
 
         secondCap.position += new Vector3(capRoadOffsetSpeed, 0, capSpeed);
-        if(secondCap.localPosition.z > capMax)
+        if(secondCap.localPosition.z > lineEndPosition)
         {
-            secondCap.localPosition = new Vector3(0, secondCap.localPosition.y, capMax);
+            secondCap.localPosition = new Vector3(0, secondCap.localPosition.y, lineEndPosition);
             secondCap.position = new Vector3(secondCapRoadPos, secondCap.position.y, secondCap.position.z);
         }
 
@@ -170,7 +169,7 @@ public class BeatLine : MonoBehaviour, IBeat
         //float capMax = lineEndTime * bm.fieldLength;
 
         // Offset to selected road second cap at spawn
-        float capRoadOffsetTime = capMax / CurrentSpeed;
+        float capRoadOffsetTime = lineEndPosition / CurrentSpeed;
         float capRoadOffsetDistance = secondCapRoadPos - transform.position.x;
         float capRoadOffsetSpeed = capRoadOffsetDistance / capRoadOffsetTime;
 
@@ -178,7 +177,7 @@ public class BeatLine : MonoBehaviour, IBeat
         psystem.Play();
 
         firstCap.transform.localPosition += new Vector3(capRoadOffsetSpeed, 0, CurrentSpeed);
-        if(firstCap.transform.localPosition.z >= capMax)
+        if(firstCap.transform.localPosition.z >= lineEndPosition)
         {
             OnLineSliced();
         }

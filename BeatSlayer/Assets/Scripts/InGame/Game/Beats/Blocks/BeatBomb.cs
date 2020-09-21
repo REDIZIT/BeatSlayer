@@ -15,7 +15,7 @@ namespace InGame.Game.Beats.Blocks
         /// Multiplier of cube calculated speed from 0 to 1
         /// </summary>
         public float SpeedMultiplier { get; set; }
-        public float CurrentSpeed { get { return bm.CubeSpeed * cls.speed; } }
+        public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
 
 
         [SerializeField] private ParticleSystem bombParticleSystem;
