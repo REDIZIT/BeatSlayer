@@ -34,7 +34,7 @@ public class SpectrumVisualizer : MonoBehaviour
 
     public void Start()
     {
-        /*if (SSytem.instance.GetBool("MenuMusic"))
+        /*if (SSytem.GetBool("MenuMusic"))
         {
             if(!isInited)
             {

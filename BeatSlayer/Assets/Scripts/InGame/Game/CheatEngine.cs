@@ -111,6 +111,8 @@ public class CheatEngine : MonoBehaviour
                         if (makeMisses > 0) continue;
                     }
 
+                    if (cube.GetClass().type == BeatCubeClass.Type.Bomb) continue;
+
                     cube.OnPoint(Vector2.zero, true);
                 }
             }

@@ -16,26 +16,26 @@ namespace InGame.Settings.Old
 
         public bool RequestSettingBool(string key)
         {
-            return SSytem.instance.GetBool(key);
+            return SSytem.GetBool(key);
         }
         public float RequestSettingFloat(string key)
         {
-            return SSytem.instance.GetFloat(key);
+            return SSytem.GetFloat(key);
         }
         public int RequestSettingInt(string key)
         {
-            return SSytem.instance.GetInt(key);
+            return SSytem.GetInt(key);
         }
 
 
 
         public void SetSetting(string key, bool value)
         {
-            SSytem.instance.SetBool(key, value);
+            SSytem.SetBool(key, value);
         }
         public void SetSetting(string key, float value)
         {
-            SSytem.instance.SetFloat(key, value);
+            SSytem.SetFloat(key, value);
         }
 
         public float CalculateScoreMultiplier()
@@ -50,10 +50,10 @@ namespace InGame.Settings.Old
 
         public static float GetScoreMultiplier()
         {
-            float cubesSpeed = SSytem.instance.GetFloat("CubesSpeed") / 10f;
-            float musicSpeed = SSytem.instance.GetFloat("MusicSpeed") / 10f;
-            bool noArrows = SSytem.instance.GetBool("NoArrows");
-            bool noLines = SSytem.instance.GetBool("NoLines");
+            float cubesSpeed = SSytem.GetFloat("CubesSpeed") / 10f;
+            float musicSpeed = SSytem.GetFloat("MusicSpeed") / 10f;
+            bool noArrows = SSytem.GetBool("NoArrows");
+            bool noLines = SSytem.GetBool("NoLines");
 
             return cubesSpeed * musicSpeed * (noArrows ? 0.4f : 1) * (noLines ? 0.8f : 1);
         }

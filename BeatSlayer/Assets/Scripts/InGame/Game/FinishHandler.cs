@@ -25,10 +25,9 @@ public class FinishHandler : MonoBehaviour
     public HPManager hp;
 
     public AudioManager audioManager { get { return GetComponent<AudioManager>(); } }
-    public AdvancedSaveManager prefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
     public CompactLeaderboard leaderboard;
-    public FireworksSystem fireworksSystem;
+    public FireworkSSytem fireworkSSytem;
 
 
 
@@ -128,7 +127,7 @@ public class FinishHandler : MonoBehaviour
                 int addCoins = Mathf.RoundToInt(replay.Score / 16f * gm.scoringManager.maxCombo / 2f * gm.scoringManager.scoreMultiplier);
 
                 Payload.Account.Coins = coins + addCoins;
-                prefsManager.Save();
+                AdvancedSaveManager.Save();
             }
 
 
@@ -256,7 +255,7 @@ public class FinishHandler : MonoBehaviour
 
         if (bestReplay != null && replay.Score > bestReplay.Score)
         {
-            fireworksSystem.StartEmitting();
+            fireworkSSytem.StartEmitting();
             recordText.SetActive(true);
         }
 
@@ -279,7 +278,7 @@ public class FinishHandler : MonoBehaviour
 
         if (data.Grade == Grade.SS || data.Grade == Grade.S)
         {
-            fireworksSystem.StartEmitting();
+            fireworkSSytem.StartEmitting();
         }
 
         

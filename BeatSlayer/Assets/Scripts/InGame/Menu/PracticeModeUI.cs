@@ -46,8 +46,8 @@ namespace InGame.Menu
         public void OnPracticeBtnClick()
         {
             // !!!!!  Set defaults coz of mods  !!!!!
-            SSytem.instance.SetInt("CubesSpeed", 10);
-            SSytem.instance.SetInt("MusicSpeed", 10);
+            SSytem.SetInt("CubesSpeed", 10);
+            SSytem.SetInt("MusicSpeed", 10);
 
 
             var parameters = SceneloadParameters.AuthorMusicPreset(mapInfo, difficultyInfo, 

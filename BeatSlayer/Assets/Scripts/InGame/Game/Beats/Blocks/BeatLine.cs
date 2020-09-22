@@ -60,8 +60,8 @@ public class BeatLine : MonoBehaviour, IBeat
 
         //capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
 
-        //lineEndPosition = lineTime * bm.CubeSpeedPerSecond;
-        lineEndPosition = lineTime * bm.fieldLength * bm.LineLengthMultiplier;
+        lineEndPosition = lineTime * /*bm.CubeSpeedPerSecond*/ bm.LineLengthMultiplier;
+        //lineEndPosition = lineTime * bm.fieldLength * bm.LineLengthMultiplier;
         //Debug.Log($"{capMax} = {lineEndTime} * ({bm.fieldLength} / {bm.fieldCrossTime}) / {CurrentSpeed}");
     }
 

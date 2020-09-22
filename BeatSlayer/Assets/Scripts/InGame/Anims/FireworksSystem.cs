@@ -3,7 +3,7 @@
 namespace InGame.Animations
 {
     [RequireComponent(typeof(ParticleSystem))]
-    public class FireworksSystem : MonoBehaviour
+    public class FireworkSSytem : MonoBehaviour
     {
         public ParticleSystem ps;
 

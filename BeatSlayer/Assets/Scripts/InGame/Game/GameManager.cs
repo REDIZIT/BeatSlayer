@@ -40,7 +40,6 @@ public class GameManager : MonoBehaviour
     public AccountManager accountManager;
     public AudioManager audioManager;
     public FinishHandler finishHandler;
-    public AdvancedSaveManager prefsManager;
     public GameUIManager UIManager;
     public BeatManager beatManager;
     public ScoringManager scoringManager;
@@ -277,7 +276,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateScene()
     {
-        GameObject sc = Instantiate(scenes[prefsManager.prefs.selectedMapId]);
+        GameObject sc = Instantiate(scenes[AdvancedSaveManager.prefs.selectedMapId]);
         sc.transform.position = new Vector3(0, 0, 0);
     }
     private void InitProject()
@@ -397,13 +396,13 @@ public class GameManager : MonoBehaviour
 
     void StartForUI()
     {
-        if (prefsManager.prefs.skillSelected == -1)
+        if (AdvancedSaveManager.prefs.skillSelected == -1)
         {
             skillImg.SetActive(false);
             return;
         }
-        skillImg.transform.GetChild(0).GetComponent<Image>().sprite = skillSprites[prefsManager.prefs.skillSelected];
-        skillImg.transform.GetChild(2).GetComponent<Text>().text = "x" + prefsManager.prefs.skills[prefsManager.prefs.skillSelected].count;
+        skillImg.transform.GetChild(0).GetComponent<Image>().sprite = skillSprites[AdvancedSaveManager.prefs.skillSelected];
+        skillImg.transform.GetChild(2).GetComponent<Text>().text = "x" + AdvancedSaveManager.prefs.skills[AdvancedSaveManager.prefs.skillSelected].count;
     }
 
 
@@ -648,20 +647,20 @@ public class GameManager : MonoBehaviour
     #region Skills
     void UseSkill()
     {
-        if (prefsManager.prefs.skillSelected == -1) return;
-        if (prefsManager.prefs.skills[prefsManager.prefs.skillSelected].count > 0)
+        if (AdvancedSaveManager.prefs.skillSelected == -1) return;
+        if (AdvancedSaveManager.prefs.skills[AdvancedSaveManager.prefs.skillSelected].count > 0)
         {
-            if (prefsManager.prefs.skillSelected == 0) TimeTravel();
-            else if (prefsManager.prefs.skillSelected == 1) Explode();
+            if (AdvancedSaveManager.prefs.skillSelected == 0) TimeTravel();
+            else if (AdvancedSaveManager.prefs.skillSelected == 1) Explode();
 
-            skillImg.transform.GetChild(2).GetComponent<Text>().text = "x" + prefsManager.prefs.skills[prefsManager.prefs.skillSelected].count;
+            skillImg.transform.GetChild(2).GetComponent<Text>().text = "x" + AdvancedSaveManager.prefs.skills[AdvancedSaveManager.prefs.skillSelected].count;
         }
     }
 
     void TimeTravel()
     {
-        prefsManager.prefs.skills[prefsManager.prefs.skillSelected].count--;
-        prefsManager.Save();
+        AdvancedSaveManager.prefs.skills[AdvancedSaveManager.prefs.skillSelected].count--;
+        AdvancedSaveManager.Save();
         StartCoroutine(TimeTravelling());
     }
     IEnumerator TimeTravelling()
@@ -713,8 +712,8 @@ public class GameManager : MonoBehaviour
         {
             cube.Destroy();
         }
-        prefsManager.prefs.skills[prefsManager.prefs.skillSelected].count--;
-        prefsManager.Save();
+        AdvancedSaveManager.prefs.skills[AdvancedSaveManager.prefs.skillSelected].count--;
+        AdvancedSaveManager.Save();
     }
     #endregion
 
@@ -795,7 +794,7 @@ public class GameManager : MonoBehaviour
 
     public void RateBtnUpdate()
     {
-        int state = prefsManager.prefs.GetRateState(trackname);
+        int state = AdvancedSaveManager.prefs.GetRateState(trackname);
 
         if (state != 0)
         {
@@ -810,14 +809,14 @@ public class GameManager : MonoBehaviour
     }
     public void OnRateTrackBtnClicked(GameObject btn)
     {
-        int state = prefsManager.prefs.GetRateState(trackname);
+        int state = AdvancedSaveManager.prefs.GetRateState(trackname);
         
 
         bool liked = btn.name == "LikeBtn";
 
         if (state == 0)
         {
-            prefsManager.prefs.SetRateState(trackname, liked ? 1 : -1);
+            AdvancedSaveManager.prefs.SetRateState(trackname, liked ? 1 : -1);
             
             //string trackname = project.author + "-" + project.name;
             DatabaseManager.SendStatistics(trackname, project.creatorNick, difficultyInfo.id, liked ? StatisticsKeyType.Like : StatisticsKeyType.Dislike);
@@ -829,7 +828,7 @@ public class GameManager : MonoBehaviour
             dislikeBtnImg.transform.GetChild(0).GetComponent<Image>().color = new Color32((byte)(!liked ? 145 : 34), 0, 0, 255);
         }
 
-        prefsManager.Save();
+        AdvancedSaveManager.Save();
     }
 
 

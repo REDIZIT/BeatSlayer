@@ -6,12 +6,8 @@ using UnityEngine.UI;
 public class MenuAudioManager : MonoBehaviour
 {
     public AudioSource asource;
-    public AdvancedSaveManager saveManager;
 
-    //public SpectrumVisualizer spectrum;
-    //public MonoBehaviour ispectrumObject;
     public LineSpectrumVisualizer spectrum;
-    //private ISpectrumVisualizer ispectrum;
 
     public Text audioText;
 
@@ -55,7 +51,7 @@ public class MenuAudioManager : MonoBehaviour
 
     public void OnSceneLoaded()
     {
-        //ThemeSongEnabled = SSytem.instance.GetBool("MenuMusic");
+        //ThemeSongEnabled = SSytem.GetBool("MenuMusic");
         ThemeSongEnabled = SettingsManager.Settings.Sound.MenuMusicEnabled;
         Volume = SettingsManager.Settings.Sound.MenuMusicVolume / 100f * 0.4f;
         asource.volume = Volume;

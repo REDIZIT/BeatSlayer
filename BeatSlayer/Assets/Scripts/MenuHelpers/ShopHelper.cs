@@ -65,8 +65,8 @@ public class ShopHelper : MonoBehaviour
     private void RefreshShop()
     {
         content = skillsScrollView.GetChild(0).GetChild(0);
-        skills = menuscript.PrefsManager.prefs.skills;
-        boosters = menuscript.PrefsManager.prefs.boosters;
+        skills = AdvancedSaveManager.prefs.skills;
+        boosters = AdvancedSaveManager.prefs.boosters;
 
         FillSabersView();
         FillEffectsView();
@@ -95,21 +95,21 @@ public class ShopHelper : MonoBehaviour
     {
         HelperUI.FillContent<SaberShopItem, SaberSO>(saberContent, sodb.sabers, (item, data) =>
         {
-            item.Refresh(data, menuscript.PrefsManager.prefs);
+            item.Refresh(data, AdvancedSaveManager.prefs);
         });
     }
     public void FillEffectsView()
     {
         HelperUI.FillContent<TailShopItem, TailSO>(effectsContent, sodb.tails, (item, data) =>
         {
-            item.Refresh(data, menuscript.PrefsManager.prefs);
+            item.Refresh(data, AdvancedSaveManager.prefs);
         });
     }
     public void FillLocationsView()
     {
         HelperUI.FillContent<LocationShopItem, LocationSO>(locationsContent, sodb.locations, (item, data) =>
         {
-            item.Refresh(data, menuscript.PrefsManager.prefs);
+            item.Refresh(data, AdvancedSaveManager.prefs);
         });
     }
 
@@ -119,21 +119,21 @@ public class ShopHelper : MonoBehaviour
     {
         HelperUI.RefreshContent<SaberShopItem, SaberSO>(saberContent, sodb.sabers, (item, data) =>
         {
-            item.Refresh(data, menuscript.PrefsManager.prefs);
+            item.Refresh(data, AdvancedSaveManager.prefs);
         });
     }
     public void RefreshEffectsView()
     {
         HelperUI.RefreshContent<TailShopItem, TailSO>(effectsContent, sodb.tails, (item, data) =>
         {
-            item.Refresh(data, menuscript.PrefsManager.prefs);
+            item.Refresh(data, AdvancedSaveManager.prefs);
         });
     }
     public void RefreshLocationsView()
     {
         HelperUI.RefreshContent<LocationShopItem, LocationSO>(locationsContent, sodb.locations, (item, data) =>
         {
-            item.Refresh(data, menuscript.PrefsManager.prefs);
+            item.Refresh(data, AdvancedSaveManager.prefs);
         });
     }
 
@@ -185,42 +185,42 @@ public class ShopHelper : MonoBehaviour
 
     public void SelectSaber(int id, SaberHand hand)
     {
-        //menuscript.prefsManager.prefs.selectedSaber = id;
+        //AdvancedSaveManager.prefs.selectedSaber = id;
         if (hand == SaberHand.Both)
         {
-            menuscript.PrefsManager.prefs.selectedLeftSaberId = id;
-            menuscript.PrefsManager.prefs.selectedRightSaberId = id;
+            AdvancedSaveManager.prefs.selectedLeftSaberId = id;
+            AdvancedSaveManager.prefs.selectedRightSaberId = id;
         }
         else if (hand == SaberHand.Left)
         {
-            menuscript.PrefsManager.prefs.selectedLeftSaberId = id;
+            AdvancedSaveManager.prefs.selectedLeftSaberId = id;
 
             // If both -> left
-            if (menuscript.PrefsManager.prefs.selectedRightSaberId == id)
+            if (AdvancedSaveManager.prefs.selectedRightSaberId == id)
             {
-                menuscript.PrefsManager.prefs.selectedRightSaberId = 0;
+                AdvancedSaveManager.prefs.selectedRightSaberId = 0;
             }
         }
         else
         {
-            //menuscript.prefsManager.prefs.selectedLeftSaberId = -1;
-            if (menuscript.PrefsManager.prefs.selectedLeftSaberId == id) menuscript.PrefsManager.prefs.selectedLeftSaberId = 0;
-            menuscript.PrefsManager.prefs.selectedRightSaberId = id;
+            //AdvancedSaveManager.prefs.selectedLeftSaberId = -1;
+            if (AdvancedSaveManager.prefs.selectedLeftSaberId == id) AdvancedSaveManager.prefs.selectedLeftSaberId = 0;
+            AdvancedSaveManager.prefs.selectedRightSaberId = id;
         }
 
-        menuscript.PrefsManager.Save();
+        AdvancedSaveManager.Save();
         RefreshSabersView();
     }
     public void SelectSaberEffectClick(int id)
     {
-        menuscript.PrefsManager.prefs.selectedSaberEffect = id;
-        menuscript.PrefsManager.Save();
+        AdvancedSaveManager.prefs.selectedSaberEffect = id;
+        AdvancedSaveManager.Save();
         RefreshEffectsView();
     }
     public void SelectLocation(LocationSO so)
     {
-        menuscript.PrefsManager.prefs.selectedMapId = so.id;
-        menuscript.PrefsManager.Save();
+        AdvancedSaveManager.prefs.selectedMapId = so.id;
+        AdvancedSaveManager.Save();
         RefreshLocationsView();
     }
 
@@ -245,14 +245,14 @@ public class ShopHelper : MonoBehaviour
 
         List<PurchaseModel> upgradedList = await NetCore.ServerActions.Shop.UpgradePurchases(
             Payload.Account.Nick,
-            menuscript.PrefsManager.prefs.boughtSabers, 
-            menuscript.PrefsManager.prefs.boughtSaberEffects,
+            AdvancedSaveManager.prefs.boughtSabers,
+            AdvancedSaveManager.prefs.boughtSaberEffects,
             new bool[] {
                 true,
-                menuscript.PrefsManager.prefs.mapUnlocked0,
-                menuscript.PrefsManager.prefs.mapUnlocked1,
-                menuscript.PrefsManager.prefs.mapUnlocked2,
-                menuscript.PrefsManager.prefs.mapUnlocked3,
+                AdvancedSaveManager.prefs.mapUnlocked0,
+                AdvancedSaveManager.prefs.mapUnlocked1,
+                AdvancedSaveManager.prefs.mapUnlocked2,
+                AdvancedSaveManager.prefs.mapUnlocked3,
             });
         Debug.Log(JsonConvert.SerializeObject(upgradedList, Formatting.Indented));
 
@@ -270,10 +270,10 @@ public class ShopHelper : MonoBehaviour
         Transform grid = colorselect.GetChild(0).GetChild(1).GetChild(0);
 
         Color saberColor;
-        if (selectingColorForSaber == 0) saberColor = SSytem.instance.leftColor;
-        else if (selectingColorForSaber == 1) saberColor = SSytem.instance.rightColor;
-        else if (selectingColorForSaber == 2) saberColor = SSytem.instance.leftDirColor;
-        else saberColor = SSytem.instance.rightDirColor;
+        if (selectingColorForSaber == 0) saberColor = SSytem.leftColor;
+        else if (selectingColorForSaber == 1) saberColor = SSytem.rightColor;
+        else if (selectingColorForSaber == 2) saberColor = SSytem.leftDirColor;
+        else saberColor = SSytem.rightDirColor;
 
         for (int i = 0; i < grid.childCount; i++)
         {
@@ -285,11 +285,11 @@ public class ShopHelper : MonoBehaviour
     }
     public void SelectColorBtnClick(Image img)
     {
-        if (selectingColorForSaber == 0) SSytem.instance.leftColor = img.color;
-        else if (selectingColorForSaber == 1) SSytem.instance.rightColor = img.color;
-        else if (selectingColorForSaber == 2) SSytem.instance.leftDirColor = img.color;
-        else SSytem.instance.rightDirColor = img.color;
-        menuscript.PrefsManager.Save();
+        if (selectingColorForSaber == 0) SSytem.leftColor = img.color;
+        else if (selectingColorForSaber == 1) SSytem.rightColor = img.color;
+        else if (selectingColorForSaber == 2) SSytem.leftDirColor = img.color;
+        else SSytem.rightDirColor = img.color;
+        AdvancedSaveManager.Save();
         colorselect.gameObject.SetActive(false);
     }
 

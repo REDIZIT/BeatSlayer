@@ -311,19 +311,14 @@ namespace Multiplayer.Accounts
         {
             if (Payload.Account == null) return;
 
-            if(menu.PrefsManager == null)
-            {
-                Debug.LogError("SyncCoins: prefsmanager is null");
-                return;
-            }
-            if (menu.PrefsManager.prefs == null)
+            if (AdvancedSaveManager.prefs == null)
             {
                 Debug.LogError("SyncCoins: prefsmanager.prefs is null");
                 return;
             }
 
 
-            int coins = menu.PrefsManager.prefs.coins;
+            int coins = AdvancedSaveManager.prefs.coins;
 
             if (Payload.Account.Coins == -1)
             {

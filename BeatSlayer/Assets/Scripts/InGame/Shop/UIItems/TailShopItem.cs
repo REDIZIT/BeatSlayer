@@ -113,62 +113,62 @@ namespace InGame.Shop
 
         private void DisableSelection()
         {
-            Colorize(rightOutline, SSytem.instance.rightColor, false);
-            Colorize(leftOutline, SSytem.instance.leftColor, false);
+            Colorize(rightOutline, SSytem.rightColor, false);
+            Colorize(leftOutline, SSytem.leftColor, false);
             Colorize(bothOutline, Color.white, false);
 
-            Colorize(rightImage, SSytem.instance.rightColor, false);
-            Colorize(leftImage, SSytem.instance.leftColor, false);
-            Colorize(bothLeftImage, SSytem.instance.leftColor, false);
-            Colorize(bothRightImage, SSytem.instance.rightColor, false);
+            Colorize(rightImage, SSytem.rightColor, false);
+            Colorize(leftImage, SSytem.leftColor, false);
+            Colorize(bothLeftImage, SSytem.leftColor, false);
+            Colorize(bothRightImage, SSytem.rightColor, false);
 
-            ColorizeBackground(rightBg, SSytem.instance.rightColor, false);
-            ColorizeBackground(leftBg, SSytem.instance.leftColor, false);
+            ColorizeBackground(rightBg, SSytem.rightColor, false);
+            ColorizeBackground(leftBg, SSytem.leftColor, false);
             ColorizeBackground(bothBg, Color.white, false);
         }
         private void EnableSelectionBoth()
         {
-            Colorize(rightOutline, SSytem.instance.rightColor, false);
-            Colorize(leftOutline, SSytem.instance.leftColor, false);
+            Colorize(rightOutline, SSytem.rightColor, false);
+            Colorize(leftOutline, SSytem.leftColor, false);
             Colorize(bothOutline, Color.white, true);
 
-            Colorize(rightImage, SSytem.instance.rightColor, false);
-            Colorize(leftImage, SSytem.instance.leftColor, false);
-            Colorize(bothLeftImage, SSytem.instance.leftColor, true);
-            Colorize(bothRightImage, SSytem.instance.rightColor, true);
+            Colorize(rightImage, SSytem.rightColor, false);
+            Colorize(leftImage, SSytem.leftColor, false);
+            Colorize(bothLeftImage, SSytem.leftColor, true);
+            Colorize(bothRightImage, SSytem.rightColor, true);
 
-            ColorizeBackground(rightBg, SSytem.instance.rightColor, false);
-            ColorizeBackground(leftBg, SSytem.instance.leftColor, false);
+            ColorizeBackground(rightBg, SSytem.rightColor, false);
+            ColorizeBackground(leftBg, SSytem.leftColor, false);
             ColorizeBackground(bothBg, Color.white, true);
         }
         private void EnableSelectionRight()
         {
-            Colorize(rightOutline, SSytem.instance.rightColor, true);
-            Colorize(leftOutline, SSytem.instance.leftColor, false);
+            Colorize(rightOutline, SSytem.rightColor, true);
+            Colorize(leftOutline, SSytem.leftColor, false);
             Colorize(bothOutline, Color.white, false);
 
-            Colorize(rightImage, SSytem.instance.rightColor, true);
-            Colorize(leftImage, SSytem.instance.leftColor, false);
-            Colorize(bothLeftImage, SSytem.instance.leftColor, false);
-            Colorize(bothRightImage, SSytem.instance.rightColor, false);
+            Colorize(rightImage, SSytem.rightColor, true);
+            Colorize(leftImage, SSytem.leftColor, false);
+            Colorize(bothLeftImage, SSytem.leftColor, false);
+            Colorize(bothRightImage, SSytem.rightColor, false);
 
-            ColorizeBackground(rightBg, SSytem.instance.rightColor, true);
-            ColorizeBackground(leftBg, SSytem.instance.leftColor, false);
+            ColorizeBackground(rightBg, SSytem.rightColor, true);
+            ColorizeBackground(leftBg, SSytem.leftColor, false);
             ColorizeBackground(bothBg, Color.white, false);
         }
         private void EnableSelectionLeft()
         {
-            Colorize(rightOutline, SSytem.instance.rightColor, false);
-            Colorize(leftOutline, SSytem.instance.leftColor, true);
+            Colorize(rightOutline, SSytem.rightColor, false);
+            Colorize(leftOutline, SSytem.leftColor, true);
             Colorize(bothOutline, Color.white, false);
 
-            Colorize(rightImage, SSytem.instance.rightColor, false);
-            Colorize(leftImage, SSytem.instance.leftColor, true);
-            Colorize(bothLeftImage, SSytem.instance.leftColor, false);
-            Colorize(bothRightImage, SSytem.instance.rightColor, false);
+            Colorize(rightImage, SSytem.rightColor, false);
+            Colorize(leftImage, SSytem.leftColor, true);
+            Colorize(bothLeftImage, SSytem.leftColor, false);
+            Colorize(bothRightImage, SSytem.rightColor, false);
 
-            ColorizeBackground(rightBg, SSytem.instance.rightColor, false);
-            ColorizeBackground(leftBg, SSytem.instance.leftColor, true);
+            ColorizeBackground(rightBg, SSytem.rightColor, false);
+            ColorizeBackground(leftBg, SSytem.leftColor, true);
             ColorizeBackground(bothBg, Color.white, false);
         }
 

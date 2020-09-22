@@ -51,7 +51,15 @@ namespace InGame.Game.Spawn
         {
             get
             {
-                return gm.difficulty.speed * speedModifier / asource.pitch;
+                //return gm.difficulty.speed * speedModifier / asource.pitch;
+
+
+
+                //float dspeed = gm.difficulty.speed;
+                float speed = fieldLength / fieldCrossTime;
+                //speed /= dspeed;
+
+                return speed * asource.pitch * speedModifier;
             }
         }
         /// <summary>Cube speed per frame</summary>
@@ -84,6 +92,10 @@ namespace InGame.Game.Spawn
         /// </summary>
         private float speedModifier = 1;
 
+        /// <summary>
+        /// Audio time - offset
+        /// </summary>
+        private float virtualTime;
 
 
        
@@ -100,7 +112,17 @@ namespace InGame.Game.Spawn
         {
             instance = this;
         }
-
+        private void Update()
+        {
+            if (gm.IsGameStartingMap)
+            {
+                virtualTime += asource.pitch * Time.deltaTime;
+            }
+            else
+            {
+                virtualTime = asource.time;
+            }
+        }
 
 
 
@@ -110,10 +132,10 @@ namespace InGame.Game.Spawn
 
             this.cubesSpeed = cubesSpeed;
 
-            leftSaberColor = SSytem.instance.leftColor * gm.prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
-            rightSaberColor = SSytem.instance.rightColor * gm.prefsManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
-            leftArrowColor = SSytem.instance.leftDirColor * gm.prefsManager.prefs.colorPower;
-            rightArrowColor = SSytem.instance.rightDirColor * gm.prefsManager.prefs.colorPower;
+            leftSaberColor = SSytem.leftColor * AdvancedSaveManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
+            rightSaberColor = SSytem.rightColor * AdvancedSaveManager.prefs.colorPower * new Color(2f, 0.5f, 0.5f);
+            leftArrowColor = SSytem.leftDirColor * AdvancedSaveManager.prefs.colorPower;
+            rightArrowColor = SSytem.rightDirColor * AdvancedSaveManager.prefs.colorPower;
 
             secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
 
@@ -138,7 +160,10 @@ namespace InGame.Game.Spawn
             CalculateField();
 
             if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) gm.audioManager.spectrumAsource.Play();
-            
+
+            virtualTime = -fieldCrossTime;
+            gm.IsGameStartingMap = true;
+
             yield return new WaitForSeconds(fieldCrossTime);
 
             if (!isTutorial)
@@ -201,7 +226,7 @@ namespace InGame.Game.Spawn
 
             foreach (BeatCubeClass cls in Beats)
             {
-                if(asource.time >= GetNormalizedTime(cls))
+                if(virtualTime >= GetNormalizedTime(cls))
                 {
                     SpawnBeatCube(cls);
 
@@ -241,6 +266,8 @@ namespace InGame.Game.Spawn
             fieldCrossTime = 1.5f; // Время за которое куб должен преодолеть поле (в секундах)
             //fieldCrossTime = .5f; // Время за которое куб должен преодолеть поле (в секундах)
             //fieldCrossTime = 1f; // Время за которое куб должен преодолеть поле (в секундах)
+            //fieldCrossTime = 2f; // Время за которое куб должен преодолеть поле (в секундах)
+            //fieldCrossTime = 5f; // Время за которое куб должен преодолеть поле (в секундах)
         }
 
 

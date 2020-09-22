@@ -36,16 +36,18 @@ namespace InGame.Game.Sabers
         {
             instance = this;
             cam = Camera.main;
+
+            Color leftSaberColor = SSytem.leftColor * (1 + SSytem.GlowPowerSaberLeft / 25f);
+            Color rightSaberColor = SSytem.rightColor * (1 + SSytem.GlowPowerSaberRight / 25f);
+
+            float trailLifeTime = SSytem.TrailLength / 100f * 0.4f;
+
+            leftSaber.Init(leftSaberColor, AdvancedSaveManager.prefs.selectedLeftSaberId, AdvancedSaveManager.prefs.selectedSaberEffect, trailLifeTime);
+            rightSaber.Init(rightSaberColor, AdvancedSaveManager.prefs.selectedRightSaberId, AdvancedSaveManager.prefs.selectedSaberEffect, trailLifeTime);
         }
         private void Start()
         {
-            Color leftSaberColor = SSytem.instance.leftColor * (1 + SSytem.instance.GlowPowerSaberLeft / 25f);
-            Color rightSaberColor = SSytem.instance.rightColor * (1 + SSytem.instance.GlowPowerSaberRight / 25f);
-
-            float trailLifeTime = SSytem.instance.TrailLength / 100f * 0.4f;
-
-            leftSaber.Init(leftSaberColor, gm.prefsManager.prefs.selectedLeftSaberId, gm.prefsManager.prefs.selectedSaberEffect, trailLifeTime);
-            rightSaber.Init(rightSaberColor, gm.prefsManager.prefs.selectedRightSaberId, gm.prefsManager.prefs.selectedSaberEffect, trailLifeTime);
+            
         }
         private void Update()
         {

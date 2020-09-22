@@ -71,23 +71,23 @@ public class BeatCube : MonoBehaviour, IBeat
 
             if(cls.saberType == 1)
             {
-                //saberColor *= (1 + SSytem.instance.GlowPowerCubeRight / 15f);
+                //saberColor *= (1 + SSytem.GlowPowerCubeRight / 15f);
 
-                //saberColor *= 1 + Mathf.Pow(2, SSytem.instance.GlowPowerCubeRight / 75f);
+                //saberColor *= 1 + Mathf.Pow(2, SSytem.GlowPowerCubeRight / 75f);
 
                 float intensity = (saberColor.r + saberColor.g + saberColor.b) / 3f;
-                float factor = (1 + SSytem.instance.GlowPowerCubeRight / 25f) / intensity;
+                float factor = (1 + SSytem.GlowPowerCubeRight / 25f) / intensity;
                 saberColor *= new Color(saberColor.r * factor, saberColor.g * factor, saberColor.b * factor, saberColor.a);
             }
             else
             {
-                //saberColor *= (1 + SSytem.instance.GlowPowerCubeLeft / 15f);
+                //saberColor *= (1 + SSytem.GlowPowerCubeLeft / 15f);
 
-                //saberColor *= 1 + Mathf.Pow(2, SSytem.instance.GlowPowerCubeLeft / 75f);
+                //saberColor *= 1 + Mathf.Pow(2, SSytem.GlowPowerCubeLeft / 75f);
 
                 float intensity = (saberColor.r + saberColor.g + saberColor.b) / 3f;
                 //float factor = 1f / intensity;
-                float factor = (1 + SSytem.instance.GlowPowerCubeRight / 25f) / intensity;
+                float factor = (1 + SSytem.GlowPowerCubeRight / 25f) / intensity;
                 saberColor *= new Color(saberColor.r * factor, saberColor.g * factor, saberColor.b * factor, saberColor.a);
             }
 

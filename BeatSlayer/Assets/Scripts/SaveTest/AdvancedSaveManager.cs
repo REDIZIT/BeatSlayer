@@ -6,11 +6,10 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class AdvancedSaveManager : MonoBehaviour
+public static class AdvancedSaveManager
 {
-    //public AdvancedSave save;
-    Prefs _prefs;
-    public Prefs prefs
+    static Prefs _prefs;
+    public static Prefs prefs
     {
         get
         {
@@ -23,17 +22,17 @@ public class AdvancedSaveManager : MonoBehaviour
         }
     }
 
-    BinaryFormatter formatter = new BinaryFormatter();
+    static BinaryFormatter formatter = new BinaryFormatter();
 
     const string filename = "/save.bin";
     const string prevFilename = "/Prefs.bin";
 
-    private void Awake()
+    static AdvancedSaveManager()
     {
         Load();
     }
 
-    public void Save()
+    public static void Save()
     {
         //Debug.LogWarning("To save");
 
@@ -54,7 +53,7 @@ public class AdvancedSaveManager : MonoBehaviour
         }
     }
 
-    public void SaveDefault()
+    public static void SaveDefault()
     {
         using (Stream stream = File.Create(Application.persistentDataPath + filename))
         {
@@ -62,7 +61,7 @@ public class AdvancedSaveManager : MonoBehaviour
         }
     }
 
-    public void Load()
+    public static void Load()
     {
         // Загружен из памяти (возможны неточности)
         Prefs loaded;
@@ -148,7 +147,7 @@ public class AdvancedSaveManager : MonoBehaviour
         ViewSaveFields();
     }
 
-    public Array HandleArray(object fieldVal, Array defaultVal)
+    public static Array HandleArray(object fieldVal, Array defaultVal)
     {
         // Получаем загруженное значение
         Array loaded = (Array)fieldVal;
@@ -203,7 +202,7 @@ public class AdvancedSaveManager : MonoBehaviour
         }
     }
 
-    public void ViewSaveFields()
+    public static void ViewSaveFields()
     {
         string msg = "Runtime save has these fields:";
 

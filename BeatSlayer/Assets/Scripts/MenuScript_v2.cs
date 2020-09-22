@@ -23,11 +23,9 @@ using InGame.Game.Menu;
 
 public class MenuScript_v2 : MonoBehaviour
 {
-    public DailyRewarder dailyRewarder;
     public BeatmapUI beatmapUI;
     
     public TrackListUI TrackListUI { get { return GetComponent<TrackListUI>(); } }
-    public AdvancedSaveManager PrefsManager { get { return GetComponent<AdvancedSaveManager>(); } }
     public AccountManager accountManager;
     public TutorialManager tutorialManager;
     public OwnMusicUI ownMusicUI;
@@ -116,17 +114,11 @@ public class MenuScript_v2 : MonoBehaviour
         #region Loading prefs
 
 
-        mapHss.StartingScreen = PrefsManager.prefs.selectedMapId;
-        mapLockers[0].SetActive(!PrefsManager.prefs.mapUnlocked0);
-        mapLockers[1].SetActive(!PrefsManager.prefs.mapUnlocked1);
-        mapLockers[2].SetActive(!PrefsManager.prefs.mapUnlocked2);
-        mapLockers[3].SetActive(!PrefsManager.prefs.mapUnlocked3);
-
-        if(File.Exists(Application.persistentDataPath + "/Money.txt"))
-        {
-            PrefsManager.prefs.coins = 9999999;
-            PrefsManager.Save();
-        }
+        mapHss.StartingScreen = AdvancedSaveManager.prefs.selectedMapId;
+        mapLockers[0].SetActive(!AdvancedSaveManager.prefs.mapUnlocked0);
+        mapLockers[1].SetActive(!AdvancedSaveManager.prefs.mapUnlocked1);
+        mapLockers[2].SetActive(!AdvancedSaveManager.prefs.mapUnlocked2);
+        mapLockers[3].SetActive(!AdvancedSaveManager.prefs.mapUnlocked3);
 
         if(Payload.Account != null) RefreshCoinsTexts();
        
@@ -271,15 +263,19 @@ public class MenuScript_v2 : MonoBehaviour
     public HorizontalScrollSnap mapHss;
     public void SelectMap()
     {
-        PrefsManager.prefs.selectedMapId = mapHss._currentPage;
-        PrefsManager.Save();
+        AdvancedSaveManager.prefs.selectedMapId = mapHss._currentPage;
+        AdvancedSaveManager.Save();
     }
     public void ScrollMap(int dir)
     {
         if (mapHss._currentPage + dir != 0)
         {
             int mapIndex = mapHss._currentPage + dir;
-            selectMapBtn.interactable = mapIndex == 0 ? true : mapIndex == 1 ? PrefsManager.prefs.mapUnlocked0 : mapIndex == 2 ? PrefsManager.prefs.mapUnlocked1 : mapIndex == 3 ? PrefsManager.prefs.mapUnlocked2 : mapIndex == 4 ? PrefsManager.prefs.mapUnlocked3 : false;
+            selectMapBtn.interactable = mapIndex == 0 ? true : 
+                mapIndex == 1 ? AdvancedSaveManager.prefs.mapUnlocked0 :
+                mapIndex == 2 ? AdvancedSaveManager.prefs.mapUnlocked1 :
+                mapIndex == 3 ? AdvancedSaveManager.prefs.mapUnlocked2 : 
+                mapIndex == 4 ? AdvancedSaveManager.prefs.mapUnlocked3 : false;
         }
         else
         {
@@ -363,10 +359,10 @@ public class MenuScript_v2 : MonoBehaviour
         {
             Payload.Account.Coins -= cost;
             NetCore.ServerActions.Shop.SendCoins(Payload.Account.Nick, -cost);
-            if (mapIndex == 0) PrefsManager.prefs.mapUnlocked0 = true;
-            else if (mapIndex == 1) PrefsManager.prefs.mapUnlocked1 = true;
-            else if (mapIndex == 2) PrefsManager.prefs.mapUnlocked2 = true;
-            else if (mapIndex == 3) PrefsManager.prefs.mapUnlocked3 = true;
+            if (mapIndex == 0) AdvancedSaveManager.prefs.mapUnlocked0 = true;
+            else if (mapIndex == 1) AdvancedSaveManager.prefs.mapUnlocked1 = true;
+            else if (mapIndex == 2) AdvancedSaveManager.prefs.mapUnlocked2 = true;
+            else if (mapIndex == 3) AdvancedSaveManager.prefs.mapUnlocked3 = true;
             //btn.gameObject.SetActive(false);
             RefreshCoinsTexts();
             selectMapBtn.interactable = true;
@@ -380,7 +376,7 @@ public class MenuScript_v2 : MonoBehaviour
                 if (!success) Debug.LogError("Achiv error");
                 if (success)
                 {
-                    PrefsManager.prefs.hasAchiv_NewMapNewLife = true;
+                    AdvancedSaveManager.prefs.hasAchiv_NewMapNewLife = true;
                 }
             });
 
@@ -388,7 +384,7 @@ public class MenuScript_v2 : MonoBehaviour
 
             // Animation
             StartCoroutine(UnlockMapAnimator(btn.gameObject, cost));
-            PrefsManager.Save();
+            AdvancedSaveManager.Save();
         }
     }
     IEnumerator UnlockMapAnimator(GameObject locker, float cost)
@@ -424,8 +420,8 @@ public class MenuScript_v2 : MonoBehaviour
     
     public void CloseEditorAvailableForever()
     {
-        PrefsManager.prefs.showedEditorAvailableWindow = true;
-        PrefsManager.Save();
+        AdvancedSaveManager.prefs.showedEditorAvailableWindow = true;
+        AdvancedSaveManager.Save();
     }
     public void OpenWebsite()
     {
@@ -441,14 +437,14 @@ public class MenuScript_v2 : MonoBehaviour
     {
         //if (!prefsManager.prefs.hasAchiv_ShoppingSpree) return;
         // Если открыты все карты
-        if (PrefsManager.prefs.mapUnlocked0 && PrefsManager.prefs.mapUnlocked1 && PrefsManager.prefs.mapUnlocked2 && PrefsManager.prefs.mapUnlocked3)
+        if (AdvancedSaveManager.prefs.mapUnlocked0 && AdvancedSaveManager.prefs.mapUnlocked1 && AdvancedSaveManager.prefs.mapUnlocked2 && AdvancedSaveManager.prefs.mapUnlocked3)
         {
-            int len = PrefsManager.prefs.boughtSabers.Length;
+            int len = AdvancedSaveManager.prefs.boughtSabers.Length;
             bool allSabersBought = true;
 
             for (int i = 0; i < len; i++)
             {
-                if (!PrefsManager.prefs.boughtSabers[i])
+                if (!AdvancedSaveManager.prefs.boughtSabers[i])
                 {
                     allSabersBought = false;
                 }
@@ -458,18 +454,18 @@ public class MenuScript_v2 : MonoBehaviour
             if (allSabersBought)
             {
                 // Если куплены все ускорители
-                if (PrefsManager.prefs.boosters.Where(c => c.count > 0).ToList().Count == PrefsManager.prefs.boosters.Count)
+                if (AdvancedSaveManager.prefs.boosters.Where(c => c.count > 0).ToList().Count == AdvancedSaveManager.prefs.boosters.Count)
                 {
                     // Если куплены все скилы
-                    if (PrefsManager.prefs.skills.Where(c => c.count > 0).ToList().Count == PrefsManager.prefs.skills.Count)
+                    if (AdvancedSaveManager.prefs.skills.Where(c => c.count > 0).ToList().Count == AdvancedSaveManager.prefs.skills.Count)
                     {
                         Social.ReportProgress(GPGamesManager.achiv_shoppingSpree, 100, (bool success) =>
                         {
                             if (!success) Debug.Log("Cant give shopping spree achiv");
                             else
                             {
-                                PrefsManager.prefs.hasAchiv_ShoppingSpree = true;
-                                PrefsManager.Save();
+                                AdvancedSaveManager.prefs.hasAchiv_ShoppingSpree = true;
+                                AdvancedSaveManager.Save();
                             }
                         });
                     }

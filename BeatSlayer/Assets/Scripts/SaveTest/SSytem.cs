@@ -7,14 +7,12 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 
-public class SSytem : MonoBehaviour
+public static class SSytem
 {
-    public static SSytem instance;
-
-    string filepath;
+    static string filepath;
 
 
-    public Dictionary<string, string> data;
+    public static Dictionary<string, string> data;
 
     #region Save vars
 
@@ -24,7 +22,7 @@ public class SSytem : MonoBehaviour
     // Color.................Name|r,g,b,a
 
 
-    string defaultSave =
+    static string defaultSave =
 $@"bloomQuality|2
 fileLoad|false
 console|false
@@ -56,33 +54,31 @@ GlowPowerCubeLeft|50
 GlowPowerCubeRight|50
 TrailLength|50";
 
-    public int score { get { return GetInt("score"); } set { SetInt("score", value); } }
+    public static int score { get { return GetInt("score"); } set { SetInt("score", value); } }
 
-    public bool postProcessing { get { return GetBool("postProcessing"); } set { SetBool("postProcessing", value); } }
-    public int bloomQuality { get { return GetInt("bloomQuality"); } set { SetInt("bloomQuality", value); } }
-    public bool fileLoad { get { return GetBool("fileLoad"); } set { SetBool("fileLoad", value); } }
-    public bool console { get { return GetBool("console"); } set { SetBool("console", value); } }
-    public bool showfps { get { return GetBool("showfps"); } set { SetBool("showfps", value); } }
+    public static bool postProcessing { get { return GetBool("postProcessing"); } set { SetBool("postProcessing", value); } }
+    public static int bloomQuality { get { return GetInt("bloomQuality"); } set { SetInt("bloomQuality", value); } }
+    public static bool fileLoad { get { return GetBool("fileLoad"); } set { SetBool("fileLoad", value); } }
+    public static bool console { get { return GetBool("console"); } set { SetBool("console", value); } }
+    public static bool showfps { get { return GetBool("showfps"); } set { SetBool("showfps", value); } }
 
-    public Color leftColor { get { return GetColor("leftCubeColor"); } set { SetColor("leftCubeColor", value.r, value.g, value.b); } }
-    public Color rightColor { get { return GetColor("rightCubeColor"); } set { SetColor("rightCubeColor", value.r, value.g, value.b); } }
-    public Color leftDirColor { get { return GetColor("leftDirColor"); } set { SetColor("leftDirColor", value.r, value.g, value.b); } }
-    public Color rightDirColor { get { return GetColor("rightDirColor"); } set { SetColor("rightDirColor", value.r, value.g, value.b); } }
+    public static Color leftColor { get { return GetColor("leftCubeColor"); } set { SetColor("leftCubeColor", value.r, value.g, value.b); } }
+    public static Color rightColor { get { return GetColor("rightCubeColor"); } set { SetColor("rightCubeColor", value.r, value.g, value.b); } }
+    public static Color leftDirColor { get { return GetColor("leftDirColor"); } set { SetColor("leftDirColor", value.r, value.g, value.b); } }
+    public static Color rightDirColor { get { return GetColor("rightDirColor"); } set { SetColor("rightDirColor", value.r, value.g, value.b); } }
 
-    public int GlowPowerSaberLeft { get { return GetInt("GlowPowerSaberLeft"); } set { SetInt("GlowPowerSaberLeft", value); } }
-    public int GlowPowerSaberRight { get { return GetInt("GlowPowerSaberRight"); } set { SetInt("GlowPowerSaberRight", value); } }
-    public int GlowPowerCubeLeft { get { return GetInt("GlowPowerCubeLeft"); } set { SetInt("GlowPowerCubeLeft", value); } }
-    public int GlowPowerCubeRight { get { return GetInt("GlowPowerCubeRight"); } set { SetInt("GlowPowerCubeRight", value); } }
+    public static int GlowPowerSaberLeft { get { return GetInt("GlowPowerSaberLeft"); } set { SetInt("GlowPowerSaberLeft", value); } }
+    public static int GlowPowerSaberRight { get { return GetInt("GlowPowerSaberRight"); } set { SetInt("GlowPowerSaberRight", value); } }
+    public static int GlowPowerCubeLeft { get { return GetInt("GlowPowerCubeLeft"); } set { SetInt("GlowPowerCubeLeft", value); } }
+    public static int GlowPowerCubeRight { get { return GetInt("GlowPowerCubeRight"); } set { SetInt("GlowPowerCubeRight", value); } }
 
-    public int TrailLength { get { return GetInt("TrailLength"); } set { SetInt("TrailLength", value); } }
+    public static int TrailLength { get { return GetInt("TrailLength"); } set { SetInt("TrailLength", value); } }
 
 
     #endregion
 
-    private void Awake()
+    static SSytem()
     {
-        instance = this;
-
         filepath = Application.persistentDataPath + "/ssave.txt";
 
         data = new Dictionary<string, string>();
@@ -90,7 +86,7 @@ TrailLength|50";
         ReadFile();
     }
 
-    void CheckFile()
+    static void CheckFile()
     {
         if (!File.Exists(filepath))
         {
@@ -99,7 +95,7 @@ TrailLength|50";
     }
 
 
-    public void ReadFile(int splitCount = 2)
+    public static void ReadFile(int splitCount = 2)
     {
         CheckFile();
 
@@ -133,7 +129,7 @@ TrailLength|50";
         if (doSave) SaveFile();
     }
 
-    public void SaveFile()
+    public static void SaveFile()
     {
         List<string> lines = new List<string>();
         foreach (var item in data)
@@ -149,7 +145,7 @@ TrailLength|50";
 
 
 
-    public string GetString(string key)
+    public static string GetString(string key)
     {
         if (data.ContainsKey(key)) return data[key];
         else
@@ -159,7 +155,7 @@ TrailLength|50";
         }
     }
 
-    public void SetString(string key, string value)
+    public static void SetString(string key, string value)
     {
         bool exists = data.ContainsKey(key);
         if (exists)
@@ -178,7 +174,7 @@ TrailLength|50";
 
     #region Int, Float, Bool
 
-    public int GetInt(string key)
+    public static int GetInt(string key)
     {
         try
         {
@@ -192,21 +188,21 @@ TrailLength|50";
             return 0;
         }
     }
-    public void SetInt(string key, int value)
+    public static void SetInt(string key, int value)
     {
         SetString(key, value.ToString());
     }
 
-    public float GetFloat(string key)
+    public static float GetFloat(string key)
     {
         return float.Parse(GetString(key), System.Globalization.NumberStyles.AllowDecimalPoint);
     }
-    public void SetFloat(string key, float value)
+    public static void SetFloat(string key, float value)
     {
         SetString(key, value.ToString());
     }
 
-    public bool GetBool(string key)
+    public static bool GetBool(string key)
     {
         try
         {
@@ -217,11 +213,11 @@ TrailLength|50";
         }
         catch
         {
-            Debug.LogError("[SSYSTEM] Bool key: " + key);
+            Debug.LogError("[SSytem] Bool key: " + key);
             return false;
         }
     }
-    public void SetBool(string key, bool value)
+    public static void SetBool(string key, bool value)
     {
         SetString(key, value.ToString());
     }
@@ -230,7 +226,7 @@ TrailLength|50";
 
     #region Dictionary
 
-    public Dictionary<string, string> GetDictionary(string key)
+    public static Dictionary<string, string> GetDictionary(string key)
     {
         Dictionary<string, string> dict = new Dictionary<string, string>();
 
@@ -256,7 +252,7 @@ TrailLength|50";
 
         return dict;
     }
-    public void SetDictionary(string key, Dictionary<string, string> dict)
+    public static void SetDictionary(string key, Dictionary<string, string> dict)
     {
         string dictStr = "";
 
@@ -269,7 +265,7 @@ TrailLength|50";
         SetString(key, dictStr);
     }
 
-    public Dictionary<string, int> GetDictionaryInt(string key)
+    public static Dictionary<string, int> GetDictionaryInt(string key)
     {
         Dictionary<string, int> dict = new Dictionary<string, int>();
         foreach (var pair in GetDictionary(key))
@@ -278,7 +274,7 @@ TrailLength|50";
         }
         return dict;
     }
-    public void SetDictionary(string key, Dictionary<string, int> dict)
+    public static void SetDictionary(string key, Dictionary<string, int> dict)
     {
         Dictionary<string, string> dictStr = new Dictionary<string, string>();
         foreach (var pair in dict)
@@ -292,11 +288,11 @@ TrailLength|50";
 
     #region Color
 
-    public void SetColor(string key, float r, float g, float b)
+    public static void SetColor(string key, float r, float g, float b)
     {
         SetString(key, r + ";" + g + ";" + b);
     }
-    public Color GetColor(string key)
+    public static Color GetColor(string key)
     {
         string[] split = GetString(key).Split(';');
         float r = float.Parse(split[0], System.Globalization.NumberStyles.AllowDecimalPoint);
@@ -311,11 +307,11 @@ TrailLength|50";
 
     #region Security
 
-    public string Encrypt(string str)
+    public static string Encrypt(string str)
     {
         return StringCipher.Encrypt(str, "What are you doing here?");
     }
-    public string Decrypt(string str)
+    public static string Decrypt(string str)
     {
         return StringCipher.Decrypt(str, "What are you doing here?");
     }

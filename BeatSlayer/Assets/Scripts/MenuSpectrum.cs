@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class MenuSpectrum : MonoBehaviour
@@ -12,18 +10,10 @@ public class MenuSpectrum : MonoBehaviour
 
     public Transform video;
 
-    //public ParticleSystem sys;
-    //public ParticleSystemRenderer pr;
-
     public float kickVal;
     public Color kickColor, notKickColor;
     public float kickCooldown;
     float _kickCooldown;
-
-    AdvancedSaveManager prefsManager
-    {
-        get { return GetComponent<AdvancedSaveManager>(); }
-    }
 
     public float prevVolume;
     public bool useMenuMusic;
@@ -33,9 +23,9 @@ public class MenuSpectrum : MonoBehaviour
 
     public void Start()
     {
-        useMenuMusic = SSytem.instance.GetBool("MenuMusic");
+        useMenuMusic = SSytem.GetBool("MenuMusic");
 
-        useKickVideo = SSytem.instance.GetBool("KickVideo");
+        useKickVideo = SSytem.GetBool("KickVideo");
         //sourceText.SetActive(useMenuMusic);
 
         if (useMenuMusic && !isPlaying)

@@ -29,11 +29,11 @@ namespace InGame.UI.Menu.Shop
 
         public void Refresh()
         {
-            leftSaberColorImg.color = SSytem.instance.leftColor;
-            rightSaberColorImg.color = SSytem.instance.rightColor;
+            leftSaberColorImg.color = SSytem.leftColor;
+            rightSaberColorImg.color = SSytem.rightColor;
 
-            leftCubeColorImg.color = SSytem.instance.leftDirColor;
-            rightCubeColorImg.color = SSytem.instance.rightDirColor;
+            leftCubeColorImg.color = SSytem.leftDirColor;
+            rightCubeColorImg.color = SSytem.rightDirColor;
 
             RefreshSliders();
         }
@@ -41,34 +41,34 @@ namespace InGame.UI.Menu.Shop
 
         public void OnGlowPowerSliderChange()
         {
-            SSytem.instance.GlowPowerSaberLeft = (int)glowSaberLeftSlider.value;
-            SSytem.instance.GlowPowerSaberRight = (int)glowSaberRightSlider.value;
-            SSytem.instance.GlowPowerCubeLeft = (int)glowCubeLeftSlider.value;
-            SSytem.instance.GlowPowerCubeRight = (int)glowCubeRightSlider.value;
-            SSytem.instance.TrailLength = (int)trailLengthSlider.value;
+            SSytem.GlowPowerSaberLeft = (int)glowSaberLeftSlider.value;
+            SSytem.GlowPowerSaberRight = (int)glowSaberRightSlider.value;
+            SSytem.GlowPowerCubeLeft = (int)glowCubeLeftSlider.value;
+            SSytem.GlowPowerCubeRight = (int)glowCubeRightSlider.value;
+            SSytem.TrailLength = (int)trailLengthSlider.value;
 
-            SSytem.instance.SaveFile();
+            SSytem.SaveFile();
         }
         public async void OnSaberColorBtnClick(int hand)
         {
-            Color color = await colorPicker.GetColorAsync(hand == -1 ? SSytem.instance.leftColor : SSytem.instance.rightColor);
+            Color color = await colorPicker.GetColorAsync(hand == -1 ? SSytem.leftColor : SSytem.rightColor);
 
-            if (hand == -1) SSytem.instance.leftColor = color;
-            else if (hand == 1) SSytem.instance.rightColor = color;
+            if (hand == -1) SSytem.leftColor = color;
+            else if (hand == 1) SSytem.rightColor = color;
 
-            SSytem.instance.SaveFile();
+            SSytem.SaveFile();
 
             Refresh();
             shop.FillSabersView();
         }
         public async void OnCubeColorBtnClick(int hand)
         {
-            Color color = await colorPicker.GetColorAsync(hand == -1 ? SSytem.instance.leftDirColor : SSytem.instance.rightDirColor);
+            Color color = await colorPicker.GetColorAsync(hand == -1 ? SSytem.leftDirColor : SSytem.rightDirColor);
 
-            if (hand == -1) SSytem.instance.leftDirColor = color;
-            else if (hand == 1) SSytem.instance.rightDirColor = color;
+            if (hand == -1) SSytem.leftDirColor = color;
+            else if (hand == 1) SSytem.rightDirColor = color;
 
-            SSytem.instance.SaveFile();
+            SSytem.SaveFile();
 
             Refresh();
             shop.FillSabersView();
@@ -76,17 +76,17 @@ namespace InGame.UI.Menu.Shop
 
         public void OnColorpicked(Color clr)
         {
-            if (colorpickingForId == -1) SSytem.instance.leftColor = clr;
-            if (colorpickingForId == 1) SSytem.instance.rightColor = clr;
+            if (colorpickingForId == -1) SSytem.leftColor = clr;
+            if (colorpickingForId == 1) SSytem.rightColor = clr;
         }
 
         private void RefreshSliders()
         {
-            glowSaberLeftSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerSaberLeft);
-            glowSaberRightSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerSaberRight);
-            glowCubeLeftSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerCubeLeft);
-            glowCubeRightSlider.SetValueWithoutNotify(SSytem.instance.GlowPowerCubeRight);
-            trailLengthSlider.SetValueWithoutNotify(SSytem.instance.TrailLength);
+            glowSaberLeftSlider.SetValueWithoutNotify(SSytem.GlowPowerSaberLeft);
+            glowSaberRightSlider.SetValueWithoutNotify(SSytem.GlowPowerSaberRight);
+            glowCubeLeftSlider.SetValueWithoutNotify(SSytem.GlowPowerCubeLeft);
+            glowCubeRightSlider.SetValueWithoutNotify(SSytem.GlowPowerCubeRight);
+            trailLengthSlider.SetValueWithoutNotify(SSytem.TrailLength);
         }
     }
 }

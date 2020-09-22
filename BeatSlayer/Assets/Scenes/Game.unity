@@ -48334,7 +48334,6 @@ GameObject:
   - component: {fileID: 1901715879}
   - component: {fileID: 1901715882}
   - component: {fileID: 1901715883}
-  - component: {fileID: 1901715885}
   - component: {fileID: 1901715887}
   - component: {fileID: 1901715888}
   - component: {fileID: 1901715876}
@@ -48449,7 +48448,6 @@ MonoBehaviour:
   accountManager: {fileID: 1901715888}
   audioManager: {fileID: 1901715876}
   finishHandler: {fileID: 1901715889}
-  prefsManager: {fileID: 1901715885}
   UIManager: {fileID: 1901715890}
   beatManager: {fileID: 1901715892}
   scoringManager: {fileID: 1901715895}
@@ -48709,18 +48707,6 @@ MonoBehaviour:
   stateText: {fileID: 1245541478}
   percentText: {fileID: 1589252122}
   progressBar: {fileID: 1931338971}
---- !u!114 &1901715885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901715873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e3a75f88741aea42ba3262cf0591fc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1901715886
 Transform:
   m_ObjectHideFlags: 0
@@ -48799,7 +48785,7 @@ MonoBehaviour:
   hp: {fileID: 1901715881}
   accountManager: {fileID: 1901715888}
   leaderboard: {fileID: 1701399168}
-  fireworksSystem: {fileID: 36428282}
+  fireworkSSytem: {fileID: 0}
   finishOverlay: {fileID: 874546910}
   coverImage: {fileID: 1320437787}
   authorText: {fileID: 1303929432}

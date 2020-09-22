@@ -20,8 +20,6 @@ public class FlexibleColorPicker : MonoBehaviour {
     public InputField hexInput, redInput, greenInput, blueInput, powerInput;
     public Dropdown modeDropdown;
     public Action<Color> callback;
-    //public PrefsManager prefsManager;
-    public AdvancedSaveManager prefsManager;
 
     //public state
     public Color color {
@@ -151,7 +149,7 @@ public class FlexibleColorPicker : MonoBehaviour {
         if (!float.TryParse(powerInput.text, out float power)) return;
 
         power = Mathf.Clamp(power, 1, 3.5f);
-        prefsManager.prefs.colorPower = power;
+        AdvancedSaveManager.prefs.colorPower = power;
 
         UpdateTextures();
         UpdateMarkers();
@@ -456,7 +454,7 @@ public class FlexibleColorPicker : MonoBehaviour {
         redInput.text = Mathf.CeilToInt(color.r * 255) + "";
         greenInput.text = Mathf.CeilToInt(color.g * 255) + "";
         blueInput.text = Mathf.CeilToInt(color.b * 255) + "";
-        powerInput.text = prefsManager.prefs.colorPower + "";
+        powerInput.text = AdvancedSaveManager.prefs.colorPower + "";
         typeUpdate = false;
     }
 

@@ -38,7 +38,7 @@ namespace InGame.Game.Tutorial
         [Header("Finish")]
         public GameObject finishLocker;
         public Animator finishAnimator;
-        public FireworksSystem fireworks;
+        public FireworkSSytem fireworks;
 
         [Header("Buttons")]
         public GameObject skipBtnOverlay;
