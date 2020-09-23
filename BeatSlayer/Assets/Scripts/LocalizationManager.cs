@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Stopwatch = System.Diagnostics.Stopwatch;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace Assets.SimpleLocalization
 		/// </summary>
         public static event Action LocalizationChanged = () => { }; 
 
-        private static readonly Dictionary<string, Dictionary<string, string>> Dictionary = new Dictionary<string, Dictionary<string, string>>();
+        public static readonly Dictionary<string, Dictionary<string, string>> Dictionary = new Dictionary<string, Dictionary<string, string>>();
         public static string _language = "Unknown";
         public static string folderPath = "GameLocalization/Master";
 
@@ -85,10 +86,7 @@ namespace Assets.SimpleLocalization
         /// </summary>
         public static string Localize(string localizationKey)
         {
-            if (Dictionary.Count == 0)
-            {
-                Read();
-            }
+            ReadIfNeeded();
 
             if (!Dictionary.ContainsKey(Language)) { Debug.LogError("Language not found: " + Language); return localizationKey; }
             if (!Dictionary[Language].ContainsKey(localizationKey)) { Debug.LogError("Translation not found: " + localizationKey); return localizationKey; }
@@ -106,9 +104,27 @@ namespace Assets.SimpleLocalization
             return string.Format(pattern, args);
         }
 
+
+        public static bool HasLocalization(string localizationKey)
+        {
+            ReadIfNeeded();
+            if (Dictionary.Values.All(c => !c.ContainsKey(localizationKey))) return false;
+
+            return true;
+        }
+
+
         private static string ReplaceMarkers(string text)
         {
             return text.Replace("[Newline]", "\n");
+        }
+
+        private static void ReadIfNeeded()
+        {
+            if (Dictionary.Count == 0)
+            {
+                Read();
+            }
         }
     }
 }
