@@ -27,6 +27,8 @@ namespace Assets.SimpleLocalization
         }
     }
 
+#if UNITY_EDITOR
+
     [CustomEditor(typeof(LocalizedTextMesh))]
     public class LocalizedTextMeshEditor : Editor
     {
@@ -53,4 +55,7 @@ namespace Assets.SimpleLocalization
             }
         }
     }
+
+#endif
+
 }

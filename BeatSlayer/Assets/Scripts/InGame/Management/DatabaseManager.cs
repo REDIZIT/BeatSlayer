@@ -266,7 +266,7 @@ namespace DatabaseManagement
 
     public enum StatisticsKeyType
     {
-        Download, Play, Like, Dislike
+        Download, Play, Launch, Like, Dislike
     }
 
     public class DatabaseContainer

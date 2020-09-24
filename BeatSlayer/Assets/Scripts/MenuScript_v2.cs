@@ -233,7 +233,7 @@ public class MenuScript_v2 : MonoBehaviour
     public Transform trackInfoMapContent;
     public RawImage trackInfoCoverImage;
 
-    public void OnTrackItemClicked(TrackListItem listItem)
+    public void OnTrackItemClicked(MapsDataPresenter listItem)
     {
         beatmapUI.Open(listItem);
     }

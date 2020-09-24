@@ -54,9 +54,9 @@ namespace CoversManagement
             requests.Add(new AvatarRequestPackage(targetImage, playerNick, priority));
             OnRequestsListUpdate();
         }
-        public static void AddMapPackage(RawImage image, string trackname, string mapperNick = "")
+        public static void AddMapPackage(RawImage image, string trackname, string mapperNick = "", Action<Texture2D> callback = null)
         {
-            requests.Add(new CoverRequestPackage(image, trackname, mapperNick));
+            requests.Add(new CoverRequestPackage(image, trackname, mapperNick, callback: callback));
             OnRequestsListUpdate();
         }
 

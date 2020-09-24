@@ -51,15 +51,12 @@ namespace InGame.Game.Spawn
         {
             get
             {
-                //return gm.difficulty.speed * speedModifier / asource.pitch;
+                float dspeed = gm.difficulty.speed;
 
-
-
-                //float dspeed = gm.difficulty.speed;
                 float speed = fieldLength / fieldCrossTime;
                 //speed /= dspeed;
 
-                return speed * asource.pitch * speedModifier;
+                return speed * asource.pitch * modsSpeedMultiplayer * dspeed;
             }
         }
         /// <summary>Cube speed per frame</summary>
@@ -82,7 +79,7 @@ namespace InGame.Game.Spawn
                 float speed = distance / time;
                 speed *= dspeed;
 
-                return speed * asource.pitch * speedModifier;
+                return speed * asource.pitch * modsSpeedMultiplayer;
             }
         }
         
@@ -90,7 +87,7 @@ namespace InGame.Game.Spawn
         /// <summary>
         /// Modifier of <see cref="CubeSpeedPerFrame"/> based on selected Mods
         /// </summary>
-        private float speedModifier = 1;
+        private float modsSpeedMultiplayer = 1;
 
         /// <summary>
         /// Audio time - offset
@@ -143,7 +140,7 @@ namespace InGame.Game.Spawn
             if(Beats != null && Beats.Count > 0) lastCubeTime = Beats.Last().time;
 
 
-            speedModifier = ((gm.scoringManager.Replay.Mods & ModEnum.Easy) == ModEnum.Easy) ? 0.75f :
+            modsSpeedMultiplayer = ((gm.scoringManager.Replay.Mods & ModEnum.Easy) == ModEnum.Easy) ? 0.75f :
                             (gm.scoringManager.Replay.Mods.HasFlag(ModEnum.Hard)) ? 1.25f :
                             1;
         }

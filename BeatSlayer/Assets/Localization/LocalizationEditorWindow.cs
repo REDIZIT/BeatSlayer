@@ -11,6 +11,8 @@ using Debug = UnityEngine.Debug;
 
 namespace Localization
 {
+#if UNITY_EDITOR
+
     public class LocalizationEditorWindow : EditorWindow
     {
         private string searchString;
@@ -61,7 +63,7 @@ namespace Localization
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Read file", GUILayout.ExpandWidth(false)))
             {
-                LocalizationManager.Read();
+                LocalizationManager.Read(true);
             }
             GUILayout.EndHorizontal();
         }
@@ -156,4 +158,6 @@ namespace Localization
             return wordToCheck.ToLower().Contains(searchString.ToLower());
         }
     }
+
+#endif
 }

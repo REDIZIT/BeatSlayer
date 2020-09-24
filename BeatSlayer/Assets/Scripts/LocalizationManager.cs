@@ -33,9 +33,9 @@ namespace Assets.SimpleLocalization
 		/// <summary>
 		/// Read localization spreadsheets.
 		/// </summary>
-		public static void Read()
+		public static void Read(bool force = false)
         {
-            if (Dictionary.Count > 0) return;
+            if (Dictionary.Count > 0 && !force) return;
 
             var textAssets = Resources.LoadAll<TextAsset>(folderPath);
 
@@ -107,6 +107,8 @@ namespace Assets.SimpleLocalization
 
         public static bool HasLocalization(string localizationKey)
         {
+            if (localizationKey == null) return false;
+
             ReadIfNeeded();
             if (Dictionary.Values.All(c => !c.ContainsKey(localizationKey))) return false;
 

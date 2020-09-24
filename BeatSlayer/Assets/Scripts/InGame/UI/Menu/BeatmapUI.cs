@@ -161,7 +161,7 @@ public class BeatmapUI : MonoBehaviour
 
 
 
-    public void Open(TrackListItem listItem)
+    public void Open(MapsDataPresenter listItem)
     {
         overlay.SetActive(true);
         ResetUI();
@@ -405,6 +405,8 @@ public class BeatmapUI : MonoBehaviour
         {
             parameters = SceneloadParameters.TutorialPreset(currentMapInfo, currentDifficultyInfo);
         }
+
+        DatabaseManager.SendStatistics(currentMapInfo.Trackname, currentMapInfo.MapperNick, currentDifficultyInfo.id, StatisticsKeyType.Launch);
 
         SceneController.instance.LoadScene(parameters);
     }
