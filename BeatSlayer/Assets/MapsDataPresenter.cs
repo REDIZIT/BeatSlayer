@@ -72,6 +72,8 @@ public class MapsDataPresenter : MonoBehaviour
 
     private void RefreshBackgroundImage()
     {
+        if (backgroundCoverImage == null) return;
+
         backgroundCoverImage.texture = coverImage.texture;
         var rect = backgroundCoverImage.GetComponent<RectTransform>();
         rect.sizeDelta = new Vector2(rect.sizeDelta.x, rect.sizeDelta.y);
