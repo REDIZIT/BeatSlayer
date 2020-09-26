@@ -161,7 +161,7 @@ public class BeatmapUI : MonoBehaviour
 
 
 
-    public void Open(MapsDataPresenter listItem)
+    public void Open(GroupPresenter listItem)
     {
         overlay.SetActive(true);
         ResetUI();
@@ -399,12 +399,19 @@ public class BeatmapUI : MonoBehaviour
         }
         else if (currentMapInfo.MapType == GroupType.Author)
         {
-            parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo, modsUI.selectedMods);
+            if (currentMapInfo.Trackname == "Beat Slayer-Tutorial")
+            {
+                parameters = SceneloadParameters.TutorialPreset(currentMapInfo, currentDifficultyInfo);
+            }
+            else
+            {
+                parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo, modsUI.selectedMods);
+            }
         }
-        else if (currentMapInfo.MapType == GroupType.Tutorial)
-        {
-            parameters = SceneloadParameters.TutorialPreset(currentMapInfo, currentDifficultyInfo);
-        }
+        //else if (currentMapInfo.MapType == GroupType.Tutorial)
+        //{
+            
+        //}
 
         DatabaseManager.SendStatistics(currentMapInfo.Trackname, currentMapInfo.MapperNick, currentDifficultyInfo.id, StatisticsKeyType.Launch);
 

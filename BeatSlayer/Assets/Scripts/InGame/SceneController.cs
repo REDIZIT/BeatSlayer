@@ -1,9 +1,6 @@
-﻿using BeatSlayerServer.Dtos.Mapping;
-using MapData = BeatSlayerServer.Multiplayer.Accounts.AccountMapData;
-using GameNet;
+﻿using GameNet;
 using InGame.Menu.Mods;
 using ProjectManagement;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -40,6 +37,7 @@ namespace InGame.SceneManagement
 
             switch (loadpamars.Type)
             {
+                case SceneloadParameters.LoadType.Tutorial:
                 case SceneloadParameters.LoadType.Author:
                     loader = new ProjectLoaderMap();
                     break;
@@ -66,28 +64,6 @@ namespace InGame.SceneManagement
 
         public static void LoadHitSounds()
         {
-            //if(LCData.hitSoundIds != null && LCData.hitSoundIds.Length > 0)
-            //{
-            //    foreach (int id in LCData.hitSoundIds)
-            //    {
-            //        AndroidNativeAudio.unload(id);
-            //    }
-            //    AndroidNativeAudio.releasePool();
-            //}
-
-            //int streamsCount = 20;
-            //if (File.Exists(Application.persistentDataPath + "/streamcount.txt"))
-            //{
-            //    streamsCount = int.Parse(File.ReadAllText(Application.persistentDataPath + "/streamcount.txt"));
-            //}
-
-            //AndroidNativeAudio.makePool(streamsCount);
-            //LCData.hitSoundIds = new int[10];
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    LCData.hitSoundIds[i] = AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg");
-            //}
-
             if (Payload.HitSoundIds != null && Payload.HitSoundIds.Count > 0)
             {
                 foreach (int id in Payload.HitSoundIds)
@@ -196,6 +172,7 @@ public class SceneloadParameters
 
     public static SceneloadParameters AuthorMusicPreset(BasicMapData map, DifficultyInfo difficultyInfo, List<ModSO> mods)
     {
+        map.MapType = GroupType.Tutorial;
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.Author,
@@ -322,14 +299,8 @@ public class ProjectLoaderMap : IProjectLoader
     {
         string projectFolderPath;
 
-        if(parameters.Type == SceneloadParameters.LoadType.Author)
-        {
-            projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.MapperNick;
-        }
-        else
-        {
-            projectFolderPath = parameters.ProjectFolderPath;
-        }
+        projectFolderPath = Application.persistentDataPath + "/Maps/" + parameters.Trackname + "/" + parameters.Map.MapperNick;
+
 
         string bsuPath = projectFolderPath + "/" + parameters.Trackname + ".bsu";
         LoadingData.project = ProjectManager.LoadProject(bsuPath);
@@ -349,8 +320,6 @@ public class ProjectLoaderAudioFile : IProjectLoader
 {
     public IEnumerator LoadProject(SceneloadParameters parameters)
     {
-        Debug.Log("[LOADER] Loading from AudioFile " + parameters.AudioFilePath);
-
         string audioFilePath = parameters.AudioFilePath;
         string filename = Path.GetFileNameWithoutExtension(audioFilePath);
         string author = filename.Split('-')[0];

@@ -392,6 +392,8 @@ namespace InGame.Game.Spawn
             if (Beats == null) return true;
             if (asource.time == 0) return false;
 
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial) return false;
+
             if (Beats.Count == 0) return asource.time >= lastCubeTime + 2;
             return GetSkipTime() > asource.time;
         }

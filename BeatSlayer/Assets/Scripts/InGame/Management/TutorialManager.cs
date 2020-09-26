@@ -4,6 +4,7 @@ using InGame.Menu.Maps;
 using InGame.Models;
 using InGame.SceneManagement;
 using Michsky.UI.ModernUIPack;
+using Newtonsoft.Json;
 using ProjectManagement;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,8 +115,9 @@ public class TutorialManager : MonoBehaviour
     public void OnStartMapBtnClick()
     {
         FullMapData mapInfo = DatabaseManager.GetMapInfo(tutorialMapTask.Trackname, tutorialMapTask.Mapper);
+        mapInfo.MapType = GroupType.Tutorial;
 
-        SceneloadParameters param = SceneloadParameters.AuthorMusicPreset(mapInfo, mapInfo.Difficulties[0], new List<InGame.Menu.Mods.ModSO>());
+        SceneloadParameters param = SceneloadParameters.TutorialPreset(mapInfo, mapInfo.Difficulties[0]);
         SceneController.instance.LoadScene(param);
     }
 }

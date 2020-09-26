@@ -172,7 +172,7 @@ public class TrackListUI : MonoBehaviour
 
         for (int i = 0; i < groups.Count; i++)
         {
-            MapsDataPresenter item = Instantiate(trackItemPrefab, content).GetComponent<MapsDataPresenter>();
+            GroupPresenter item = Instantiate(trackItemPrefab, content).GetComponent<GroupPresenter>();
             item.Setup(groups[i], menu);
 
             //coverPackages.Add(new CoverRequestPackage(item.GetComponentInChildren<RawImage>(), groups[i].Trackname));

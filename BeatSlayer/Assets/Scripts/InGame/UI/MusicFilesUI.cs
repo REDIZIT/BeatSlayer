@@ -62,7 +62,7 @@ public class MusicFilesUI : MonoBehaviour
                 Filepath = filepath
             };
 
-            MapsDataPresenter item = Instantiate(trackItemPrefab, ownMusicList).GetComponent<MapsDataPresenter>();
+            GroupPresenter item = Instantiate(trackItemPrefab, ownMusicList).GetComponent<GroupPresenter>();
             item.Setup(groupInfo, menu, false, true);
 
             //item.coverImage.texture = downloadHelper.defaultIcon;

@@ -187,7 +187,6 @@ public class GameManager : MonoBehaviour
         // If no one have disabled automatic game starting -> start game
         if (StartGameAuto)
         {
-            Debug.Log("Start game automatically");
             StartGame();
         }
     }
@@ -258,9 +257,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        Debug.Log("Start game");
-
-        bool isTutorial = mapData.MapType == GroupType.Tutorial;
+        bool isTutorial = LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial;
 
         StartCoroutine(beatManager.IStartGame(isTutorial));
 
@@ -290,7 +287,7 @@ public class GameManager : MonoBehaviour
         }
 
         difficulty = project.difficulties.Find(c => c.id == difficultyInfo.id);
-        //Debug.Log("Id: " + difficultyInfo.id + "\nIs DIFF null? " + (difficulty == null) + "\nCount is: " + project.difficulties.Count);
+
 
         IEnumerable<BeatCubeClass> ls = difficulty == null ? project.beatCubeList : difficulty.beatCubeList;
 
@@ -727,23 +724,6 @@ public class GameManager : MonoBehaviour
 
     void UpdateSkipButton()
     {
-        //if (!isSkipAnimatorPlaying)
-        //{
-        //    if (beatManager.CanSkip())
-        //    {
-        //        Debug.Log("Play show");
-        //        isSkipAnimatorPlaying = true;
-        //        skipBtnAnimator.Play("Show");
-        //    }
-        //}
-        //else
-        //{
-        //    if (!beatManager.CanSkip())
-        //    {
-        //        Debug.Log("Play hide");
-        //        skipBtnAnimator.Play("Hide");
-        //    }
-        //}
         skipBtnAnimator.Play(beatManager.CanSkip() ? "Show" : "Hide");
     }
     public void OnSkipBtnClick()
