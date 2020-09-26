@@ -66,7 +66,8 @@ namespace Testing
             if (request.type == TestType.ModerationMap)
             {
                 filepath = Application.persistentDataPath + "/data/moderation/map/" + request.trackname + ".bsu";
-                
+                Debug.Log("Moderation Map trackname is " + filepath);
+
                 request.filepath = filepath;
 
                 Project proj = ProjectManager.LoadProject(filepath);

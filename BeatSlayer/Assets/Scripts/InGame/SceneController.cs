@@ -236,8 +236,8 @@ public class SceneloadParameters
 
         BasicMapData map = new BasicMapData()
         {
-            Name = request.trackname.Split('-')[0],
-            Author = request.trackname.Split('-')[1],
+            Author = request.trackname.Split('-')[0],
+            Name = request.trackname.Split('-')[1],
             MapperNick = "[MODERATION *]"
         };
 
