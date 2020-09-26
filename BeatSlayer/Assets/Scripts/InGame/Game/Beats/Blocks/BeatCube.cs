@@ -14,10 +14,11 @@ public class BeatCube : MonoBehaviour, IBeat
 
     [SerializeField] private ParticleSystem cubeParticleSystem, cubeDissovleParticleSystem;
 
-    public Mesh pointMesh;
+    public Transform markersPivot;
+    public MeshRenderer arrowMarker;
+    public MeshRenderer pointMarker;
 
-    BeatManager bm;
-    GameManager gm;
+    public Mesh pointMesh;
 
     /// <summary>
     /// Multiplier of cube calculated speed from 0 to 1
@@ -30,17 +31,18 @@ public class BeatCube : MonoBehaviour, IBeat
 
     private bool isDead;
 
+    private BeatManager bm;
+    private GameManager gm;
+
 
     public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
     {
-        //w.Start();
-
         this.gm = gm;
         this.cls = cls;
         SpeedMultiplier = 1;
         this.bm = bm;
 
-        if(cls.type == BeatCubeClass.Type.Point)
+        if (cls.type == BeatCubeClass.Type.Point)
         {
             filter.mesh = pointMesh;
         }
@@ -51,50 +53,50 @@ public class BeatCube : MonoBehaviour, IBeat
                 int rnd = Random.Range(0, 8);
                 cls.subType = (BeatCubeClass.SubType)rnd;
             }
-            
+
             float angle = (int)cls.subType * 45;
             transform.eulerAngles = new Vector3(0, 0, angle);
         }
 
+        pointMarker.gameObject.SetActive(cls.type == BeatCubeClass.Type.Point);
+        arrowMarker.gameObject.SetActive(cls.type == BeatCubeClass.Type.Dir);
+
+
         cubeParticleSystem.Stop();
         cubeDissovleParticleSystem.Stop();
 
-        renderer.materials[0].SetFloat("_Threshold", materialThreshold);
-        renderer.materials[1].SetFloat("_Threshold", materialThreshold);
-        renderer.materials[2].SetFloat("_Threshold", materialThreshold);
+        foreach (Material material in renderer.materials)
+        {
+            material.SetFloat("_Threshold", materialThreshold);
+        }
 
 
-        if(cls.saberType != 0)
+        if (cls.saberType != 0)
         {
             Color saberColor = cls.saberType == 1 ? bm.rightSaberColor : bm.leftSaberColor;
             Color arrowColor = cls.saberType == 1 ? bm.rightArrowColor : bm.leftArrowColor;
 
-            if(cls.saberType == 1)
+            if (cls.saberType == 1)
             {
-                //saberColor *= (1 + SSytem.GlowPowerCubeRight / 15f);
-
-                //saberColor *= 1 + Mathf.Pow(2, SSytem.GlowPowerCubeRight / 75f);
-
                 float intensity = (saberColor.r + saberColor.g + saberColor.b) / 3f;
                 float factor = (1 + SSytem.GlowPowerCubeRight / 25f) / intensity;
                 saberColor *= new Color(saberColor.r * factor, saberColor.g * factor, saberColor.b * factor, saberColor.a);
             }
             else
             {
-                //saberColor *= (1 + SSytem.GlowPowerCubeLeft / 15f);
-
-                //saberColor *= 1 + Mathf.Pow(2, SSytem.GlowPowerCubeLeft / 75f);
-
                 float intensity = (saberColor.r + saberColor.g + saberColor.b) / 3f;
-                //float factor = 1f / intensity;
                 float factor = (1 + SSytem.GlowPowerCubeRight / 25f) / intensity;
                 saberColor *= new Color(saberColor.r * factor, saberColor.g * factor, saberColor.b * factor, saberColor.a);
             }
 
-            renderer.materials[1].SetColor("_Color", saberColor);
-            renderer.materials[1].SetColor("_EmissionColor", saberColor);
-            renderer.materials[2].SetColor("_Color", arrowColor * 2);
-            renderer.materials[2].SetColor("_EmissionColor", arrowColor * 2);
+            foreach (Material material in renderer.materials)
+            {
+                material.SetColor("_Color", saberColor / 8f);
+                material.SetColor("_EmissionColor", saberColor / 8f);
+            }
+
+            arrowMarker.material.SetColor("_EmissionColor", arrowColor * 4f);
+            pointMarker.material.SetColor("_EmissionColor", arrowColor * 4f);
         }
 
 
@@ -169,13 +171,21 @@ public class BeatCube : MonoBehaviour, IBeat
 
     void Animate()
     {
-        materialThreshold += Time.deltaTime * thresholdChange * CurrentSpeed; 
-        if (materialThreshold< -0.1f) {materialThreshold = -0.1f; thresholdChange = 0; }
+        materialThreshold += Time.deltaTime * thresholdChange * CurrentSpeed;
+        if (materialThreshold < -0.1f) { materialThreshold = -0.1f; thresholdChange = 0; }
         else if (materialThreshold > 1) materialThreshold = 1;
 
-        renderer.materials[0].SetFloat("_Threshold", materialThreshold);
-        renderer.materials[1].SetFloat("_Threshold", materialThreshold);
-        renderer.materials[2].SetFloat("_Threshold", materialThreshold);
+        foreach (Material material in renderer.materials)
+        {
+            material.SetFloat("_Threshold", materialThreshold);
+        }
+
+        arrowMarker.material.SetFloat("_Threshold", materialThreshold);
+        pointMarker.material.SetFloat("_Threshold", materialThreshold);
+
+        Quaternion rotation = Quaternion.LookRotation((transform.position - gm.transform.position).normalized);
+        transform.rotation = rotation;
+        //transform.LookAt(gm.transform, Vector3.right);
     }
 
     void Movement()
@@ -224,7 +234,7 @@ public class BeatCube : MonoBehaviour, IBeat
     void SlicedUpdate()
     {
         SpeedMultiplier -= (SpeedMultiplier - Time.deltaTime) / 8f;
-        if(materialThreshold >= 1)
+        if (materialThreshold >= 1)
         {
             Destroy(gameObject);
         }
