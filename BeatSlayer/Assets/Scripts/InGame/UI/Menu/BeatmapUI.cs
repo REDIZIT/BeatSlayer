@@ -294,16 +294,16 @@ public class BeatmapUI : MonoBehaviour
         List<DifficultyInfo> difficulties = new List<DifficultyInfo>();
         if (item.mapInfo.Difficulties.Count == 0)
         {
-            throw new NotImplementedException("Difficulties count is 0");
-            //difficulties.Add(new DifficultyInfo()
-            //{
-            //    name = item.mapInfo.Difficulties,
-            //    stars = item.mapInfo.difficultyStars,
-            //    downloads = item.mapInfo.downloads,
-            //    playCount = item.mapInfo.PlayCount,
-            //    likes = item.mapInfo.Likes,
-            //    dislikes = item.mapInfo.Dislikes
-            //});
+            //throw new NotImplementedException("Difficulties count is 0");
+            difficulties.Add(new DifficultyInfo()
+            {
+                name = "",
+                stars = 4,
+                downloads = item.mapInfo.downloads,
+                playCount = item.mapInfo.PlayCount,
+                likes = item.mapInfo.Likes,
+                dislikes = item.mapInfo.Dislikes
+            });
         }
         else
         {
@@ -395,6 +395,8 @@ public class BeatmapUI : MonoBehaviour
         }
         else if (currentMapInfo.MapType == GroupType.Own)
         {
+            Debug.Log("Is currentMapInfo == null? " + (currentMapInfo == null));
+            Debug.Log("Is OwnMapData == null? " + ((currentMapInfo as OwnMapData) == null));
             parameters = SceneloadParameters.OwnMusicPreset(currentMapInfo as OwnMapData, modsUI.selectedMods);
         }
         else if (currentMapInfo.MapType == GroupType.Author)

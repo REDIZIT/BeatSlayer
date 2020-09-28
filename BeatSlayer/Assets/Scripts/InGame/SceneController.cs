@@ -45,7 +45,7 @@ namespace InGame.SceneManagement
                     loader = new ProjectLoaderAudioFile();
                     break;
                 case SceneloadParameters.LoadType.ProjectFolder:
-                    loader = new ProjectLoaderMap();
+                    loader = new ProjectLoaderEditorTest();
                     break;
                 case SceneloadParameters.LoadType.Moderation:
                     loader = new ProjectLoaderModeration();
@@ -216,6 +216,7 @@ public class SceneloadParameters
     }
     public static SceneloadParameters OwnMusicPreset(OwnMapData map, List<ModSO> mods)
     {
+        Debug.Log("Is map null? " + (map == null));
         var parameters = new SceneloadParameters()
         {
             Type = LoadType.AudioFile,

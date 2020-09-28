@@ -127,6 +127,7 @@ public class BeatCube : MonoBehaviour, IBeat
 
         if (direction.normalized == Vector2.zero) return;
 
+        //Debug.Log("On point");
 
         direction = new Vector3(-direction.x, direction.y);
 
@@ -185,7 +186,9 @@ public class BeatCube : MonoBehaviour, IBeat
 
         Quaternion rotation = Quaternion.LookRotation((transform.position - gm.transform.position).normalized);
         transform.rotation = rotation;
-        //transform.LookAt(gm.transform, Vector3.right);
+
+        float angle = (int)cls.subType * 45;
+        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, angle);
     }
 
     void Movement()

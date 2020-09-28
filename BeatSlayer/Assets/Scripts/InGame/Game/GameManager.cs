@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviour
     /// Is game in period when asource isn't playing but cubes are spawning
     /// </summary>
     public bool IsGameStartingMap { get; set; }
+    public bool IsGameStarted { get; set; }
 
     private SettingsModel Settings => SettingsManager.Settings;
 
@@ -121,6 +122,8 @@ public class GameManager : MonoBehaviour
 
     public void ProcessBeatTime()
     {
+        if (IsGameStartingMap == false && IsGameStarted == false) return;
+
         if (LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile)
         {
             beatManager.ProcessSpawnCycle();
@@ -165,6 +168,7 @@ public class GameManager : MonoBehaviour
             LoadingData.loadparams.Type, LoadingData.loadparams.Mods);
         modsBar.Refresh(LoadingData.loadparams.Mods);
 
+        InitAudio(mapData.MapType == GroupType.Tutorial);
         InitSettings();
 
         beatManager.Setup(this, difficulty.speed);
@@ -180,10 +184,10 @@ public class GameManager : MonoBehaviour
         AlignToSide();
 
 
-        IsGameStartingMap = true;
-
-        InitAudio(mapData.MapType == GroupType.Tutorial);
-
+        
+    }
+    private void Start()
+    {
         // If no one have disabled automatic game starting -> start game
         if (StartGameAuto)
         {
@@ -257,6 +261,9 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        Debug.Log("Start game");
+        IsGameStartingMap = true;
+
         bool isTutorial = LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial;
 
         StartCoroutine(beatManager.IStartGame(isTutorial));
@@ -336,6 +343,7 @@ public class GameManager : MonoBehaviour
             audioManager.spectrumAsource.time = time;
         }
     }
+
     void InitGraphics()
     {
         bool usePostProcessing = Settings.Graphics.IsGlowEnabled;

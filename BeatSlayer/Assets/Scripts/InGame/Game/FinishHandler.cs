@@ -103,6 +103,7 @@ public class FinishHandler : MonoBehaviour
         if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial) return false;
 
         if (!hp.isAlive) return false;
+        if (!gm.IsGameStarted) return false;
 
         return
             !gm.IsGameStartingMap

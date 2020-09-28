@@ -147,6 +147,7 @@ namespace InGame.Game.Spawn
 
         public void SetBeats(IEnumerable<BeatCubeClass> ls)
         {
+            Debug.Log("Set beats");
             Beats = new List<BeatCubeClass>();
             Beats.AddRange(ls.OrderBy(c => c.time));
         }
@@ -167,6 +168,8 @@ namespace InGame.Game.Spawn
                 asource.Play();
             
             gm.IsGameStartingMap = false;
+            gm.IsGameStarted = true;
+
             if (gm.paused)
             {
                 gm.audioManager.asource.Pause();
