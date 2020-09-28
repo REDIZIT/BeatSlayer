@@ -3,7 +3,7 @@ using ProjectManagement;
 
 namespace InGame.Models
 {
-    public class BasicMapData
+    public class BasicMapData : IMapData
     {
         public string Author { get; set; }
         public string Name { get; set; }
@@ -22,5 +22,20 @@ namespace InGame.Models
             Name = mapsDataParent.Name;
             MapType = mapsDataParent.MapType;
         }
+    }
+
+    public interface IMapData
+    {
+        string Author { get; set; }
+        string Name { get; set; }
+        string MapperNick { get; set; }
+        bool IsApproved { get; set; }
+        GroupType MapType { get; set; }
+
+        [JsonIgnore] string Trackname { get; }
+    }
+    public interface IOwnMapData : IMapData
+    {
+        string Filepath { get; set; }
     }
 }

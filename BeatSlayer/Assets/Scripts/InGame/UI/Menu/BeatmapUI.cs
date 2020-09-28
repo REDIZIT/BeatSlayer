@@ -177,7 +177,7 @@ public class BeatmapUI : MonoBehaviour
         isGroupDeleted = false;
         testRequest = null;
 
-        if (listItem.groupInfo.MapType == GroupType.Own) mapInfos = new List<FullMapData>() { new FullMapData(listItem.groupInfo) };
+        if (listItem.groupInfo.MapType == GroupType.Own) mapInfos = new List<FullMapData>() { new OwnMapData((OwnMapsData)listItem.groupInfo) };
         else if (listItem.isLocalItem) mapInfos = DatabaseManager.GetDownloadedMaps(listItem.groupInfo);
         else
         {
@@ -395,9 +395,7 @@ public class BeatmapUI : MonoBehaviour
         }
         else if (currentMapInfo.MapType == GroupType.Own)
         {
-            Debug.Log("Is currentMapInfo == null? " + (currentMapInfo == null));
-            Debug.Log("Is OwnMapData == null? " + ((currentMapInfo as OwnMapData) == null));
-            parameters = SceneloadParameters.OwnMusicPreset(currentMapInfo as OwnMapData, modsUI.selectedMods);
+            parameters = SceneloadParameters.OwnMusicPreset((OwnMapData)currentMapInfo, modsUI.selectedMods);
         }
         else if (currentMapInfo.MapType == GroupType.Author)
         {
@@ -410,10 +408,6 @@ public class BeatmapUI : MonoBehaviour
                 parameters = SceneloadParameters.AuthorMusicPreset(currentMapInfo, currentDifficultyInfo, modsUI.selectedMods);
             }
         }
-        //else if (currentMapInfo.MapType == GroupType.Tutorial)
-        //{
-            
-        //}
 
         DatabaseManager.SendStatistics(currentMapInfo.Trackname, currentMapInfo.MapperNick, currentDifficultyInfo.id, StatisticsKeyType.Launch);
 

@@ -92,10 +92,12 @@ namespace ProjectManagement
         }
         public static IEnumerator LoadAudioCoroutine(string path)
         {
+            Debug.Log(">Load " + path);
             // Must work in sync mode!
             using (WWW www = new WWW("file:///" + path))
             {
                 yield return www;
+                Debug.Log("Loaded!");
                 LoadingData.aclip = www.GetAudioClip();
             }
         }

@@ -194,16 +194,10 @@ namespace InGame.Game.Sabers
                 hits.AddRange(raycasted);
             }
 
-            //Debug.Log("raycastedCount: " + raycastedCount);
-            //Debug.Log("hits distinct: " + hits.Distinct().Count());
-            int ibeatCount = 0;
-            int nullBeats = 0;
 
             foreach (RaycastHit hit in hits.Distinct().OrderBy(c => c.point.z))
             {
                 if (hit.point.z > bm.playAreaZ + 10) continue;
-                ibeatCount++;
-
                 IBeat beat = hit.transform.GetComponent<IBeat>();
                 if (beat == null)
                 {
@@ -219,19 +213,10 @@ namespace InGame.Game.Sabers
                     }
                     else cubesToPing.Add(beat);
                 }
-                else
-                {
-                    nullBeats++;
-                }
             }
-
-            //Debug.Log("nullbeats: " + nullBeats);
-            //Debug.Log("ibeats: " + ibeatCount);
-            //Debug.Log("cube to ping: " + cubesToPing.Count);
 
             foreach (IBeat beat in cubesToPing.Distinct())
             {
-                Debug.Log("Ping cube!");
                 int beatSaberType = beat.GetClass().saberType;
                 if (beatSaberType == saberSide || beatSaberType == 0 || Application.isEditor)
                 {

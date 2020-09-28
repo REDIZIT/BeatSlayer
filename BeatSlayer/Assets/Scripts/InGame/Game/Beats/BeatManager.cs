@@ -392,10 +392,16 @@ namespace InGame.Game.Spawn
         {
             if (!asource.isPlaying) return false;
 
-            if (Beats == null) return true;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial) return false;
+            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.AudioFile) return false;
+
             if (asource.time == 0) return false;
 
-            if (LoadingData.loadparams.Type == SceneloadParameters.LoadType.Tutorial) return false;
+
+            if (Beats == null) return true;
+            
+
+
 
             if (Beats.Count == 0) return asource.time >= lastCubeTime + 2;
             return GetSkipTime() > asource.time;

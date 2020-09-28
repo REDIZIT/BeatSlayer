@@ -310,6 +310,7 @@ public class GameManager : MonoBehaviour
     void InitAudio(bool isTutorial)
     {
         audioManager.asource.clip = LoadingData.aclip;
+        Debug.LogError("LoadingData.aclip.len = " + LoadingData.aclip.length);
 
 
         Pitch = LoadingData.loadparams.IsPracticeMode ? LoadingData.loadparams.MusicSpeed : 1;

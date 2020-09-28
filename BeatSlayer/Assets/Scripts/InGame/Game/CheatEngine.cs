@@ -129,7 +129,7 @@ public class CheatEngine : MonoBehaviour
         {
             doSkipToEnd = false;
             float endTime = asource.clip.length - 5;
-            bm.SetBeats(bm.Beats.SkipWhile(c => c.time < endTime).ToList());
+            bm.SetBeats(bm.Beats?.SkipWhile(c => c.time < endTime).ToList());
             asource.time = endTime;
         }
     }
