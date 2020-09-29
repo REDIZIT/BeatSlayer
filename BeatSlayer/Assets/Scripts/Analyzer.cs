@@ -36,7 +36,7 @@ public class Analyzer : MonoBehaviour
     }
 
     float fpslimiter;
-    float asourceDelay;
+
     public void AnalyzerUpdate()
     {
         timeLeftAfterSpawn += Time.deltaTime;
@@ -72,7 +72,6 @@ public class Analyzer : MonoBehaviour
             gs.audioManager.asource.GetSpectrumData(data, 0, FFTWindow.Triangle);
         }
 
-        asourceDelay = Mathf.Abs(gs.audioManager.asource.time - gs.audioManager.spectrumAsource.time);
         if (useAlg == 1)
         {
             FirstAlg();
@@ -252,20 +251,16 @@ public class Analyzer : MonoBehaviour
     float ta_timeFromLastSpawn = 0;
     public void ThirdAlg()
     {
-        //Debug.Log(asource.isPlaying + " / " + spectrumAudioSource.isPlaying);
-
         if (ta_prevSamples == null) ta_prevSamples = new float[data.Length];
         float disturbance = 0;
 
-        float volume = 0;
         for (int i = 0; i < data.Length; i++)
         {
-            //volume += data[i] * 2;
             disturbance += Mathf.Abs(data[i] - ta_prevSamples[i]);
             ta_prevSamples[i] = data[i] * ((i + 1) / 1.8f);
             
         }
-        volume = disturbance;
+        float volume = disturbance;
 
         AnalyzerItem item = new AnalyzerItem(volume, data);
         volumeline.Add(item);
@@ -278,7 +273,7 @@ public class Analyzer : MonoBehaviour
             {
                 item.isBeatCube = true;
                 m_cubeCooldown = 0.05f;
-                //Color c = Color.white;
+
 
                 BeatCubeClass.Type t = ta_timeFromLastSpawn <= 0.14f ? BeatCubeClass.Type.Point : BeatCubeClass.Type.Dir;
 
