@@ -1,4 +1,5 @@
 ﻿using InGame.Game.Spawn;
+using System.Collections;
 using UnityEngine;
 
 public class BeatCube : MonoBehaviour, IBeat

@@ -153,7 +153,11 @@ namespace InGame.Settings
 
         [Option("Cubes sync offset")]
         [Range(-4, 10)]
-        public float CubesSuncOffset { get; set; } = 2;
+        public float CubesSuncOffset { get; set; } = 2.5f;
+
+        [Option("Music offset (more - cube spawns earlier)")]
+        [Range(-1, 1)]
+        public float MusicOffset { get; set; } = 0;
 
         [Option("Hide sabers")]
         public bool HideSabers { get; set; } = false;

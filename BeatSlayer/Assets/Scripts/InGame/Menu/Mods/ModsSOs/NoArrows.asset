@@ -19,5 +19,5 @@ MonoBehaviour:
   modEnum: 128
   blockInMultiplayer: 0
   modPillowColor: {r: 0.22745098, g: 0.654902, b: 0.2627451, a: 0.6313726}
-  scoreMultiplier: 0.01
-  rpMultiplier: 0
+  scoreMultiplier: 0.4
+  rpMultiplier: 0.2

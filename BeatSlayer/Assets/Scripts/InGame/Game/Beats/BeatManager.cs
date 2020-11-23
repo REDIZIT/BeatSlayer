@@ -101,13 +101,14 @@ namespace InGame.Game.Spawn
         public float playAreaZ;
         private float cubesSpeed;
 
-
+        private float musicOffset;
 
 
 
         private void Awake()
         {
             instance = this;
+            musicOffset = SettingsManager.Settings.Gameplay.MusicOffset;
         }
         private void Update()
         {
@@ -147,7 +148,6 @@ namespace InGame.Game.Spawn
 
         public void SetBeats(IEnumerable<BeatCubeClass> ls)
         {
-            Debug.Log("Set beats");
             Beats = new List<BeatCubeClass>();
             Beats.AddRange(ls.OrderBy(c => c.time));
         }
@@ -249,7 +249,7 @@ namespace InGame.Game.Spawn
 
             float offset = fieldCrossTime / dspeed / cls.speed;
 
-            return cls.time - offset;
+            return cls.time - offset - musicOffset;
             // Return absolute time
             //return cls.time + timeOffset;
         }
@@ -264,6 +264,7 @@ namespace InGame.Game.Spawn
 
             fieldLength = distanceSpawnAndPlayArea + SettingsManager.Settings.Gameplay.CubesSuncOffset; // Длина поля в юнитах (где летят кубы)
             fieldCrossTime = 1.5f; // Время за которое куб должен преодолеть поле (в секундах)
+            //fieldCrossTime = 1.3f; // Время за которое куб должен преодолеть поле (в секундах)
             //fieldCrossTime = .5f; // Время за которое куб должен преодолеть поле (в секундах)
             //fieldCrossTime = 1f; // Время за которое куб должен преодолеть поле (в секундах)
             //fieldCrossTime = 2f; // Время за которое куб должен преодолеть поле (в секундах)

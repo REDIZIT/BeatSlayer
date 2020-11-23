@@ -83,7 +83,7 @@ namespace InGame.SceneManagement
             Payload.HitSoundIds.Clear();
             for (int i = 0; i < 10; i++)
             {
-                Payload.HitSoundIds.Add(AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg"));
+                //Payload.HitSoundIds.Add(AndroidNativeAudio.load("LastHit" + (i + 1) + ".ogg"));
                 Payload.HitSoundIds.Add(AndroidNativeAudio.load("ShortHits/HitShort" + (i + 1) + ".ogg"));
             }
         }
