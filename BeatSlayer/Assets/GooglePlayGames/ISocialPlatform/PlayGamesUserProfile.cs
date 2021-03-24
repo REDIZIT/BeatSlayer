@@ -108,6 +108,8 @@ namespace GooglePlayGames
             get { return mAvatarUrl; }
         }
 
+        public string gameId => throw new NotImplementedException();
+
         /// <summary>
         /// Loads the local user's image from the url.  Loading urls
         /// is asynchronous so the return from this call is fast,
