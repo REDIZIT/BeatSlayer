@@ -13,12 +13,12 @@ namespace InGame.UI.Menu.Winter
         [SerializeField] private Text rewardText, numberText;
 
         [Inject]
-        public void Construct(WordEvent wordEvent, Word word)
+        public void Construct(WordEventManager wordEvent, Word word)
         {
             HelperUI.UpdateContent(content, prefab, word.letters, (uii, m) => { uii.Refresh(m); });
             rewardText.text = word.reward.ToString();
 
-            numberText.text = (wordEvent.words.IndexOf(word) + 1) + "/" + wordEvent.words.Count;
+            numberText.text = (wordEvent.Event.words.IndexOf(word) + 1) + "/" + wordEvent.Event.words.Count;
         }
 
         public class Factory : PlaceholderFactory<Word, WordContainerUII>
