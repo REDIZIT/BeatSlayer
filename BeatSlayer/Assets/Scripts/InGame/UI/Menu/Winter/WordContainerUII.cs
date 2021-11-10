@@ -1,6 +1,7 @@
 using InGame.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace InGame.UI.Menu.Winter
 {
@@ -11,10 +12,18 @@ namespace InGame.UI.Menu.Winter
 
         [SerializeField] private Text rewardText, numberText;
 
-        public void Refresh(Word word)
+        [Inject]
+        public void Construct(WordEvent wordEvent, Word word)
         {
             HelperUI.UpdateContent(content, prefab, word.letters, (uii, m) => { uii.Refresh(m); });
             rewardText.text = word.reward.ToString();
+
+            numberText.text = (wordEvent.words.IndexOf(word) + 1) + "/" + wordEvent.words.Count;
+        }
+
+        public class Factory : PlaceholderFactory<Word, WordContainerUII>
+        {
+
         }
     }
 }

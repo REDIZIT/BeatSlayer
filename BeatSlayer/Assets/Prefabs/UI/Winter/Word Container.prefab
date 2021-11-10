@@ -683,3 +683,4 @@ MonoBehaviour:
   content: {fileID: 8166815193335479578}
   prefab: {fileID: 1264604978032120050, guid: 9e490dec65e55214fae83c12da83425a, type: 3}
   rewardText: {fileID: 8166815193350138508}
+  numberText: {fileID: 8166815194683797048}

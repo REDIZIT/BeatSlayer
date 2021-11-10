@@ -2,19 +2,23 @@ using InGame.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Zenject;
 
 namespace InGame.UI.Menu.Winter
 {
     public class WordCollectUI : MonoBehaviour
 	{
-        [SerializeField] private Transform wordContent;
-        [SerializeField] private WordContainerUII wordPrefab;
+        private WordEvent wordEvent;
 
-        private WordEvent wordEvent = new WordEvent();
-
-        private void Awake()
+        [Inject]
+        public void Construct(WordEvent wordEvent, WordContainerUII.Factory factory)
         {
-            HelperUI.UpdateContent(wordContent, wordPrefab, wordEvent.words, (uii, m) => { uii.Refresh(m); });
+            this.wordEvent = wordEvent;
+
+            foreach (Word word in wordEvent.words)
+            {
+                factory.Create(word);
+            }
         }
 
         private void Update()
