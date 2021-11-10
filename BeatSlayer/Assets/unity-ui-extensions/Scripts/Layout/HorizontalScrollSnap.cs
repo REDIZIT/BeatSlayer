@@ -72,6 +72,8 @@ namespace UnityEngine.UI.Extensions
                     }
                 }
             }
+
+            InitialiseChildObjectsFromScene();
         }
 
         private bool IsRectMovingSlowerThanThreshold(float startingSpeed)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -116,6 +117,24 @@ namespace InGame.Helpers
             }
         }
 
+        public static void UpdateContent<UIItem, Model>(Transform content, UIItem prefab, IEnumerable<Model> models, Action<UIItem, Model> implementation) where UIItem : MonoBehaviour
+        {
+            int diff = models.Count() - content.childCount;
+
+            for (int i = 0; i < diff; i++)
+            {
+                Instantiate(prefab.gameObject, content);
+            }
+            for (int i = 0; i < -diff; i++)
+            {
+                Destroy(content.GetChild(0).gameObject);
+            }
+
+            for (int i = 0; i < models.Count(); i++)
+            {
+                implementation(content.GetChild(i).GetComponent<UIItem>(), models.ElementAt(i));
+            }
+        }
 
 
         public static GameObject ClearContent(Transform content)
