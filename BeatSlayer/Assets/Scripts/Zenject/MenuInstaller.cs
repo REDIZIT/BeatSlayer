@@ -9,7 +9,7 @@ public class MenuInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.BindFactory<Word, WordContainerUII, WordContainerUII.Factory>()
+        Container.BindFactory<WordContainerUII, WordContainerUII.Factory>()
             .FromComponentInNewPrefab(wordContainerUII)
             .UnderTransform(wordContainerGroup);
     }

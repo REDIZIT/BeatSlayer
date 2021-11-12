@@ -15,7 +15,7 @@ namespace InGame.UI.Menu.Winter
 
             foreach (Word word in wordEvent.Event.words)
             {
-                factory.Create(word);
+                factory.Create().Refresh(word);
             }
         }
 

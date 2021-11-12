@@ -58,5 +58,9 @@ namespace InGame.Game
         {
             uisource.PlayOneShot(menuOpenClip);
         }
+        public void PlayOneShot(AudioClip clip)
+        {
+            uisource.PlayOneShot(clip);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using InGame.Utils;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -19,7 +20,12 @@ namespace InGame.UI.Menu.Winter
         {
             if (File.Exists(filepath) == false)
             {
-                Event = new WordEvent();
+                Event = new WordEvent(new List<Word>()
+                {
+                    new Word("Happy", 5000),
+                    new Word("New", 1200),
+                    new Word("Year", 20000)
+                });
             }
             else
             {

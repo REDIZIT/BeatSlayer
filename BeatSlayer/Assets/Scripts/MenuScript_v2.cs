@@ -153,6 +153,7 @@ public class MenuScript_v2 : MonoBehaviour
     {
         TestManager.CheckUpdates();
         TestManager.CheckModerationUpdates();
+        RefreshCoinsTexts();
     }
 
 
@@ -415,6 +416,7 @@ public class MenuScript_v2 : MonoBehaviour
 
     public void RefreshCoinsTexts()
     {
+        if (Payload.Account == null) return;
         foreach (var t in coinsTexts) t.text = Payload.Account.Coins.ToString();
     }
     

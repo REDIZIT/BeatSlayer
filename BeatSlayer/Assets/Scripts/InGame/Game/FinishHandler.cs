@@ -15,6 +15,7 @@ using InGame.Game.HP;
 using DatabaseManagement;
 using InGame.Multiplayer.Lobby;
 using System;
+using InGame.UI.Game.Winter;
 
 public class FinishHandler : MonoBehaviour
 {
@@ -59,12 +60,10 @@ public class FinishHandler : MonoBehaviour
     public Text leaderboardLoadingText;
 
     [Header("Finish conditions")]
-    //public bool isNotStarting;
-    //public bool isAudioTimeZero;
-   
-    //public bool isAudioStopped;
-
     public float audioTime;
+
+    [Header("Words")]
+    [SerializeField] private WordSpinner wordSpinner;
 
     public Action OnFinishEvent { get; set; }
 
@@ -76,10 +75,6 @@ public class FinishHandler : MonoBehaviour
 
     public void CheckLevelFinish()
     {
-        //isNotStarting = !gm.IsGameStartingMap;
-        //isAudioTimeZero = audioManager.asource.time == 0;
-        //isAudioStopped = !audioManager.asource.isPlaying;
-
         audioTime = audioManager.asource.time;
 
 
@@ -150,7 +145,7 @@ public class FinishHandler : MonoBehaviour
 
 
 
-    void HandleFinishUI(ReplayData replay)
+    private void HandleFinishUI(ReplayData replay)
     {
         finishOverlay.SetActive(true);
         gm.trackText.gameObject.SetActive(false);
@@ -168,7 +163,6 @@ public class FinishHandler : MonoBehaviour
 
 
         cubesSpeedText.text = replay.Difficulty.CubesSpeed == 1 ? "1.0x" : replay.Difficulty.CubesSpeed.ToString().Replace(",", ".") + "x";
-        //musicSpeedText.text = (.replay.musicSpeed == 1 ? "1.0x" : gm.replay.musicSpeed.ToString().Replace(",", ".") + "x");
 
         heartIcon.SetActive(LoadingData.loadparams.Map.IsApproved);
 
@@ -176,11 +170,14 @@ public class FinishHandler : MonoBehaviour
 
 
         goToEditorBtn.SetActive(LoadingData.loadparams.Type == SceneloadParameters.LoadType.Moderation);
+
+
+        wordSpinner.Spin();
     }
-    public void UpdateDifficulty()
+    private void UpdateDifficulty()
     {
         int difficulty = LoadingData.loadparams.difficultyInfo.stars;
-        string diffName = LoadingData.loadparams.difficultyInfo.name;//LoadingData.loadparams.Map.difficultyName;
+        string diffName = LoadingData.loadparams.difficultyInfo.name;
 
         difficultyText.text = diffName;
         float xOffset = difficultyText.preferredWidth + 20;
