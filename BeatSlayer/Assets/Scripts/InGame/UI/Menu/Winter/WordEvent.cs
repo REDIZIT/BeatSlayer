@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace InGame.UI.Menu.Winter
     {
         public List<Word> words = new List<Word>();
 
-        public Word CurrentWord => words.FirstOrDefault(w => w.IsCompleted == false);
+        [JsonIgnore] public Word CurrentWord => words.FirstOrDefault(w => w.IsCompleted == false);
 
         public WordEvent()
         {

@@ -1,6 +1,7 @@
 using GameNet;
 using InGame.Helpers;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 using Zenject;
 
@@ -9,7 +10,8 @@ namespace InGame.UI.Menu.Winter
     public class WordCollectUI : MonoBehaviour
 	{
         [SerializeField] private HorizontalScrollSnap scrollSnap;
-        [SerializeField] private GameObject takeRewardButton;
+        [SerializeField] private Button takeRewardButton;
+        [SerializeField] private GameObject rewardedLabel;
 
         private WordEventManager wordEvent;
 
@@ -28,7 +30,10 @@ namespace InGame.UI.Menu.Winter
 
         private void Update()
         {
-            takeRewardButton.SetActive(wordEvent.Event.words[scrollSnap.CurrentPage].IsCompleted && SelectedWord.isRewarded == false);
+            takeRewardButton.gameObject.SetActive(SelectedWord.isRewarded == false);
+            takeRewardButton.interactable = SelectedWord.IsCompleted;
+            rewardedLabel.SetActive(SelectedWord.isRewarded);
+
 
             if (Input.anyKeyDown)
             {
@@ -49,6 +54,8 @@ namespace InGame.UI.Menu.Winter
 
             Payload.Account.AddCoins(SelectedWord.reward);
             SelectedWord.isRewarded = true;
+
+            wordEvent.Save();
         }
     }
 }

@@ -7,8 +7,10 @@ namespace InGame.UI.Menu.Winter
     {
         [SerializeField] private Text text;
         [SerializeField] private Shadow underline;
+        [SerializeField] private Image background;
 
         [SerializeField] private Color lockedColor, unlockedColor;
+        [SerializeField] private Color lockedBackground, unlockedBackground;
 
         private WordLetter letter;
 
@@ -25,6 +27,8 @@ namespace InGame.UI.Menu.Winter
 
             text.color = color;
             underline.effectColor = color;
+
+            background.color = letter.isCollected ? unlockedBackground : lockedBackground;
         }
     }
 }

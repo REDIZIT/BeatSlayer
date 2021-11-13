@@ -122,8 +122,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: {fileID: 8463542403115270001}
   underline: {fileID: 8463542402841048033}
+  background: {fileID: 8463542402841048046}
   lockedColor: {r: 0.19607843, g: 0.23137255, b: 0.2901961, a: 1}
   unlockedColor: {r: 1, g: 0.5686275, b: 0, a: 1}
+  lockedBackground: {r: 0, g: 0.34901962, b: 0.4745098, a: 1}
+  unlockedBackground: {r: 0, g: 0.7372549, b: 1, a: 1}
 --- !u!1 &8463542403115270014
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,7 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.5686275, b: 0, a: 1}
+  m_Color: {r: 0.19607843, g: 0.23137255, b: 0.2901961, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
