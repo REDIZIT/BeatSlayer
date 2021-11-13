@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
+//using UnityEngine.Rendering.PostProcessing;
 
 public class GameUIManager : MonoBehaviour
 {
-    public PostProcessVolume postProcessVolume;
-    DepthOfField depthOfField;
+    //public PostProcessVolume postProcessVolume;
+    //DepthOfField depthOfField;
     public float focusTarget;
 
     public float focusingTime;
@@ -17,7 +17,7 @@ public class GameUIManager : MonoBehaviour
 
     private void Start()
     {
-        depthOfField = postProcessVolume.profile.GetSetting<DepthOfField>();
+        //depthOfField = postProcessVolume.profile.GetSetting<DepthOfField>();
         _focusingTime = focusingTime;
     }
     private void Update()
@@ -28,9 +28,9 @@ public class GameUIManager : MonoBehaviour
     void Animate()
     {
         float target = focusTarget;
-        float current = depthOfField.focusDistance.value;
+        //float current = depthOfField.focusDistance.value;
 
-        depthOfField.focusDistance.value += (target - current) / _focusingTime;
+        //depthOfField.focusDistance.value += (target - current) / _focusingTime;
     }
 
     public void OnPause()

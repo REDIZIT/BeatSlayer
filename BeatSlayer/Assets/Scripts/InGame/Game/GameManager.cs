@@ -8,7 +8,7 @@ using ProjectManagement;
 using Testing;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
+//using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public BasicMapData mapData;
 
     [Header("Environment")]
-    public PostProcessVolume PostProcessing;
+    //public PostProcessVolume PostProcessing;
     public GameObject[] scenes;
     public Text trackText;
 
@@ -348,7 +348,7 @@ public class GameManager : MonoBehaviour
     {
         bool usePostProcessing = Settings.Graphics.IsGlowEnabled;
 
-        PostProcessing.gameObject.SetActive(usePostProcessing);
+        //PostProcessing.gameObject.SetActive(usePostProcessing);
 
         if (usePostProcessing)
         {
@@ -371,10 +371,10 @@ public class GameManager : MonoBehaviour
 
             cam.allowHDR = Settings.Graphics.GlowQuality == GlowQuality.High;
 
-            Bloom bloom = PostProcessing.profile.GetSetting<Bloom>();
-            bloom.active = true;
-            bloom.clamp.value = clamp;
-            bloom.intensity.value = bloomPower;
+            //Bloom bloom = PostProcessing.profile.GetSetting<Bloom>();
+            //bloom.active = true;
+            //bloom.clamp.value = clamp;
+            //bloom.intensity.value = bloomPower;
         }
 
 

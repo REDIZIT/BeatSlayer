@@ -18,7 +18,6 @@ namespace InGame.Game.Spawn
         public GameManager gm;
         public HPManager hp;
         public AudioManager audioManager;
-        public Camera cam;
         public AudioSource asource, spectrumAsource;
 
         public List<BeatCubeClass> Beats { get; private set; }
@@ -44,6 +43,8 @@ namespace InGame.Game.Spawn
         [HideInInspector] public Color32 leftSaberColor, rightSaberColor;
         [HideInInspector] public Color32 leftArrowColor, rightArrowColor;
 
+
+        private Camera cam;
         
 
 
@@ -109,6 +110,7 @@ namespace InGame.Game.Spawn
         {
             instance = this;
             musicOffset = SettingsManager.Settings.Gameplay.MusicOffset;
+            cam = Camera.main;
         }
         private void Update()
         {

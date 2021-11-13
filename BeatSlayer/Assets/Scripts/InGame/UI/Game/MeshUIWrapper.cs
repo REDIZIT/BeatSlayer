@@ -7,7 +7,6 @@ namespace InGame.UI.Game
 {
     public class MeshUIWrapper : BasicWrapper
     {
-        public Camera cam;
         public Transform leftGroup, rightGroup;
 
         [Header("Positions")]
@@ -18,9 +17,11 @@ namespace InGame.UI.Game
         public Material overlayMaterial;
 
         private float defaultFOV;
+        private Camera cam;
 
         private void Start()
         {
+            cam = Camera.main;
             defaultFOV = cam.fieldOfView;
 
             if (SettingsManager.Settings.Gameplay.TextMeshOverlay)

@@ -6,33 +6,20 @@ namespace InGame.Game.Environment
     public class SkyboxEnvironment : MonoBehaviour
     {
         [SerializeField] private Transform skyboxTransform;
-        [SerializeField] private Camera playerCamera;
 
         public float delayTime;
 
         public float scaleMultiplier;
         public bool isScaling;
 
+        private Camera cam;
+
 
         void Start()
         {
-            //if (!isScaling) return;
-
+            cam = Camera.main;
             ScaleToCamRect();
         }
-
-
-        /// <summary>
-        /// Stretch object with screen size
-        /// </summary>
-        //private void ScaleToCamRect()
-        //{
-        //    float distance = skyboxTransform.position.z;
-        //    float height = Mathf.Tan(playerCamera.fieldOfView) * distance;
-        //    float width = height * Screen.width / Screen.height / 2f;
-
-        //    skyboxTransform.localScale = new Vector3(width * scaleMultiplier, height * scaleMultiplier, skyboxTransform.localScale.z);
-        //}
 
         private void ScaleToCamRect()
         {
@@ -42,7 +29,6 @@ namespace InGame.Game.Environment
             w.Start();
 
             Transform scaledImage = skyboxTransform;
-            Camera cam = playerCamera;
 
             SpriteRenderer rend = scaledImage.GetComponent<SpriteRenderer>();
             float texWidth = rend.sprite.rect.width;
@@ -69,18 +55,5 @@ namespace InGame.Game.Environment
             w.Stop();
             delayTime = w.ElapsedMilliseconds;
         }
-
-        //private void ScaleToCamRect()
-        //{
-        //    float distance = skyboxTransform.position.z;
-        //    float height = Mathf.Tan(0.5f * playerCamera.fieldOfView * Mathf.Deg2Rad) * distance;
-        //    float width = height * Screen.width / Screen.height;
-
-        //    width /= 10f;
-        //    height /= 10f;
-
-
-        //    skyboxTransform.localScale = new Vector3(width, height, 1f);
-        //}
     }
 }
