@@ -8,7 +8,6 @@ using ProjectManagement;
 using Testing;
 using TMPro;
 using UnityEngine;
-//using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -60,7 +59,6 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public BasicMapData mapData;
 
     [Header("Environment")]
-    //public PostProcessVolume PostProcessing;
     public GameObject[] scenes;
     public Text trackText;
 
@@ -346,38 +344,6 @@ public class GameManager : MonoBehaviour
 
     void InitGraphics()
     {
-        bool usePostProcessing = Settings.Graphics.IsGlowEnabled;
-
-        //PostProcessing.gameObject.SetActive(usePostProcessing);
-
-        if (usePostProcessing)
-        {
-            int clamp = 0;
-            int bloomPower = 0;
-
-            switch(Settings.Graphics.GlowQuality)
-            {
-                case GlowQuality.Disabled: clamp = 0; break;
-                case GlowQuality.Low: clamp = 1; break;
-                case GlowQuality.High: clamp = 2; break;
-            }
-
-            switch (Settings.Graphics.GlowPower)
-            {
-                case GlowPower.Low: bloomPower = 1; break;
-                case GlowPower.Middle: bloomPower = 2; break;
-                case GlowPower.High: bloomPower = 3; break;
-            }
-
-            cam.allowHDR = Settings.Graphics.GlowQuality == GlowQuality.High;
-
-            //Bloom bloom = PostProcessing.profile.GetSetting<Bloom>();
-            //bloom.active = true;
-            //bloom.clamp.value = clamp;
-            //bloom.intensity.value = bloomPower;
-        }
-
-
         fpsText.gameObject.SetActive(false);
 
         likeBtnImg.gameObject.SetActive(LoadingData.loadparams.Type != SceneloadParameters.LoadType.AudioFile);

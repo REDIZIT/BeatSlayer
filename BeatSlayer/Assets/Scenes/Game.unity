@@ -10626,6 +10626,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 370039089}
+  - component: {fileID: 370039090}
   - component: {fileID: 370039088}
   m_Layer: 0
   m_Name: PostProcess
@@ -10665,6 +10666,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &370039090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 370039087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7fa3ae2f0081b24bb9dfe050e0e50cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &370453499
 GameObject:
   m_ObjectHideFlags: 0
@@ -49126,7 +49139,6 @@ MonoBehaviour:
   gm: {fileID: 1901715879}
   hp: {fileID: 1901715881}
   audioManager: {fileID: 1901715876}
-  cam: {fileID: 0}
   asource: {fileID: 1813542389}
   spectrumAsource: {fileID: 1555360461}
   secondHeight: 0
@@ -51324,7 +51336,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skyboxTransform: {fileID: 1840104481}
-  playerCamera: {fileID: 0}
   delayTime: 0
   scaleMultiplier: 0.5
   isScaling: 1
@@ -51354,7 +51365,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de7a9f8d57fa12a44876c07571dd96a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 0}
   leftGroup: {fileID: 1398783155}
   rightGroup: {fileID: 1951642474}
   leftGroupHorizontal: {x: -14.54, y: -4.1, z: 1.9}

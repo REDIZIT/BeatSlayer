@@ -185,7 +185,9 @@ namespace InGame.Settings
 
     public enum GlowQuality
     {
-        High, Low, Disabled
+        Disabled,
+        Low,
+        High
     }
     public enum GlowPower
     {
