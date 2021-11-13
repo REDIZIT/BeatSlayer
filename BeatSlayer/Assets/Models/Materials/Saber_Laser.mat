@@ -75,6 +75,7 @@ Material:
     - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 2.2935948, g: 0.43173552, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  m_BuildTextureStacks: []
 --- !u!114 &5444537990759685030
 MonoBehaviour:
   m_ObjectHideFlags: 11
