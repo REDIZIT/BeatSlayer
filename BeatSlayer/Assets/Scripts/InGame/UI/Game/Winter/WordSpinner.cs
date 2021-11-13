@@ -1,12 +1,18 @@
 using GameNet;
+using InGame.Audio;
 using InGame.UI.Menu.Winter;
+using Pixelplacement;
+using Pixelplacement.TweenSystem;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace InGame.UI.Game.Winter
 {
+    [RequireComponent(typeof(CanvasGroup))]
     public class WordSpinner : MonoBehaviour
 	{
 		[SerializeField] private RectTransform arrow;
@@ -14,7 +20,9 @@ namespace InGame.UI.Game.Winter
         [SerializeField] private float speed = 10;
         [SerializeField] private Transform backgroundContent;
 
-        [SerializeField] private AudioClip audioClip;
+        [SerializeField] private AudioClip spinAudio, winAudio;
+
+        [SerializeField] private Button closeButton;
 
         private WordSpinnerLotUII[] lotsUII;
 
@@ -29,33 +37,56 @@ namespace InGame.UI.Game.Winter
 
         private WordEventManager wordEvent;
         private SpinnerWordLot.Factory spinnerLotFactory;
+        private new AudioService audio;
+
+        private Word word;
+
+        private CanvasGroup canvasGroup;
+        private TweenBase appearAnimationTween;
+        private bool isAppeared;
+
         private bool isInited;
+        private int prevSpin;
 
 
         [Inject]
-        private void Construct(WordEventManager wordEvent, SpinnerWordLot.Factory spinnerLotFactory)
+        private void Construct(WordEventManager wordEvent, SpinnerWordLot.Factory spinnerLotFactory, AudioService audio)
         {
             this.wordEvent = wordEvent;
             this.spinnerLotFactory = spinnerLotFactory;
+            this.audio = audio;
+
+            word = wordEvent.Event.CurrentWord;
         }
 
         private void Start()
         {
+            canvasGroup = GetComponent<CanvasGroup>();
             Init();
         }
         private void Update()
         {
+            closeButton.gameObject.SetActive(isSpinning == false && isAppeared);
+
             if (isSpinning == false)
             {
-                //if (Input.GetKeyDown(KeyCode.Space))
-                //{
-                //    Spin();
-                //}
+#if UNITY_EDITOR
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    ShowAndSpin();
+                }
+#endif
                 return;
             }
 
             currentSpin += Mathf.Min(MAX_SPEED, (targetSpin - currentSpin) / speed);
             arrow.eulerAngles = new Vector3(0, 0, -Mathf.Repeat(DegreesPerPart / 2f + currentSpin * DegreesPerPart, 360));
+
+            if (Mathf.RoundToInt(currentSpin) != prevSpin)
+            {
+                prevSpin = Mathf.RoundToInt(currentSpin);
+                audio.PlayOneShot(spinAudio);
+            }
 
             for (int i = 0; i < PARTS_COUNT; i++)
             {
@@ -72,9 +103,11 @@ namespace InGame.UI.Game.Winter
                 lotsUII[index].OnWon();
 
                 lot.ApplyAward();
+
+                audio.PlayOneShot(winAudio);
             }
 
-            wordContainer.Refresh(wordEvent.Event.CurrentWord);
+            wordContainer.Refresh(word);
         }
 
         private void Init()
@@ -89,7 +122,7 @@ namespace InGame.UI.Game.Winter
         {
             lots = new ISpinnerLot[PARTS_COUNT];
 
-            WordLetter[] letters = GetRandomLetters(wordEvent.Event.CurrentWord);
+            WordLetter[] letters = GetRandomLetters(word);
             int randomLettersIndex = 0;
 
             int coinsRewardIndex = 0;
@@ -111,13 +144,45 @@ namespace InGame.UI.Game.Winter
                 }
             }
         }
-        public void Spin()
+        
+        public void ShowAndSpin()
+        {
+            StartCoroutine(IEAppearAnimation());
+        }
+
+        private IEnumerator IEAppearAnimation()
+        {
+            // Don't remove this wait. In game scene, in Finish handler time works weirdly.
+            // When you start tween without delay, it will Running, but nothing changes.
+            // Delay before tween start resolves this problem
+            // I know, bad, but WordSpinner is bad in all
+            yield return new WaitForSecondsRealtime(0.35f);
+
+            isAppeared = false;
+            appearAnimationTween = Tween.Value(0f, 1f, (v) => canvasGroup.alpha = v, 0.8f, 0, Tween.EaseLinear, obeyTimescale: false);
+            appearAnimationTween.Start();
+
+            while(appearAnimationTween.Status != Tween.TweenStatus.Finished)
+            {
+                yield return null;
+            }
+
+            yield return new WaitForSecondsRealtime(0.35f);
+
+            isAppeared = true;
+
+            Spin();
+        }
+
+
+        private void Spin()
         {
             Init();
             if (isSpinning) return;
             isSpinning = true;
 
             currentSpin = 0;
+            prevSpin = -1;
 
             float letterChance = 0.75f;
             if (Random.value <= letterChance)

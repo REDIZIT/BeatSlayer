@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BeatSlayerServer.Models.Database;
+using GameNet;
 using Notifications;
 
 namespace BeatSlayerServer.Multiplayer.Accounts
@@ -92,5 +93,14 @@ namespace BeatSlayerServer.Multiplayer.Accounts
         // Shop stuff
         public int Coins { get; set; }
         public List<PurchaseModel> Purchases { get; set; }
+
+
+
+        /// <summary>Add/remove coins to Account and sync with server</summary>
+        public void AddCoins(int coins)
+        {
+            Coins += coins;
+            NetCore.ServerActions.Shop.SendCoins(Nick, coins);
+        }
     }
 }

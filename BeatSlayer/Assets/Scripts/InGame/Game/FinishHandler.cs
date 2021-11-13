@@ -172,7 +172,7 @@ public class FinishHandler : MonoBehaviour
         goToEditorBtn.SetActive(LoadingData.loadparams.Type == SceneloadParameters.LoadType.Moderation);
 
 
-        wordSpinner.Spin();
+        wordSpinner.ShowAndSpin();
     }
     private void UpdateDifficulty()
     {

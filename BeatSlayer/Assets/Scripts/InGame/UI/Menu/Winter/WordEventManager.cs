@@ -23,7 +23,7 @@ namespace InGame.UI.Menu.Winter
                 Event = new WordEvent(new List<Word>()
                 {
                     new Word("Happy", 5000),
-                    new Word("New", 1200),
+                    new Word("New", 12000),
                     new Word("Year", 20000)
                 });
             }

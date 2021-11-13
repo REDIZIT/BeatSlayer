@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Linq;
 
 namespace InGame.UI.Menu.Winter
@@ -6,8 +7,9 @@ namespace InGame.UI.Menu.Winter
     {
 		public WordLetter[] letters;
         public int reward;
+        public bool isRewarded;
 
-        public bool IsCompleted => letters.All(l => l.isCollected);
+        [JsonIgnore] public bool IsCompleted => letters.All(l => l.isCollected);
 
         public Word() { }
         public Word(string word, int reward)
