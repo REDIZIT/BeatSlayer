@@ -6,7 +6,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="14" />
+    <uses-sdk />
 
              <!-- Required for Nearby Connections -->
         <uses-permission android:name="android.permission.BLUETOOTH" />

@@ -65,7 +65,7 @@ PlayerSettings:
   preserveFramebufferAlpha: 0
   disableDepthAndStencilBuffers: 0
   androidStartInFullscreen: 1
-  androidRenderOutsideSafeArea: 0
+  androidRenderOutsideSafeArea: 1
   androidUseSwappy: 0
   androidBlitType: 1
   androidResizableWindow: 0
@@ -242,12 +242,12 @@ PlayerSettings:
   useCustomLauncherGradleManifest: 0
   useCustomBaseGradleTemplate: 0
   useCustomGradlePropertiesTemplate: 0
-  useCustomProguardFile: 0
-  AndroidTargetArchitectures: 3
+  useCustomProguardFile: 1
+  AndroidTargetArchitectures: 2
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: D:/# Data
+  AndroidKeystoreName: D:/# Data #/# Backups #/publishkey.keystore
   AndroidKeyaliasName: publish
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
@@ -417,7 +417,7 @@ PlayerSettings:
     m_GraphicsJobMode: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: AndroidPlayer
-    m_APIs: 08000000
+    m_APIs: 0b000000
     m_Automatic: 1
   - m_BuildTarget: iOSSupport
     m_APIs: 10000000
@@ -789,6 +789,7 @@ PlayerSettings:
     ErrorHub: 0
     Hub: 0
     UNet: 1
+    Unity Ads: 1
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
