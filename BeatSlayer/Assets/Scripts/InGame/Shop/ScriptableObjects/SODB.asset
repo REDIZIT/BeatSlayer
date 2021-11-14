@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 684de8d8c50e2d540976f8816d635aef, type: 3}
   m_Name: SODB
   m_EditorClassIdentifier: 
-  lastUsedId: 15
+  lastUsedId: 16
   sabers:
   - {fileID: 11400000, guid: 5b6e10ac21a3f8648a80bc0ba6773f7d, type: 2}
   - {fileID: 11400000, guid: 3e617e9959a5d844098b3fe9eb1dd112, type: 2}
@@ -22,6 +22,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4329c3ccccbfdab4cb2f9da92179b7ab, type: 2}
   - {fileID: 11400000, guid: 1797436069af8454887a1cbbfa4c73db, type: 2}
   - {fileID: 11400000, guid: 4eb3e5520807a2d429c8c34774bac625, type: 2}
+  - {fileID: 11400000, guid: 18ecd737d839b664b83581cdb712beac, type: 2}
   tails:
   - {fileID: 11400000, guid: a90d29f399dc9db4c8e31da7ecdde986, type: 2}
   - {fileID: 11400000, guid: d30ac3d8c739a324f922e9dc3d3a3007, type: 2}

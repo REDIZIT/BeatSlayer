@@ -22,6 +22,7 @@ namespace InGame.Shop
         public Image rightOutline, leftOutline, bothOutline;
         public Image rightBg, leftBg, bothBg;
         public Image rightImage, leftImage, bothLeftImage, bothRightImage;
+        [SerializeField] private GameObject winterRewardText;
 
         [Header("Buy section")]
         public float coinSpacing;
@@ -43,7 +44,7 @@ namespace InGame.Shop
 
 
             bool isBought = shopHelper.IsPurchased(shopItem);
-            RefreshSections(isBought/*prefs.boughtSabers[item.id]*/);
+            RefreshSections(isBought, shopItem.cost);
 
             if(Payload.Account != null)
                 buyBtn.interactable = Payload.Account.Coins >= shopItem.cost;
@@ -77,10 +78,11 @@ namespace InGame.Shop
 
 
 
-        private void RefreshSections(bool isBought)
+        private void RefreshSections(bool isBought, int cost)
         {
-            buySection.SetActive(!isBought);
+            buySection.SetActive(!isBought && cost >= 0);
             selectSection.SetActive(isBought);
+            winterRewardText.SetActive(cost < 0);
 
             RefreshCoinsContainer();
         }

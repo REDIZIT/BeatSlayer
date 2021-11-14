@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 849ae327276cf2a438fdbf420af5f76d, type: 3}
   m_Name: Candy Cane
   m_EditorClassIdentifier: 
-  name: Candy Cane
-  description: Candy Cane-Descript
+  name: CandyCane
+  description: CandyCane-descript
   cost: -1
-  purchaseId: -1
+  purchaseId: 17
   purchaseName: CandyCaneSaber
   id: 8
-  image: {fileID: 0}
+  image: {fileID: 21300000, guid: 8ecff369be5c7384fbc6e03187253001, type: 3}
   model: {fileID: 280951435924403068, guid: c1e0075c302659e4c8d4c5ffe891455f, type: 3}

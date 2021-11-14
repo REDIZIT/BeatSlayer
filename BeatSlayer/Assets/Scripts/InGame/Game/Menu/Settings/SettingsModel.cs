@@ -155,7 +155,7 @@ namespace InGame.Settings
         [Range(-4, 10)]
         public float CubesSuncOffset { get; set; } = 2.5f;
 
-        [Option("Music offset (more - cube spawns earlier)")]
+        [Option("Music offset")]
         [Range(-1, 1)]
         public float MusicOffset { get; set; } = 0;
 
