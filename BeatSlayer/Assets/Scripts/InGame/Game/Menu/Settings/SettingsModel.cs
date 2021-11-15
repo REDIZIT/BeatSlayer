@@ -50,7 +50,7 @@ namespace InGame.Settings
         [Option("Trackname text position")]
         public TracknameTextPosition TracknameTextPosition { get; set; } = TracknameTextPosition.Top;
 
-        [Option("Enable blur (expensive)")]
+        //[Option("Enable blur (expensive)")]
         public bool IsBlurEnabled { get; set; }
 
 

@@ -237,8 +237,6 @@ namespace InGame.Game.Menu
             // Update values
             model.Enabled = SettingsManager.IsPropertyEnabled(item.model.PropertyInfo, SettingsProperties, item.model.PropertyTarget);
 
-            if (model.Enabled == false) Debug.Log(model.NameWithoutLocalization + " is disabled");
-
             item.Refresh(model, this, dropdownlocker);
         }
     }

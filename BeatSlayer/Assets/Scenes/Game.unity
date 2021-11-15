@@ -6022,6 +6022,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: WordSpinner
       objectReference: {fileID: 0}
+    - target: {fileID: 7123777693015805923, guid: 3d10cf047ccd03d459ac0faf7eba9eaf,
+        type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d10cf047ccd03d459ac0faf7eba9eaf, type: 3}
 --- !u!224 &45307193 stripped

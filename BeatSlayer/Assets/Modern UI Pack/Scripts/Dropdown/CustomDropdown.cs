@@ -44,6 +44,7 @@ namespace Michsky.UI.ModernUIPack
 
 
         private Animator dropdownAnimator;
+        private CanvasGroup dropdownGroup;
         private TextMeshProUGUI setItemText;
         private Image setItemImage;
 
@@ -75,6 +76,7 @@ namespace Michsky.UI.ModernUIPack
         {
             dropdownAnimator = gameObject.GetComponent<Animator>();
             itemList = itemParent.GetComponent<VerticalLayoutGroup>();
+            dropdownGroup = itemListContent.GetComponent<CanvasGroup>();
 
             foreach (Transform child in itemParent)
                 GameObject.Destroy(child.gameObject);
@@ -100,7 +102,7 @@ namespace Michsky.UI.ModernUIPack
                 itemButton = go.GetComponent<Button>();
 
                 if(dropdownItems[i].OnItemSelection != null) itemButton.onClick.AddListener(dropdownItems[i].OnItemSelection.Invoke);
-                itemButton.onClick.AddListener(Animate);
+                itemButton.onClick.AddListener(() => Animate(true));
                 itemButton.onClick.AddListener(delegate
                 {
                     ChangeDropdownInfo(index = go.transform.GetSiblingIndex());
@@ -137,6 +139,7 @@ namespace Michsky.UI.ModernUIPack
             //    selectedImage.gameObject.SetActive(true);
 
             currentListParent = transform.parent;
+            dropdownGroup.alpha = 0;
         }
 
         public void ChangeDropdownInfo(int itemIndex)
@@ -144,70 +147,89 @@ namespace Michsky.UI.ModernUIPack
             selectedImage.sprite = dropdownItems[itemIndex].itemIcon;
             selectedImage.gameObject.SetActive(dropdownItems[itemIndex].itemIcon != null);
 
-            Debug.Log("On dropdown value changed ");
-
             OnValueChanged?.Invoke(itemIndex);
 
             selectedText.text = dropdownItems[itemIndex].itemName;
             selectedItemIndex = itemIndex;
-            // dropdownItems[itemIndex].OnItemSelection.Invoke();
         }
 
-        public void Animate()
+        public void Animate(bool skipAnimation)
         {
-            if (isOn == false && animationType == AnimationType.FADING)
+            if (skipAnimation)
             {
-                dropdownAnimator.Play("Fading In");
-                isOn = true;
+                dropdownGroup.alpha = isOn ? 0 : 1;
 
-                if (isListItem == true)
-                    gameObject.transform.SetParent(listParent, true);
+                if (isOn)
+                {
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(currentListParent, true);
+                }
+                else
+                {
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(listParent, true);
+                }
+
+                isOn = !isOn;
+            }
+            else
+            {
+                if (isOn == false && animationType == AnimationType.FADING)
+                {
+                    dropdownAnimator.Play("Fading In");
+                    isOn = true;
+
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(listParent, true);
+                }
+
+                else if (isOn == true && animationType == AnimationType.FADING)
+                {
+                    dropdownAnimator.Play("Fading Out");
+                    isOn = false;
+
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(currentListParent, true);
+                }
+
+                else if (isOn == false && animationType == AnimationType.SLIDING)
+                {
+                    dropdownAnimator.Play("Sliding In");
+                    isOn = true;
+
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(listParent, true);
+                }
+
+                else if (isOn == true && animationType == AnimationType.SLIDING)
+                {
+                    dropdownAnimator.Play("Sliding Out");
+                    isOn = false;
+
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(currentListParent, true);
+                }
+
+                else if (isOn == false && animationType == AnimationType.STYLISH)
+                {
+                    dropdownAnimator.Play("Stylish In");
+                    isOn = true;
+
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(listParent, true);
+                }
+
+                else if (isOn == true && animationType == AnimationType.STYLISH)
+                {
+                    dropdownAnimator.Play("Stylish Out");
+                    isOn = false;
+
+                    if (isListItem == true)
+                        gameObject.transform.SetParent(currentListParent, true);
+                }
             }
 
-            else if (isOn == true && animationType == AnimationType.FADING)
-            {
-                dropdownAnimator.Play("Fading Out");
-                isOn = false;
-
-                if (isListItem == true)
-                    gameObject.transform.SetParent(currentListParent, true);
-            }
-
-            else if (isOn == false && animationType == AnimationType.SLIDING)
-            {
-                dropdownAnimator.Play("Sliding In");
-                isOn = true;
-
-                if (isListItem == true)
-                    gameObject.transform.SetParent(listParent, true);
-            }
-
-            else if (isOn == true && animationType == AnimationType.SLIDING)
-            {
-                dropdownAnimator.Play("Sliding Out");
-                isOn = false;
-
-                if (isListItem == true)
-                    gameObject.transform.SetParent(currentListParent, true);
-            }
-
-            else if (isOn == false && animationType == AnimationType.STYLISH)
-            {
-                dropdownAnimator.Play("Stylish In");
-                isOn = true;
-
-                if (isListItem == true)
-                    gameObject.transform.SetParent(listParent, true);
-            }
-
-            else if (isOn == true && animationType == AnimationType.STYLISH)
-            {
-                dropdownAnimator.Play("Stylish Out");
-                isOn = false;
-
-                if (isListItem == true)
-                    gameObject.transform.SetParent(currentListParent, true);
-            }
+            
 
             if (enableTrigger == true && isOn == false)
                 triggerObject.SetActive(false);
@@ -225,7 +247,7 @@ namespace Michsky.UI.ModernUIPack
             {
                 if (isOn == true)
                 {
-                    Animate();
+                    Animate(true);
                     isOn = false;
                 }
 

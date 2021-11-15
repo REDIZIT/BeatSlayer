@@ -14,7 +14,4 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SaberMaker.unity
     guid: a55c21e77841bd24098ef606e0e7bebd
-  - enabled: 1
-    path: Assets/Plugins/Zenject/OptionalExtras/IntegrationTests/SceneTests/TestDestructionOrder/EmptyScene.unity
-    guid: f0b451bb575d6874db7cdbcfb24a45de
   m_configObjects: {}

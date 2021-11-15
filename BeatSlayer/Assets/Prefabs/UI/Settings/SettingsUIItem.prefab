@@ -851,9 +851,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 983183350050908040}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: Michsky.UI.ModernUIPack.CustomDropdown, Assembly-CSharp
         m_MethodName: Animate
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -908,7 +908,7 @@ MonoBehaviour:
   outOnPointerExit: 0
   isListItem: 1
   invokeAtStart: 0
-  animationType: 1
+  animationType: 3
   selectedItemIndex: 0
   dropdownItems: []
   index: 0

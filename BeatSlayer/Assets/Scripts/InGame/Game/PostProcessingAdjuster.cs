@@ -38,9 +38,9 @@ namespace InGame
         {
             switch (power)
             {
-                case GlowPower.High: return 3.2f;
-                case GlowPower.Middle: return 2.1f;
-                case GlowPower.Low: return 1.3f;
+                case GlowPower.High: return 2.2f;
+                case GlowPower.Middle: return 1.5f;
+                case GlowPower.Low: return 1f;
                 default:
                     Debug.Log($"Can't find value for GlowPower = {power}. Default value (1) will be used.");
                     return 1;
