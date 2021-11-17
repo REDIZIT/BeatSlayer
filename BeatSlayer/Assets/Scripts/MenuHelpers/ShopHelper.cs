@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using Assets.SimpleLocalization;
+﻿using BeatSlayerServer.Models.Database;
 using GameNet;
 using InGame.Helpers;
-using InGame.Shop;
 using InGame.ScriptableObjects;
-using InGame.Menu.Shop;
-using InGame.UI.Menu.Shop;
-using System.Threading.Tasks;
-using BeatSlayerServer.Models.Database;
-using System.Linq;
-using UnityEditor;
-using Newtonsoft.Json;
+using InGame.Shop;
 using InGame.Shop.UIItems;
-using System.Diagnostics;
+using InGame.UI.Menu.Shop;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 using Debug = UnityEngine.Debug;
 
 public class ShopHelper : MonoBehaviour
@@ -29,12 +26,9 @@ public class ShopHelper : MonoBehaviour
 
     public Transform skillsScrollView, sabersView;
     public GameObject sabersGroup;
-    Transform content;
 
-    List<Skill> skills = new List<Skill>();
     public Sprite[] skillsSprites;
 
-    List<Booster> boosters = new List<Booster>();
     public Sprite[] boostersSprites;
 
     public Transform colorselect;
@@ -50,6 +44,8 @@ public class ShopHelper : MonoBehaviour
     public Transform saberContent;
     public Transform effectsContent, locationsContent;
 
+    private ShopService shop;
+
 
     private void Awake()
     {
@@ -62,12 +58,25 @@ public class ShopHelper : MonoBehaviour
             };
         });
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Debug.Log("Debug key pressed (L). Invoke shop test");
+
+            shop.TryBuy(16);
+        }
+    }
+
+    [Inject]
+    private void Construct(ShopService shop)
+    {
+        this.shop = shop;
+    }
+
     private void RefreshShop()
     {
-        content = skillsScrollView.GetChild(0).GetChild(0);
-        skills = AdvancedSaveManager.prefs.skills;
-        boosters = AdvancedSaveManager.prefs.boosters;
-
         FillSabersView();
         FillEffectsView();
         FillLocationsView();
@@ -150,9 +159,8 @@ public class ShopHelper : MonoBehaviour
 
         // Updating UI
         RefreshSabersView();
-        menuscript.RefreshCoinsTexts();
 
-        await Purchase(saberSO.purchaseId);
+        await shop.Purchase(saberSO.purchaseId);
     }
    
     public async Task BuyTail(int id)
@@ -164,9 +172,8 @@ public class ShopHelper : MonoBehaviour
 
         // Updating UI
         RefreshEffectsView();
-        menuscript.RefreshCoinsTexts();
 
-        await Purchase(tail.purchaseId);
+        await shop.Purchase(tail.purchaseId);
     }
     public async Task BuyLocation(LocationSO so)
     {
@@ -176,16 +183,14 @@ public class ShopHelper : MonoBehaviour
 
         // Updating UI
         RefreshLocationsView();
-        menuscript.RefreshCoinsTexts();
 
-        await Purchase(so.purchaseId);
+        await shop.Purchase(so.purchaseId);
     }
     
 
 
     public void SelectSaber(int id, SaberHand hand)
     {
-        //AdvancedSaveManager.prefs.selectedSaber = id;
         if (hand == SaberHand.Both)
         {
             AdvancedSaveManager.prefs.selectedLeftSaberId = id;
@@ -203,7 +208,6 @@ public class ShopHelper : MonoBehaviour
         }
         else
         {
-            //AdvancedSaveManager.prefs.selectedLeftSaberId = -1;
             if (AdvancedSaveManager.prefs.selectedLeftSaberId == id) AdvancedSaveManager.prefs.selectedLeftSaberId = 0;
             AdvancedSaveManager.prefs.selectedRightSaberId = id;
         }
@@ -291,35 +295,6 @@ public class ShopHelper : MonoBehaviour
         else SSytem.rightDirColor = img.color;
         AdvancedSaveManager.Save();
         colorselect.gameObject.SetActive(false);
-    }
-
-
-
-
-
-
-    private async Task<bool> Purchase(int purchaseId)
-    {
-        // Check if already bought
-        if (Payload.Account.Purchases.Any(c => c.ItemId == purchaseId)) return false;
-
-        Stopwatch w = Stopwatch.StartNew();
-        PurchaseModel purchase = await NetCore.ServerActions.Shop.TryBuyPurchase(Payload.Account.Nick, purchaseId);
-        w.Stop();
-        UnityEngine.Debug.Log($"Purchase elapsed time is {w.ElapsedMilliseconds}ms");
-
-        // Purchasing failed on server side
-        if (purchase == null)
-        {
-            Debug.LogError("Purchase is null");
-            return false;
-        }
-
-        // Adding bought purchase to local account class and decrease local balance
-        Payload.Account.Purchases.Add(purchase);
-        Payload.Account.Coins -= purchase.Cost;
-
-        return true;
     }
 }
 

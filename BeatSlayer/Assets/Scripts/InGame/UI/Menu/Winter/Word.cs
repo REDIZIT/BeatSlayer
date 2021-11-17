@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace InGame.UI.Menu.Winter
@@ -6,13 +7,13 @@ namespace InGame.UI.Menu.Winter
     public class Word
     {
 		public WordLetter[] letters;
-        public int reward;
+        public List<WordReward> rewards;
         public bool isRewarded;
 
         [JsonIgnore] public bool IsCompleted => letters.All(l => l.isCollected);
 
         public Word() { }
-        public Word(string word, int reward)
+        public Word(string word, List<WordReward> rewards)
         {
             letters = new WordLetter[word.Length];
             for (int i = 0; i < letters.Length; i++)
@@ -20,7 +21,7 @@ namespace InGame.UI.Menu.Winter
                 letters[i] = new WordLetter(word[i]);
             }
 
-            this.reward = reward;
+            this.rewards = rewards;
         }
 
         public void TryGiveLetter(WordLetter letter)
@@ -33,6 +34,17 @@ namespace InGame.UI.Menu.Winter
                     return;
                 }
             }
+        }
+        public void ApplyRewards()
+        {
+            if (isRewarded || IsCompleted == false) return;
+
+            foreach (WordReward reward in rewards)
+            {
+                reward.Apply();
+            }
+
+            isRewarded = true;
         }
     }
 }

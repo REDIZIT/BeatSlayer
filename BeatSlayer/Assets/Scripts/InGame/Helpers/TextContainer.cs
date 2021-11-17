@@ -53,17 +53,19 @@ public class TextContainer : MonoBehaviour
     {
         if (!enabled) return;
 
-        bool update = false;
-        for (int i = 0; i < texts.Count; i++)
-        {
-            if (prevTextsValue[i] != texts[i].text)
-            {
-                prevTextsValue[i] = texts[i].text;
-                update = true;
-            }
-        }
+        UpdateThis();
+
+        //bool update = false;
+        //for (int i = 0; i < texts.Count; i++)
+        //{
+        //    if (prevTextsValue[i] != texts[i].text)
+        //    {
+        //        prevTextsValue[i] = texts[i].text;
+        //        update = true;
+        //    }
+        //}
         
-        if (update) UpdateThis();
+        //if (update) UpdateThis();
     }
 
     private void OnDisable()

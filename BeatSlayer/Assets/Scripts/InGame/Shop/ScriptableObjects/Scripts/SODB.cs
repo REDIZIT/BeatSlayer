@@ -19,6 +19,14 @@ namespace InGame.ScriptableObjects
         public List<LocationSO> locations;
         public List<ModSO> mods;
 
+
+        public IEnumerable<ShopItemSO> EnumerateAllItems()
+        {
+            foreach (var saber in sabers) yield return saber;
+            foreach (var tail in tails) yield return tail;
+            foreach (var loc in locations) yield return loc;
+        }
+
         private void OnValidate()
         {
             List<ShopItemSO> all = new List<ShopItemSO>();

@@ -1,5 +1,3 @@
-using GameNet;
-using InGame.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
@@ -33,27 +31,13 @@ namespace InGame.UI.Menu.Winter
             takeRewardButton.gameObject.SetActive(SelectedWord.isRewarded == false);
             takeRewardButton.interactable = SelectedWord.IsCompleted;
             rewardedLabel.SetActive(SelectedWord.isRewarded);
-
-
-            if (Input.anyKeyDown)
-            {
-                foreach (WordLetter letter in wordEvent.Event.CurrentWord.letters)
-                {
-                    if (Input.GetKeyDown(letter.letter.ToString().ToLower()))
-                    {
-                        wordEvent.TryGiveLetter(letter);
-                        break;
-                    }
-                }
-            }
         }
 
         public void ClickTakeReward()
         {
             if (SelectedWord.IsCompleted == false || SelectedWord.isRewarded) return;
 
-            Payload.Account.AddCoins(SelectedWord.reward);
-            SelectedWord.isRewarded = true;
+            SelectedWord.ApplyRewards();
 
             wordEvent.Save();
         }
