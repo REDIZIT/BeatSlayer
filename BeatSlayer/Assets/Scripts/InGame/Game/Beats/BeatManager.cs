@@ -6,6 +6,7 @@ using InGame.Game.Scoring.Mods;
 using InGame.Multiplayer.Lobby;
 using InGame.Settings;
 using UnityEngine;
+using Zenject;
 
 namespace InGame.Game.Spawn
 {
@@ -45,7 +46,6 @@ namespace InGame.Game.Spawn
 
 
         private Camera cam;
-        
 
 
         public float LineLengthMultiplier
@@ -83,7 +83,7 @@ namespace InGame.Game.Spawn
                 return speed * asource.pitch * modsSpeedMultiplayer;
             }
         }
-        
+
 
         /// <summary>
         /// Modifier of <see cref="CubeSpeedPerFrame"/> based on selected Mods
@@ -96,7 +96,7 @@ namespace InGame.Game.Spawn
         private float virtualTime;
 
 
-       
+
         private float firstCubeTime, lastCubeTime;
 
         public float playAreaZ;
@@ -104,6 +104,15 @@ namespace InGame.Game.Spawn
 
         private float musicOffset;
 
+        private BeatCube.Pool beatPool;
+        private SliceEffectSystem.Pool effectPool;
+
+        [Inject]
+        private void Construct(BeatCube.Pool beatPool, SliceEffectSystem.Pool effectPool)
+        {
+            this.beatPool = beatPool;
+            this.effectPool = effectPool;
+        }
 
 
         private void Awake()
@@ -124,6 +133,7 @@ namespace InGame.Game.Spawn
             }
         }
 
+        
 
 
         public void Setup(GameManager gm, float cubesSpeed)
@@ -139,8 +149,8 @@ namespace InGame.Game.Spawn
 
             secondHeight = SettingsManager.Settings.Gameplay.SecondCubeHeight;
 
-            if(Beats != null && Beats.Count > 0) firstCubeTime = Beats[0].time;
-            if(Beats != null && Beats.Count > 0) lastCubeTime = Beats.Last().time;
+            if (Beats != null && Beats.Count > 0) firstCubeTime = Beats[0].time;
+            if (Beats != null && Beats.Count > 0) lastCubeTime = Beats.Last().time;
 
 
             modsSpeedMultiplayer = ((gm.scoringManager.Replay.Mods & ModEnum.Easy) == ModEnum.Easy) ? 0.75f :
@@ -168,7 +178,7 @@ namespace InGame.Game.Spawn
 
             if (!isTutorial)
                 asource.Play();
-            
+
             gm.IsGameStartingMap = false;
             gm.IsGameStarted = true;
 
@@ -228,7 +238,7 @@ namespace InGame.Game.Spawn
 
             foreach (BeatCubeClass cls in Beats)
             {
-                if(virtualTime >= GetNormalizedTime(cls))
+                if (virtualTime >= GetNormalizedTime(cls))
                 {
                     SpawnBeatCube(cls);
 
@@ -256,7 +266,7 @@ namespace InGame.Game.Spawn
             //return cls.time + timeOffset;
         }
 
-        
+
 
         void CalculateField()
         {
@@ -302,14 +312,23 @@ namespace InGame.Game.Spawn
             }
 
 
-            GameObject c = Instantiate(prefab);
-            c.transform.name = prefab.name;
+            GameObject t;
+            if (beat.type == BeatCubeClass.Type.Dir || beat.type == BeatCubeClass.Type.Point)
+            {
+                t = beatPool.Spawn().gameObject;
+            }
+            else
+            {
+                t = Instantiate(prefab);
+            }
+
+
+            t.transform.name = prefab.name;
             // Copensate error appeared due to limited fps
             // Make offset to proper time
-            c.transform.position += new Vector3(0, 0, (asource.time - beat.time) * CubeSpeedPerSecond);
+            t.transform.position += new Vector3(0, 0, (asource.time - beat.time) * CubeSpeedPerSecond);
 
-            IBeat cube = c.GetComponent<IBeat>();
-
+            IBeat cube = t.GetComponent<IBeat>();
             cube.Setup(gm, beat, cubesSpeed, this);
 
 
@@ -333,7 +352,7 @@ namespace InGame.Game.Spawn
                 if (noCooldown.Count() > 1)
                 {
                     point = noCooldown.ElementAt(Random.Range(0, noCooldown.Count() - 1));
-                    
+
                 }
                 else
                 {
@@ -345,40 +364,6 @@ namespace InGame.Game.Spawn
                 point = noCooldown.ElementAt(Random.Range(0, sorted.Count() - 1));
             }
             return point.road;
-
-            //// Список тех точек которые полностью свободены
-            //List<int> freePoints = new List<int>();
-
-            //// Поиск наилучшего варианта (Если freepoints пустой)
-            //float min = 999;
-            //int bestIndex = Random.Range(0,4);
-
-            //for (int i = 0; i < spawnPoints.Length; i++)
-            //{
-            //    if(spawnPoints[i].cooldown < min)
-            //    {
-            //        min = spawnPoints[i].cooldown;
-            //        bestIndex = i;
-            //    }
-
-
-            //    // Если точка полностью свободна, то добавляем её в список
-            //    if (spawnPoints[i].cooldown <= 0)
-            //    {
-            //        freePoints.Add(i);
-            //    }
-            //}
-
-            //// Если послностью свободных точек нет, то возвращаем лучший вариант 
-            //if(freePoints.ToArray().Length == 0)
-            //{
-            //    return bestIndex;
-            //}
-            //else
-            //{
-            //    // Если есть полностью свободные точки, то вернуть одну из них
-            //    return freePoints[Random.Range(0, freePoints.ToArray().Length)];
-            //}
         }
 
         public float GetPositionByRoad(int road)
@@ -402,7 +387,7 @@ namespace InGame.Game.Spawn
 
 
             if (Beats == null) return true;
-            
+
 
 
 
@@ -423,11 +408,5 @@ namespace InGame.Game.Spawn
 
             asource.time = GetSkipTime();
         }
-    }
-
-    public class SpawnPointClass
-    {
-        public int index;
-        public float cooldown;
     }
 }

@@ -34115,6 +34115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1153734588}
   - component: {fileID: 1153734589}
+  - component: {fileID: 1153734590}
   m_Layer: 0
   m_Name: '[Scripts]'
   m_TagString: Untagged
@@ -34153,7 +34154,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers: []
-  _monoInstallers: []
+  _monoInstallers:
+  - {fileID: 1153734590}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -34171,6 +34173,22 @@ MonoBehaviour:
   _parentNewObjectsUnderSceneContext: 0
   _contractNames: []
   _parentContractNames: []
+--- !u!114 &1153734590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153734587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7e75c3f5704fae49ba2cb414f529959, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cubeSliceEffectPrefab: {fileID: 6399446966512558054, guid: b4560cbca3cea944594d0dea14271707,
+    type: 3}
+  cubePrefab: {fileID: 5246573814853622201, guid: 8c1737f44538e5b4391d66a1e27c62bd,
+    type: 3}
 --- !u!1 &1163323234
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,19 +2,22 @@ using InGame.UI.Menu.Winter;
 using UnityEngine;
 using Zenject;
 
-public class MenuInstaller : MonoInstaller
+namespace InGame.DI
 {
-    [SerializeField] private ShopHelper shop;
-
-    [SerializeField] private Transform wordContainerGroup;
-    [SerializeField] private WordContainerUII wordContainerUII;
-
-    public override void InstallBindings()
+    public class MenuInstaller : MonoInstaller
     {
-        Container.Bind<ShopHelper>().FromInstance(shop);
+        [SerializeField] private ShopHelper shop;
 
-        Container.BindFactory<WordContainerUII, WordContainerUII.Factory>()
-            .FromComponentInNewPrefab(wordContainerUII)
-            .UnderTransform(wordContainerGroup);
+        [SerializeField] private Transform wordContainerGroup;
+        [SerializeField] private WordContainerUII wordContainerUII;
+
+        public override void InstallBindings()
+        {
+            Container.Bind<ShopHelper>().FromInstance(shop);
+
+            Container.BindFactory<WordContainerUII, WordContainerUII.Factory>()
+                .FromComponentInNewPrefab(wordContainerUII)
+                .UnderTransform(wordContainerGroup);
+        }
     }
 }

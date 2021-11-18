@@ -1,6 +1,7 @@
 ﻿using InGame.Game.Spawn;
 using System.Collections;
 using UnityEngine;
+using Zenject;
 
 public class BeatCube : MonoBehaviour, IBeat
 {
@@ -13,7 +14,7 @@ public class BeatCube : MonoBehaviour, IBeat
     public MeshRenderer renderer;
     public MeshFilter filter;
 
-    [SerializeField] private ParticleSystem cubeParticleSystem, cubeDissovleParticleSystem;
+    [SerializeField] private ParticleSystem cubeDissovleParticleSystem;
 
     public Transform markersPivot;
     public MeshRenderer arrowMarker;
@@ -27,14 +28,25 @@ public class BeatCube : MonoBehaviour, IBeat
     public float SpeedMultiplier { get; set; }
     public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
 
-    private float materialThreshold = 0.5f;
-    private float thresholdChange = -1;
+    private float materialThreshold;
+    private float thresholdChange;
 
     private bool isDead;
+
+    private new BoxCollider collider;
 
     private BeatManager bm;
     private GameManager gm;
 
+    private Pool pool;
+    private SliceEffectSystem.Pool sliceEffectPool;
+
+    [Inject]
+    private void Construct(Pool pool, SliceEffectSystem.Pool sliceEffectPool)
+    {
+        this.pool = pool;
+        this.sliceEffectPool = sliceEffectPool;
+    }
 
     public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
     {
@@ -42,6 +54,8 @@ public class BeatCube : MonoBehaviour, IBeat
         this.cls = cls;
         SpeedMultiplier = 1;
         this.bm = bm;
+
+        Reset();
 
         if (cls.type == BeatCubeClass.Type.Point)
         {
@@ -62,14 +76,7 @@ public class BeatCube : MonoBehaviour, IBeat
         pointMarker.gameObject.SetActive(cls.type == BeatCubeClass.Type.Point);
         arrowMarker.gameObject.SetActive(cls.type == BeatCubeClass.Type.Dir);
 
-
-        cubeParticleSystem.Stop();
         cubeDissovleParticleSystem.Stop();
-
-        foreach (Material material in renderer.materials)
-        {
-            material.SetFloat("_Threshold", materialThreshold);
-        }
 
 
         if (cls.saberType != 0)
@@ -109,6 +116,10 @@ public class BeatCube : MonoBehaviour, IBeat
         transform.position = pos;
     }
 
+    void Awake()
+    {
+        collider = GetComponent<BoxCollider>();
+    }
     void Update()
     {
         if (isDead) SlicedUpdate();
@@ -164,7 +175,7 @@ public class BeatCube : MonoBehaviour, IBeat
         if (isDead) return;
         isDead = true;
 
-        gm.BeatCubeSliced(this);
+        gm.BeatCubeSliced   (this);
 
         OnSlice(angle, dissolve);
     }
@@ -218,9 +229,7 @@ public class BeatCube : MonoBehaviour, IBeat
         }
         else
         {
-            cubeParticleSystem.gameObject.SetActive(true);
-            cubeParticleSystem.transform.parent = null;
-            cubeParticleSystem.transform.eulerAngles = new Vector3(0, 0, angle);
+            sliceEffectPool.Spawn(transform.position, angle);
         }
 
         thresholdChange = 4;
@@ -232,7 +241,7 @@ public class BeatCube : MonoBehaviour, IBeat
                 mat.color.b / 10f));
         }
 
-        GetComponent<BoxCollider>().enabled = false;
+        collider.enabled = false;
     }
 
     void SlicedUpdate()
@@ -240,7 +249,29 @@ public class BeatCube : MonoBehaviour, IBeat
         SpeedMultiplier -= (SpeedMultiplier - Time.deltaTime) / 8f;
         if (materialThreshold >= 1)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            pool.Despawn(this);
+        }
+    }
+
+    private void Reset()
+    {
+        collider.enabled = true;
+        isDead = false;
+
+        materialThreshold = 0.5f;
+        thresholdChange = -1;
+        foreach (Material material in renderer.materials)
+        {
+            material.SetFloat("_Threshold", materialThreshold);
+        }
+    }
+
+    public class Pool : MonoMemoryPool<BeatCube>
+    {
+        protected override void Reinitialize(BeatCube item)
+        {
+            item.Reset();
         }
     }
 }
