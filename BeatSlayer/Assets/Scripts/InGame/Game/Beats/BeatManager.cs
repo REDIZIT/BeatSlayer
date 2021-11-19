@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using InGame.DI;
 using InGame.Game.Beats.Blocks;
 using InGame.Game.HP;
 using InGame.Game.Scoring.Mods;
@@ -17,13 +18,14 @@ namespace InGame.Game.Spawn
         public static BeatManager instance;
 
         [Header("Components")]
-        public GameManager gm;
-        public HPManager hp;
-        public AudioManager audioManager;
-        public AudioSource asource, spectrumAsource;
+        [SerializeField] private GameManager gm;
+        [SerializeField] private HPManager hp;
+        [SerializeField] private AudioManager audioManager;
+        [SerializeField] private AudioSource asource, spectrumAsource;
+        [SerializeField] private CheatEngine cheatEngine;
 
         public List<BeatCubeClass> Beats { get; private set; }
-        public List<IBeat> ActiveBeats { get; private set; } = new List<IBeat>();
+        public List<Beat> ActiveBeats { get; private set; } = new List<Beat>();
 
 
         [Header("Valuables")]
@@ -44,7 +46,6 @@ namespace InGame.Game.Spawn
         // Colors
         [HideInInspector] public Color32 leftSaberColor, rightSaberColor;
         [HideInInspector] public Color32 leftArrowColor, rightArrowColor;
-
 
         private Camera cam;
 
@@ -196,7 +197,7 @@ namespace InGame.Game.Spawn
 
         public void OnGameOver()
         {
-            List<IBeat> toDissolve = new List<IBeat>();
+            List<Beat> toDissolve = new List<Beat>();
             toDissolve.AddRange(ActiveBeats);
             toDissolve.ForEach(c => c.OnPoint(Vector2.zero, true));
 
@@ -287,7 +288,7 @@ namespace InGame.Game.Spawn
                 beat.type = BeatCubeClass.Type.Point;
 
 
-            IMemoryPool<Beat> pool;
+            BeatPool pool;
 
             switch (beat.type)
             {
@@ -304,23 +305,13 @@ namespace InGame.Game.Spawn
                 default: throw new System.Exception("Can't define pool for BeatCubeClass.Type " + beat.type);
             }
 
-            Beat b = pool.Spawn();
-
-            // Copensate error appeared due to limited fps
-            // Make offset to proper time
-            b.transform.position += new Vector3(0, 0, (asource.time - beat.time) * CubeSpeedPerSecond);
-
-            IBeat cube = b.GetComponent<IBeat>();
-            cube.Setup(gm, beat, cubesSpeed, this);
-
+            Beat b = pool.Spawn(beat, cubesSpeed);
 
             int road = beat.road == -1 ? GetBestSpawnPoint(beat) : beat.road;
             spawnPoints[road].Spawn(beat.type);
 
 
-            GetComponent<CheatEngine>().AddCube(cube);
-
-            ActiveBeats.Add(cube);
+            cheatEngine.AddCube(b);
         }
 
         public int GetBestSpawnPoint(BeatCubeClass beat)

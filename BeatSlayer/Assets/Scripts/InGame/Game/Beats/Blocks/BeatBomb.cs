@@ -1,26 +1,11 @@
-using InGame.Game.Spawn;
+using InGame.DI;
 using UnityEngine;
 using Zenject;
 
 namespace InGame.Game.Beats.Blocks
 {
-    public class BeatBomb : Beat, IBeat
+    public class BeatBomb : Beat
     {
-        public Transform Transform { get { return transform == null ? null : transform; } }
-
-
-        public BeatCubeClass cls;
-        public BeatCubeClass GetClass() { return cls; }
-
-        /// <summary>
-        /// Multiplier of cube calculated speed from 0 to 1
-        /// </summary>
-        public float SpeedMultiplier { get; set; }
-        public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
-
-        private BeatManager bm;
-        private GameManager gm;
-
         private bool isDead;
 
         private Pool pool;
@@ -34,12 +19,9 @@ namespace InGame.Game.Beats.Blocks
             this.effectPool = effectPool;
         }
 
-        public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
+        public override void Setup(BeatCubeClass cls, float cubesSpeed)
         {
-            this.gm = gm;
-            this.cls = cls;
-            SpeedMultiplier = 1;
-            this.bm = bm;
+            base.Setup(cls, cubesSpeed);
 
             if (cls.road == -1) cls.road = Random.Range(0, 3);
 
@@ -54,7 +36,7 @@ namespace InGame.Game.Beats.Blocks
         }
 
 
-        public void OnPoint(Vector2 direction, bool destroy = false)
+        public override void OnPoint(Vector2 direction, bool destroy = false)
         {
             if (destroy)
             {
@@ -67,7 +49,7 @@ namespace InGame.Game.Beats.Blocks
             Slice();
         }
 
-        public void Destroy()
+        public override void Destroy()
         {
             Slice();
         }
@@ -101,12 +83,8 @@ namespace InGame.Game.Beats.Blocks
             
         }
 
-        public class Pool : MonoMemoryPool<Beat>
+        public class Pool : BeatPool
         {
-            protected override void Reinitialize(Beat item)
-            {
-                
-            }
         }
     }
 }

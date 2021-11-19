@@ -535,22 +535,21 @@ public class GameManager : MonoBehaviour
 
     #region Beat cubes voids
 
-    public List<IBeat> activeCubes = new List<IBeat>();
+    public List<Beat> activeCubes = new List<Beat>();
     
-    public void MissedBeatCube(IBeat beat)
+    public void MissedBeatCube(Beat beat)
     {
         scoringManager.OnCubeMiss(beat);
 
-        if(beat.GetClass().type != BeatCubeClass.Type.Bomb)
+        if(beat.Model.type != BeatCubeClass.Type.Bomb)
         {
             missAnim.OnMiss();
             UseSkill();
         }
 
         cheatEngine.RemoveCube(beat);
-        beatManager.ActiveBeats.Remove(beat);
 
-        switch (beat.GetClass().type)
+        switch (beat.Model.type)
         {
             case BeatCubeClass.Type.Point:
             case BeatCubeClass.Type.Dir:
@@ -564,14 +563,14 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void BeatCubeSliced(IBeat beat)
+    public void BeatCubeSliced(Beat beat)
     {
         if (Settings.Sound.SliceEffectEnabled)
         {
             AndroidNativeAudio.play(Payload.HitSoundIds[UnityEngine.Random.Range(0, Payload.HitSoundIds.Count)], Settings.Sound.SliceEffectVolume * 0.001f);
         }
 
-        if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
+        if(beat.Model.type == BeatCubeClass.Type.Bomb)
         {
             missAnim.OnMiss();
         }
@@ -581,7 +580,7 @@ public class GameManager : MonoBehaviour
 
         beatManager.ActiveBeats.Remove(beat);
 
-        switch (beat.GetClass().type)
+        switch (beat.Model.type)
         {
             case BeatCubeClass.Type.Point:
             case BeatCubeClass.Type.Dir:
@@ -595,7 +594,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-    public void BeatLineSliced(IBeat beat)
+    public void BeatLineSliced(Beat beat)
     {
         scoringManager.OnLineHit();
         cheatEngine.RemoveCube(beat);
@@ -679,7 +678,7 @@ public class GameManager : MonoBehaviour
 
     void Explode()
     {
-        foreach (IBeat cube in activeCubes)
+        foreach (Beat cube in activeCubes)
         {
             cube.Destroy();
         }

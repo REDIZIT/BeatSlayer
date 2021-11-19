@@ -34185,6 +34185,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e75c3f5704fae49ba2cb414f529959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 1901715879}
+  beatManager: {fileID: 1901715892}
   cubeSliceEffectPrefab: {fileID: 6399446966512558054, guid: b4560cbca3cea944594d0dea14271707,
     type: 3}
   cubePrefab: {fileID: 5246573814853622201, guid: 8c1737f44538e5b4391d66a1e27c62bd,
@@ -48892,6 +48894,7 @@ MonoBehaviour:
   dislikeBtnImg: {fileID: 297792643}
   paused: 0
   gameCompleted: 0
+  activeCubes: []
 --- !u!114 &1901715880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49170,6 +49173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bm: {fileID: 1901715892}
   asource: {fileID: 1813542389}
+  beats: []
   keys:
   - {fileID: 1699539544}
   - {fileID: 1482777665}
@@ -49199,6 +49203,7 @@ MonoBehaviour:
   audioManager: {fileID: 1901715876}
   asource: {fileID: 1813542389}
   spectrumAsource: {fileID: 1555360461}
+  cheatEngine: {fileID: 1901715891}
   secondHeight: 0
   fieldLength: 0
   fieldCrossTime: 0

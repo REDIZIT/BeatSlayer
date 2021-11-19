@@ -19,7 +19,7 @@ public class CheatEngine : MonoBehaviour
     public BeatManager bm;
     
     public AudioSource asource;
-    public List<IBeat> Beats => bm.ActiveBeats;
+    public List<Beat> beats = new List<Beat>();
 
     public Image[] keys;
 
@@ -49,51 +49,24 @@ public class CheatEngine : MonoBehaviour
             asource.pitch = pitch;
         }
 
-        if(Beats.Count > 0)
+        if(beats.Count > 0)
         {
-            //List<BeatCube> cubesToSlice = cubes.Where(c => c != null && Mathf.Abs(c.transform.position.z - transform.position.z) < 30).ToList();
-            //if (Input.GetKeyDown(KeyCode.E))
-            //{
-            //    keys[2].color = new Color(1f, 0.6f, 0, 0.8f);
-            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == 1.25f);
-            //    if(cube != null) cube.OnPoint(Vector2.zero);
-            //}
-            //if (Input.GetKeyDown(KeyCode.W))
-            //{
-            //    keys[1].color = new Color(1f, 0.6f, 0, 0.8f);
-            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == -1.25f);
-            //    if (cube != null) cube.OnPoint(Vector2.zero);
-            //}
-            //if (Input.GetKeyDown(KeyCode.Q))
-            //{
-            //    keys[0].color = new Color(1f, 0.6f, 0, 0.8f);
-            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == -3.5f);
-            //    if (cube != null) cube.OnPoint(Vector2.zero);
-            //}
-            //if (Input.GetKeyDown(KeyCode.R))
-            //{
-            //    keys[3].color = new Color(1f, 0.6f, 0, 0.8f);
-            //    BeatCube cube = cubesToSlice.Find(c => c.transform.position.x == 3.5f);
-            //    if (cube != null) cube.OnPoint(Vector2.zero);
-            //}
-
-
             if (autoSaber)
             {
 
                 //List<IBeat> toPing = beats.Where(c => c != null && c.Transform != null && c.Transform.position.z - transform.position.z < 30).ToList();
-                List<IBeat> toPing = new List<IBeat>();
+                List<Beat> toPing = new List<Beat>();
 
-                foreach (IBeat beat in Beats)
+                foreach (Beat beat in beats)
                 {
                     if (beat == null) continue;
-                    if (beat.GetClass() == null) continue;
+                    if (beat.Model == null) continue;
 
                     try
                     {
                         if (beat.Transform == null) continue;
                     }
-                    catch(Exception err)
+                    catch
                     {
                         continue;
                     }
@@ -104,14 +77,14 @@ public class CheatEngine : MonoBehaviour
                     }
                 }
 
-                foreach (IBeat cube in toPing)
+                foreach (Beat cube in toPing)
                 {
-                    if(cube.GetClass().type != BeatCubeClass.Type.Line)
+                    if(cube.Model.type != BeatCubeClass.Type.Line)
                     {
                         if (makeMisses > 0) continue;
                     }
 
-                    if (cube.GetClass().type == BeatCubeClass.Type.Bomb) continue;
+                    if (cube.Model.type == BeatCubeClass.Type.Bomb) continue;
 
                     cube.OnPoint(Vector2.zero, true);
                 }
@@ -143,16 +116,16 @@ public class CheatEngine : MonoBehaviour
         }
     }
 
-    public void AddCube(IBeat cube)
+    public void AddCube(Beat cube)
     {
         if (!Application.isEditor) return;
 
-        //Beats.Add(cube);
+        beats.Add(cube);
     }
-    public void RemoveCube(IBeat beat)
+    public void RemoveCube(Beat beat)
     {
         if (!Application.isEditor) return;
-        //Beats.Remove(beat);
+        beats.Remove(beat);
 
         if (makeMisses > 0) makeMisses--;
     }

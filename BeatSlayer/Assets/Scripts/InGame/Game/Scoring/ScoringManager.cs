@@ -135,9 +135,9 @@ namespace InGame.Game
             };
         }
 
-        public void OnCubeHit(IBeat beat)
+        public void OnCubeHit(Beat beat)
         {
-            if(beat.GetClass().type == BeatCubeClass.Type.Bomb)
+            if(beat.Model.type == BeatCubeClass.Type.Bomb)
             {
                 CubeMissRemoveScore();
                 gm.tutorial.OnBombHit();
@@ -153,9 +153,9 @@ namespace InGame.Game
             Replay.CubesSliced++;
             comboValue += 1;
         }
-        public void OnCubeMiss(IBeat beat)
+        public void OnCubeMiss(Beat beat)
         {
-            if (beat.GetClass().type == BeatCubeClass.Type.Bomb)
+            if (beat.Model.type == BeatCubeClass.Type.Bomb)
             {
                 CubeHitAddScore();
             }

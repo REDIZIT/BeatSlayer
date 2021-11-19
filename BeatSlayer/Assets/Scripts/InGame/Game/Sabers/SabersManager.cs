@@ -173,7 +173,7 @@ namespace InGame.Game.Sabers
             int xOffset = saberSide == -1 ? 14 : saberSide == 1 ? -14 : 0;
 
             List<RaycastHit> hits = new List<RaycastHit>();
-            List<IBeat> cubesToPing = new List<IBeat>();
+            List<Beat> cubesToPing = new List<Beat>();
             int raycastedCount = 0;
             for (int i = 0; i < samples; i++)
             {
@@ -188,7 +188,7 @@ namespace InGame.Game.Sabers
 
                 if (i == samples - 1)
                 {
-                    raycasted.RemoveAll(c => GetComponent<IBeat>()?.GetClass().type == BeatCubeClass.Type.Bomb);
+                    raycasted.RemoveAll(c => GetComponent<Beat>()?.Model.type == BeatCubeClass.Type.Bomb);
                 }
 
                 hits.AddRange(raycasted);
@@ -198,16 +198,16 @@ namespace InGame.Game.Sabers
             foreach (RaycastHit hit in hits.Distinct().OrderBy(c => c.point.z))
             {
                 if (hit.point.z > bm.playAreaZ + 10) continue;
-                IBeat beat = hit.transform.GetComponent<IBeat>();
+                Beat beat = hit.transform.GetComponent<Beat>();
                 if (beat == null)
                 {
-                    beat = hit.transform.parent.GetComponent<IBeat>();
+                    beat = hit.transform.parent.GetComponent<Beat>();
                 }
 
 
                 if (beat != null)
                 {
-                    if (beat.GetClass().type == BeatCubeClass.Type.Bomb)
+                    if (beat.Model.type == BeatCubeClass.Type.Bomb)
                     {
                         if (hit.point.z <= bm.playAreaZ) cubesToPing.Add(beat);
                     }
@@ -215,9 +215,9 @@ namespace InGame.Game.Sabers
                 }
             }
 
-            foreach (IBeat beat in cubesToPing.Distinct())
+            foreach (Beat beat in cubesToPing.Distinct())
             {
-                int beatSaberType = beat.GetClass().saberType;
+                int beatSaberType = beat.Model.saberType;
                 if (beatSaberType == saberSide || beatSaberType == 0 || Application.isEditor)
                 {
                     beat.OnPoint(dir);

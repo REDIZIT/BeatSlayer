@@ -1,17 +1,10 @@
-﻿using InGame.Game.Spawn;
+﻿using InGame.DI;
+using InGame.Game.Spawn;
 using UnityEngine;
 using Zenject;
 
-public class BeatLine : Beat, IBeat
+public class BeatLine : Beat
 {
-    public Transform Transform { get { return transform; } }
-    public BeatCubeClass cls;
-    
-    public BeatCubeClass GetClass() { return cls; }
-
-    BeatManager bm;
-    GameManager gm;
-
     public Transform firstCap, secondCap;
     public CapsuleCollider lineCollider;
     public Transform cylinder;
@@ -19,10 +12,6 @@ public class BeatLine : Beat, IBeat
     float lineEndPosition;
     float lineTime;
     public float secondCapRoadPos;
-
-
-    public float SpeedMultiplier { get; set; }
-    public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
 
 
     public Transform firstAnimCap, secondAnimCap;
@@ -39,13 +28,10 @@ public class BeatLine : Beat, IBeat
         this.effectSystemPool = effectSystemPool;
     }
 
-    public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
+    public override void Setup(BeatCubeClass cls, float cubesSpeed)
     {
-        this.gm = gm;
-        this.cls = cls;
-        this.bm = bm;
+        base.Setup(cls, cubesSpeed);
 
-        Reset();
         effectSystem = effectSystemPool.Spawn();
 
         float y = cls.level == 0 ? 0.8f : bm.secondHeight;
@@ -167,7 +153,7 @@ public class BeatLine : Beat, IBeat
     }
 
 
-    public void OnPoint(Vector2 direction, bool destroy = false)
+    public override void OnPoint(Vector2 direction, bool destroy = false)
     {
         if (destroy)
         {
@@ -198,7 +184,7 @@ public class BeatLine : Beat, IBeat
         pool.Despawn(this);
     }
 
-    public void Destroy()
+    public override void Destroy()
     {
         OnLineSliced();
     }
@@ -207,12 +193,9 @@ public class BeatLine : Beat, IBeat
     {
         firstCap.localPosition = Vector3.zero;
         secondCap.localPosition = Vector3.zero;
+        SpeedMultiplier = 1;
     }
-    public class Pool : MonoMemoryPool<Beat>
+    public class Pool : BeatPool
     {
-        protected override void Reinitialize(Beat item)
-        {
-            item.Reset();
-        }
     }
 }

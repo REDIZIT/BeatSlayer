@@ -1,17 +1,10 @@
-﻿using InGame.Game.Spawn;
-using System.Collections;
+﻿using InGame.DI;
 using UnityEngine;
 using Zenject;
 
-public class BeatCube : Beat, IBeat
+public class BeatCube : Beat
 {
-    public Transform Transform { get { return transform == null ? null : transform; } }
-
-
-    public BeatCubeClass cls;
-    public BeatCubeClass GetClass() { return cls; }
-
-    public MeshRenderer renderer;
+    public new MeshRenderer renderer;
     public MeshFilter filter;
 
     [SerializeField] private ParticleSystem cubeDissovleParticleSystem;
@@ -22,21 +15,12 @@ public class BeatCube : Beat, IBeat
 
     public Mesh pointMesh;
 
-    /// <summary>
-    /// Multiplier of cube calculated speed from 0 to 1
-    /// </summary>
-    public float SpeedMultiplier { get; set; }
-    public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
-
     private float materialThreshold;
     private float thresholdChange;
 
     private bool isDead;
 
     private new BoxCollider collider;
-
-    private BeatManager bm;
-    private GameManager gm;
 
     private Pool pool;
     private SliceEffectSystem.Pool sliceEffectPool;
@@ -48,14 +32,9 @@ public class BeatCube : Beat, IBeat
         this.sliceEffectPool = sliceEffectPool;
     }
 
-    public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
+    public override void Setup(BeatCubeClass cls, float cubesSpeed)
     {
-        this.gm = gm;
-        this.cls = cls;
-        SpeedMultiplier = 1;
-        this.bm = bm;
-
-        Reset();
+        base.Setup(cls, cubesSpeed);
 
         if (cls.type == BeatCubeClass.Type.Point)
         {
@@ -129,7 +108,7 @@ public class BeatCube : Beat, IBeat
     }
 
 
-    public void OnPoint(Vector2 direction, bool destroy = false)
+    public override void OnPoint(Vector2 direction, bool destroy = false)
     {
         if (destroy)
         {
@@ -139,7 +118,6 @@ public class BeatCube : Beat, IBeat
 
         if (direction.normalized == Vector2.zero) return;
 
-        //Debug.Log("On point");
 
         direction = new Vector3(-direction.x, direction.y);
 
@@ -149,13 +127,13 @@ public class BeatCube : Beat, IBeat
         if (degrees < 0) degrees = 360 + degrees;
 
 
-        float i = Mathf.Repeat((int)cls.subType + 4, 8);
+        float i = Mathf.Repeat((int)Model.subType + 4, 8);
         float targetDeg = i * 45;
-        //float targetDeg = (int) cls.subType * 45;
+
         float anglediff = (degrees - targetDeg + 180 + 360) % 360 - 180;
 
 
-        if (cls.type == BeatCubeClass.Type.Point || cls.type == BeatCubeClass.Type.Bomb)
+        if (Model.type == BeatCubeClass.Type.Point || Model.type == BeatCubeClass.Type.Bomb)
         {
             Slice(degrees);
         }
@@ -165,7 +143,7 @@ public class BeatCube : Beat, IBeat
         }
     }
 
-    public void Destroy()
+    public override void Destroy()
     {
         Slice(Random.Range(0, 360));
     }
@@ -199,7 +177,7 @@ public class BeatCube : Beat, IBeat
         Quaternion rotation = Quaternion.LookRotation((transform.position - gm.transform.position).normalized);
         transform.rotation = rotation;
 
-        float angle = (int)cls.subType * 45;
+        float angle = (int)Model.subType * 45;
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, angle);
     }
 
@@ -229,7 +207,7 @@ public class BeatCube : Beat, IBeat
         }
         else
         {
-            sliceEffectPool.Spawn().Play(transform.position, angle, cls.type);
+            sliceEffectPool.Spawn().Play(transform.position, angle, Model.type);
         }
 
         thresholdChange = 4;
@@ -258,6 +236,8 @@ public class BeatCube : Beat, IBeat
         collider.enabled = true;
         isDead = false;
 
+        SpeedMultiplier = 1;
+
         materialThreshold = 0.5f;
         thresholdChange = -1;
         foreach (Material material in renderer.materials)
@@ -266,11 +246,7 @@ public class BeatCube : Beat, IBeat
         }
     }
 
-    public class Pool : MonoMemoryPool<Beat>
+    public class Pool : BeatPool
     {
-        protected override void Reinitialize(Beat item)
-        {
-            item.Reset();
-        }
     }
 }
