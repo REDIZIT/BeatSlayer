@@ -1,6 +1,5 @@
 using InGame.Game.Spawn;
 using UnityEngine;
-
 public interface IBeat
 {
     Transform Transform { get; }

@@ -1,7 +1,8 @@
 ﻿using InGame.Game.Spawn;
 using UnityEngine;
+using Zenject;
 
-public class BeatLine : MonoBehaviour, IBeat
+public class BeatLine : Beat, IBeat
 {
     public Transform Transform { get { return transform; } }
     public BeatCubeClass cls;
@@ -14,7 +15,6 @@ public class BeatLine : MonoBehaviour, IBeat
     public Transform firstCap, secondCap;
     public CapsuleCollider lineCollider;
     public Transform cylinder;
-    public ParticleSystem psystem;
 
     float lineEndPosition;
     float lineTime;
@@ -28,11 +28,25 @@ public class BeatLine : MonoBehaviour, IBeat
     public Transform firstAnimCap, secondAnimCap;
     Vector3 firstCapRotation, secondCapRotation;
 
+    private Pool pool;
+    private SliceEffectSystem.Pool effectSystemPool;
+    private SliceEffectSystem effectSystem;
+
+    [Inject]
+    private void Construct(Pool pool, SliceEffectSystem.Pool effectSystemPool)
+    {
+        this.pool = pool;
+        this.effectSystemPool = effectSystemPool;
+    }
+
     public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
     {
         this.gm = gm;
         this.cls = cls;
         this.bm = bm;
+
+        Reset();
+        effectSystem = effectSystemPool.Spawn();
 
         float y = cls.level == 0 ? 0.8f : bm.secondHeight;
         Vector3 pos = new Vector3(bm.GetPositionByRoad(cls.road), y, 100);
@@ -58,11 +72,7 @@ public class BeatLine : MonoBehaviour, IBeat
             Debug.LogError("Line BUG! Line end time is zero! Value / 0 = Infinity = Unity BAG!!");
         }
 
-        //capMax = lineEndTime * (CurrentSpeed / Time.deltaTime);
-
         lineEndPosition = lineTime * bm.LineLengthMultiplier;
-        //lineEndPosition = lineTime * bm.fieldLength * bm.LineLengthMultiplier;
-        //Debug.Log($"{capMax} = {lineEndTime} * ({bm.fieldLength} / {bm.fieldCrossTime}) / {CurrentSpeed}");
     }
 
     void Update()
@@ -74,15 +84,15 @@ public class BeatLine : MonoBehaviour, IBeat
         AnimateCaps();
     }
 
-    public float totalDist;
     void Movement()
     {
         transform.position += new Vector3(0, 0, -CurrentSpeed);
-        totalDist += CurrentSpeed;
         if (firstCap.position.z <= bm.maxDistance)
         {
             gm.MissedBeatCube(this);
-            Destroy(gameObject);
+
+            effectSystem.Stop();
+            pool.Despawn(this);
         }
     }
     void CapMovement()
@@ -165,19 +175,17 @@ public class BeatLine : MonoBehaviour, IBeat
             return;
         }
 
-        float lineEndTime = cls.linePoints.Count > 0 ? cls.linePoints[1].z : cls.lineLenght; // Use new or legacy way
-        //float capMax = lineEndTime * bm.fieldLength;
-
         // Offset to selected road second cap at spawn
         float capRoadOffsetTime = lineEndPosition / CurrentSpeed;
         float capRoadOffsetDistance = secondCapRoadPos - transform.position.x;
         float capRoadOffsetSpeed = capRoadOffsetDistance / capRoadOffsetTime;
 
         gm.BeatLineHold();
-        psystem.Play();
 
         firstCap.transform.localPosition += new Vector3(capRoadOffsetSpeed, 0, CurrentSpeed);
-        if(firstCap.transform.localPosition.z >= lineEndPosition)
+        effectSystem.Play(firstCap.transform.position, 0, BeatCubeClass.Type.Line);
+
+        if (firstCap.transform.localPosition.z >= lineEndPosition)
         {
             OnLineSliced();
         }
@@ -185,15 +193,26 @@ public class BeatLine : MonoBehaviour, IBeat
 
     void OnLineSliced()
     {
-        psystem.transform.parent = null;
-        psystem.Stop();
+        effectSystem.Stop();
         gm.BeatLineSliced(this);
-        Destroy(gameObject);
+        pool.Despawn(this);
     }
 
     public void Destroy()
     {
         OnLineSliced();
     }
-    
+
+    public override void Reset()
+    {
+        firstCap.localPosition = Vector3.zero;
+        secondCap.localPosition = Vector3.zero;
+    }
+    public class Pool : MonoMemoryPool<Beat>
+    {
+        protected override void Reinitialize(Beat item)
+        {
+            item.Reset();
+        }
+    }
 }

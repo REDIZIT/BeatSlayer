@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Zenject;
 
-public class BeatCube : MonoBehaviour, IBeat
+public class BeatCube : Beat, IBeat
 {
     public Transform Transform { get { return transform == null ? null : transform; } }
 
@@ -216,7 +216,7 @@ public class BeatCube : MonoBehaviour, IBeat
         {
             gm.MissedBeatCube(this);
 
-            Destroy(gameObject);
+            pool.Despawn(this);
         }
     }
 
@@ -229,7 +229,7 @@ public class BeatCube : MonoBehaviour, IBeat
         }
         else
         {
-            sliceEffectPool.Spawn(transform.position, angle);
+            sliceEffectPool.Spawn().Play(transform.position, angle, cls.type);
         }
 
         thresholdChange = 4;
@@ -249,12 +249,11 @@ public class BeatCube : MonoBehaviour, IBeat
         SpeedMultiplier -= (SpeedMultiplier - Time.deltaTime) / 8f;
         if (materialThreshold >= 1)
         {
-            //Destroy(gameObject);
             pool.Despawn(this);
         }
     }
 
-    private void Reset()
+    public override void Reset()
     {
         collider.enabled = true;
         isDead = false;
@@ -267,9 +266,9 @@ public class BeatCube : MonoBehaviour, IBeat
         }
     }
 
-    public class Pool : MonoMemoryPool<BeatCube>
+    public class Pool : MonoMemoryPool<Beat>
     {
-        protected override void Reinitialize(BeatCube item)
+        protected override void Reinitialize(Beat item)
         {
             item.Reset();
         }

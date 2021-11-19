@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using InGame.Game.Beats.Blocks;
 using InGame.Game.HP;
 using InGame.Game.Scoring.Mods;
 using InGame.Multiplayer.Lobby;
@@ -55,7 +56,6 @@ namespace InGame.Game.Spawn
                 float dspeed = gm.difficulty.speed;
 
                 float speed = fieldLength / fieldCrossTime;
-                //speed /= dspeed;
 
                 return speed * asource.pitch * modsSpeedMultiplayer * dspeed;
             }
@@ -105,13 +105,15 @@ namespace InGame.Game.Spawn
         private float musicOffset;
 
         private BeatCube.Pool beatPool;
-        private SliceEffectSystem.Pool effectPool;
+        private BeatLine.Pool linePool;
+        private BeatBomb.Pool bombPool;
 
         [Inject]
-        private void Construct(BeatCube.Pool beatPool, SliceEffectSystem.Pool effectPool)
+        private void Construct(BeatCube.Pool beatPool, BeatLine.Pool linePool, BeatBomb.Pool bombPool)
         {
             this.beatPool = beatPool;
-            this.effectPool = effectPool;
+            this.linePool = linePool;
+            this.bombPool = bombPool;
         }
 
 
@@ -254,16 +256,11 @@ namespace InGame.Game.Spawn
             // If faster, make a delay before spawning
             // Delay = timeOffset
 
-            //float timeOffset = fieldCrossTime * (cls.speed - 1);
-            //timeOffset /= cls.speed * gm.difficulty.speed;
-
             float dspeed = gm.difficulty.speed;
 
             float offset = fieldCrossTime / dspeed / cls.speed;
 
             return cls.time - offset - musicOffset;
-            // Return absolute time
-            //return cls.time + timeOffset;
         }
 
 
@@ -276,11 +273,6 @@ namespace InGame.Game.Spawn
 
             fieldLength = distanceSpawnAndPlayArea + SettingsManager.Settings.Gameplay.CubesSuncOffset; // Длина поля в юнитах (где летят кубы)
             fieldCrossTime = 1.5f; // Время за которое куб должен преодолеть поле (в секундах)
-            //fieldCrossTime = 1.3f; // Время за которое куб должен преодолеть поле (в секундах)
-            //fieldCrossTime = .5f; // Время за которое куб должен преодолеть поле (в секундах)
-            //fieldCrossTime = 1f; // Время за которое куб должен преодолеть поле (в секундах)
-            //fieldCrossTime = 2f; // Время за которое куб должен преодолеть поле (в секундах)
-            //fieldCrossTime = 5f; // Время за которое куб должен преодолеть поле (в секундах)
         }
 
 
@@ -294,41 +286,31 @@ namespace InGame.Game.Spawn
             if (beat.type == BeatCubeClass.Type.Dir && gm.scoringManager.Replay.Mods.HasFlag(ModEnum.NoArrows))
                 beat.type = BeatCubeClass.Type.Point;
 
-            GameObject prefab;
+
+            IMemoryPool<Beat> pool;
+
             switch (beat.type)
             {
                 case BeatCubeClass.Type.Dir:
                 case BeatCubeClass.Type.Point:
-                    prefab = cubePrefab; break;
+                    pool = beatPool; break;
 
                 case BeatCubeClass.Type.Line:
-                    prefab = linePrefab; break;
+                    pool = linePool; break;
 
                 case BeatCubeClass.Type.Bomb:
-                    prefab = bombPrefab; break;
+                    pool = bombPool; break;
 
-                default:
-                    prefab = null; break;
+                default: throw new System.Exception("Can't define pool for BeatCubeClass.Type " + beat.type);
             }
 
+            Beat b = pool.Spawn();
 
-            GameObject t;
-            if (beat.type == BeatCubeClass.Type.Dir || beat.type == BeatCubeClass.Type.Point)
-            {
-                t = beatPool.Spawn().gameObject;
-            }
-            else
-            {
-                t = Instantiate(prefab);
-            }
-
-
-            t.transform.name = prefab.name;
             // Copensate error appeared due to limited fps
             // Make offset to proper time
-            t.transform.position += new Vector3(0, 0, (asource.time - beat.time) * CubeSpeedPerSecond);
+            b.transform.position += new Vector3(0, 0, (asource.time - beat.time) * CubeSpeedPerSecond);
 
-            IBeat cube = t.GetComponent<IBeat>();
+            IBeat cube = b.GetComponent<IBeat>();
             cube.Setup(gm, beat, cubesSpeed, this);
 
 

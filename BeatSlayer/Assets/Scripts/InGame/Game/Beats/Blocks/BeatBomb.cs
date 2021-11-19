@@ -1,9 +1,10 @@
 using InGame.Game.Spawn;
 using UnityEngine;
+using Zenject;
 
 namespace InGame.Game.Beats.Blocks
 {
-    public class BeatBomb : MonoBehaviour, IBeat
+    public class BeatBomb : Beat, IBeat
     {
         public Transform Transform { get { return transform == null ? null : transform; } }
 
@@ -17,15 +18,21 @@ namespace InGame.Game.Beats.Blocks
         public float SpeedMultiplier { get; set; }
         public float CurrentSpeed { get { return bm.CubeSpeedPerFrame * cls.speed; } }
 
-
-        [SerializeField] private ParticleSystem bombParticleSystem;
-
         private BeatManager bm;
         private GameManager gm;
 
         private bool isDead;
 
-        
+        private Pool pool;
+        private SliceEffectSystem.Pool effectPool;
+
+
+        [Inject]
+        private void Construct(Pool pool, SliceEffectSystem.Pool effectPool)
+        {
+            this.pool = pool;
+            this.effectPool = effectPool;
+        }
 
         public void Setup(GameManager gm, BeatCubeClass cls, float cubesSpeed, BeatManager bm)
         {
@@ -51,28 +58,30 @@ namespace InGame.Game.Beats.Blocks
         {
             if (destroy)
             {
-                Slice(0);
+                Slice();
                 return;
             }
 
             if (direction.normalized == Vector2.zero) return;
 
-            Slice(0);
+            Slice();
         }
 
         public void Destroy()
         {
-            Slice(Random.Range(0, 360));
+            Slice();
         }
 
-        void Slice(float angle)
+        void Slice()
         {
             if (isDead) return;
             isDead = true;
 
             gm.BeatCubeSliced(this);
 
-            OnSlice(angle);
+            pool.Despawn(this);
+
+            effectPool.Spawn().Play(transform.position, 0, BeatCubeClass.Type.Bomb);
         }
 
 
@@ -83,18 +92,21 @@ namespace InGame.Game.Beats.Blocks
             {
                 gm.MissedBeatCube(this);
 
-                Destroy(gameObject);
+                pool.Despawn(this);
             }
         }
 
-        void OnSlice(float angle)
+        public override void Reset()
         {
-            bombParticleSystem.gameObject.SetActive(true);
-            bombParticleSystem.transform.parent = null;
-            bombParticleSystem.transform.eulerAngles = new Vector3(0, 0, angle);
-            bombParticleSystem.Play();
+            
+        }
 
-            Destroy(gameObject);
+        public class Pool : MonoMemoryPool<Beat>
+        {
+            protected override void Reinitialize(Beat item)
+            {
+                
+            }
         }
     }
 }

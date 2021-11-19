@@ -34189,6 +34189,11 @@ MonoBehaviour:
     type: 3}
   cubePrefab: {fileID: 5246573814853622201, guid: 8c1737f44538e5b4391d66a1e27c62bd,
     type: 3}
+  bombPrefab: {fileID: 3725440852304195483, guid: 7e97a367362f6f545a334a3193ba46dc,
+    type: 3}
+  linePrefab: {fileID: 5586058274515205648, guid: b9e3623f049e48c44ba84444d0710065,
+    type: 3}
+  poolContent: {fileID: 1367497078}
 --- !u!1 &1163323234
 GameObject:
   m_ObjectHideFlags: 0
@@ -41823,6 +41828,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1351609808}
   m_CullTransparentMesh: 0
+--- !u!1 &1367497077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1367497078}
+  m_Layer: 0
+  m_Name: BeatCubes Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1367497078
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367497077}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1386725028
 GameObject:
   m_ObjectHideFlags: 0
