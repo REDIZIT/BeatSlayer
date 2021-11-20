@@ -153,7 +153,7 @@ public class BeatCube : Beat
         if (isDead) return;
         isDead = true;
 
-        gm.BeatCubeSliced   (this);
+        gm.BeatCubeSliced(this);
 
         OnSlice(angle, dissolve);
     }
